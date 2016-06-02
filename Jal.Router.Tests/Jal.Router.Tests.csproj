@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B4BA67C0-C664-4F4A-B3B3-38D837B46163}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Jal.Router.Tests</RootNamespace>
+    <AssemblyName>Jal.Router.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core.3.3.0\lib\net40-client\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\packages\Castle.Windsor.3.3.0\lib\net40\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Factory, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Jal.Factory.1.0.12.0\lib\net40\Jal.Factory.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Factory.Installer, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Jal.Factory.Installer.1.0.9.0\lib\net40\Jal.Factory.Installer.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Finder">
+      <HintPath>..\packages\Jal.Finder.1.0.0.0\lib\net40\Jal.Finder.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Locator, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Jal.Locator.1.0.6.0\lib\net40\Jal.Locator.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Locator.CastleWindsor, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Jal.Locator.CastleWindsor.1.0.4.0\lib\net40\Jal.Locator.CastleWindsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Settings, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Jal.Settings.1.0.4.0\lib\net40\Jal.Settings.dll</HintPath>
+    </Reference>
+    <Reference Include="Jal.Settings.Installer">
+      <HintPath>..\packages\Jal.Settings.Installer.1.0.2.0\lib\net40\Jal.Settings.Installer.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.core.interfaces">
+      <HintPath>..\packages\AutoFixture.NUnit2.3.36.12\lib\net40\nunit.core.interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture">
+      <HintPath>..\packages\AutoFixture.3.36.12\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.AutoMoq">
+      <HintPath>..\packages\AutoFixture.AutoMoq.3.36.12\lib\net40\Ploeh.AutoFixture.AutoMoq.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.NUnit2">
+      <HintPath>..\packages\AutoFixture.NUnit2.3.36.12\lib\net40\Ploeh.AutoFixture.NUnit2.dll</HintPath>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.NUnit2.Addins">
+      <HintPath>..\packages\AutoFixture.NUnit2.3.36.12\lib\net40\Ploeh.AutoFixture.NUnit2.Addins.dll</HintPath>
+    </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\packages\Shouldly.2.6.0\lib\net40\Shouldly.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attribute\ModelValidatorBuilderAttribute.cs" />
+    <Compile Include="Impl\OtherRequestSender.cs" />
+    <Compile Include="Impl\RequestSender.cs" />
+    <Compile Include="Impl\RouterConfigurationSource.cs" />
+    <Compile Include="Integration\Tests.cs" />
+    <Compile Include="LocalAddin.cs" />
+    <Compile Include="ModelValidatorTests.cs" />
+    <Compile Include="Model\Response.cs" />
+    <Compile Include="Model\Request.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Jal.Router.Installer\Jal.Router.Installer.csproj">
+      <Project>{9C5F53E5-A886-42FD-83D4-5C780786E6C4}</Project>
+      <Name>Jal.Router.Installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj">
+      <Project>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</Project>
+      <Name>Jal.Router</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
