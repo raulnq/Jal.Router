@@ -4,7 +4,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class MessageRouterConfigurationFluentBuilder<TRequest>
+    public class MessageRouterConfigurationFluentBuilder<TMessage>
     {
         private readonly ObjectFactoryConfigurationItem _objectFactoryConfigurationItem;
 
@@ -12,14 +12,14 @@ namespace Jal.Router.Fluent.Impl
         {
             _objectFactoryConfigurationItem = objectFactoryConfigurationItem;
 
-            _objectFactoryConfigurationItem.TargetType = typeof(TRequest);
+            _objectFactoryConfigurationItem.TargetType = typeof(TMessage);
         }
 
-        public MessageRouterConfigurationEndFluentBuilder<TRequest> To<TSubmitter>() where TSubmitter : IMessageSender<TRequest>
+        public MessageRouterConfigurationEndFluentBuilder<TMessage> To<THandler>() where THandler : IMessageHandler<TMessage>
         {
-            _objectFactoryConfigurationItem.ResultType = typeof(TSubmitter);
+            _objectFactoryConfigurationItem.ResultType = typeof(THandler);
 
-            return new MessageRouterConfigurationEndFluentBuilder<TRequest>(_objectFactoryConfigurationItem);
+            return new MessageRouterConfigurationEndFluentBuilder<TMessage>(_objectFactoryConfigurationItem);
         }
     }
 }

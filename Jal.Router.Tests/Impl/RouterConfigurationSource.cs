@@ -7,13 +7,13 @@ namespace Jal.Router.Tests.Impl
     {
         public MessageRouterConfigurationSource()
         {
-            Route<Request>().To<MessageSender>();
-            Route<Request>().To<OtherMessageSender>();
+            Route<Request>().To<MessageHandler>();
+            Route<Request>().To<OtherMessageHandler>();
 
             Route<Request>("Route", x =>
                            {
-                               x.To<MessageSender>();
-                               x.To<OtherMessageSender>();
+                               x.To<MessageHandler>();
+                               x.To<OtherMessageHandler>();
                            });
         }
     }

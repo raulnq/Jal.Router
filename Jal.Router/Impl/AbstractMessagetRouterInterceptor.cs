@@ -8,19 +8,19 @@ namespace Jal.Router.Impl
         public static IMessagetRouterInterceptor Instance = new NullMessagetRouterInterceptor();
 
 
-        public void OnEntry<TMessage>(TMessage message, IMessageSender<TMessage> sender)
+        public void OnEntry<TMessage>(TMessage message, IMessageHandler<TMessage> handler)
         {
         }
 
-        public void OnExit<TMessage>(TMessage message, IMessageSender<TMessage> sender)
+        public void OnExit<TMessage>(TMessage message, IMessageHandler<TMessage> handler)
         {
         }
 
-        public void OnSuccess<TMessage>(TMessage message, IMessageSender<TMessage> sender)
+        public void OnSuccess<TMessage>(TMessage message, IMessageHandler<TMessage> handler)
         {
         }
 
-        public void OnError<TMessage>(TMessage message, IMessageSender<TMessage> sender, Exception ex)
+        public void OnError<TMessage>(TMessage message, IMessageHandler<TMessage> handler, Exception ex)
         {
         }
     }

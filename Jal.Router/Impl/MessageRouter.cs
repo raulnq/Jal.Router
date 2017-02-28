@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class MessageRouter : IMessageRouter
     {
-        public MessageRouter(IMessageSenderProvider provider)
+        public MessageRouter(IMessageHandlerProvider provider)
         {
             Provider = provider;
 
@@ -20,28 +20,28 @@ namespace Jal.Router.Impl
 
         public void Route<TMessage>(TMessage message, string route)
         {
-            var senders = Provider.Provide<TMessage>(message, route);
+            var handlers = Provider.Provide<TMessage>(message, route);
 
-            if (senders != null && senders.Length > 0)
+            if (handlers != null && handlers.Length > 0)
             {
-                foreach (var r in senders)
+                foreach (var handler in handlers)
                 {
                     try
                     {
-                        Interceptor.OnEntry(message, r);
+                        Interceptor.OnEntry(message, handler);
 
-                        r.Send(message);
+                        handler.Handle(message);
 
-                        Interceptor.OnSuccess(message, r);
+                        Interceptor.OnSuccess(message, handler);
                     }
                     catch (Exception ex)
                     {
-                        Interceptor.OnError(message, r, ex);
+                        Interceptor.OnError(message, handler, ex);
                         throw;
                     }
                     finally
                     {
-                        Interceptor.OnExit(message, r);
+                        Interceptor.OnExit(message, handler);
                     }
                 }
             }
@@ -58,28 +58,28 @@ namespace Jal.Router.Impl
 
         public void Route<TMessage>(TMessage message, dynamic context, string route)
         {
-            var senders = Provider.Provide<TMessage>(message, route);
+            var handlers = Provider.Provide<TMessage>(message, route);
 
-            if (senders != null && senders.Length > 0)
+            if (handlers != null && handlers.Length > 0)
             {
-                foreach (var r in senders)
+                foreach (var handler in handlers)
                 {
                     try
                     {
-                        Interceptor.OnEntry(message, r);
+                        Interceptor.OnEntry(message, handler);
 
-                        r.Send(message, context);
+                        handler.Handle(message, context);
 
-                        Interceptor.OnSuccess(message, r);
+                        Interceptor.OnSuccess(message, handler);
                     }
                     catch (Exception ex)
                     {
-                        Interceptor.OnError(message, r, ex);
+                        Interceptor.OnError(message, handler, ex);
                         throw;
                     }
                     finally
                     {
-                        Interceptor.OnExit(message, r);
+                        Interceptor.OnExit(message, handler);
                     }
                 }
             }
@@ -89,7 +89,7 @@ namespace Jal.Router.Impl
             }
         }
 
-        public IMessageSenderProvider Provider { get; set; }
+        public IMessageHandlerProvider Provider { get; set; }
 
         public IMessagetRouterInterceptor Interceptor { get; set; }
     }

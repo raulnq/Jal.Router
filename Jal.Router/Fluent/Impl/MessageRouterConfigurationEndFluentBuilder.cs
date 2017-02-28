@@ -3,7 +3,7 @@ using Jal.Factory.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class MessageRouterConfigurationEndFluentBuilder<TRequest>
+    public class MessageRouterConfigurationEndFluentBuilder<TMessage>
     {
         private readonly ObjectFactoryConfigurationItem _objectFactoryConfigurationItem;
 
@@ -11,7 +11,7 @@ namespace Jal.Router.Fluent.Impl
         {
             _objectFactoryConfigurationItem = objectFactoryConfigurationItem;
         }
-        public void When(Func<TRequest, bool> selector)
+        public void When(Func<TMessage, bool> selector)
         {
             _objectFactoryConfigurationItem.Selector = selector;
         }

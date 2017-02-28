@@ -22,20 +22,20 @@ namespace Jal.Router.Impl
             return result;
         }
 
-        public MessageRouterConfigurationFluentBuilder<TResquest> Route<TResquest>()
+        public MessageRouterConfigurationFluentBuilder<TMessage> Route<TMessage>()
         {
-            var value = new ObjectFactoryConfigurationItem(typeof(TResquest));
+            var value = new ObjectFactoryConfigurationItem(typeof(TMessage));
 
-            var descriptor = new MessageRouterConfigurationFluentBuilder<TResquest>(value);
+            var descriptor = new MessageRouterConfigurationFluentBuilder<TMessage>(value);
             
             _objectFactoryConfigurationItems.Add(value);
 
             return descriptor;
         }
 
-        public void Route<TRequest>(string name, Action<MessageRouterConfigurationGroupFluentBuilder<TRequest>> action)
+        public void Route<TMessage>(string name, Action<MessageRouterConfigurationGroupFluentBuilder<TMessage>> action)
         {
-            var descriptor = new MessageRouterConfigurationGroupFluentBuilder<TRequest>(_objectFactoryConfigurationItems, name);
+            var descriptor = new MessageRouterConfigurationGroupFluentBuilder<TMessage>(_objectFactoryConfigurationItems, name);
 
             action(descriptor);
         }

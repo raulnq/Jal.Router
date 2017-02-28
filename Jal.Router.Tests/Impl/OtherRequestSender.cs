@@ -4,9 +4,9 @@ using Jal.Router.Tests.Model;
 
 namespace Jal.Router.Tests.Impl
 {
-    public class OtherMessageSender : AbstractMessageSender<Request>
+    public class OtherMessageHandler : AbstractMessageHandler<Request>
     {
-        public override void Send(Request message)
+        public override void Handle(Request message)
         {
             Console.WriteLine("OtherMessageSender");
         }

@@ -8,7 +8,7 @@ namespace Jal.Router.Fluent.Impl
 {
     public class MessageRouterFluentBuilder : IMessageRouterFluentBuilder, IMessageRouterStartFluentBuilder
     {
-        private IMessageSenderProvider _messageSenderProvider;
+        private IMessageHandlerProvider _messageHandlerProvider;
 
         private IMessagetRouterInterceptor _messagetRouterInterceptor;
 
@@ -18,7 +18,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(objectFactory));
             }
-            _messageSenderProvider = new MessageSenderProvider(objectFactory);
+            _messageHandlerProvider = new MessageHandlerProvider(objectFactory);
             return this;
         }
 
@@ -27,7 +27,7 @@ namespace Jal.Router.Fluent.Impl
         {
             get
             {
-                var result = new MessageRouter(_messageSenderProvider);
+                var result = new MessageRouter(_messageHandlerProvider);
 
                 if (_messagetRouterInterceptor != null)
                 {

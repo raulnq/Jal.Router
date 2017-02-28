@@ -49,10 +49,10 @@
   <ItemGroup>
     <Compile Include="Attributes\IsTransientAttribute.cs" />
     <Compile Include="Fluent\Impl\MessageRouterConfigurationGroupFluentBuilder.cs" />
-    <Compile Include="Interface\IMessageSenderProvider.cs" />
+    <Compile Include="Interface\IMessageHandlerProvider.cs" />
     <Compile Include="Impl\NullMessagetRouterInterceptor.cs" />
     <Compile Include="Impl\AbstractMessagetRouterInterceptor.cs" />
-    <Compile Include="Impl\MessageSenderProvider.cs" />
+    <Compile Include="Impl\MessageHandlerProvider.cs" />
     <Compile Include="Impl\MessageRouter.cs" />
     <Compile Include="Fluent\Interface\IMessageRouterFluentBuilder.cs" />
     <Compile Include="Interface\IMessageRouter.cs" />
@@ -60,9 +60,9 @@
     <Compile Include="Fluent\Interface\IMessageRouterStartFluentBuilder.cs" />
     <Compile Include="Fluent\Interface\IMessageRouterEndFluentBuilder.cs" />
     <Compile Include="Impl\AbstractMessageRouterConfigurationSource.cs" />
-    <Compile Include="Impl\AbstractMessageSender.cs" />
+    <Compile Include="Impl\AbstractMessageHandler.cs" />
     <Compile Include="Fluent\Impl\MessageRouterFluentBuilder.cs" />
-    <Compile Include="Interface\IMessageSender.cs" />
+    <Compile Include="Interface\IMessageHandler.cs" />
     <Compile Include="Fluent\Impl\MessageRouterConfigurationFluentBuilder.cs" />
     <Compile Include="Fluent\Impl\MessageRouterConfigurationEndFluentBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

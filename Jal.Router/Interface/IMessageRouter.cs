@@ -10,7 +10,7 @@
 
         void Route<TMessage>(TMessage message, dynamic context);
 
-        IMessageSenderProvider Provider { get; }
+        IMessageHandlerProvider Provider { get; }
 
         IMessagetRouterInterceptor Interceptor { get; set; }
     }
