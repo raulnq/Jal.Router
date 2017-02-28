@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</ProjectGuid>
+    <ProjectGuid>{6173E97A-E056-4FB7-B4E3-3B5B66FDA2BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Jal.Router</RootNamespace>
-    <AssemblyName>Jal.Router</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>Jal.Router.LightInject.Installer</RootNamespace>
+    <AssemblyName>Jal.Router.LightInject.Installer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -35,8 +35,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Jal.Locator, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Jal.Locator.1.0.6.0\lib\net40\Jal.Locator.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.4.1.0\lib\net45\LightInject.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,34 +48,21 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\IsTransientAttribute.cs" />
-    <Compile Include="Fluent\Impl\MessageRouterConfigurationGroupFluentBuilder.cs" />
-    <Compile Include="Interface\IMessageHandlerFactory.cs" />
-    <Compile Include="Impl\NullMessagetRouterInterceptor.cs" />
-    <Compile Include="Impl\AbstractMessagetRouterInterceptor.cs" />
-    <Compile Include="Impl\MessageHandlerFactory.cs" />
-    <Compile Include="Impl\MessageRouter.cs" />
-    <Compile Include="Fluent\Interface\IMessageRouterFluentBuilder.cs" />
-    <Compile Include="Interface\IMessageRouter.cs" />
-    <Compile Include="Interface\IMessagetRouterInterceptor.cs" />
-    <Compile Include="Fluent\Interface\IMessageRouterStartFluentBuilder.cs" />
-    <Compile Include="Fluent\Interface\IMessageRouterEndFluentBuilder.cs" />
-    <Compile Include="Impl\AbstractMessageRouterConfigurationSource.cs" />
-    <Compile Include="Impl\AbstractMessageHandler.cs" />
-    <Compile Include="Fluent\Impl\MessageRouterFluentBuilder.cs" />
-    <Compile Include="Interface\IMessageHandler.cs" />
-    <Compile Include="Fluent\Impl\MessageRouterConfigurationFluentBuilder.cs" />
-    <Compile Include="Fluent\Impl\MessageRouterConfigurationEndFluentBuilder.cs" />
+    <Compile Include="ServiceContainerExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj">
+      <Project>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</Project>
+      <Name>Jal.Router</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

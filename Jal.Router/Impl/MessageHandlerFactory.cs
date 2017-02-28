@@ -7,16 +7,16 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class MessageHandlerProvider : IMessageHandlerProvider
+    public class MessageHandlerFactory : IMessageHandlerFactory
     {
         private readonly IObjectFactory _objectFactory;
 
-        public MessageHandlerProvider(IObjectFactory objectFactory)
+        public MessageHandlerFactory(IObjectFactory objectFactory)
         {
             _objectFactory = objectFactory;
         }
 
-        public IMessageHandler<TMessage>[] Provide<TMessage>(TMessage message, string route)
+        public IMessageHandler<TMessage>[] Create<TMessage>(TMessage message, string route)
         {
             if (string.IsNullOrWhiteSpace(route))
             {

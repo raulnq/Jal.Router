@@ -57,7 +57,7 @@ namespace Jal.Router.Installer
                     }
                 }
                 container.Register(Component.For(typeof(IMessageRouter)).ImplementedBy(typeof(Impl.MessageRouter)).LifestyleSingleton());
-                container.Register(Component.For(typeof(IMessageHandlerProvider)).ImplementedBy(typeof(MessageHandlerProvider)).LifestyleSingleton());
+                container.Register(Component.For(typeof(IMessageHandlerFactory)).ImplementedBy(typeof(MessageHandlerFactory)).LifestyleSingleton());
             }
 
             var assembliessource = _requestRouterConfigurationSourceAssemblies;

@@ -6,9 +6,9 @@ namespace Jal.Router.Impl
 {
     public class MessageRouter : IMessageRouter
     {
-        public MessageRouter(IMessageHandlerProvider provider)
+        public MessageRouter(IMessageHandlerFactory factory)
         {
-            Provider = provider;
+            Factory = factory;
 
             Interceptor = AbstractMessagetRouterInterceptor.Instance;
         }
@@ -20,7 +20,7 @@ namespace Jal.Router.Impl
 
         public void Route<TMessage>(TMessage message, string route)
         {
-            var handlers = Provider.Provide<TMessage>(message, route);
+            var handlers = Factory.Create<TMessage>(message, route);
 
             if (handlers != null && handlers.Length > 0)
             {
@@ -58,7 +58,7 @@ namespace Jal.Router.Impl
 
         public void Route<TMessage>(TMessage message, dynamic context, string route)
         {
-            var handlers = Provider.Provide<TMessage>(message, route);
+            var handlers = Factory.Create<TMessage>(message, route);
 
             if (handlers != null && handlers.Length > 0)
             {
@@ -89,7 +89,7 @@ namespace Jal.Router.Impl
             }
         }
 
-        public IMessageHandlerProvider Provider { get; set; }
+        public IMessageHandlerFactory Factory { get; set; }
 
         public IMessagetRouterInterceptor Interceptor { get; set; }
     }
