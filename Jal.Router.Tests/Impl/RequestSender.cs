@@ -1,14 +1,14 @@
-﻿using Jal.Router.Impl;
-using Jal.Router.Model;
+﻿using System;
+using Jal.Router.Impl;
 using Jal.Router.Tests.Model;
 
 namespace Jal.Router.Tests.Impl
 {
-    public class RequestSender : AbstractRequestSender<Request, Response>
+    public class MessageSender : AbstractMessageSender<Request>
     {
-        public override Response Send(Request request, EndPoint endPoint)
+        public override void Send(Request message)
         {
-            return new Response(){Status = "OK"};
+            Console.WriteLine("MessageSender");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Jal.Router.Tests.Attribute;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Shouldly;

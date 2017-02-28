@@ -6,7 +6,7 @@ using Jal.Router.Fluent.Impl;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractRequestRouterConfigurationSource : IObjectFactoryConfigurationSource
+    public abstract class AbstractMessageRouterConfigurationSource : IObjectFactoryConfigurationSource
     {
         private readonly List<ObjectFactoryConfigurationItem> _objectFactoryConfigurationItems = new List<ObjectFactoryConfigurationItem>();
 
@@ -22,20 +22,20 @@ namespace Jal.Router.Impl
             return result;
         }
 
-        public RequestRouterConfigurationFluentBuilder<TResquest, TResponse> Route<TResquest, TResponse>()
+        public MessageRouterConfigurationFluentBuilder<TResquest> Route<TResquest>()
         {
             var value = new ObjectFactoryConfigurationItem(typeof(TResquest));
 
-            var descriptor = new RequestRouterConfigurationFluentBuilder<TResquest, TResponse>(value);
+            var descriptor = new MessageRouterConfigurationFluentBuilder<TResquest>(value);
             
             _objectFactoryConfigurationItems.Add(value);
 
             return descriptor;
         }
 
-        public void Route<TRequest, TResponse>(string name, Action<RequestRouterConfigurationGroupFluentBuilder<TRequest, TResponse>> action)
+        public void Route<TRequest>(string name, Action<MessageRouterConfigurationGroupFluentBuilder<TRequest>> action)
         {
-            var descriptor = new RequestRouterConfigurationGroupFluentBuilder<TRequest, TResponse>(_objectFactoryConfigurationItems, name);
+            var descriptor = new MessageRouterConfigurationGroupFluentBuilder<TRequest>(_objectFactoryConfigurationItems, name);
 
             action(descriptor);
         }

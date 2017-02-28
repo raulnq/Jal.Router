@@ -1,6 +1,7 @@
 ﻿using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
 using Jal.Factory.Installer;
+using Jal.Finder.Atrribute;
 using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
 using Jal.Router.Installer;
@@ -14,27 +15,27 @@ namespace Jal.Router.Tests.Integration
     [TestFixture]
     public class Tests
     {
-        private IRequestRouter _requestRouter;
+        private IMessageRouter _messageRouter;
 
         [SetUp]
         public void SetUp()
         {
             AssemblyFinder.Current = AssemblyFinder.Builder.UsePath(TestContext.CurrentContext.TestDirectory).Create;
             IWindsorContainer container = new WindsorContainer();
+            var assemblies = AssemblyFinder.Current.GetAssembliesTagged<AssemblyTagAttribute>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
-            container.Install(new RouterInstaller( AssemblyFinder.Current.GetAssemblies("Sender"), AssemblyFinder.Current.GetAssemblies("SenderSource")));
+            container.Install(new RouterInstaller(assemblies, assemblies));
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
-            container.Install(new FactoryInstaller(AssemblyFinder.Current.GetAssemblies("FactorySource")));
-            _requestRouter = container.Resolve<IRequestRouter>();
+            container.Install(new FactoryInstaller(assemblies));
+            _messageRouter = container.Resolve<IMessageRouter>();
         }
 
         [Test]
         public void Validate_WithoutRuleName_Valid()
         {
             var request = new Request();
-            var response = _requestRouter.Route<Request, Response>(request, "Route");
-            Assert.AreEqual(null, response);
+            _messageRouter.Route<Request>(request, "Route");
         }
 
         //[Test]

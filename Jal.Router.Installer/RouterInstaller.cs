@@ -35,31 +35,29 @@ namespace Jal.Router.Installer
                     var types = (assembly.GetTypes().Where(type =>
                                                            {
                                                                var isTransient = type.GetCustomAttributes(false).OfType<IsTransientAttribute>().Any();
-                                                               return isTransient && typeof(IRequestSender).IsAssignableFrom(type);
+                                                               return isTransient && typeof(IMessageSender).IsAssignableFrom(type);
                     }));
                     foreach (var t in types)
                     {
-                        var service = t.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRequestSender<,>));
+                        var service = t.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IMessageSender<>));
                         if (service != null)
                         {
                             container.Register((Component.For(service).ImplementedBy(t).LifestyleTransient().Named(t.FullName)));
                         }
                     }
 
-                    types = (assembly.GetTypes().Where(type => !type.GetCustomAttributes(false).OfType<IsTransientAttribute>().Any() && typeof(IRequestSender).IsAssignableFrom(type)));
+                    types = (assembly.GetTypes().Where(type => !type.GetCustomAttributes(false).OfType<IsTransientAttribute>().Any() && typeof(IMessageSender).IsAssignableFrom(type)));
                     foreach (var t in types)
                     {
-                        var service = t.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRequestSender<,>));
+                        var service = t.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IMessageSender<>));
                         if (service != null)
                         {
                             container.Register((Component.For(service).ImplementedBy(t).LifestyleSingleton().Named(t.FullName)));
                         }
                     }
                 }
-                container.Register(Component.For(typeof(IRequestRouter)).ImplementedBy(typeof(Impl.RequestRouter)).LifestyleSingleton());
-                container.Register(Component.For(typeof(IRouteProvider)).ImplementedBy(typeof(RouteProvider)).LifestyleSingleton());
-                container.Register(Component.For(typeof(IEndPointSource)).ImplementedBy(typeof(EndPointSource)).LifestyleSingleton());
-                container.Register(Component.For(typeof(IRequestSenderSource)).ImplementedBy(typeof(RequestSenderSource)).LifestyleSingleton());
+                container.Register(Component.For(typeof(IMessageRouter)).ImplementedBy(typeof(Impl.MessageRouter)).LifestyleSingleton());
+                container.Register(Component.For(typeof(IMessageSenderProvider)).ImplementedBy(typeof(MessageSenderProvider)).LifestyleSingleton());
             }
 
             var assembliessource = _requestRouterConfigurationSourceAssemblies;
@@ -69,7 +67,7 @@ namespace Jal.Router.Installer
                 foreach (var assembly in assembliessource)
                 {
                     var assemblyDescriptor = Classes.FromAssembly(assembly);
-                    container.Register(assemblyDescriptor.BasedOn<AbstractRequestRouterConfigurationSource>().WithServiceAllInterfaces());
+                    container.Register(assemblyDescriptor.BasedOn<AbstractMessageRouterConfigurationSource>().WithServiceAllInterfaces());
                 }
             }
         }
