@@ -1,13 +1,18 @@
-﻿using Castle.MicroKernel.Resolvers.SpecializedResolvers;
+﻿using Castle.MicroKernel.Registration;
+using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
-using Jal.Factory.Installer;
+using Common.Logging;
 using Jal.Finder.Atrribute;
 using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
+using Jal.Router.AzureServiceBus.Installer;
+using Jal.Router.AzureServiceBus.Interface;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
+using Jal.Router.Tests.Impl;
 using Jal.Router.Tests.Model;
 using Jal.Settings.Installer;
+using Microsoft.ServiceBus.Messaging;
 using NUnit.Framework;
 
 namespace Jal.Router.Tests.Integration
@@ -15,7 +20,9 @@ namespace Jal.Router.Tests.Integration
     [TestFixture]
     public class Tests
     {
-        private IMessageRouter _messageRouter;
+        private IRouter _router;
+
+        private IBrokeredMessageRouter _brokeredMessageRouter;
 
         [SetUp]
         public void SetUp()
@@ -24,18 +31,26 @@ namespace Jal.Router.Tests.Integration
             IWindsorContainer container = new WindsorContainer();
             var assemblies = AssemblyFinder.Current.GetAssembliesTagged<AssemblyTagAttribute>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
-            container.Install(new RouterInstaller(assemblies, assemblies));
+            container.Install(new RouterInstaller(assemblies));
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
-            container.Install(new FactoryInstaller(assemblies));
-            _messageRouter = container.Resolve<IMessageRouter>();
+            container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
+            container.Install(new BrokeredMessageRouterInstaller());
+            _router = container.Resolve<IRouter>();
+            container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
+            _brokeredMessageRouter = container.Resolve<IBrokeredMessageRouter>();
         }
 
         [Test]
         public void Validate_WithoutRuleName_Valid()
         {
+            var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
+
             var request = new Request();
-            _messageRouter.Route<Request>(request, "Route");
+            //_router.Route<Request>(request);
+            _brokeredMessageRouter.Route<Request>(bm);
+            //_router.Route(request, new Response() {Status = "Hi"});
         }
 
         //[Test]

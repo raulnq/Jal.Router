@@ -1,20 +1,32 @@
-﻿using Jal.Router.Impl;
+﻿using System.Security.Cryptography.X509Certificates;
+using Jal.Router.Impl;
+using Jal.Router.Model;
 using Jal.Router.Tests.Model;
 
 namespace Jal.Router.Tests.Impl
 {
-    public class MessageRouterConfigurationSource : AbstractMessageRouterConfigurationSource
+    public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
-        public MessageRouterConfigurationSource()
+        public RouterConfigurationSource()
         {
-            Route<Request>().To<MessageHandler>();
-            Route<Request>().To<OtherMessageHandler>();
+            RegisterRoute<IMessageHandler<Request>>().ForMessage<Request>().ToBeConsumedBy<MessageHandler>(x =>
+            {
+                x.With(((request, handler) => handler.Handle(request)));
+            });
 
-            Route<Request>("Route", x =>
-                           {
-                               x.To<MessageHandler>();
-                               x.To<OtherMessageHandler>();
-                           });
+
+            RegisterRoute<IMessageHandler<Request>>().ForMessage<Request>().ToBeConsumedBy<OtherMessageHandler>(x =>
+            {
+                x.With(((request, handler) => handler.Handle(request)));
+                //x.With<Response>(((request, handler, context) => handler.Handle(request, context)));
+            });
+
+
+            //RegisterFlow<Data>(s => s.Id).StartedByMessage<Request>(h => h.Name).UsingRoute("Tag1").FollowingBy(y =>
+            //{
+            //    y.Message<Request>(r => r.Id).UsingRoute("");
+            //    y.Message<Request>(r => r.Id).UsingRoute("");
+            //});
         }
     }
 }
