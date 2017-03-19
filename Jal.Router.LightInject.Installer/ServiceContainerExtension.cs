@@ -27,6 +27,7 @@ namespace Jal.Router.LightInject.Installer
                         }
                     }
                 }
-            }        }
+            }
+        }
     }
 }

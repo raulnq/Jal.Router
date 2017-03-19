@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using Common.Logging;
 using Jal.Router.AzureServiceBus.Interface;
-using Jal.Router.AzureServiceBus.Model;
 using Jal.Router.Interface;
 using Microsoft.ServiceBus.Messaging;
 
@@ -14,11 +13,13 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public IBrokeredMessageReader Reader { get; set; }
 
+        public IBrokeredMessageContextBuilder Builder { get; set; }
+
         public IBrokeredMessageRouterInterceptor Interceptor { get; set; }
 
         private readonly ILog _log;
 
-        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageReader reader)
+        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageReader reader, IBrokeredMessageContextBuilder builder)
         {
             _log = log;
 
@@ -26,7 +27,9 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             Reader = reader;
 
-            Interceptor = AbstractRouterInterceptor.Instance;
+            Interceptor = AbstractBrokeredMessageRouterInterceptor.Instance;
+
+            Builder = builder;
         }
 
         public void Route<TContent>(BrokeredMessage brokeredMessage, string name="")
@@ -35,26 +38,9 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             stopwatch.Start();
 
-            var context = new BrokeredMessageContext();
-
-            var messageid = brokeredMessage.MessageId;
-
-            var contenttype = brokeredMessage.ContentType;
-
-            var replyto = brokeredMessage.ReplyTo;
-
-            var to = brokeredMessage.To;
-
-            var correlationid = brokeredMessage.CorrelationId;
-
-            var source = string.Empty;
-
-            if (brokeredMessage.Properties.ContainsKey("source"))
-            {
-                source = brokeredMessage.Properties["source"].ToString();
-            }
-
-            _log.Info($"[BrokeredMessageRouter.cs, Route, {messageid}] Start Call. MessageId: {messageid} CorrelationId: {correlationid} Content: {contenttype} From: {source} To: {to} ReplyTo: {replyto}");
+            var context = Builder.Build(brokeredMessage);
+           
+            _log.Info($"[BrokeredMessageRouter.cs, Route, {context.MessageId}] Start Call. MessageId: {context.MessageId} CorrelationId: {context.CorrelationId} From: {context.From} To: {context.To} ReplyTo: {context.ReplyTo}");
 
             var body = default(TContent); 
 
@@ -70,7 +56,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
             catch (Exception ex)
             {
-                _log.Error($"[BrokeredMessageRouter.cs, Route, {messageid}] Exception.", ex);
+                _log.Error($"[BrokeredMessageRouter.cs, Route, {context.MessageId}] Exception.", ex);
 
                 Interceptor.OnException(body, brokeredMessage, ex);
 
@@ -82,7 +68,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 stopwatch.Stop();
 
-                _log.Info($"[BrokeredMessageRouter.cs, Route, {messageid}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
+                _log.Info($"[BrokeredMessageRouter.cs, Route, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
             }
 
         }

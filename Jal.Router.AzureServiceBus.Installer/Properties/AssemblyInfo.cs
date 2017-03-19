@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Jal.Router.AzureServiceBus.Installer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Castle Windsor installer for the Jal.Router.AzureServiceBus library")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Raul Naupari")]
 [assembly: AssemblyProduct("Jal.Router.AzureServiceBus.Installer")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
