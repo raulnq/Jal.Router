@@ -17,7 +17,7 @@ namespace Jal.Router.AzureServiceBus.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For(typeof(IBrokeredMessageReader)).ImplementedBy(typeof(BrokeredMessageReader)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IBrokeredMessageAdapter)).ImplementedBy(typeof(BrokeredMessageAdapter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageRouter)).ImplementedBy(typeof(BrokeredMessageRouter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageContextBuilder)).ImplementedBy(typeof(BrokeredMessageContextBuilder)).LifestyleSingleton());
         }

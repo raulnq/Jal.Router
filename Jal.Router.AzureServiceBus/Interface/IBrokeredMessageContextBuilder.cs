@@ -6,6 +6,5 @@ namespace Jal.Router.AzureServiceBus.Interface
     public interface IBrokeredMessageContextBuilder
     {
         BrokeredMessageContext Build(BrokeredMessage brokeredMessage);
-
     }
 }

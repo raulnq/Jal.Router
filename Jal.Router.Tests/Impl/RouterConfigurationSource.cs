@@ -27,6 +27,8 @@ namespace Jal.Router.Tests.Impl
             //    y.Message<Request>(r => r.Id).UsingRoute("");
             //    y.Message<Request>(r => r.Id).UsingRoute("");
             //});
+
+            //RegisterEndpoint("").With<SettingExtractor>().ToSend<Request>().To(x=>x.Get(), "").ReplyTo("", "").WithMessageId(x=>x.D);
         }
     }
 }

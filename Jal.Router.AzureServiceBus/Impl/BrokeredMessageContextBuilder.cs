@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.AzureServiceBus.Interface;
 using Jal.Router.AzureServiceBus.Model;
 using Microsoft.ServiceBus.Messaging;
@@ -11,7 +12,8 @@ namespace Jal.Router.AzureServiceBus.Impl
             var context = new BrokeredMessageContext
             {
                 MessageId = brokeredMessage.MessageId,
-                ReplyTo = brokeredMessage.ReplyTo,
+                ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo),
+                ReplyToQueue = GetEntity(brokeredMessage.ReplyTo),
                 To = brokeredMessage.To,
                 CorrelationId = brokeredMessage.CorrelationId
             };
@@ -23,5 +25,32 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             return context;
         }
+
+        public string GetConnectionString(string connectionstringandqueuename)
+        {
+            if (string.IsNullOrEmpty(connectionstringandqueuename) || connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) == -1)
+            {
+                return string.Empty;
+            }
+
+            return connectionstringandqueuename.Substring(0, connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public string GetEntity(string connectionstringandqueuename)
+        {
+            if (string.IsNullOrEmpty(connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7)))
+            {
+                return string.Empty;
+            }
+
+            return connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7);
+        }
+
+        public void Convert(BrokeredMessageContext context, BrokeredMessage brokeredMessage)
+        {
+            
+        }
     }
+
+    
 }

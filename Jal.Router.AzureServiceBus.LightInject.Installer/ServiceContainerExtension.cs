@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
     {
         public static void RegisterBrokeredMessageRouter(this IServiceContainer container)
         {
-            container.Register<IBrokeredMessageReader, BrokeredMessageReader>(new PerContainerLifetime());
+            container.Register<IBrokeredMessageAdapter, BrokeredMessageAdapter>(new PerContainerLifetime());
 
             container.Register<IBrokeredMessageRouter, BrokeredMessageRouter>(new PerContainerLifetime());
 

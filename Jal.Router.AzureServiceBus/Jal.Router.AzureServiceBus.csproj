@@ -56,11 +56,11 @@
   <ItemGroup>
     <Compile Include="Impl\BrokeredMessageContextBuilder.cs" />
     <Compile Include="Impl\BrokeredMessageRouter.cs" />
-    <Compile Include="Impl\BrokeredMessageReader.cs" />
+    <Compile Include="Impl\BrokeredMessageAdapter.cs" />
     <Compile Include="Impl\AbstractBrokeredMessageRouterInterceptor.cs" />
     <Compile Include="Impl\NullBrokeredMessageRouterInterceptor.cs" />
     <Compile Include="Interface\IBrokeredMessageContextBuilder.cs" />
-    <Compile Include="Interface\IBrokeredMessageReader.cs" />
+    <Compile Include="Interface\IBrokeredMessageAdapter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouterInterceptor.cs" />
     <Compile Include="Model\BrokeredMessageContext.cs" />
