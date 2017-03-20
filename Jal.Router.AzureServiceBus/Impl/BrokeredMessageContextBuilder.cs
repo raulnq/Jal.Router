@@ -52,12 +52,17 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public string GetEntity(string connectionstringandqueuename)
         {
-            if (string.IsNullOrEmpty(connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7)))
-            {
-                return string.Empty;
+            if(!string.IsNullOrWhiteSpace(connectionstringandqueuename))
+            { 
+                if (string.IsNullOrEmpty(connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7)))
+                {
+                    return string.Empty;
+                }
+
+                return connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7);
             }
 
-            return connectionstringandqueuename.Substring(connectionstringandqueuename.IndexOf(";queue=", StringComparison.InvariantCultureIgnoreCase) + 7);
+            return string.Empty;
         }
 
         public void Convert(BrokeredMessageContext context, BrokeredMessage brokeredMessage)

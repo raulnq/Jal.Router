@@ -112,7 +112,9 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         }
 
-        //public void Send<TContent>(TContent content, string name="")
+        //ReplyToTopic<TContent>(TContent content, BrokeredMessageContext context)
+
+        //public void SendToQueue<TContent>(TContent content, string name="")
         //{
         //    var stopwatch = new Stopwatch();
 
