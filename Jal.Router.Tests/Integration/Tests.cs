@@ -7,6 +7,7 @@ using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
 using Jal.Router.AzureServiceBus.Installer;
 using Jal.Router.AzureServiceBus.Interface;
+using Jal.Router.AzureServiceBus.Model;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
 using Jal.Router.Tests.Impl;
@@ -36,7 +37,7 @@ namespace Jal.Router.Tests.Integration
             container.Install(new SettingsInstaller());
             container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
-            container.Install(new BrokeredMessageRouterInstaller());
+            container.Install(new BrokeredMessageRouterInstaller(assemblies));
             _router = container.Resolve<IRouter>();
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             _brokeredMessageRouter = container.Resolve<IBrokeredMessageRouter>();
@@ -49,8 +50,10 @@ namespace Jal.Router.Tests.Integration
 
             var request = new Request();
             //_router.Route<Request>(request);
-            _brokeredMessageRouter.Route<Request>(bm);
+            //_brokeredMessageRouter.Route<Request>(bm);
             //_router.Route(request, new Response() {Status = "Hi"});
+
+            _brokeredMessageRouter.SendToQueue(request, new BrokeredMessageContext(),"hola");
         }
 
         //[Test]

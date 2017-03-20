@@ -1,4 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using Jal.Router.AzureServiceBus.Interface;
+using Jal.Router.AzureServiceBus.Model;
 using Jal.Router.Impl;
 using Jal.Router.Model;
 using Jal.Router.Tests.Model;
@@ -27,9 +29,6 @@ namespace Jal.Router.Tests.Impl
             //    y.Message<Request>(r => r.Id).UsingRoute("");
             //    y.Message<Request>(r => r.Id).UsingRoute("");
             //});
-
-            //RegisterEndpoint<SettingExtractor>("").ForMessage<Request>(x=>x.D).From(x=>x.Get()).To(x=>x.Get(), "").ReplyTo("", "");
-
         }
     }
 }

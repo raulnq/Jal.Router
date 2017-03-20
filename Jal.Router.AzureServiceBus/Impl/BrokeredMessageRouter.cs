@@ -18,9 +18,13 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public IBrokeredMessageRouterInterceptor Interceptor { get; set; }
 
+        public IBrokeredMessageEndPointProvider Provider { get; set; }
+
+        public IBrokeredMessageSettingsExtractorFactory Factory { get; set; }
+
         private readonly ILog _log;
 
-        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageAdapter adapter, IBrokeredMessageContextBuilder builder)
+        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageAdapter adapter, IBrokeredMessageContextBuilder builder, IBrokeredMessageEndPointProvider provider, IBrokeredMessageSettingsExtractorFactory factory)
         {
             _log = log;
 
@@ -31,6 +35,10 @@ namespace Jal.Router.AzureServiceBus.Impl
             Interceptor = AbstractBrokeredMessageRouterInterceptor.Instance;
 
             Builder = builder;
+
+            Provider = provider;
+
+            Factory = factory;
         }
 
         public void Route<TContent>(BrokeredMessage brokeredMessage, string name="")
@@ -112,46 +120,87 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         }
 
-        //ReplyToTopic<TContent>(TContent content, BrokeredMessageContext context)
+        public void SendToQueue<TContent>(TContent content, BrokeredMessageContext context, string messageid, string name = "")
+        {
+            var stopwatch = new Stopwatch();
 
-        //public void SendToQueue<TContent>(TContent content, string name="")
-        //{
-        //    var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-        //    stopwatch.Start();
+            _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Start Call.");
 
-        //    _log.Info($"[BrokeredMessageRouter.cs, Send, {context.MessageId}] Start Call.");
+            try
+            {
+                var endpoints = Provider.Provide<TContent>(name);
 
-        //    try
-        //    {
-        //        if (!string.IsNullOrEmpty(context.ReplyToConnectionString) && !string.IsNullOrEmpty(context.ReplyToQueue))
-        //        {
-        //            var queueclient = QueueClient.CreateFromConnectionString(context.ReplyToConnectionString, context.ReplyToQueue);
+                foreach (var endpoint in endpoints)
+                {
+                    var extractor = Factory.Create(endpoint.ExtractorType);
 
-        //            var message = Adapter.Writer(content);
+                    var toconnectionextractor = endpoint.ToConnectionStringExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
 
-        //            message.CorrelationId = context.MessageId;
+                    var topathextractor = endpoint.ToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
 
-        //            message.MessageId = context.MessageId;
+                    if (toconnectionextractor != null && topathextractor != null)
+                    {
+                        var toconnection = toconnectionextractor(extractor);
 
-        //            queueclient.Send(message);
+                        var topath = topathextractor(extractor);
 
-        //            queueclient.Close();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _log.Error($"[BrokeredMessageRouter.cs, Send, {context.MessageId}] Exception.", ex);
+                        if (!string.IsNullOrWhiteSpace(toconnection) && !string.IsNullOrWhiteSpace(topath))
+                        {
+                            var queueclient = QueueClient.CreateFromConnectionString(toconnection, topath);
 
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        stopwatch.Stop();
+                            var message = Adapter.Writer(content);
 
-        //        _log.Info($"[BrokeredMessageRouter.cs, Send, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
-        //    }
+                            var toreplyconnectionextractor = endpoint.ReplyToConnectionStringExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
 
-        //}
+                            var toreplypathextractor = endpoint.ReplyToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
+
+                            if (toreplyconnectionextractor != null && toreplypathextractor != null)
+                            {
+                                var toreplyconnection = toreplyconnectionextractor(extractor);
+
+                                var toreplypath = toreplypathextractor(extractor);
+
+                                if (!string.IsNullOrWhiteSpace(toreplyconnection) && !string.IsNullOrWhiteSpace(toreplypath))
+                                {
+                                    message.ReplyTo = $"{toreplyconnection};queue={toreplypath}";
+
+                                    message.Properties.Add("replytoconnectionstring", toreplyconnection);
+
+                                    message.Properties.Add("replytoqueue", toreplypath);
+                                }
+                            }
+
+                            var fromextractor = endpoint.ReplyToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
+
+                            var from = fromextractor?.Invoke(extractor);
+
+                            if (!string.IsNullOrWhiteSpace(from))
+                            {
+                                message.Properties.Add("from", from);
+                            }
+
+                            queueclient.Send(message);
+
+                            queueclient.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Exception.", ex);
+
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+
+                _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
+            }
+
+        }
     }
 }
