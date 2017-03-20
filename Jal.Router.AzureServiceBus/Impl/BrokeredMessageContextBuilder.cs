@@ -22,6 +22,20 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 context.From = brokeredMessage.Properties["from"].ToString();
             }
+            if (brokeredMessage.Properties.ContainsKey("replytoconnectionstring"))
+            {
+                context.ReplyToConnectionString = brokeredMessage.Properties["replytoconnectionstring"].ToString();
+            }
+
+            if (brokeredMessage.Properties.ContainsKey("replytoqueue"))
+            {
+                context.ReplyToQueue = brokeredMessage.Properties["replytoqueue"].ToString();
+            }
+
+            if (brokeredMessage.Properties.ContainsKey("replytotopic"))
+            {
+                context.ReplyToTopic = brokeredMessage.Properties["replytotopic"].ToString();
+            }
 
             return context;
         }

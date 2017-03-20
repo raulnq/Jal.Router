@@ -41,7 +41,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             var context = Builder.Build(brokeredMessage);
            
-            _log.Info($"[BrokeredMessageRouter.cs, Route, {context.MessageId}] Start Call. MessageId: {context.MessageId} CorrelationId: {context.CorrelationId} From: {context.From} To: {context.To} ReplyTo: {context.ReplyToConnectionString}");
+            _log.Info($"[BrokeredMessageRouter.cs, Route, {context.MessageId}] Start Call. MessageId: {context.MessageId} CorrelationId: {context.CorrelationId} From: {context.From} To: {context.To}");
 
             var body = default(TContent); 
 
@@ -74,13 +74,13 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         }
 
-        public void Reply<TContent>(TContent content, BrokeredMessageContext context)
+        public void ReplyToQueue<TContent>(TContent content, BrokeredMessageContext context)
         {
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
 
-            _log.Info($"[BrokeredMessageRouter.cs, Reply, {context.MessageId}] Start Call.");
+            _log.Info($"[BrokeredMessageRouter.cs, ReplyToQueue, {context.MessageId}] Start Call. ReplyToConnectionString: {context.ReplyToConnectionString} ReplyToQueue: {context.ReplyToQueue}");
 
             try
             {
@@ -101,15 +101,13 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
             catch (Exception ex)
             {
-                _log.Error($"[BrokeredMessageRouter.cs, Reply, {context.MessageId}] Exception.", ex);
-
-                throw;
+                _log.Error($"[BrokeredMessageRouter.cs, ReplyToQueue, {context.MessageId}] Exception.", ex);
             }
             finally
             {
                 stopwatch.Stop();
 
-                _log.Info($"[BrokeredMessageRouter.cs, Reply, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
+                _log.Info($"[BrokeredMessageRouter.cs, ReplyToQueue, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
             }
 
         }

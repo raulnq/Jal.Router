@@ -7,6 +7,6 @@ namespace Jal.Router.AzureServiceBus.Interface
     {
         void Route<TContent>(BrokeredMessage brokeredMessage, string name = "");
 
-        void Reply<TContent>(TContent content, BrokeredMessageContext context);
+        void ReplyToQueue<TContent>(TContent content, BrokeredMessageContext context);
     }
 }
