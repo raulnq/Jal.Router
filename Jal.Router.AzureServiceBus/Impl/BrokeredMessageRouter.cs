@@ -176,6 +176,11 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                             var from = fromextractor?.Invoke(extractor);
 
+                            if (!string.IsNullOrWhiteSpace(messageid))
+                            {
+                                message.MessageId = messageid;
+                            }
+
                             if (!string.IsNullOrWhiteSpace(from))
                             {
                                 message.Properties.Add("from", from);
