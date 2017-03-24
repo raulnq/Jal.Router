@@ -6,6 +6,6 @@ namespace Jal.Router.AzureServiceBus.Fluent.Interface
 {
     public interface IFromEndPointBuilder : IToEndPointBuilder
     {
-        IToEndPointBuilder From(Func<IBrokeredMessageSettingsExtractor, string> fromextractor);
+        IToEndPointBuilder From(Func<IBrokeredMessageEndPointSettingValueFinder, string> fromextractor);
     }
 }

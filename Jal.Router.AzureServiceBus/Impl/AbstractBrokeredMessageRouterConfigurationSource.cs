@@ -15,7 +15,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return _enpoints.ToArray();
         }
 
-        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IBrokeredMessageSettingsExtractor
+        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IBrokeredMessageEndPointSettingValueFinder
         {
             var endpoint = new EndPoint(name);
 
@@ -24,6 +24,17 @@ namespace Jal.Router.AzureServiceBus.Impl
             var builder = new EndPointBuilder<TExtractor>(endpoint);
 
             return builder;
+        }
+
+        public void RegisterEndPoint<TExtractor, T>(string name = "") where TExtractor : IBrokeredMessageEndPointSettingFinder<T>
+        {
+            var endpoint = new EndPoint(name);
+
+            _enpoints.Add(endpoint);
+
+            endpoint.ExtractorType = typeof (TExtractor);
+
+            endpoint.MessageType = typeof (T);
         }
     }
 }

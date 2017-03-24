@@ -21,9 +21,10 @@ namespace Jal.Router.AzureServiceBus.Installer
             container.Register(Component.For(typeof(IBrokeredMessageRouter)).ImplementedBy(typeof(BrokeredMessageRouter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageContextBuilder)).ImplementedBy(typeof(BrokeredMessageContextBuilder)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageEndPointProvider)).ImplementedBy(typeof(BrokeredMessageEndPointProvider)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IBrokeredMessageSettingsExtractorFactory)).ImplementedBy(typeof(BrokeredMessageSettingsExtractorFactory)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IBrokeredMessageSettingsExtractor)).ImplementedBy(typeof(AppBrokeredMessageSettingsExtractor)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IBrokeredMessageSettingsFactory)).ImplementedBy(typeof(BrokeredMessageSettingsFactory)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IBrokeredMessageEndPointSettingValueFinder)).ImplementedBy(typeof(AppBrokeredMessageEndPointSettingValueFinder)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageRouterConfigurationSource)).ImplementedBy(typeof(EmptyBrokeredMessageRouterConfigurationSource)).Named(typeof(EmptyBrokeredMessageRouterConfigurationSource).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IBrokeredMessageEndPointSettingProvider)).ImplementedBy(typeof(BrokeredMessageEndPointSettingProvider)).LifestyleSingleton());
             
             if (_sourceassemblies != null)
             {
@@ -31,6 +32,8 @@ namespace Jal.Router.AzureServiceBus.Installer
                 {
                     var assemblyDescriptor = Classes.FromAssembly(assembly);
                     container.Register(assemblyDescriptor.BasedOn<AbstractBrokeredMessageRouterConfigurationSource>().WithServiceAllInterfaces());
+                    container.Register(assemblyDescriptor.BasedOn<IBrokeredMessageEndPointSettingValueFinder>().WithServiceAllInterfaces());
+                    container.Register(assemblyDescriptor.BasedOn(typeof(IBrokeredMessageEndPointSettingFinder<>)).WithServiceAllInterfaces());
                 }
             }
         }

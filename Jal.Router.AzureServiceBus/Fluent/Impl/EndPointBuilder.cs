@@ -5,7 +5,7 @@ using Jal.Router.AzureServiceBus.Model;
 
 namespace Jal.Router.AzureServiceBus.Fluent.Impl
 {
-    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, IFromEndPointBuilder, INameEndPointBuilder where TExtractor : IBrokeredMessageSettingsExtractor
+    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, IFromEndPointBuilder, INameEndPointBuilder where TExtractor : IBrokeredMessageEndPointSettingValueFinder
     {
         private readonly EndPoint _endpoint;
 
@@ -23,22 +23,47 @@ namespace Jal.Router.AzureServiceBus.Fluent.Impl
             return this;
         }
 
-        public IToEndPointBuilder From(Func<IBrokeredMessageSettingsExtractor, string> fromextractor)
+        public IToEndPointBuilder From(Func<IBrokeredMessageEndPointSettingValueFinder, string> fromextractor)
         {
+            if (fromextractor == null)
+            {
+                throw new ArgumentNullException(nameof(fromextractor));
+            }
+
             _endpoint.FromExtractor = fromextractor;
 
             return this;
         }
 
-        public void ReplyTo(Func<IBrokeredMessageSettingsExtractor, string> connectionstringextractor, Func<IBrokeredMessageSettingsExtractor, string> pathextractor)
+        public void ReplyTo(Func<IBrokeredMessageEndPointSettingValueFinder, string> connectionstringextractor, Func<IBrokeredMessageEndPointSettingValueFinder, string> pathextractor)
         {
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            if (pathextractor == null)
+            {
+                throw new ArgumentNullException(nameof(pathextractor));
+            }
+
             _endpoint.ReplyToConnectionStringExtractor = connectionstringextractor;
 
             _endpoint.ReplyToPathExtractor = pathextractor;
         }
 
-        public IReplyToEndPointBuilder To(Func<IBrokeredMessageSettingsExtractor, string> connectionstringextractor, Func<IBrokeredMessageSettingsExtractor, string> pathextractor)
+        public IReplyToEndPointBuilder To(Func<IBrokeredMessageEndPointSettingValueFinder, string> connectionstringextractor, Func<IBrokeredMessageEndPointSettingValueFinder, string> pathextractor)
         {
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            if (pathextractor == null)
+            {
+                throw new ArgumentNullException(nameof(pathextractor));
+            }
+
             _endpoint.ToConnectionStringExtractor = connectionstringextractor;
 
             _endpoint.ToPathExtractor = pathextractor;

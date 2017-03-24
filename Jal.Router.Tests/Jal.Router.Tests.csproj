@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Impl\BrokeredMessageEndPointSettingFinder.cs" />
     <Compile Include="Impl\BrokeredMessageRouterConfigurationSource.cs" />
     <Compile Include="Impl\OtherMessageHandler.cs" />
     <Compile Include="Impl\MessageHandler.cs" />

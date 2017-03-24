@@ -7,11 +7,13 @@ namespace Jal.Router.Tests.Impl
     {
         public BrokeredMessageRouterConfigurationSource()
         {
-            RegisterEndPoint<AppBrokeredMessageSettingsExtractor>()
+            RegisterEndPoint<AppBrokeredMessageEndPointSettingValueFinder>()
                 .ForMessage<Request>()
-                .From(x => x.Get("from"))
-                .To(x => x.Get("toconnectionstring"), x => x.Get("topath"))
-                .ReplyTo(x => x.Get("replytoconnectionstring"), x => x.Get("replytopath"));
+                .From(x => x.Find("from"))
+                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"))
+                .ReplyTo(x => x.Find("replytoconnectionstring"), x => x.Find("replytopath"));
+
+            RegisterEndPoint<BrokeredMessageEndPointSettingFinder, Request>();
         }
     }
 }

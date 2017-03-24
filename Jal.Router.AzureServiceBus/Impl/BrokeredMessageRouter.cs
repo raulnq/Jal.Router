@@ -20,11 +20,11 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public IBrokeredMessageEndPointProvider Provider { get; set; }
 
-        public IBrokeredMessageSettingsExtractorFactory Factory { get; set; }
+        public IBrokeredMessageEndPointSettingProvider SettingsProvider { get; set; }
 
         private readonly ILog _log;
 
-        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageAdapter adapter, IBrokeredMessageContextBuilder builder, IBrokeredMessageEndPointProvider provider, IBrokeredMessageSettingsExtractorFactory factory)
+        public BrokeredMessageRouter(ILog log, IRouter router, IBrokeredMessageAdapter adapter, IBrokeredMessageContextBuilder builder, IBrokeredMessageEndPointProvider provider, IBrokeredMessageEndPointSettingProvider settingsprovider)
         {
             _log = log;
 
@@ -38,7 +38,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             Provider = provider;
 
-            Factory = factory;
+            SettingsProvider = settingsprovider;
         }
 
         public void Route<TContent>(BrokeredMessage brokeredMessage, string name="")
@@ -94,6 +94,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 if (!string.IsNullOrEmpty(context.ReplyToConnectionString) && !string.IsNullOrEmpty(context.ReplyToQueue))
                 {
+
                     var queueclient = QueueClient.CreateFromConnectionString(context.ReplyToConnectionString, context.ReplyToQueue);
 
                     var message = Adapter.Writer(content);
@@ -101,6 +102,8 @@ namespace Jal.Router.AzureServiceBus.Impl
                     message.CorrelationId = context.MessageId;
 
                     message.MessageId = context.MessageId;
+
+                    _log.Info($"[BrokeredMessageRouter.cs, ReplyToQueue, {context.MessageId}] Sending message to connectionstring: {context.ReplyToConnectionString} queue: {context.ReplyToQueue} messageId: {message.MessageId} correlationid: {message.CorrelationId}");
 
                     queueclient.Send(message);
 
@@ -120,6 +123,64 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         }
 
+        public void SendToQueue<TContent>(TContent content, BrokeredMessageContext context, BrokeredMessageEndPoint endpoint, string messageid)
+        {
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Start Call.");
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(endpoint.ToConnectionString) && !string.IsNullOrWhiteSpace(endpoint.To))
+                {
+                    var queueclient = QueueClient.CreateFromConnectionString(endpoint.ToConnectionString, endpoint.To);
+
+                    var message = Adapter.Writer(content);
+
+
+                    if (!string.IsNullOrWhiteSpace(endpoint.ReplyToConnectionString) && !string.IsNullOrWhiteSpace(endpoint.ReplyTo))
+                    {
+                        message.ReplyTo = $"{endpoint.ReplyToConnectionString};queue={endpoint.ReplyTo}";
+
+                        message.Properties.Add("replytoconnectionstring", endpoint.ReplyToConnectionString);
+
+                        message.Properties.Add("replytoqueue", endpoint.ReplyTo);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(messageid))
+                    {
+                        message.MessageId = messageid;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(endpoint.From))
+                    {
+                        message.Properties.Add("from", endpoint.From);
+                    }
+
+                    _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Sending message to connectionstring: {endpoint.ToConnectionString} queue: {endpoint.To} messageId: {message.MessageId}");
+
+                    queueclient.Send(message);
+
+                    queueclient.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Exception.", ex);
+
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+
+                _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
+            }
+
+        }
+
         public void SendToQueue<TContent>(TContent content, BrokeredMessageContext context, string messageid, string name = "")
         {
             var stopwatch = new Stopwatch();
@@ -134,62 +195,38 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 foreach (var endpoint in endpoints)
                 {
-                    var extractor = Factory.Create(endpoint.ExtractorType);
+                    var brokeredmessageendpoint = SettingsProvider.Provide<TContent>(endpoint, content);
 
-                    var toconnectionextractor = endpoint.ToConnectionStringExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
-
-                    var topathextractor = endpoint.ToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
-
-                    if (toconnectionextractor != null && topathextractor != null)
+                    if (!string.IsNullOrWhiteSpace(brokeredmessageendpoint.ToConnectionString) && !string.IsNullOrWhiteSpace(brokeredmessageendpoint.To))
                     {
-                        var toconnection = toconnectionextractor(extractor);
+                        var queueclient = QueueClient.CreateFromConnectionString(brokeredmessageendpoint.ToConnectionString, brokeredmessageendpoint.To);
 
-                        var topath = topathextractor(extractor);
+                        var message = Adapter.Writer(content);
 
-                        if (!string.IsNullOrWhiteSpace(toconnection) && !string.IsNullOrWhiteSpace(topath))
+                        if (!string.IsNullOrWhiteSpace(brokeredmessageendpoint.ReplyToConnectionString) && !string.IsNullOrWhiteSpace(brokeredmessageendpoint.ReplyTo))
                         {
-                            var queueclient = QueueClient.CreateFromConnectionString(toconnection, topath);
+                            message.ReplyTo = $"{brokeredmessageendpoint.ReplyToConnectionString};queue={brokeredmessageendpoint.ReplyTo}";
 
-                            var message = Adapter.Writer(content);
+                            message.Properties.Add("replytoconnectionstring", brokeredmessageendpoint.ReplyToConnectionString);
 
-                            var toreplyconnectionextractor = endpoint.ReplyToConnectionStringExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
-
-                            var toreplypathextractor = endpoint.ReplyToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
-
-                            if (toreplyconnectionextractor != null && toreplypathextractor != null)
-                            {
-                                var toreplyconnection = toreplyconnectionextractor(extractor);
-
-                                var toreplypath = toreplypathextractor(extractor);
-
-                                if (!string.IsNullOrWhiteSpace(toreplyconnection) && !string.IsNullOrWhiteSpace(toreplypath))
-                                {
-                                    message.ReplyTo = $"{toreplyconnection};queue={toreplypath}";
-
-                                    message.Properties.Add("replytoconnectionstring", toreplyconnection);
-
-                                    message.Properties.Add("replytoqueue", toreplypath);
-                                }
-                            }
-
-                            var fromextractor = endpoint.ReplyToPathExtractor as Func<IBrokeredMessageSettingsExtractor, string>;
-
-                            var from = fromextractor?.Invoke(extractor);
-
-                            if (!string.IsNullOrWhiteSpace(messageid))
-                            {
-                                message.MessageId = messageid;
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(from))
-                            {
-                                message.Properties.Add("from", from);
-                            }
-
-                            queueclient.Send(message);
-
-                            queueclient.Close();
+                            message.Properties.Add("replytoqueue", brokeredmessageendpoint.ReplyTo);
                         }
+ 
+                        if (!string.IsNullOrWhiteSpace(messageid))
+                        {
+                            message.MessageId = messageid;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(brokeredmessageendpoint.From))
+                        {
+                            message.Properties.Add("from", brokeredmessageendpoint.From);
+                        }
+
+                        _log.Info($"[BrokeredMessageRouter.cs, SendToQueue, {context.MessageId}] Sending message to connectionstring: {brokeredmessageendpoint.ToConnectionString} queue: {brokeredmessageendpoint.To} messageId: {message.MessageId}");
+
+                        queueclient.Send(message);
+
+                        queueclient.Close();
                     }
                 }
             }

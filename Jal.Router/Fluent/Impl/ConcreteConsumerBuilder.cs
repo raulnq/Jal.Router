@@ -16,6 +16,11 @@ namespace Jal.Router.Fluent.Impl
 
         public void ToBeConsumedBy<TConcreteConsumer>(Action<IWhithMethodBuilder<TBody, TConsumer>> action) where TConcreteConsumer : TConsumer
         {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             _route.ConsumerType = typeof (TConcreteConsumer);
 
             var whitRouteBuilder = new WhitRouteBuilder<TBody, TConsumer>(_route);

@@ -17,6 +17,11 @@ namespace Jal.Router.Fluent.Impl
 
         public IWhenMethodBuilder<TBody, TConsumer> With(Action<TBody, TConsumer> method)
         {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+
             var routemethod = new RouteMethod<TBody, TConsumer>(method);
 
             _route.RouteMethods.Add(routemethod);
@@ -26,6 +31,11 @@ namespace Jal.Router.Fluent.Impl
 
         public IWhenMethodBuilder<TBody, TConsumer> With<TContext>(Action<TBody, TConsumer, TContext> method)
         {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+
             Action<TBody, TConsumer, dynamic> wrapper = (b,c,d) => method(b,c,d);
 
             var routemethod = new RouteMethod<TBody, TConsumer>(wrapper);

@@ -3,9 +3,9 @@ using Jal.Router.AzureServiceBus.Interface;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class AppBrokeredMessageSettingsExtractor : IBrokeredMessageSettingsExtractor
+    public class AppBrokeredMessageEndPointSettingValueFinder : IBrokeredMessageEndPointSettingValueFinder
     {
-        public string Get(string name)
+        public string Find(string name)
         {
             return ConfigurationManager.AppSettings[name];
         }
