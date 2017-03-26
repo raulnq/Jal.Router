@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class BrokeredMessageAdapter : IBrokeredMessageAdapter
+    public class BrokeredMessageContentAdapter : IBrokeredMessageContentAdapter
     {
         public TBody Read<TBody>(BrokeredMessage brokeredMessage)
         {

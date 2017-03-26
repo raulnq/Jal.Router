@@ -13,9 +13,9 @@ namespace Jal.Router.Impl
             _serviceLocator = serviceLocator;
         }
 
-        public T Create<T>(Type type) where T : class
+        public THandler Create<THandler>(Type type) where THandler : class
         {
-            return _serviceLocator.Resolve<T>(type.FullName);
+            return _serviceLocator.Resolve<THandler>(type.FullName);
         }
     }
 }

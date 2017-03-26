@@ -2,7 +2,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Interface
 {
-    public interface IBrokeredMessageAdapter
+    public interface IBrokeredMessageContentAdapter
     {
         TBody Read<TBody>(BrokeredMessage brokeredMessage);
 

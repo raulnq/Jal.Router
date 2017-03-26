@@ -4,10 +4,10 @@ namespace Jal.Router.Interface
 {
     public interface IBus
     {
-        void ReplyTo<TContent>(TContent content, Context context);
+        void ReplyTo<TContent>(TContent content, InboundMessageContext context);
 
-        void Send<TContent>(TContent content, Context context, string id="", string name = "");
+        void Send<TContent>(TContent content, InboundMessageContext context, string id="", string name = "");
 
-        void Send<TContent>(TContent content, Context context, EndPointSetting endpoint, string id="");
+        void Send<TContent>(TContent content, InboundMessageContext context, EndPointSetting endpoint, string id="");
     }
 }

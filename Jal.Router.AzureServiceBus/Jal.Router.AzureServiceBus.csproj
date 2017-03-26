@@ -59,14 +59,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\BrokeredMessageBus.cs" />
-    <Compile Include="Impl\ContextBuilder.cs" />
+    <Compile Include="Impl\AzureServiceBusQueue.cs" />
+    <Compile Include="Impl\BrokeredMessageFromAdapter.cs" />
+    <Compile Include="Impl\BrokeredMessageIdAdapter.cs" />
+    <Compile Include="Impl\BrokeredMessageReplyToAdapter.cs" />
+    <Compile Include="Interface\IBrokeredMessageFromAdapter.cs" />
     <Compile Include="Impl\BrokeredMessageRouter.cs" />
-    <Compile Include="Impl\BrokeredMessageAdapter.cs" />
+    <Compile Include="Impl\BrokeredMessageContentAdapter.cs" />
     <Compile Include="Impl\AbstractBrokeredMessageRouterInterceptor.cs" />
+    <Compile Include="Impl\LoggerBusInterceptor.cs" />
     <Compile Include="Impl\NullBrokeredMessageRouterInterceptor.cs" />
-    <Compile Include="Interface\IContextBuilder.cs" />
-    <Compile Include="Interface\IBrokeredMessageAdapter.cs" />
+    <Compile Include="Interface\IBrokeredMessageIdAdapter.cs" />
+    <Compile Include="Interface\IBrokeredMessageReplyToAdapter.cs" />
+    <Compile Include="Interface\IBrokeredMessageContentAdapter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouterInterceptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,9 +85,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

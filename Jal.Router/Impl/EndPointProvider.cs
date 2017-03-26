@@ -33,12 +33,12 @@ namespace Jal.Router.Impl
 
         public IEndPointSettingFinderFactory Factory { get; set; }
 
-        public EndPointSetting Provide<T>(EndPoint endpoint, T content)
+        public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)
         {
 
             var isvaluefinder = typeof(IEndPointValueSettingFinder).IsAssignableFrom(endpoint.ExtractorType);
 
-            var isfinder = typeof(IEndPointSettingFinder<T>).IsAssignableFrom(endpoint.ExtractorType);
+            var isfinder = typeof(IEndPointSettingFinder<TContent>).IsAssignableFrom(endpoint.ExtractorType);
 
             if (isvaluefinder)
             {
@@ -47,7 +47,7 @@ namespace Jal.Router.Impl
 
             if (isfinder)
             {
-                return Finder<T>(endpoint, content);
+                return Finder(endpoint, content);
             }
 
             return null;

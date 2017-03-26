@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using Jal.Router.Model;
-
-namespace Jal.Router.Interface
+﻿namespace Jal.Router.Interface
 {
     public interface IRouter
     {

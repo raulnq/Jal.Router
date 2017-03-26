@@ -18,11 +18,13 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
-            container.Register<EndPointSettingFinderFactory, EndPointSettingFinderFactory>(new PerContainerLifetime());
+            container.Register<IEndPointSettingFinderFactory, EndPointSettingFinderFactory>(new PerContainerLifetime());
 
             container.Register<IEndPointValueSettingFinder, AppSettingEndPointValueSettingFinder>(typeof(AppSettingEndPointValueSettingFinder).FullName ,new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof(EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
+
+            container.Register<IBus, Bus>(new PerContainerLifetime());
 
             if (sourceassemblies != null)
             {

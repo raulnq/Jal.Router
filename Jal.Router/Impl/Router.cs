@@ -139,7 +139,7 @@ namespace Jal.Router.Impl
 
                 var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
 
-                genericroutemethod.Invoke(this, new[] { (object)content, context, route });
+                genericroutemethod.Invoke(this, new object[] { content, context, route });
             }
         }
 
