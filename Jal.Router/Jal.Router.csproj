@@ -35,6 +35,7 @@
       <HintPath>..\packages\Jal.Locator.1.0.6.0\lib\net40\Jal.Locator.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,25 +44,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fluent\Interface\IConcreteConsumerBuilder.cs" />
+    <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
+    <Compile Include="Fluent\Interface\IFromEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IInterceptorRouterBuilder.cs" />
+    <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IReplyToEndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
-    <Compile Include="Interface\IConsumerFactory.cs" />
+    <Compile Include="Impl\AppSettingEndPointValueSettingFinder.cs" />
+    <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
+    <Compile Include="Impl\EndPointProvider.cs" />
+    <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
+    <Compile Include="Interface\IEndPointProvider.cs" />
+    <Compile Include="Interface\IEndPointSettingFinder.cs" />
+    <Compile Include="Interface\IEndPointValueSettingFinder.cs" />
+    <Compile Include="Interface\IEndPointSettingFinderFactory.cs" />
+    <Compile Include="Interface\IHandlerFactory.cs" />
     <Compile Include="Interface\IRouteProvider.cs" />
     <Compile Include="Impl\RouteProvider.cs" />
+    <Compile Include="Interface\IBus.cs" />
+    <Compile Include="Model\EndPointSetting.cs" />
+    <Compile Include="Model\EndPoint.cs" />
     <Compile Include="Model\Flow.cs" />
     <Compile Include="Model\Route.cs" />
     <Compile Include="Model\RouteMethod.cs" />
     <Compile Include="Interface\IRouterConfigurationSource.cs" />
-    <Compile Include="Fluent\Impl\ConcreteConsumerBuilder.cs" />
+    <Compile Include="Fluent\Impl\HandlerBuilder.cs" />
     <Compile Include="Fluent\Impl\WhenRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\WhitRouteBuilder.cs" />
     <Compile Include="Impl\NullRouterInterceptor.cs" />
     <Compile Include="Impl\AbstractRouterInterceptor.cs" />
-    <Compile Include="Impl\ConsumerFactory.cs" />
+    <Compile Include="Impl\HandlerFactory.cs" />
     <Compile Include="Impl\Router.cs" />
     <Compile Include="Fluent\Interface\IRouterBuilder.cs" />
     <Compile Include="Interface\IRouter.cs" />
@@ -70,6 +87,7 @@
     <Compile Include="Fluent\Interface\IRouterEndBuilder.cs" />
     <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
     <Compile Include="Fluent\Impl\RouterBuilder.cs" />
+    <Compile Include="Model\Context.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

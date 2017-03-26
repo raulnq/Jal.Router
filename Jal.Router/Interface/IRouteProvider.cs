@@ -5,7 +5,7 @@ namespace Jal.Router.Interface
 {
     public interface IRouteProvider
     {
-        Route<TBody, TConsumer>[] Provide<TBody, TConsumer>(string name);
-        Route[] Provide(Type bodytype, string name);
+        Route<TContent, THandler>[] Provide<TContent, THandler>(string name);
+        Route[] Provide(Type type, string name);
     }
 }

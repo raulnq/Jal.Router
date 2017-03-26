@@ -1,11 +1,11 @@
 ﻿using System;
-using Jal.Router.AzureServiceBus.Fluent.Interface;
-using Jal.Router.AzureServiceBus.Interface;
-using Jal.Router.AzureServiceBus.Model;
+using Jal.Router.Fluent.Interface;
+using Jal.Router.Interface;
+using Jal.Router.Model;
 
-namespace Jal.Router.AzureServiceBus.Fluent.Impl
+namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, IFromEndPointBuilder, INameEndPointBuilder where TExtractor : IBrokeredMessageEndPointSettingValueFinder
+    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, IFromEndPointBuilder, INameEndPointBuilder where TExtractor : IEndPointValueSettingFinder
     {
         private readonly EndPoint _endpoint;
 
@@ -23,7 +23,7 @@ namespace Jal.Router.AzureServiceBus.Fluent.Impl
             return this;
         }
 
-        public IToEndPointBuilder From(Func<IBrokeredMessageEndPointSettingValueFinder, string> fromextractor)
+        public IToEndPointBuilder From(Func<IEndPointValueSettingFinder, string> fromextractor)
         {
             if (fromextractor == null)
             {
@@ -35,7 +35,7 @@ namespace Jal.Router.AzureServiceBus.Fluent.Impl
             return this;
         }
 
-        public void ReplyTo(Func<IBrokeredMessageEndPointSettingValueFinder, string> connectionstringextractor, Func<IBrokeredMessageEndPointSettingValueFinder, string> pathextractor)
+        public void ReplyTo(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)
         {
             if (connectionstringextractor == null)
             {
@@ -52,7 +52,7 @@ namespace Jal.Router.AzureServiceBus.Fluent.Impl
             _endpoint.ReplyToPathExtractor = pathextractor;
         }
 
-        public IReplyToEndPointBuilder To(Func<IBrokeredMessageEndPointSettingValueFinder, string> connectionstringextractor, Func<IBrokeredMessageEndPointSettingValueFinder, string> pathextractor)
+        public IReplyToEndPointBuilder To(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)
         {
             if (connectionstringextractor == null)
             {

@@ -4,18 +4,18 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class ConsumerFactory : IConsumerFactory
+    public class HandlerFactory : IHandlerFactory
     {
         private readonly IServiceLocator _serviceLocator;
 
-        public ConsumerFactory(IServiceLocator serviceLocator)
+        public HandlerFactory(IServiceLocator serviceLocator)
         {
             _serviceLocator = serviceLocator;
         }
 
-        public T Create<T>(Type consumertype) where T : class
+        public T Create<T>(Type type) where T : class
         {
-            return _serviceLocator.Resolve<T>(consumertype.FullName);
+            return _serviceLocator.Resolve<T>(type.FullName);
         }
     }
 }

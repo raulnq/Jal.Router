@@ -5,6 +5,8 @@ namespace Jal.Router.Interface
 {
     public interface IRouterConfigurationSource
     {
-        Route[] Source();
+        Route[] GetRoutes();
+
+        EndPoint[] GetEndPoints();
     }
 }

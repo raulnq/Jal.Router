@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.Tests.Model
 {
-    public class Request
+    public class Message
     {
         public string Name { get; set; }
     }

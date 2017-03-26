@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class NameRouteBuilder<TConsumer> : INameRouteBuilder<TConsumer>
+    public class NameRouteBuilder<THandler> : INameRouteBuilder<THandler>
     {
         private readonly string _name;
 
@@ -18,11 +18,11 @@ namespace Jal.Router.Fluent.Impl
             _routes = routes;
         }
 
-        public IConcreteConsumerBuilder<TBody, TConsumer> ForMessage<TBody>()
+        public IHandlerBuilder<TBody, THandler> ForMessage<TBody>()
         {
-            var value = new Route<TBody, TConsumer>(_name);
+            var value = new Route<TBody, THandler>(_name);
 
-            var builder = new ConcreteConsumerBuilder<TBody, TConsumer>(value);
+            var builder = new HandlerBuilder<TBody, THandler>(value);
 
             _routes.Add(value);
 

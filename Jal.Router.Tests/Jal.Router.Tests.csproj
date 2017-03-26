@@ -88,14 +88,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\BrokeredMessageEndPointSettingFinder.cs" />
-    <Compile Include="Impl\BrokeredMessageRouterConfigurationSource.cs" />
+    <Compile Include="Impl\EndPointSettingFinder.cs" />
     <Compile Include="Impl\OtherMessageHandler.cs" />
     <Compile Include="Impl\MessageHandler.cs" />
     <Compile Include="Impl\RouterConfigurationSource.cs" />
     <Compile Include="Integration\Tests.cs" />
     <Compile Include="Model\Response.cs" />
-    <Compile Include="Model\Request.cs" />
+    <Compile Include="Model\Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

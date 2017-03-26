@@ -2,10 +2,10 @@ using System;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IWhenMethodBuilder<out TBody, out TConsumer>
+    public interface IWhenMethodBuilder<out TBody, out THandler>
     {
-        void When(Func<TBody, TConsumer, bool> method);
+        void When(Func<TBody, THandler, bool> method);
 
-        void When<TContext>(Func<TBody, TConsumer, TContext, bool> method);
+        void When<TContext>(Func<TBody, THandler, TContext, bool> method);
     }
 }

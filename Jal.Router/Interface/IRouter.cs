@@ -1,14 +1,15 @@
-﻿using Jal.Router.Model;
+﻿using System.Collections;
+using Jal.Router.Model;
 
 namespace Jal.Router.Interface
 {
     public interface IRouter
     {
-        void Route<TBody>(TBody body, string name="");
+        void Route<TContent>(TContent content, string name="");
 
-        void Route<TBody>(TBody body, dynamic context, string name = "");
+        void Route<TContent>(TContent content, dynamic context, string name = "");
 
-        IConsumerFactory Factory { get; }
+        IHandlerFactory Factory { get; }
 
         IRouteProvider Provider { get;}
 

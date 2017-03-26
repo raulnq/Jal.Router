@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -9,13 +8,13 @@ namespace Jal.Router.Impl
 
     public class Router : IRouter
     {
-        public IConsumerFactory Factory { get; set; }
+        public IHandlerFactory Factory { get; set; }
 
         public IRouteProvider Provider { get; set; }
 
         public IRouterInterceptor Interceptor { get; set; }
 
-        public Router(IConsumerFactory factory, IRouteProvider provider)
+        public Router(IHandlerFactory factory, IRouteProvider provider)
         {
             Factory = factory;
 
@@ -24,15 +23,15 @@ namespace Jal.Router.Impl
             Interceptor = AbstractRouterInterceptor.Instance;
         }
 
-        public void InternalRoute<TBody, TConsumer>(TBody body, dynamic context, Route<TBody, TConsumer> route) where TConsumer : class
+        public void InternalRoute<TContent, THandler>(TContent content, dynamic context, Route<TContent, THandler> route) where THandler : class
         {
-            var consumer = Factory.Create<TConsumer>(route.ConsumerType);
+            var consumer = Factory.Create<THandler>(route.ConsumerType);
 
             foreach (var routeMethod in route.RouteMethods)
             {
                 try
                 {
-                    Interceptor.OnEntry(body, consumer);
+                    Interceptor.OnEntry(content, consumer);
 
                     if (routeMethod.EvaluatorWithContext == null)
                     {
@@ -40,61 +39,61 @@ namespace Jal.Router.Impl
                         {
                             if (routeMethod.ConsumerWithContext != null)
                             {
-                                routeMethod.ConsumerWithContext(body, consumer, context);
+                                routeMethod.ConsumerWithContext(content, consumer, context);
 
-                                Interceptor.OnSuccess(body, consumer);
+                                Interceptor.OnSuccess(content, consumer);
                             }
                             else
                             {
                                 if (routeMethod.Consumer != null)
                                 {
-                                    routeMethod.Consumer(body, consumer);
+                                    routeMethod.Consumer(content, consumer);
 
-                                    Interceptor.OnSuccess(body, consumer);
+                                    Interceptor.OnSuccess(content, consumer);
                                 }
                             }
                         }
                         else
                         {
-                            if (routeMethod.Evaluator(body, consumer))
+                            if (routeMethod.Evaluator(content, consumer))
                             {
                                 if (routeMethod.ConsumerWithContext != null)
                                 {
-                                    routeMethod.ConsumerWithContext(body, consumer, context);
+                                    routeMethod.ConsumerWithContext(content, consumer, context);
 
-                                    Interceptor.OnSuccess(body, consumer);
+                                    Interceptor.OnSuccess(content, consumer);
                                 }
                                 else
                                 {
                                     if (routeMethod.Consumer != null)
                                     {
-                                        routeMethod.Consumer(body, consumer);
+                                        routeMethod.Consumer(content, consumer);
 
-                                        Interceptor.OnSuccess(body, consumer);
+                                        Interceptor.OnSuccess(content, consumer);
                                     }
                                 }
                             }
                         }
 
-                        Interceptor.OnSuccess(body, consumer);
+                        Interceptor.OnSuccess(content, consumer);
                     }
                     else
                     {
-                        if (routeMethod.EvaluatorWithContext(body, consumer, context))
+                        if (routeMethod.EvaluatorWithContext(content, consumer, context))
                         {
                             if (routeMethod.ConsumerWithContext != null)
                             {
-                                routeMethod.ConsumerWithContext(body, consumer, context);
+                                routeMethod.ConsumerWithContext(content, consumer, context);
 
-                                Interceptor.OnSuccess(body, consumer);
+                                Interceptor.OnSuccess(content, consumer);
                             }
                             else
                             {
                                 if (routeMethod.Consumer != null)
                                 {
-                                    routeMethod.Consumer(body, consumer);
+                                    routeMethod.Consumer(content, consumer);
 
-                                    Interceptor.OnSuccess(body, consumer);
+                                    Interceptor.OnSuccess(content, consumer);
                                 }
                             }
                         }
@@ -102,19 +101,19 @@ namespace Jal.Router.Impl
                 }
                 catch (Exception ex)
                 {
-                    Interceptor.OnError(body, consumer, ex);
+                    Interceptor.OnError(content, consumer, ex);
                     throw;
                 }
                 finally
                 {
-                    Interceptor.OnExit(body, consumer);
+                    Interceptor.OnExit(content, consumer);
                 }
             }
         }
 
-        public void Route<TBody>(TBody body, string name = "")
+        public void Route<TContent>(TContent content, string name = "")
         {
-            var bodytype = typeof (TBody);
+            var bodytype = typeof (TContent);
 
             var routes = Provider.Provide(bodytype, name);
 
@@ -124,13 +123,13 @@ namespace Jal.Router.Impl
 
                 var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
 
-                genericroutemethod.Invoke(this, new[] { (object)body, route });
+                genericroutemethod.Invoke(this, new[] { (object)content, route });
             }
         }
 
-        public void Route<TBody>(TBody body, dynamic context, string name = "")
+        public void Route<TContent>(TContent content, dynamic context, string name = "")
         {
-            var bodytype = typeof(TBody);
+            var bodytype = typeof(TContent);
 
             var routes = Provider.Provide(bodytype, name);
 
@@ -140,50 +139,50 @@ namespace Jal.Router.Impl
 
                 var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
 
-                genericroutemethod.Invoke(this, new[] { (object)body, context, route });
+                genericroutemethod.Invoke(this, new[] { (object)content, context, route });
             }
         }
 
-        public void InternalRoute<TBody, TConsumer>(TBody body, Route<TBody, TConsumer> route) where TConsumer : class 
+        public void InternalRoute<TContent, THandler>(TContent content, Route<TContent, THandler> route) where THandler : class 
         {
-            var consumer = Factory.Create<TConsumer>(route.ConsumerType);
+            var consumer = Factory.Create<THandler>(route.ConsumerType);
 
             foreach (var routeMethod in route.RouteMethods)
             {
                 try
                 {
-                    Interceptor.OnEntry(body, consumer);
+                    Interceptor.OnEntry(content, consumer);
 
                     if (routeMethod.Evaluator == null)
                     {
                         if (routeMethod.Consumer != null)
                         {
-                            routeMethod.Consumer(body, consumer);
+                            routeMethod.Consumer(content, consumer);
 
-                            Interceptor.OnSuccess(body, consumer);
+                            Interceptor.OnSuccess(content, consumer);
                         }
                     }
                     else
                     {
-                        if (routeMethod.Evaluator(body, consumer))
+                        if (routeMethod.Evaluator(content, consumer))
                         {
                             if (routeMethod.Consumer != null)
                             {
-                                routeMethod.Consumer(body, consumer);
+                                routeMethod.Consumer(content, consumer);
 
-                                Interceptor.OnSuccess(body, consumer);
+                                Interceptor.OnSuccess(content, consumer);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Interceptor.OnError(body, consumer, ex);
+                    Interceptor.OnError(content, consumer, ex);
                     throw;
                 }
                 finally
                 {
-                    Interceptor.OnExit(body, consumer);
+                    Interceptor.OnExit(content, consumer);
                 }
             }
         }

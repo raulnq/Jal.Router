@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using LightInject;
@@ -11,9 +12,17 @@ namespace Jal.Router.LightInject.Installer
         {
             container.Register<IRouter, Impl.Router>(new PerContainerLifetime());
 
-            container.Register<IConsumerFactory, ConsumerFactory>(new PerContainerLifetime());
+            container.Register<IHandlerFactory, HandlerFactory>(new PerContainerLifetime());
 
             container.Register<IRouteProvider, RouteProvider>(new PerContainerLifetime());
+
+            container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
+
+            container.Register<EndPointSettingFinderFactory, EndPointSettingFinderFactory>(new PerContainerLifetime());
+
+            container.Register<IEndPointValueSettingFinder, AppSettingEndPointValueSettingFinder>(typeof(AppSettingEndPointValueSettingFinder).FullName ,new PerContainerLifetime());
+
+            container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof(EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
 
             if (sourceassemblies != null)
             {
@@ -24,6 +33,22 @@ namespace Jal.Router.LightInject.Installer
                         if (exportedType.IsSubclassOf(typeof(AbstractRouterConfigurationSource)))
                         {
                             container.Register(typeof(AbstractRouterConfigurationSource), exportedType, exportedType.FullName, new PerContainerLifetime());
+                        }
+
+                        if (typeof(IEndPointValueSettingFinder).IsAssignableFrom(exportedType))
+                        {
+                            container.Register(typeof(IEndPointValueSettingFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
+                        }
+
+                        if (exportedType.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)))
+                        {
+                            var argument = exportedType.GetGenericArguments();
+
+                            var type = typeof(IEndPointSettingFinder<>);
+
+                            var genericType = type.MakeGenericType(argument);
+
+                            container.Register(genericType, exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
                     }
                 }

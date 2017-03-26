@@ -15,27 +15,27 @@ namespace Jal.Router.Impl
 
             foreach (var source in sources)
             {
-                routes.AddRange(source.Source());
+                routes.AddRange(source.GetRoutes());
             }
 
             _routes = routes.ToArray();
         }
 
 
-        public Route<TBody, TConsumer>[] Provide<TBody, TConsumer>(string name)
+        public Route<TContent, THandler>[] Provide<TContent, THandler>(string name)
         {
-            return Provide(typeof (TBody), name).Where(x=>x.ConsumerInterfaceType==typeof(TConsumer)).OfType<Route<TBody, TConsumer>>().ToArray();
+            return Provide(typeof (TContent), name).Where(x=>x.ConsumerInterfaceType==typeof(THandler)).OfType<Route<TContent, THandler>>().ToArray();
         }
 
-        public Route[] Provide(Type bodytype, string name)
+        public Route[] Provide(Type type, string name)
         {
             if (string.IsNullOrEmpty(name))
             {
-                return _routes.Where(x => x.BodyType == bodytype).ToArray();
+                return _routes.Where(x => x.BodyType == type).ToArray();
             }
             else
             {
-                return _routes.Where(x => x.Name == name && x.BodyType == bodytype).ToArray();
+                return _routes.Where(x => x.Name == name && x.BodyType == type).ToArray();
             }
             
         }

@@ -1,4 +1,4 @@
-using Jal.Router.AzureServiceBus.Model;
+using Jal.Router.Interface;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Interface
@@ -6,11 +6,5 @@ namespace Jal.Router.AzureServiceBus.Interface
     public interface IBrokeredMessageRouter
     {
         void Route<TContent>(BrokeredMessage brokeredMessage, string name = "");
-
-        void ReplyToQueue<TContent>(TContent content, BrokeredMessageContext context);
-
-        void SendToQueue<TContent>(TContent content, BrokeredMessageContext context, string messageid, string name = "");
-
-        void SendToQueue<TContent>(TContent content, BrokeredMessageContext context, BrokeredMessageEndPoint endpoint, string messageid);
     }
 }

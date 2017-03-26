@@ -59,6 +59,10 @@
       <Project>{f016307f-797e-4fa0-b671-baea91188be9}</Project>
       <Name>Jal.Router.AzureServiceBus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj">
+      <Project>{01c0dba5-6a4b-49c0-b7bc-75c12b84f191}</Project>
+      <Name>Jal.Router</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

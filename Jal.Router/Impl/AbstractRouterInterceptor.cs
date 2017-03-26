@@ -7,19 +7,19 @@ namespace Jal.Router.Impl
     {
         public static IRouterInterceptor Instance = new NullRouterInterceptor();
 
-        public virtual void OnEntry<TBody, TConsumer>(TBody message, TConsumer consumer)
+        public virtual void OnEntry<TContent, THandler>(TContent content, THandler handler)
         {
         }
 
-        public virtual void OnExit<TBody, TConsumer>(TBody message, TConsumer consumer)
+        public virtual void OnExit<TContent, THandler>(TContent content, THandler handler)
         {
         }
 
-        public virtual void OnSuccess<TBody, TConsumer>(TBody message, TConsumer consumer)
+        public virtual void OnSuccess<TContent, THandler>(TContent content, THandler handler)
         {
         }
 
-        public virtual void OnError<TBody, TConsumer>(TBody message, TConsumer consumer, Exception ex)
+        public virtual void OnError<TContent, THandler>(TContent content, THandler handler, Exception ex)
         {
         }
     }

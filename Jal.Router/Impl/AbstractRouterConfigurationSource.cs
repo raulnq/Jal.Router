@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using Jal.Router.Fluent.Impl;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
@@ -12,16 +11,46 @@ namespace Jal.Router.Impl
     {
         private readonly List<Route> _routes = new List<Route>();
 
-        public Route[] Source()
+        private readonly List<EndPoint> _enpoints = new List<EndPoint>();
+
+        public Route[] GetRoutes()
         {
             return _routes.ToArray();
         }
 
-        public INameRouteBuilder<TConsumer> RegisterRoute<TConsumer>(string name="")
+        public EndPoint[] GetEndPoints()
         {
-            var builder = new NameRouteBuilder<TConsumer>(name, _routes);
+            return _enpoints.ToArray();
+        }
+
+        public INameRouteBuilder<THandler> RegisterRoute<THandler>(string name="")
+        {
+            var builder = new NameRouteBuilder<THandler>(name, _routes);
 
             return builder;
+        }
+
+
+        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IEndPointValueSettingFinder
+        {
+            var endpoint = new EndPoint(name);
+
+            _enpoints.Add(endpoint);
+
+            var builder = new EndPointBuilder<TExtractor>(endpoint);
+
+            return builder;
+        }
+
+        public void RegisterEndPoint<TExtractor, T>(string name = "") where TExtractor : IEndPointSettingFinder<T>
+        {
+            var endpoint = new EndPoint(name);
+
+            _enpoints.Add(endpoint);
+
+            endpoint.ExtractorType = typeof(TExtractor);
+
+            endpoint.MessageType = typeof(T);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Jal.Router.Fluent.Impl
 {
     public class RouterBuilder : IRouterBuilder, IRouterStartBuilder, IInterceptorRouterBuilder
     {
-        private IConsumerFactory _consumerFactory;
+        private IHandlerFactory _handlerFactory;
 
         private IRouterInterceptor _routerInterceptor;
 
@@ -21,7 +21,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(serviceLocator));
             }
 
-            _consumerFactory = new ConsumerFactory(serviceLocator);
+            _handlerFactory = new HandlerFactory(serviceLocator);
 
             return this;
         }
@@ -43,7 +43,7 @@ namespace Jal.Router.Fluent.Impl
         {
             get
             {
-                var result = new Router.Impl.Router(_consumerFactory, _routeProvider);
+                var result = new Router.Impl.Router(_handlerFactory, _routeProvider);
 
                 if (_routerInterceptor != null)
                 {

@@ -4,12 +4,12 @@ namespace Jal.Router.Interface
 {
     public interface IRouterInterceptor
     {
-        void OnEntry<TBody,TConsumer>(TBody message, TConsumer consumer);
+        void OnEntry<TContent,THandler>(TContent content, THandler handler);
 
-        void OnExit<TBody, TConsumer>(TBody message, TConsumer consumer);
+        void OnExit<TContent, THandler>(TContent content, THandler handler);
 
-        void OnSuccess<TBody, TConsumer>(TBody message, TConsumer consumer);
+        void OnSuccess<TContent, THandler>(TContent content, THandler handler);
 
-        void OnError<TBody, TConsumer>(TBody message, TConsumer consumer, Exception ex);
+        void OnError<TContent, THandler>(TContent content, THandler handler, Exception ex);
     }
 }

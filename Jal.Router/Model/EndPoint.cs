@@ -1,6 +1,6 @@
 using System;
 
-namespace Jal.Router.AzureServiceBus.Model
+namespace Jal.Router.Model
 {
     public class EndPoint
     {

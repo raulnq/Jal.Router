@@ -6,43 +6,43 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class WhitRouteBuilder<TBody, TConsumer> : IWhithMethodBuilder<TBody, TConsumer>
+    public class WhitRouteBuilder<TBody, THandler> : IWhithMethodBuilder<TBody, THandler>
     {
-        private readonly Route<TBody, TConsumer> _route;
+        private readonly Route<TBody, THandler> _route;
 
-        public WhitRouteBuilder(Route<TBody, TConsumer> route)
+        public WhitRouteBuilder(Route<TBody, THandler> route)
         {
             _route = route;
         }
 
-        public IWhenMethodBuilder<TBody, TConsumer> With(Action<TBody, TConsumer> method)
+        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            var routemethod = new RouteMethod<TBody, TConsumer>(method);
+            var routemethod = new RouteMethod<TBody, THandler>(method);
 
             _route.RouteMethods.Add(routemethod);
 
-            return new WhenRouteBuilder<TBody, TConsumer>(routemethod);
+            return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TBody, TConsumer> With<TContext>(Action<TBody, TConsumer, TContext> method)
+        public IWhenMethodBuilder<TBody, THandler> With<TContext>(Action<TBody, THandler, TContext> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Action<TBody, TConsumer, dynamic> wrapper = (b,c,d) => method(b,c,d);
+            Action<TBody, THandler, dynamic> wrapper = (b,c,d) => method(b,c,d);
 
-            var routemethod = new RouteMethod<TBody, TConsumer>(wrapper);
+            var routemethod = new RouteMethod<TBody, THandler>(wrapper);
 
             _route.RouteMethods.Add(routemethod);
 
-            return new WhenRouteBuilder<TBody, TConsumer>(routemethod);
+            return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
     }
 }

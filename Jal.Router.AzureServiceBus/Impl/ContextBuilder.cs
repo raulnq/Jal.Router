@@ -1,27 +1,28 @@
 using System;
 using Jal.Router.AzureServiceBus.Interface;
-using Jal.Router.AzureServiceBus.Model;
+using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class BrokeredMessageContextBuilder : IBrokeredMessageContextBuilder
+    public class ContextBuilder : IContextBuilder
     {
-        public BrokeredMessageContext Build(BrokeredMessage brokeredMessage)
+        public Context Build(BrokeredMessage brokeredMessage)
         {
-            var context = new BrokeredMessageContext
+            var context = new Context
             {
-                MessageId = brokeredMessage.MessageId,
-                ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo),
-                ReplyToQueue = GetEntity(brokeredMessage.ReplyTo),
+                Id = brokeredMessage.MessageId,
+                ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo),//TODO delete
+                ReplyToPath = GetEntity(brokeredMessage.ReplyTo),//TODO delete
                 To = brokeredMessage.To,
-                CorrelationId = brokeredMessage.CorrelationId
+                Correlation = brokeredMessage.CorrelationId
             };
 
             if (brokeredMessage.Properties.ContainsKey("from"))
             {
                 context.From = brokeredMessage.Properties["from"].ToString();
             }
+
             if (brokeredMessage.Properties.ContainsKey("replytoconnectionstring"))
             {
                 context.ReplyToConnectionString = brokeredMessage.Properties["replytoconnectionstring"].ToString();
@@ -29,12 +30,12 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (brokeredMessage.Properties.ContainsKey("replytoqueue"))
             {
-                context.ReplyToQueue = brokeredMessage.Properties["replytoqueue"].ToString();
+                context.ReplyToPath = brokeredMessage.Properties["replytoqueue"].ToString();
             }
 
             if (brokeredMessage.Properties.ContainsKey("replytotopic"))
             {
-                context.ReplyToTopic = brokeredMessage.Properties["replytotopic"].ToString();
+                context.ReplyToPublisherPath = brokeredMessage.Properties["replytotopic"].ToString();
             }
 
             return context;
@@ -63,11 +64,6 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
 
             return string.Empty;
-        }
-
-        public void Convert(BrokeredMessageContext context, BrokeredMessage brokeredMessage)
-        {
-            
         }
     }
 

@@ -4,14 +4,14 @@ using Jal.Router.Tests.Model;
 
 namespace Jal.Router.Tests.Impl
 {
-    public class MessageHandler : IMessageHandler<Request>
+    public class MessageHandler : IMessageHandler<Message>
     {
-        public void Handle(Request message)
+        public void Handle(Message message)
         {
             Console.WriteLine("Sender"+ message.Name);
         }
 
-        public void Handle(Request message, Response response)
+        public void Handle(Message message, Response response)
         {
             throw new NotImplementedException();
         }

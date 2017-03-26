@@ -59,35 +59,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\AppBrokeredMessageEndPointSettingValueFinder.cs" />
-    <Compile Include="Impl\BrokeredMessageContextBuilder.cs" />
-    <Compile Include="Impl\BrokeredMessageEndPointProvider.cs" />
-    <Compile Include="Impl\BrokeredMessageEndPointSettingProvider.cs" />
+    <Compile Include="Impl\BrokeredMessageBus.cs" />
+    <Compile Include="Impl\ContextBuilder.cs" />
     <Compile Include="Impl\BrokeredMessageRouter.cs" />
     <Compile Include="Impl\BrokeredMessageAdapter.cs" />
     <Compile Include="Impl\AbstractBrokeredMessageRouterInterceptor.cs" />
-    <Compile Include="Impl\BrokeredMessageSettingsFactory.cs" />
-    <Compile Include="Impl\EmptyBrokeredMessageRouterConfigurationSource.cs" />
-    <Compile Include="Interface\IBrokeredMessageEndPointProvider.cs" />
-    <Compile Include="Interface\IBrokeredMessageEndPointSettingFinder.cs" />
-    <Compile Include="Interface\IBrokeredMessageEndPointSettingProvider.cs" />
-    <Compile Include="Interface\IBrokeredMessageSettingsFactory.cs" />
     <Compile Include="Impl\NullBrokeredMessageRouterInterceptor.cs" />
-    <Compile Include="Interface\IBrokeredMessageContextBuilder.cs" />
+    <Compile Include="Interface\IContextBuilder.cs" />
     <Compile Include="Interface\IBrokeredMessageAdapter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouter.cs" />
     <Compile Include="Interface\IBrokeredMessageRouterInterceptor.cs" />
-    <Compile Include="Interface\IBrokeredMessageEndPointSettingValueFinder.cs" />
-    <Compile Include="Impl\AbstractBrokeredMessageRouterConfigurationSource.cs" />
-    <Compile Include="Model\BrokeredMessageContext.cs" />
-    <Compile Include="Model\BrokeredMessageEndPoint.cs" />
-    <Compile Include="Model\EndPoint.cs" />
-    <Compile Include="Interface\IBrokeredMessageRouterConfigurationSource.cs" />
-    <Compile Include="Fluent\Interface\IFromEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IReplyToEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
-    <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -99,7 +80,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

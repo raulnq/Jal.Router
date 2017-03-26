@@ -7,9 +7,9 @@ using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
 using Jal.Router.AzureServiceBus.Installer;
 using Jal.Router.AzureServiceBus.Interface;
-using Jal.Router.AzureServiceBus.Model;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
+using Jal.Router.Model;
 using Jal.Router.Tests.Impl;
 using Jal.Router.Tests.Model;
 using Jal.Settings.Installer;
@@ -23,7 +23,9 @@ namespace Jal.Router.Tests.Integration
     {
         private IRouter _router;
 
-        private IBrokeredMessageRouter _brokeredMessageRouter;
+        private IBrokeredMessageRouter _brokered;
+
+        private IBus _bus;
 
         [SetUp]
         public void SetUp()
@@ -35,12 +37,13 @@ namespace Jal.Router.Tests.Integration
             container.Install(new RouterInstaller(assemblies));
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
-            container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
-            container.Register(Component.For(typeof(IMessageHandler<Request>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
-            container.Install(new BrokeredMessageRouterInstaller(assemblies));
+            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
+            container.Install(new BrokeredMessageRouterInstaller());
             _router = container.Resolve<IRouter>();
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
-            _brokeredMessageRouter = container.Resolve<IBrokeredMessageRouter>();
+            _bus = container.Resolve<IBus>();
+            _brokered = container.Resolve<IBrokeredMessageRouter>();
         }
 
         [Test]
@@ -48,12 +51,15 @@ namespace Jal.Router.Tests.Integration
         {
             var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
 
-            var request = new Request();
-            //_router.Route<Request>(request);
-            //_brokeredMessageRouter.Route<Request>(bm);
+            var message = new Message();
+
+            _router.Route<Message>(message);
+
+            _brokered.Route<Message>(bm);
+
             //_router.Route(request, new Response() {Status = "Hi"});
 
-            _brokeredMessageRouter.SendToQueue(request, new BrokeredMessageContext(),"hola");
+            _bus.Send(message, new Context(),"hola");
         }
 
         //[Test]
