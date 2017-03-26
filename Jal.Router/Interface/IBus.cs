@@ -6,8 +6,8 @@ namespace Jal.Router.Interface
     {
         void ReplyTo<TContent>(TContent content, InboundMessageContext context);
 
-        void Send<TContent>(TContent content, InboundMessageContext context, string id="", string name = "");
+        void Send<TContent>(TContent content, Options options);
 
-        void Send<TContent>(TContent content, InboundMessageContext context, EndPointSetting endpoint, string id="");
+        void Send<TContent>(TContent content, EndPointSetting endpoint, Options options);
     }
 }

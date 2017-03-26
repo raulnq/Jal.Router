@@ -27,7 +27,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         {
             var queueclient = QueueClient.CreateFromConnectionString(context.ToConnectionString, context.ToPath);
 
-            var message = _contentAdapter.Writer(context);
+            var message = _contentAdapter.Writer(context.Content);
 
             _replyToAdapter.WritePath(context.ReplyToPath, message);
 

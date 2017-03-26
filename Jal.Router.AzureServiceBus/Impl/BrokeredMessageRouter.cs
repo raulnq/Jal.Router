@@ -49,7 +49,6 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             var context = new InboundMessageContext
             {
-                Correlation = brokeredMessage.CorrelationId,//TODO delete
                 Id = _idAdapter.Read(brokeredMessage),
                 From = _fromAdapter.Read(brokeredMessage),
                 ReplyToConnectionString = _replyToAdapter.ReadConnectionString(brokeredMessage),

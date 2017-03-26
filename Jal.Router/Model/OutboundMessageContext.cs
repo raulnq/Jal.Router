@@ -15,7 +15,6 @@ namespace Jal.Router.Model
     public class OutboundMessageContext
     {
         public string Id { get; set; }
-        public string Correlation { get; set; }
         public string ToConnectionString { get; set; }
         public string ToPath { get; set; }
         public string ReplyToConnectionString { get; set; }

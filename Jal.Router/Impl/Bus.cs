@@ -32,26 +32,27 @@ namespace Jal.Router.Impl
             {
                 Id = context.Id,
                 Content = content,
-                Correlation = context.Id,
                 //From = endpoint.From,
                 ToConnectionString = context.ReplyToConnectionString,
                 ToPath = context.ReplyToPath
             };
 
+            var options = new Options() {Correlation = context.Id };
+
             try
             {
-                Interceptor.OnEntry(outboundmessagecontext, "ReplyTo");
+                Interceptor.OnEntry(outboundmessagecontext, options, "ReplyTo");
 
                 if (!string.IsNullOrEmpty(outboundmessagecontext.ReplyToConnectionString) && !string.IsNullOrEmpty(outboundmessagecontext.ReplyToPath))
                 {
                     Queue.Enqueue(outboundmessagecontext);
 
-                    Interceptor.OnSuccess(outboundmessagecontext, "ReplyTo");
+                    Interceptor.OnSuccess(outboundmessagecontext, options, "ReplyTo");
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(outboundmessagecontext, "ReplyTo", ex);
+                Interceptor.OnError(outboundmessagecontext, options, "ReplyTo", ex);
 
                 throw;
             }
@@ -59,13 +60,13 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(outboundmessagecontext, "ReplyTo", stopwatch.ElapsedMilliseconds);
+                Interceptor.OnExit(outboundmessagecontext, options, "ReplyTo",  stopwatch.ElapsedMilliseconds);
             }
 
         }
 
 
-        public void Send<TContent>(TContent content, InboundMessageContext context, EndPointSetting endpoint, string id="")
+        public void Send<TContent>(TContent content, EndPointSetting endpoint, Options options)
         {
             var stopwatch = new Stopwatch();
 
@@ -73,9 +74,8 @@ namespace Jal.Router.Impl
 
             var outboundmessagecontext = new OutboundMessageContext<TContent>
             {
-                Id = id,
+                Id = options.MessageId,
                 Content = content,
-                Correlation = context.Id,
                 From = endpoint.From,
                 ReplyToConnectionString = endpoint.ReplyToConnectionString,
                 ReplyToPath = endpoint.ReplyToPath,
@@ -83,7 +83,7 @@ namespace Jal.Router.Impl
                 ToPath = endpoint.ToPath
             };
 
-            Interceptor.OnEntry(outboundmessagecontext, "Send");
+            Interceptor.OnEntry(outboundmessagecontext, options, "Send");
 
             try
             {
@@ -91,12 +91,12 @@ namespace Jal.Router.Impl
                 {
                     Queue.Enqueue(outboundmessagecontext);
 
-                    Interceptor.OnSuccess(outboundmessagecontext, "Send");
+                    Interceptor.OnSuccess(outboundmessagecontext, options,"Send");
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(outboundmessagecontext, "Send", ex);
+                Interceptor.OnError(outboundmessagecontext, options, "Send", ex);
 
                 throw;
             }
@@ -104,20 +104,20 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(outboundmessagecontext, "Send", stopwatch.ElapsedMilliseconds);
+                Interceptor.OnExit(outboundmessagecontext, options, "Send", stopwatch.ElapsedMilliseconds);
             }
 
         }
 
-        public void Send<TContent>(TContent content, InboundMessageContext context, string id="", string name = "")
+        public void Send<TContent>(TContent content, Options options)
         {
-            var endpoints = Provider.Provide<TContent>(name);
+            var endpoints = Provider.Provide<TContent>(options.EndPoint);
 
             foreach (var endpoint in endpoints)
             {
                 var setting = Provider.Provide(endpoint, content);
 
-                Send(content, context, setting, id);
+                Send(content, setting, options);
             }
         }
     }

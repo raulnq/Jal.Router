@@ -144,7 +144,7 @@ Use the BrokeredMessageBus class to send brokered messages to a queue
 
     var message = new Message();
 
-    _bus.Send(message, new InboundMessageContext());
+    _bus.Send(message, new Options());
 
 Use the BrokeredMessageBus class to reply brokered messages to a queue
 

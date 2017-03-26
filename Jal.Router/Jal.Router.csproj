@@ -78,6 +78,7 @@
     <Compile Include="Model\EndPoint.cs" />
     <Compile Include="Model\Flow.cs" />
     <Compile Include="Model\InboundMessageContext.cs" />
+    <Compile Include="Model\Options.cs" />
     <Compile Include="Model\OutboundMessageContext.cs" />
     <Compile Include="Model\Route.cs" />
     <Compile Include="Model\RouteMethod.cs" />
