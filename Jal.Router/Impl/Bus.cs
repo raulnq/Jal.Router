@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
             Interceptor = AbstractBusInterceptor.Instance;
         }
 
-        public void ReplyTo<TContent>(TContent content, InboundMessageContext context)
+        public void Reply<TContent>(TContent content, InboundMessageContext context)
         {
             var stopwatch = new Stopwatch();
 
@@ -41,18 +41,18 @@ namespace Jal.Router.Impl
 
             try
             {
-                Interceptor.OnEntry(outboundmessagecontext, options, "ReplyTo");
+                Interceptor.OnReplyEntry(outboundmessagecontext, options);
 
                 if (!string.IsNullOrEmpty(outboundmessagecontext.ReplyToConnectionString) && !string.IsNullOrEmpty(outboundmessagecontext.ReplyToPath))
                 {
                     Queue.Enqueue(outboundmessagecontext);
 
-                    Interceptor.OnSuccess(outboundmessagecontext, options, "ReplyTo");
+                    Interceptor.OnReplySuccess(outboundmessagecontext, options);
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(outboundmessagecontext, options, "ReplyTo", ex);
+                Interceptor.OnReplyError(outboundmessagecontext, options, ex);
 
                 throw;
             }
@@ -60,7 +60,7 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(outboundmessagecontext, options, "ReplyTo",  stopwatch.ElapsedMilliseconds);
+                Interceptor.OnReplyExit(outboundmessagecontext, options, stopwatch.ElapsedMilliseconds);
             }
 
         }
@@ -83,7 +83,7 @@ namespace Jal.Router.Impl
                 ToPath = endpoint.ToPath
             };
 
-            Interceptor.OnEntry(outboundmessagecontext, options, "Send");
+            Interceptor.OnSendEntry(outboundmessagecontext, options);
 
             try
             {
@@ -91,12 +91,12 @@ namespace Jal.Router.Impl
                 {
                     Queue.Enqueue(outboundmessagecontext);
 
-                    Interceptor.OnSuccess(outboundmessagecontext, options,"Send");
+                    Interceptor.OnSendSuccess(outboundmessagecontext, options);
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(outboundmessagecontext, options, "Send", ex);
+                Interceptor.OnSendError(outboundmessagecontext, options, ex);
 
                 throw;
             }
@@ -104,7 +104,7 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(outboundmessagecontext, options, "Send", stopwatch.ElapsedMilliseconds);
+                Interceptor.OnSendExit(outboundmessagecontext, options,  stopwatch.ElapsedMilliseconds);
             }
 
         }

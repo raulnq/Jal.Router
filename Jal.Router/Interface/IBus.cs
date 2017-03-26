@@ -4,7 +4,7 @@ namespace Jal.Router.Interface
 {
     public interface IBus
     {
-        void ReplyTo<TContent>(TContent content, InboundMessageContext context);
+        void Reply<TContent>(TContent content, InboundMessageContext context);
 
         void Send<TContent>(TContent content, Options options);
 

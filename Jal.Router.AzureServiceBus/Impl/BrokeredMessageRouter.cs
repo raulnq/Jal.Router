@@ -47,27 +47,27 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             stopwatch.Start();
 
-            var context = new InboundMessageContext
-            {
-                Id = _idAdapter.Read(brokeredMessage),
-                From = _fromAdapter.Read(brokeredMessage),
-                ReplyToConnectionString = _replyToAdapter.ReadConnectionString(brokeredMessage),
-                ReplyToPath = _replyToAdapter.ReadPath(brokeredMessage)
-            };
+            _log.Info($"[BrokeredMessageRouter.cs, Route, {brokeredMessage.MessageId}] Start Call.");
 
-            context.ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo);//TODO delete
-
-            context.ReplyToPath = GetEntity(brokeredMessage.ReplyTo);//TODO delete
-
-            _log.Info($"[BrokeredMessageRouter.cs, Route, {context.Id}] Start Call. id: {context.Id} from: {context.From}");
-
-            var body = default(TContent); 
+            Interceptor.OnEntry(brokeredMessage);
 
             try
             {
-                body = _contentAdapter.Read<TContent>(brokeredMessage);
+                var context = new InboundMessageContext
+                {
+                    Id = _idAdapter.Read(brokeredMessage),
+                    From = _fromAdapter.Read(brokeredMessage),
+                    ReplyToConnectionString = _replyToAdapter.ReadConnectionString(brokeredMessage),
+                    ReplyToPath = _replyToAdapter.ReadPath(brokeredMessage)
+                };
 
-                Interceptor.OnEntry(body, brokeredMessage);
+                context.ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo);//TODO delete
+
+                context.ReplyToPath = GetEntity(brokeredMessage.ReplyTo);//TODO delete
+
+                _log.Info($"[BrokeredMessageRouter.cs, Route, {context.Id}] Message arrived. id: {context.Id} from: {context.From}");
+
+                var body = _contentAdapter.Read<TContent>(brokeredMessage);
 
                 Router.Route(body, context, name);
 
@@ -75,19 +75,19 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
             catch (Exception ex)
             {
-                _log.Error($"[BrokeredMessageRouter.cs, Route, {context.Id}] Exception.", ex);
+                _log.Error($"[BrokeredMessageRouter.cs, Route, {brokeredMessage.MessageId}] Exception.", ex);
 
-                Interceptor.OnException(body, brokeredMessage, ex);
+                Interceptor.OnException(brokeredMessage, ex);
 
                 throw;
             }
             finally
             {
-                Interceptor.OnExit(body, brokeredMessage);
+                Interceptor.OnExit(brokeredMessage);
 
                 stopwatch.Stop();
 
-                _log.Info($"[BrokeredMessageRouter.cs, Route, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
+                _log.Info($"[BrokeredMessageRouter.cs, Route, {brokeredMessage.MessageId}] End Call. Took {stopwatch.ElapsedMilliseconds} ms.");
             }
         }
 

@@ -5,12 +5,12 @@ namespace Jal.Router.AzureServiceBus.Interface
 {
     public interface IBrokeredMessageRouterInterceptor
     {
-        void OnEntry<TBody>(TBody body, BrokeredMessage message);
+        void OnEntry(BrokeredMessage message);
 
         void OnSuccess<TBody>(TBody body, BrokeredMessage message);
 
-        void OnExit<TBody>(TBody body, BrokeredMessage message);
+        void OnExit(BrokeredMessage message);
 
-        void OnException<TBody>(TBody body, BrokeredMessage message, Exception exception);
+        void OnException(BrokeredMessage message, Exception exception);
     }
 }

@@ -5,12 +5,20 @@ namespace Jal.Router.Interface
 {
     public interface IBusInterceptor
     {
-        void OnEntry(OutboundMessageContext context, Options options, string method);
+        void OnSendEntry(OutboundMessageContext context, Options options);
 
-        void OnExit(OutboundMessageContext context, Options options, string method, long duration);
+        void OnSendExit(OutboundMessageContext context, Options options, long duration);
 
-        void OnSuccess(OutboundMessageContext context, Options options, string method);
+        void OnSendSuccess(OutboundMessageContext context, Options options);
 
-        void OnError(OutboundMessageContext context, Options options, string method, Exception ex);
+        void OnReplyError(OutboundMessageContext context, Options options, Exception ex);
+
+        void OnReplyEntry(OutboundMessageContext context, Options options);
+
+        void OnReplyExit(OutboundMessageContext context, Options options, long duration);
+
+        void OnReplySuccess(OutboundMessageContext context, Options options);
+
+        void OnSendError(OutboundMessageContext context, Options options,  Exception ex);
     }
 }

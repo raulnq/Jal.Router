@@ -9,7 +9,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         public static IBrokeredMessageRouterInterceptor Instance = new NullBrokeredMessageRouterInterceptor();
 
 
-        public virtual void OnEntry<TBody>(TBody body, BrokeredMessage message)
+        public virtual void OnEntry(BrokeredMessage message)
         {
             
         }
@@ -19,12 +19,12 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         }
 
-        public virtual void OnExit<TBody>(TBody body, BrokeredMessage message)
+        public virtual void OnExit(BrokeredMessage message)
         {
 
         }
 
-        public virtual void OnException<TBody>(TBody body, BrokeredMessage message, Exception exception)
+        public virtual void OnException(BrokeredMessage message, Exception exception)
         {
 
         }
