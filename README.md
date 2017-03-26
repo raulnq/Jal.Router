@@ -79,11 +79,11 @@ Install the Jal.Router library, use the BrokeredMessageRouterInstaller class inc
 
     container.Install(new BrokeredMessageRouterInstaller());
 
-Create a Handler interface and class. The Context class could be used as a parameter, this class will contain useful data from the orginal brokered message.
+Create a Handler interface and class. The InboundMessageContext class could be used as a parameter, this class will contain useful data from the orginal brokered message.
 
     public class MessageHandler : IMessageHandler<Message>
     {
-        public void Handle(Message message, Context context)
+        public void Handle(Message message, InboundMessageContext context)
         {
             Console.WriteLine("Sender"+ message.Name);
         }
@@ -91,7 +91,7 @@ Create a Handler interface and class. The Context class could be used as a param
 
     public interface IMessageHandler<in T>
     {
-        void Handle(T message, Context context);
+        void Handle(T message, InboundMessageContext context);
     }
 
 Create a class to setup the library
@@ -125,7 +125,7 @@ Register an endpoint in the setup class
         {
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             {
-                x.With<Context>(((request, handler, context) => handler.Handle(request, context)));
+                x.With<InboundMessageContext>(((request, handler, context) => handler.Handle(request, context)));
             });
 
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
