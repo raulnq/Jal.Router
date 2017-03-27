@@ -17,8 +17,10 @@ namespace Jal.Router.Model
         public string Id { get; set; }
         public string ToConnectionString { get; set; }
         public string ToPath { get; set; }
+        public string To { get; set; }
         public string ReplyToConnectionString { get; set; }
         public string ReplyToPath { get; set; }
+        public string ReplyTo { get; set; }
         public string From { get; set; }
     }
 }

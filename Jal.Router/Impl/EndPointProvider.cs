@@ -84,9 +84,7 @@ namespace Jal.Router.Impl
                 output.ReplyToPath = toreplypathextractor(extractor);
             }
 
-            var fromextractor = endpoint.FromExtractor as Func<IEndPointValueSettingFinder, string>;
-
-            output.From = fromextractor?.Invoke(extractor);
+            output.From = endpoint.From;
 
             return output;
         }
@@ -94,7 +92,14 @@ namespace Jal.Router.Impl
         {
             var extractor = Factory.Create<T>(endpoint.ExtractorType);
 
-            return extractor.Find(record);
+            var output = extractor.Find(record);
+
+            if (string.IsNullOrWhiteSpace(output.From))
+            {
+                output.From = endpoint.From;
+            }
+
+            return output;
         }
     }
 }

@@ -14,44 +14,24 @@ namespace Jal.Router.AzureServiceBus.Impl
             _log = log;
         }
 
-        public override void OnSendEntry(OutboundMessageContext context, Options options)
+        public override void OnEntry(OutboundMessageContext context, Options options, string method)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] Start Call. id: {context.Id} connectionstring: {context.ToConnectionString} path: {context.ToPath} replyconnectionstring: {context.ReplyToConnectionString} replypath: {context.ReplyToPath}");
+            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Start Call. id: {context.Id} to: {context.To}  toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
         }
 
-        public override void OnSendExit(OutboundMessageContext context,Options options, long duration)
+        public override void OnExit(OutboundMessageContext context,Options options, long duration, string method)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] End Call. Took {duration} ms.");
+            _log.Info($"[Bus.cs, {method}, {options.Correlation}] End Call. Took {duration} ms.");
         }
 
-        public override void OnSendSuccess(OutboundMessageContext context, Options options)
+        public override void OnSuccess(OutboundMessageContext context, Options options, string method)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] Message sent. id: {context.Id} connectionstring: {context.ToConnectionString} path: {context.ToPath} replyconnectionstring: {context.ReplyToConnectionString} replypath: {context.ReplyToPath}");
+            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Message sent. id: {context.Id} to: {context.To} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
         }
 
-        public override void OnSendError(OutboundMessageContext context, Options options, Exception ex)
+        public override void OnError(OutboundMessageContext context, Options options, Exception ex, string method)
         {
-            _log.Error($"[Bus.cs, Send, {options.Correlation}] Exception.", ex);
-        }
-
-        public override void OnReplyEntry(OutboundMessageContext context, Options options)
-        {
-            _log.Info($"[Bus.cs, Reply, {options.Correlation}] Start Call. id: {context.Id} connectionstring: {context.ReplyToConnectionString} path: {context.ReplyToPath} replyconnectionstring: {context.ReplyToConnectionString} replypath: {context.ReplyToPath}");
-        }
-
-        public override void OnReplyExit(OutboundMessageContext context, Options options, long duration)
-        {
-            _log.Info($"[Bus.cs, Reply, {options.Correlation}] End Call. Took {duration} ms.");
-        }
-
-        public override void OnReplySuccess(OutboundMessageContext context, Options options)
-        {
-            _log.Info($"[Bus.cs, Reply, {options.Correlation}] Message sent. id: {context.Id} connectionstring: {context.ReplyToConnectionString} path: {context.ReplyToPath} replyconnectionstring: {context.ReplyToConnectionString} replypath: {context.ReplyToPath}");
-        }
-
-        public override void OnReplyError(OutboundMessageContext context, Options options, Exception ex)
-        {
-            _log.Error($"[Bus.cs, Reply, {options.Correlation}] Exception.", ex);
+            _log.Error($"[Bus.cs, {method}, {options.Correlation}] Exception.", ex);
         }
     }
 }

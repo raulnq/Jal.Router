@@ -6,5 +6,6 @@
         public string ReplyToConnectionString { get; set; }
         public string ReplyToPath { get; set; }
         public string From { get; set; }
+        public string ReplyTo { get; set; }
     }
 }

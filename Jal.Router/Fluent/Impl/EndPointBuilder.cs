@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, IFromEndPointBuilder, INameEndPointBuilder where TExtractor : IEndPointValueSettingFinder
+    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, IReplyToEndPointBuilder, INameEndPointBuilder where TExtractor : IEndPointValueSettingFinder
     {
         private readonly EndPoint _endpoint;
 
@@ -16,24 +16,13 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.ExtractorType = typeof (TExtractor);
         }
 
-        public IFromEndPointBuilder ForMessage<TMessage>()
+        public IToEndPointBuilder ForMessage<TMessage>()
         {
             _endpoint.MessageType = typeof (TMessage);
 
             return this;
         }
 
-        public IToEndPointBuilder From(Func<IEndPointValueSettingFinder, string> fromextractor)
-        {
-            if (fromextractor == null)
-            {
-                throw new ArgumentNullException(nameof(fromextractor));
-            }
-
-            _endpoint.FromExtractor = fromextractor;
-
-            return this;
-        }
 
         public void ReplyTo(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)
         {

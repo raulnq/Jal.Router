@@ -102,7 +102,7 @@ Create a class to setup the library
         {
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             {
-                x.With<Context>(((request, handler, context) => handler.Handle(request, context)));
+                x.With<InboundMessageContext>(((request, handler, context) => handler.Handle(request, context)));
             });
         }
     }

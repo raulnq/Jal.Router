@@ -15,11 +15,29 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
+        public string Read(BrokeredMessage message)
+        {
+            if (message.Properties.ContainsKey("replyto"))
+            {
+                return message.Properties["replyto"].ToString();
+            }
+
+            return string.Empty;
+        }
+
         public void WritePath(string path, BrokeredMessage message)
         {
             if (!string.IsNullOrWhiteSpace(path))
             {
                 message.Properties.Add("replytoqueue", path);
+            }
+        }
+
+        public void Write(string replyTo, BrokeredMessage message)
+        {
+            if (!string.IsNullOrWhiteSpace(replyTo))
+            {
+                message.Properties.Add("replyto", replyTo);
             }
         }
 

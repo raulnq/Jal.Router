@@ -58,7 +58,8 @@ namespace Jal.Router.AzureServiceBus.Impl
                     Id = _idAdapter.Read(brokeredMessage),
                     From = _fromAdapter.Read(brokeredMessage),
                     ReplyToConnectionString = _replyToAdapter.ReadConnectionString(brokeredMessage),
-                    ReplyToPath = _replyToAdapter.ReadPath(brokeredMessage)
+                    ReplyToPath = _replyToAdapter.ReadPath(brokeredMessage),
+                    ReplyTo = _replyToAdapter.Read(brokeredMessage)
                 };
 
                 context.ReplyToConnectionString = GetConnectionString(brokeredMessage.ReplyTo);//TODO delete

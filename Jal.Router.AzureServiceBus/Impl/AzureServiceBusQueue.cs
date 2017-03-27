@@ -33,6 +33,8 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             _replyToAdapter.WriteConnectionString(context.ReplyToConnectionString, message);
 
+            _replyToAdapter.Write(context.ReplyTo, message);
+
             if (!string.IsNullOrWhiteSpace(context.ReplyToConnectionString) && !string.IsNullOrWhiteSpace(context.ReplyToPath)) //TODO delete
             {
                 message.ReplyTo = $"{context.ReplyToConnectionString};queue={context.ReplyToPath}";

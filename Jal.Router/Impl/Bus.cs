@@ -24,35 +24,45 @@ namespace Jal.Router.Impl
 
         public void Reply<TContent>(TContent content, InboundMessageContext context)
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
-            var outboundmessagecontext = new OutboundMessageContext<TContent>
+            var message = new OutboundMessageContext<TContent>
             {
                 Id = context.Id,
                 Content = content,
-                //From = endpoint.From,
+                To = context.ReplyTo,
                 ToConnectionString = context.ReplyToConnectionString,
-                ToPath = context.ReplyToPath
+                ToPath = context.ReplyToPath,
+                ReplyTo = string.Empty,
+                ReplyToConnectionString = string.Empty,
+                ReplyToPath = string.Empty,
+                From = string.Empty//current app
             };
 
             var options = new Options() {Correlation = context.Id };
 
+            Send(message, options, "Reply");
+        }
+
+
+        private void Send<TContent>(OutboundMessageContext<TContent> message, Options options, string method)
+        {
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            Interceptor.OnEntry(message, options, method);
+
             try
             {
-                Interceptor.OnReplyEntry(outboundmessagecontext, options);
-
-                if (!string.IsNullOrEmpty(outboundmessagecontext.ReplyToConnectionString) && !string.IsNullOrEmpty(outboundmessagecontext.ReplyToPath))
+                if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath))
                 {
-                    Queue.Enqueue(outboundmessagecontext);
+                    Queue.Enqueue(message);
 
-                    Interceptor.OnReplySuccess(outboundmessagecontext, options);
+                    Interceptor.OnSuccess(message, options, method);
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnReplyError(outboundmessagecontext, options, ex);
+                Interceptor.OnError(message, options, ex, method);
 
                 throw;
             }
@@ -60,53 +70,26 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnReplyExit(outboundmessagecontext, options, stopwatch.ElapsedMilliseconds);
+                Interceptor.OnExit(message, options, stopwatch.ElapsedMilliseconds, method);
             }
-
         }
-
 
         public void Send<TContent>(TContent content, EndPointSetting endpoint, Options options)
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
-            var outboundmessagecontext = new OutboundMessageContext<TContent>
+            var message = new OutboundMessageContext<TContent>
             {
                 Id = options.MessageId,
                 Content = content,
                 From = endpoint.From,
                 ReplyToConnectionString = endpoint.ReplyToConnectionString,
                 ReplyToPath = endpoint.ReplyToPath,
+                ReplyTo = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath
+                ToPath = endpoint.ToPath,
+                To = string.Empty//target app
             };
 
-            Interceptor.OnSendEntry(outboundmessagecontext, options);
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(outboundmessagecontext.ToConnectionString) && !string.IsNullOrWhiteSpace(outboundmessagecontext.ToPath))
-                {
-                    Queue.Enqueue(outboundmessagecontext);
-
-                    Interceptor.OnSendSuccess(outboundmessagecontext, options);
-                }
-            }
-            catch (Exception ex)
-            {
-                Interceptor.OnSendError(outboundmessagecontext, options, ex);
-
-                throw;
-            }
-            finally
-            {
-                stopwatch.Stop();
-
-                Interceptor.OnSendExit(outboundmessagecontext, options,  stopwatch.ElapsedMilliseconds);
-            }
-
+            Send(message, options, "Send");
         }
 
         public void Send<TContent>(TContent content, Options options)

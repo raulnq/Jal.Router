@@ -22,9 +22,10 @@ namespace Jal.Router.Tests.Impl
                 //x.With<Response>(((request, handler, context) => handler.Handle(request, context)));
             });
 
+            RegisteFrom("From");
+
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
                 .ForMessage<Message>()
-                .From(x => x.Find("from"))
                 .To(x => x.Find("toconnectionstring"), x => x.Find("topath"))
                 .ReplyTo(x => x.Find("replytoconnectionstring"), x => x.Find("replytopath"));
 

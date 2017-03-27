@@ -14,7 +14,7 @@ namespace Jal.Router.Model
 
         public Type MessageType { get; set; }
 
-        public object FromExtractor { get; set; }
+        public string From { get; set; }
 
         public object ToConnectionStringExtractor { get; set; }
 

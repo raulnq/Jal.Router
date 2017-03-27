@@ -13,6 +13,8 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
+        private string _from = string.Empty;
+
         public Route[] GetRoutes()
         {
             return _routes.ToArray();
@@ -20,6 +22,10 @@ namespace Jal.Router.Impl
 
         public EndPoint[] GetEndPoints()
         {
+            foreach (var endPoint in _enpoints)
+            {
+                endPoint.From = _from;
+            }
             return _enpoints.ToArray();
         }
 
@@ -30,6 +36,10 @@ namespace Jal.Router.Impl
             return builder;
         }
 
+        public void RegisteFrom(string from)
+        {
+            _from = from;
+        }
 
         public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IEndPointValueSettingFinder
         {
