@@ -32,7 +32,6 @@ namespace Jal.Router.Impl
             {
                 Id = context.Id,
                 Content = content,
-                To = context.ReplyTo,
                 ToConnectionString = context.ReplyToConnectionString,
                 ToPath = context.ReplyToPath,
                 ReplyTo = string.Empty,
@@ -91,7 +90,6 @@ namespace Jal.Router.Impl
                 ReplyTo = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                To = string.Empty,//target app
                 Origin = endpoint.Origin
             };
 
@@ -131,7 +129,6 @@ namespace Jal.Router.Impl
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                To = string.Empty,//target app
                 Origin = options.Origin
             };
 
@@ -166,6 +163,35 @@ namespace Jal.Router.Impl
                 stopwatch.Stop();
 
                 Interceptor.OnExit(message, options, stopwatch.ElapsedMilliseconds, method);
+            }
+        }
+
+        public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Options options)
+        {
+            var message = new OutboundMessageContext<TContent>
+            {
+                Id = options.MessageId,
+                Content = content,
+                From = endpoint.From,
+                ReplyToConnectionString = endpoint.ReplyToConnectionString,
+                ReplyToPath = endpoint.ReplyToPath,
+                ReplyTo = endpoint.From,
+                ToConnectionString = endpoint.ToConnectionString,
+                ToPath = endpoint.ToPath
+            };
+
+            Send(message, options, "FireAndForget");
+        }
+
+        public void FireAndForget<TContent>(TContent content, Options options)
+        {
+            var endpoints = Provider.Provide<TContent>(options.EndPoint);
+
+            foreach (var endpoint in endpoints)
+            {
+                var setting = Provider.Provide(endpoint, content);
+
+                FireAndForget(content, setting, options);
             }
         }
     }
