@@ -57,6 +57,7 @@ namespace Jal.Router.AzureServiceBus.Impl
                 {
                     Id = _idAdapter.Read(brokeredMessage),
                     From = _fromAdapter.Read(brokeredMessage),
+                    Origin = _fromAdapter.ReadOrigin(brokeredMessage),
                     ReplyToConnectionString = _replyToAdapter.ReadConnectionString(brokeredMessage),
                     ReplyToPath = _replyToAdapter.ReadPath(brokeredMessage),
                     ReplyTo = _replyToAdapter.Read(brokeredMessage)
@@ -66,7 +67,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 context.ReplyToPath = GetEntity(brokeredMessage.ReplyTo);//TODO delete
 
-                _log.Info($"[BrokeredMessageRouter.cs, Route, {context.Id}] Message arrived. id: {context.Id} from: {context.From}");
+                _log.Info($"[BrokeredMessageRouter.cs, Route, {context.Id}] Message arrived. id: {context.Id} from: {context.From} origin: {context.Origin}");
 
                 var body = _contentAdapter.Read<TContent>(brokeredMessage);
 

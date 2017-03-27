@@ -41,7 +41,7 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.ReplyToPathExtractor = pathextractor;
         }
 
-        public IReplyToEndPointBuilder To(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)
+        public IReplyToEndPointBuilder To(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)//TODO delete
         {
             if (connectionstringextractor == null)
             {

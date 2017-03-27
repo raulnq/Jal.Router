@@ -3,7 +3,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class BrokeredMessageReplyToAdapter : IBrokeredMessageReplyToAdapter
+    public class BrokeredMessageReplyToAdapter : IBrokeredMessageReplyToAdapter//TODO delete
     {
         public string ReadPath(BrokeredMessage message)
         {

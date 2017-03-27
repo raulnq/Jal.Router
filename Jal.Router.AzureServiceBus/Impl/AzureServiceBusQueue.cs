@@ -46,6 +46,8 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             _fromAdapter.Write(context.From, message);
 
+            _fromAdapter.WriteOrigin(context.Origin, message);
+
             queueclient.Send(message);
 
             queueclient.Close();

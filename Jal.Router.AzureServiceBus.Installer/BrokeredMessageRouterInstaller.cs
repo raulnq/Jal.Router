@@ -20,6 +20,7 @@ namespace Jal.Router.AzureServiceBus.Installer
             container.Register(Component.For(typeof(IBrokeredMessageFromAdapter)).ImplementedBy(typeof(BrokeredMessageFromAdapter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBrokeredMessageIdAdapter)).ImplementedBy(typeof(BrokeredMessageIdAdapter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IQueue)).ImplementedBy(typeof(AzureServiceBusQueue)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IPublisher)).ImplementedBy(typeof(AzureServiceBusTopic)).LifestyleSingleton());
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(LoggerBusInterceptor)).LifestyleSingleton());
         }
     }

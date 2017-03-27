@@ -13,7 +13,9 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
-        private string _from = string.Empty;
+        private string _originname = string.Empty;
+
+        private string _originkey = string.Empty;
 
         public Route[] GetRoutes()
         {
@@ -24,7 +26,9 @@ namespace Jal.Router.Impl
         {
             foreach (var endPoint in _enpoints)
             {
-                endPoint.From = _from;
+                endPoint.OriginName = _originname;
+
+                endPoint.OriginKey = _originkey;
             }
             return _enpoints.ToArray();
         }
@@ -36,9 +40,11 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisteFrom(string from)
+        public void RegisterOrigin(string name, string key="")
         {
-            _from = from;
+            _originname = name;
+
+            _originkey = key;
         }
 
         public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IEndPointValueSettingFinder

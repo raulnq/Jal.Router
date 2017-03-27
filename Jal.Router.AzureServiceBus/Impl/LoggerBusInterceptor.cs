@@ -16,7 +16,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public override void OnEntry(OutboundMessageContext context, Options options, string method)
         {
-            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Start Call. id: {context.Id} to: {context.To}  toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
+            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Start Call. id: {context.Id} to: {context.To} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath}  with origin: {context.Origin} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
         }
 
         public override void OnExit(OutboundMessageContext context,Options options, long duration, string method)
@@ -26,7 +26,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public override void OnSuccess(OutboundMessageContext context, Options options, string method)
         {
-            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Message sent. id: {context.Id} to: {context.To} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
+            _log.Info($"[Bus.cs, {method}, {options.Correlation}] Message sent. id: {context.Id} to: {context.To} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin} replyto: {context.ReplyTo}replytoconnectionstring: {context.ReplyToConnectionString} replytopath: {context.ReplyToPath}");
         }
 
         public override void OnError(OutboundMessageContext context, Options options, Exception ex, string method)

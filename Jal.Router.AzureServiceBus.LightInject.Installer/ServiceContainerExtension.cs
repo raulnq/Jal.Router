@@ -19,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
 
             container.Register<IBrokeredMessageReplyToAdapter, BrokeredMessageReplyToAdapter>(new PerContainerLifetime());
 
-            container.Register<IBrokeredMessageContentAdapter, BrokeredMessageContentAdapter>(new PerContainerLifetime());
+            container.Register<IPublisher, AzureServiceBusTopic>(new PerContainerLifetime());
 
             container.Register<IQueue, AzureServiceBusQueue>(new PerContainerLifetime());
 

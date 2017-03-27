@@ -56,12 +56,14 @@
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\AbstractBusInterceptor.cs" />
+    <Compile Include="Impl\AbstractPublisher.cs" />
     <Compile Include="Impl\AbstractQueue.cs" />
     <Compile Include="Impl\AppSettingEndPointValueSettingFinder.cs" />
     <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
     <Compile Include="Impl\EndPointProvider.cs" />
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
     <Compile Include="Impl\NullBusInterceptor.cs" />
+    <Compile Include="Impl\NullPublisher.cs" />
     <Compile Include="Impl\NullQueue.cs" />
     <Compile Include="Interface\IBusInterceptor.cs" />
     <Compile Include="Interface\IEndPointProvider.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Interface\IEndPointValueSettingFinder.cs" />
     <Compile Include="Interface\IEndPointSettingFinderFactory.cs" />
     <Compile Include="Interface\IHandlerFactory.cs" />
+    <Compile Include="Interface\IPublisher.cs" />
     <Compile Include="Interface\IQueue.cs" />
     <Compile Include="Interface\IRouteProvider.cs" />
     <Compile Include="Impl\RouteProvider.cs" />

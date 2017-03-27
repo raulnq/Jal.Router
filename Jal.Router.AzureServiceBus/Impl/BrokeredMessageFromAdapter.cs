@@ -22,5 +22,23 @@ namespace Jal.Router.AzureServiceBus.Impl
                 message.Properties.Add("from", @from);
             }
         }
+
+        public string ReadOrigin(BrokeredMessage message)
+        {
+            if (message.Properties.ContainsKey("origin"))
+            {
+                return message.Properties["origin"].ToString();
+            }
+
+            return string.Empty;
+        }
+
+        public void WriteOrigin(string origin, BrokeredMessage message)
+        {
+            if (!string.IsNullOrWhiteSpace(origin))
+            {
+                message.Properties.Add("origin", origin);
+            }
+        }
     }
 }

@@ -73,18 +73,20 @@ namespace Jal.Router.Impl
             }
 
             var toreplyconnectionextractor =
-                endpoint.ReplyToConnectionStringExtractor as Func<IEndPointValueSettingFinder, string>;
+                endpoint.ReplyToConnectionStringExtractor as Func<IEndPointValueSettingFinder, string>;//TODO delete
 
-            var toreplypathextractor = endpoint.ReplyToPathExtractor as Func<IEndPointValueSettingFinder, string>;
+            var toreplypathextractor = endpoint.ReplyToPathExtractor as Func<IEndPointValueSettingFinder, string>;//TODO delete
 
-            if (toreplyconnectionextractor != null && toreplypathextractor != null)
+            if (toreplyconnectionextractor != null && toreplypathextractor != null)//TODO delete
             {
-                output.ReplyToConnectionString = toreplyconnectionextractor(extractor);
+                output.ReplyToConnectionString = toreplyconnectionextractor(extractor);//TODO delete
 
-                output.ReplyToPath = toreplypathextractor(extractor);
+                output.ReplyToPath = toreplypathextractor(extractor);//TODO delete
             }
 
-            output.From = endpoint.From;
+            output.From = endpoint.OriginName;
+
+            output.Origin = endpoint.OriginKey;
 
             return output;
         }
@@ -96,7 +98,12 @@ namespace Jal.Router.Impl
 
             if (string.IsNullOrWhiteSpace(output.From))
             {
-                output.From = endpoint.From;
+                output.From = endpoint.OriginName;
+            }
+
+            if (string.IsNullOrWhiteSpace(output.Origin))
+            {
+                output.Origin = endpoint.OriginKey;
             }
 
             return output;

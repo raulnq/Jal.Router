@@ -53,13 +53,15 @@ namespace Jal.Router.Tests.Integration
 
             var message = new Message();
 
-            _router.Route<Message>(message);
+            //_router.Route<Message>(message);
 
-            _brokered.Route<Message>(bm);
+            //_brokered.Route<Message>(bm);
 
             //_router.Route(request, new Response() {Status = "Hi"});
 
-            _bus.Send(message, new Options() {MessageId = "Id"});
+            //_bus.Send(message, new Options() {MessageId = "Id"});
+
+            _bus.Publish(message, new Options() { MessageId = "Id" });
         }
 
         //[Test]

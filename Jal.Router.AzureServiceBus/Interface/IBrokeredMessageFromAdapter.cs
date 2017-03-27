@@ -7,5 +7,9 @@ namespace Jal.Router.AzureServiceBus.Interface
         string Read(BrokeredMessage message);
 
         void Write(string from, BrokeredMessage message);
+
+        string ReadOrigin(BrokeredMessage message);
+
+        void WriteOrigin(string origin, BrokeredMessage message);
     }
 }

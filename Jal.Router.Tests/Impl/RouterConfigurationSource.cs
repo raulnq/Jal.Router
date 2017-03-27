@@ -22,7 +22,7 @@ namespace Jal.Router.Tests.Impl
                 //x.With<Response>(((request, handler, context) => handler.Handle(request, context)));
             });
 
-            RegisteFrom("From");
+            RegisterOrigin("From", "2CE8F3B2-6542-4D5C-8B08-E7E64EF57D22");
 
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
                 .ForMessage<Message>()

@@ -2,7 +2,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Interface
 {
-    public interface IBrokeredMessageReplyToAdapter
+    public interface IBrokeredMessageReplyToAdapter//TODO delete
     {
         string ReadPath(BrokeredMessage message);
 
