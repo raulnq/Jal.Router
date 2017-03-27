@@ -153,4 +153,4 @@ Use the BrokeredMessageBus class to reply brokered messages to a queue
 
     var replymessage = new Message();
 
-    _bus.ReplyTo(replymessage, existingcontext);
+    _bus.Reply(replymessage, existingcontext);
