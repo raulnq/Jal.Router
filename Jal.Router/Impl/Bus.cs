@@ -129,13 +129,10 @@ namespace Jal.Router.Impl
                 Id = options.MessageId,
                 Content = content,
                 From = endpoint.From,
-                ReplyToConnectionString = string.Empty,
-                ReplyToPath = string.Empty,
-                ReplyTo = string.Empty,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 To = string.Empty,//target app
-                Origin = string.Empty
+                Origin = options.Origin
             };
 
             Publish(message, options, "Publish");
