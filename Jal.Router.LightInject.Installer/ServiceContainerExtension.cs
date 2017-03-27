@@ -44,7 +44,7 @@ namespace Jal.Router.LightInject.Installer
 
                         if (exportedType.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)))
                         {
-                            var argument = exportedType.GetGenericArguments();
+                            var argument = exportedType.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)).GetGenericArguments();
 
                             var type = typeof(IEndPointSettingFinder<>);
 
