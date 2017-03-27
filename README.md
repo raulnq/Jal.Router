@@ -100,6 +100,8 @@ Create a class to setup the library
     {
         public RouterConfigurationSource()
         {
+            RegisteFrom("From");
+
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             {
                 x.With<InboundMessageContext>(((request, handler, context) => handler.Handle(request, context)));
@@ -123,6 +125,8 @@ Register an endpoint in the setup class
     {
         public RouterConfigurationSource()
         {
+            RegisteFrom("From");
+
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             {
                 x.With<InboundMessageContext>(((request, handler, context) => handler.Handle(request, context)));
@@ -130,7 +134,6 @@ Register an endpoint in the setup class
 
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
                 .ForMessage<Message>()
-                .From(x => x.Find("from"))
                 .To(x => x.Find("toconnectionstring"), x => x.Find("topath"))
                 .ReplyTo(x => x.Find("replytoconnectionstring"), x => x.Find("replytopath"));
         }
