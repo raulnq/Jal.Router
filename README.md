@@ -134,8 +134,8 @@ Register an endpoint in the setup class
 
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
                 .ForMessage<Message>()
-                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"))
-                .ReplyTo(x => x.Find("replytoconnectionstring"), x => x.Find("replytopath"));
+                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"));
+               
         }
     }
 
@@ -143,14 +143,14 @@ Resolve an instance of the interface IBus
 
 	var bus = container.Resolve<IBus>();
 
-Use the BrokeredMessageBus class to send brokered messages to a queue
+Use the BrokeredMessageBus class to send brokered messages
 
     var message = new Message();
 
     _bus.Send(message, new Options());
 
-Use the BrokeredMessageBus class to reply brokered messages to a queue
+Use the BrokeredMessageBus class to publish brokered messages
 
-    var replymessage = new Message();
+    var message = new Message();
 
-    _bus.Reply(replymessage, existingcontext);
+    _bus.Publish(message, new Options());

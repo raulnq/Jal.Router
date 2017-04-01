@@ -21,9 +21,5 @@ namespace Jal.Router.Model
         public object ToConnectionStringExtractor { get; set; }
 
         public object ToPathExtractor { get; set; }
-
-        public object ReplyToConnectionStringExtractor { get; set; }//TODO delete
-
-        public object ReplyToPathExtractor { get; set; }//TODO delete
     }
 }

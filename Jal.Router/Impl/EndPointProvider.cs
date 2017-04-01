@@ -72,18 +72,6 @@ namespace Jal.Router.Impl
                 output.ToPath = topathextractor(extractor);
             }
 
-            var toreplyconnectionextractor =
-                endpoint.ReplyToConnectionStringExtractor as Func<IEndPointValueSettingFinder, string>;//TODO delete
-
-            var toreplypathextractor = endpoint.ReplyToPathExtractor as Func<IEndPointValueSettingFinder, string>;//TODO delete
-
-            if (toreplyconnectionextractor != null && toreplypathextractor != null)//TODO delete
-            {
-                output.ReplyToConnectionString = toreplyconnectionextractor(extractor);//TODO delete
-
-                output.ReplyToPath = toreplypathextractor(extractor);//TODO delete
-            }
-
             output.From = endpoint.OriginName;
 
             output.Origin = endpoint.OriginKey;

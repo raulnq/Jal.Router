@@ -26,8 +26,7 @@ namespace Jal.Router.Tests.Impl
 
             RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
                 .ForMessage<Message>()
-                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"))
-                .ReplyTo(x => x.Find("replytoconnectionstring"), x => x.Find("replytopath"));
+                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"));
 
             RegisterEndPoint<EndPointSettingFinder, Message>();
 

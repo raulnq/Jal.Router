@@ -49,7 +49,6 @@
     <Compile Include="Fluent\Interface\IFromEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IInterceptorRouterBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IReplyToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhithMethodBuilder.cs" />

@@ -26,27 +26,6 @@ namespace Jal.Router.Impl
             Publisher = AbstractPublisher.Instance;
         }
 
-        public void Reply<TContent>(TContent content, InboundMessageContext context)//TODO delete
-        {
-            var message = new OutboundMessageContext<TContent>
-            {
-                Id = context.Id,
-                Content = content,
-                ToConnectionString = context.ReplyToConnectionString,
-                ToPath = context.ReplyToPath,
-                ReplyTo = string.Empty,
-                ReplyToConnectionString = string.Empty,
-                ReplyToPath = string.Empty,
-                From = string.Empty,//current app
-                Origin = string.Empty//current app
-            };
-
-            var options = new Options() {Correlation = context.Id };
-
-            Send(message, options, "Reply");
-        }
-
-
         private void Send<TContent>(OutboundMessageContext<TContent> message, Options options, string method)
         {
             var stopwatch = new Stopwatch();
@@ -85,9 +64,6 @@ namespace Jal.Router.Impl
                 Id = options.MessageId,
                 Content = content,
                 From = endpoint.From,
-                ReplyToConnectionString = endpoint.ReplyToConnectionString,
-                ReplyToPath = endpoint.ReplyToPath,
-                ReplyTo = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = endpoint.Origin
@@ -173,9 +149,6 @@ namespace Jal.Router.Impl
                 Id = options.MessageId,
                 Content = content,
                 From = endpoint.From,
-                ReplyToConnectionString = endpoint.ReplyToConnectionString,
-                ReplyToPath = endpoint.ReplyToPath,
-                ReplyTo = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath
             };
