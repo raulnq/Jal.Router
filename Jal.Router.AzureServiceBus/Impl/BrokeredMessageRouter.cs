@@ -60,6 +60,14 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 var body = _contentAdapter.Read<TContent>(brokeredMessage);
 
+                if (brokeredMessage.Properties != null)
+                {
+                    foreach (var property in brokeredMessage.Properties)
+                    {
+                        context.Headers.Add(property.Key, property.Value?.ToString());
+                    }
+                }
+
                 Router.Route(body, context, name);
 
                 Interceptor.OnSuccess(body, brokeredMessage);

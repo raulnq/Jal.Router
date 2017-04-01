@@ -19,5 +19,6 @@ namespace Jal.Router.Model
         public string ToPath { get; set; }
         public string From { get; set; }
         public string Origin { get; set; }
+        public IDictionary<string, string> Headers { get; set; }
     }
 }

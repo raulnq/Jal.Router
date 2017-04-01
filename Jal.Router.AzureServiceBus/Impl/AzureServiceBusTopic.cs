@@ -32,6 +32,11 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             _fromAdapter.WriteOrigin(context.Origin, message);
 
+            foreach (var header in context.Headers)
+            {
+                message.Properties.Add(header.Key, header.Value);
+            }
+
             topicClient.Send(message);
 
             topicClient.Close();

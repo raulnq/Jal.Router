@@ -66,7 +66,8 @@ namespace Jal.Router.Impl
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = endpoint.Origin
+                Origin = endpoint.Origin,
+                Headers = options.Headers
             };
 
             Send(message, options, "Send");
@@ -105,7 +106,8 @@ namespace Jal.Router.Impl
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = options.Origin
+                Origin = options.Origin,
+                Headers = options.Headers
             };
 
             Publish(message, options, "Publish");
@@ -150,7 +152,8 @@ namespace Jal.Router.Impl
                 Content = content,
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath
+                ToPath = endpoint.ToPath,
+                Headers = options.Headers
             };
 
             Send(message, options, "FireAndForget");
