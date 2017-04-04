@@ -6,9 +6,9 @@ using Jal.Finder.Atrribute;
 using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
 using Jal.Router.AzureServiceBus.Installer;
-using Jal.Router.AzureServiceBus.Interface;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
+using Jal.Router.Logger.Installer;
 using Jal.Router.Model;
 using Jal.Router.Tests.Impl;
 using Jal.Router.Tests.Model;
@@ -23,7 +23,7 @@ namespace Jal.Router.Tests.Integration
     {
         private IRouter _router;
 
-        private IBrokeredMessageRouter _brokered;
+        private IRouter<BrokeredMessage> _brokered;
 
         private IBus _bus;
 
@@ -39,11 +39,12 @@ namespace Jal.Router.Tests.Integration
             container.Install(new SettingsInstaller());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
-            container.Install(new BrokeredMessageRouterInstaller());
+            container.Install(new AzureServiceBusRouterInstaller());
+            container.Install(new RouterLoggerInstaller());
             _router = container.Resolve<IRouter>();
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             _bus = container.Resolve<IBus>();
-            _brokered = container.Resolve<IBrokeredMessageRouter>();
+            _brokered = container.Resolve<IRouter<BrokeredMessage>>();
         }
 
         [Test]
@@ -57,11 +58,11 @@ namespace Jal.Router.Tests.Integration
 
             //_brokered.Route<Message>(bm);
 
-            //_router.Route(request, new Response() {Status = "Hi"});
+            //_router.Route(message, new Response() {Status = "Hi"});
+            
+            _bus.Send(message, new Options() {MessageId = "Id"});
 
-            //_bus.Send(message, new Options() {MessageId = "Id"});
-
-            _bus.Publish(message, new Options() { MessageId = "Id" });
+            //_bus.Publish(message, new Options() { MessageId = "Id" });
         }
 
         //[Test]

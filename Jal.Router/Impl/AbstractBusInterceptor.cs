@@ -7,20 +7,40 @@ namespace Jal.Router.Impl
     public abstract class AbstractBusInterceptor : IBusInterceptor
     {
         public static IBusInterceptor Instance = new NullBusInterceptor();
-        public virtual void OnEntry(OutboundMessageContext context, Options options, string method)
+        public virtual void OnSendEntry(OutboundMessageContext context, Options options)
         {
         }
 
-        public virtual void OnExit(OutboundMessageContext context, Options options, long duration, string method)
+        public virtual void OnSendExit(OutboundMessageContext context, Options options)
         {
         }
 
-        public virtual void OnSuccess(OutboundMessageContext context, Options options, string method)
+        public virtual void OnSendSuccess(OutboundMessageContext context, Options options)
         {
         }
 
-        public virtual void OnError(OutboundMessageContext context, Options options, Exception ex, string method)
+        public virtual void OnSendError(OutboundMessageContext context, Options options, Exception ex)
         {
+        }
+
+        public virtual void OnPublishError(OutboundMessageContext context, Options options, Exception ex)
+        {
+
+        }
+
+        public virtual void OnPublishEntry(OutboundMessageContext context, Options options)
+        {
+
+        }
+
+        public virtual void OnPublishExit(OutboundMessageContext context, Options options)
+        {
+
+        }
+
+        public virtual void OnPublishSuccess(OutboundMessageContext context, Options options)
+        {
+
         }
     }
 }

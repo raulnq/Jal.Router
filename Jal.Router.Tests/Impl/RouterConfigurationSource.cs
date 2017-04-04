@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Jal.Router.AzureServiceBus.Interface;
-using Jal.Router.Impl;
+﻿using Jal.Router.Impl;
 using Jal.Router.Model;
 using Jal.Router.Tests.Model;
 

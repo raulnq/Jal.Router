@@ -15,6 +15,8 @@ namespace Jal.Router.Impl
 
         public IBusInterceptor Interceptor { get; set; }
 
+        public IBusLogger Logger { get; set; }
+
         public Bus(IEndPointProvider provider)
         {
             Provider = provider;
@@ -24,15 +26,19 @@ namespace Jal.Router.Impl
             Interceptor = AbstractBusInterceptor.Instance;
 
             Publisher = AbstractPublisher.Instance;
+
+            Logger = AbstractBusLogger.Instance;
         }
 
-        private void Send<TContent>(OutboundMessageContext<TContent> message, Options options, string method)
+        private void Send<TContent>(OutboundMessageContext<TContent> message, Options options)
         {
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
 
-            Interceptor.OnEntry(message, options, method);
+            Logger.OnSendEntry(message, options);
+
+            Interceptor.OnSendEntry(message, options);
 
             try
             {
@@ -40,12 +46,16 @@ namespace Jal.Router.Impl
                 {
                     Queue.Enqueue(message);
 
-                    Interceptor.OnSuccess(message, options, method);
+                    Logger.OnSendSuccess(message, options);
+
+                    Interceptor.OnSendSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(message, options, ex, method);
+                Logger.OnSendError(message, options, ex);
+
+                Interceptor.OnSendError(message, options, ex);
 
                 throw;
             }
@@ -53,7 +63,9 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(message, options, stopwatch.ElapsedMilliseconds, method);
+                Logger.OnSendExit(message, options, stopwatch.ElapsedMilliseconds);
+
+                Interceptor.OnSendExit(message, options);
             }
         }
 
@@ -70,7 +82,7 @@ namespace Jal.Router.Impl
                 Headers = options.Headers
             };
 
-            Send(message, options, "Send");
+            Send(message, options);
         }
 
         public void Send<TContent>(TContent content, Options options)
@@ -110,16 +122,18 @@ namespace Jal.Router.Impl
                 Headers = options.Headers
             };
 
-            Publish(message, options, "Publish");
+            Publish(message, options);
         }
 
-        private void Publish<TContent>(OutboundMessageContext<TContent> message, Options options, string method)
+        private void Publish<TContent>(OutboundMessageContext<TContent> message, Options options)
         {
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
 
-            Interceptor.OnEntry(message, options, method);
+            Logger.OnPublishEntry(message, options);
+
+            Interceptor.OnPublishEntry(message, options);
 
             try
             {
@@ -127,12 +141,16 @@ namespace Jal.Router.Impl
                 {
                     Publisher.Publish(message);
 
-                    Interceptor.OnSuccess(message, options, method);
+                    Logger.OnPublishSuccess(message, options);
+
+                    Interceptor.OnPublishSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                Interceptor.OnError(message, options, ex, method);
+                Logger.OnPublishError(message, options, ex);
+
+                Interceptor.OnPublishError(message, options, ex);
 
                 throw;
             }
@@ -140,7 +158,9 @@ namespace Jal.Router.Impl
             {
                 stopwatch.Stop();
 
-                Interceptor.OnExit(message, options, stopwatch.ElapsedMilliseconds, method);
+                Logger.OnPublishExit(message, options, stopwatch.ElapsedMilliseconds);
+
+                Interceptor.OnPublishExit(message, options);
             }
         }
 
@@ -156,7 +176,7 @@ namespace Jal.Router.Impl
                 Headers = options.Headers
             };
 
-            Send(message, options, "FireAndForget");
+            Send(message, options);
         }
 
         public void FireAndForget<TContent>(TContent content, Options options)

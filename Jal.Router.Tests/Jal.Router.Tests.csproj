@@ -116,6 +116,10 @@
       <Project>{9C5F53E5-A886-42FD-83D4-5C780786E6C4}</Project>
       <Name>Jal.Router.Installer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj">
+      <Project>{3139BEBE-CB50-4C86-958E-AC77D2B7211C}</Project>
+      <Name>Jal.Router.Logger.Installer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj">
       <Project>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</Project>
       <Name>Jal.Router</Name>

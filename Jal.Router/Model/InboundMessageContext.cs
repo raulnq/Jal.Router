@@ -14,4 +14,9 @@ namespace Jal.Router.Model
             Headers = new Dictionary<string, string>();
         }
     }
+
+    public class InboundMessageContext<TContent> : InboundMessageContext
+    {
+        public TContent Content { get; set; }
+    }
 }

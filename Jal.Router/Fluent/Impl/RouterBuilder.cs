@@ -6,11 +6,9 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class RouterBuilder : IRouterBuilder, IRouterStartBuilder, IInterceptorRouterBuilder
+    public class RouterBuilder : IRouterBuilder, IRouterStartBuilder, IRouterEndBuilder
     {
         private IHandlerFactory _handlerFactory;
-
-        private IRouterInterceptor _routerInterceptor;
 
         private IRouteProvider _routeProvider;
 
@@ -26,7 +24,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IInterceptorRouterBuilder UseRouteConfigurationSource(IRouterConfigurationSource[] routerConfigurationSources)
+        public IRouterEndBuilder UseRouteConfigurationSource(IRouterConfigurationSource[] routerConfigurationSources)
         {
             if (routerConfigurationSources == null)
             {
@@ -45,24 +43,9 @@ namespace Jal.Router.Fluent.Impl
             {
                 var result = new Router.Impl.Router(_handlerFactory, _routeProvider);
 
-                if (_routerInterceptor != null)
-                {
-                    result.Interceptor = _routerInterceptor;
-                }
-
                 return result;
             }
             
-        }
-
-        public IRouterBuilder UseInterceptor(IRouterInterceptor routerInterceptor)
-        {
-            if (routerInterceptor == null)
-            {
-                throw new ArgumentNullException(nameof(routerInterceptor));
-            }
-            _routerInterceptor = routerInterceptor;
-            return this;
         }
     }
 }

@@ -5,14 +5,15 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Jal.Router.AzureServiceBus.Installer")]
-[assembly: AssemblyDescription("Castle Windsor installer for the Jal.Router.AzureServiceBus library")]
+[assembly: AssemblyTitle("Jal.Router.Logger.Installer")]
+[assembly: AssemblyDescription("Castle Windsor installer for the Jal.Router.Logger library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Raul Naupari")]
-[assembly: AssemblyProduct("Jal.Router.AzureServiceBus.Installer")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyProduct("Jal.Router.Logger.Installer")]
+[assembly: AssemblyCopyright("Copyright © 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -20,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("49513199-2f7a-41c1-9f4b-42974bdcdeef")]
+[assembly: Guid("3139bebe-cb50-4c86-958e-ac77d2b7211c")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +33,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.8.0")]
-[assembly: AssemblyFileVersion("1.0.8.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

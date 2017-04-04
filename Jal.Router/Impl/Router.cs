@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -12,15 +13,11 @@ namespace Jal.Router.Impl
 
         public IRouteProvider Provider { get; set; }
 
-        public IRouterInterceptor Interceptor { get; set; }
-
         public Router(IHandlerFactory factory, IRouteProvider provider)
         {
             Factory = factory;
 
             Provider = provider;
-
-            Interceptor = AbstractRouterInterceptor.Instance;
         }
 
         public void InternalRoute<TContent, THandler>(TContent content, dynamic context, Route<TContent, THandler> route) where THandler : class
@@ -31,8 +28,6 @@ namespace Jal.Router.Impl
             {
                 try
                 {
-                    Interceptor.OnEntry(content, consumer);
-
                     if (routeMethod.EvaluatorWithContext == null)
                     {
                         if (routeMethod.Evaluator == null)
@@ -40,17 +35,10 @@ namespace Jal.Router.Impl
                             if (routeMethod.ConsumerWithContext != null)
                             {
                                 routeMethod.ConsumerWithContext(content, consumer, context);
-
-                                Interceptor.OnSuccess(content, consumer);
                             }
                             else
                             {
-                                if (routeMethod.Consumer != null)
-                                {
-                                    routeMethod.Consumer(content, consumer);
-
-                                    Interceptor.OnSuccess(content, consumer);
-                                }
+                                routeMethod.Consumer?.Invoke(content, consumer);
                             }
                         }
                         else
@@ -60,22 +48,13 @@ namespace Jal.Router.Impl
                                 if (routeMethod.ConsumerWithContext != null)
                                 {
                                     routeMethod.ConsumerWithContext(content, consumer, context);
-
-                                    Interceptor.OnSuccess(content, consumer);
                                 }
                                 else
                                 {
-                                    if (routeMethod.Consumer != null)
-                                    {
-                                        routeMethod.Consumer(content, consumer);
-
-                                        Interceptor.OnSuccess(content, consumer);
-                                    }
+                                    routeMethod.Consumer?.Invoke(content, consumer);
                                 }
                             }
                         }
-
-                        Interceptor.OnSuccess(content, consumer);
                     }
                     else
                     {
@@ -84,29 +63,21 @@ namespace Jal.Router.Impl
                             if (routeMethod.ConsumerWithContext != null)
                             {
                                 routeMethod.ConsumerWithContext(content, consumer, context);
-
-                                Interceptor.OnSuccess(content, consumer);
                             }
                             else
                             {
-                                if (routeMethod.Consumer != null)
-                                {
-                                    routeMethod.Consumer(content, consumer);
-
-                                    Interceptor.OnSuccess(content, consumer);
-                                }
+                                routeMethod.Consumer?.Invoke(content, consumer);
                             }
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Interceptor.OnError(content, consumer, ex);
                     throw;
                 }
                 finally
                 {
-                    Interceptor.OnExit(content, consumer);
+
                 }
             }
         }
@@ -151,39 +122,85 @@ namespace Jal.Router.Impl
             {
                 try
                 {
-                    Interceptor.OnEntry(content, consumer);
-
                     if (routeMethod.Evaluator == null)
                     {
-                        if (routeMethod.Consumer != null)
-                        {
-                            routeMethod.Consumer(content, consumer);
-
-                            Interceptor.OnSuccess(content, consumer);
-                        }
+                        routeMethod.Consumer?.Invoke(content, consumer);
                     }
                     else
                     {
                         if (routeMethod.Evaluator(content, consumer))
                         {
-                            if (routeMethod.Consumer != null)
-                            {
-                                routeMethod.Consumer(content, consumer);
-
-                                Interceptor.OnSuccess(content, consumer);
-                            }
+                            routeMethod.Consumer?.Invoke(content, consumer);
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Interceptor.OnError(content, consumer, ex);
                     throw;
                 }
                 finally
                 {
-                    Interceptor.OnExit(content, consumer);
                 }
+            }
+        }
+    }
+
+    public class Router<TMessage> : IRouter<TMessage>
+    {
+        private readonly IRouter _route;
+
+        public IRouterInterceptor Interceptor { get; set; }
+
+        public IRouterLogger Logger { get; set; }
+
+        private readonly IMessageAdapter<TMessage> _adapter;
+
+        public Router(IRouter router, IMessageAdapter<TMessage> adapter)
+        {
+            _route = router;
+
+            _adapter = adapter;
+
+            Interceptor = AbstractRouterInterceptor.Instance;
+
+            Logger = AbstractRouterLogger.Instance;
+        }
+
+        public void Route<TContent>(TMessage message, string name = "")
+        {
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            var context = _adapter.Read<TContent>(message);
+
+            Logger.OnEntry(context);
+
+            Interceptor.OnEntry(context);
+
+            try
+            {
+                _route.Route(context.Content, context, name);
+
+                Logger.OnSuccess(context, context.Content);
+
+                Interceptor.OnSuccess(context, context.Content);
+            }
+            catch (Exception ex)
+            {
+                Logger.OnException(context, ex);
+
+                Interceptor.OnException(context, ex);
+
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+
+                Logger.OnExit(context, stopwatch.ElapsedMilliseconds);
+
+                Interceptor.OnExit(context);
             }
         }
     }

@@ -10,6 +10,11 @@
 
         IRouteProvider Provider { get;}
 
-        IRouterInterceptor Interceptor { get; }
+        //IRouterInterceptor Interceptor { get; }
+    }
+
+    public interface IRouter<in TMessage>
+    {
+        void Route<TContent>(TMessage message, string name = "");
     }
 }

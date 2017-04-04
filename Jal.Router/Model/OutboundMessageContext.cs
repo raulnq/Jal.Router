@@ -12,13 +12,9 @@ namespace Jal.Router.Model
     }
 
 
-    public class OutboundMessageContext
+    public class OutboundMessageContext : InboundMessageContext
     {
-        public string Id { get; set; }
         public string ToConnectionString { get; set; }
         public string ToPath { get; set; }
-        public string From { get; set; }
-        public string Origin { get; set; }
-        public IDictionary<string, string> Headers { get; set; }
     }
 }
