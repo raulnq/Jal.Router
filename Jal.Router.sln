@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger", "Jal.Ro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger.Installer", "Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj", "{3139BEBE-CB50-4C86-958E-AC77D2B7211C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger.LightInject.Installer", "Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj", "{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{3139BEBE-CB50-4C86-958E-AC77D2B7211C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3139BEBE-CB50-4C86-958E-AC77D2B7211C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3139BEBE-CB50-4C86-958E-AC77D2B7211C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

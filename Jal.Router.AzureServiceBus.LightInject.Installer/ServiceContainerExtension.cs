@@ -7,7 +7,7 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterBrokeredMessageRouter(this IServiceContainer container)
+        public static void RegisterAzureServiceBusRouter(this IServiceContainer container)
         {
             container.Register<IMessageAdapter<BrokeredMessage>, BrokeredMessageAdapter>(new PerContainerLifetime());
 

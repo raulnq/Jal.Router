@@ -16,12 +16,12 @@ namespace Jal.Router.Logger
 
         public override void OnEntry(InboundMessageContext context)
         {
-            _log.Info($"[Router.cs, Route, {context.Id}] Start Call.");
+            _log.Info($"[Router.cs, Route, {context.Id}] Start Call. Message arrived. id: {context.Id} from: {context.From} origin: {context.Origin}");
         }
 
         public override void OnSuccess<TContent>(InboundMessageContext context, TContent content)
         {
-            _log.Info( $"[Router.cs, Route, {context.Id}] Message arrived. id: {context.Id} from: {context.From} origin: {context.Origin}");
+            _log.Info( $"[Router.cs, Route, {context.Id}] Message routed. id: {context.Id} from: {context.From} origin: {context.Origin}");
         }
 
         public override void OnExit(InboundMessageContext context, long duration)
