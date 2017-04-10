@@ -18,8 +18,6 @@ namespace Jal.Router.Model
 
         public string EndPoint { get; set; }
 
-        public string Origin { get; set; }
-
         public string Version { get; set; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }

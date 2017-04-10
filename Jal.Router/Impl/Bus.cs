@@ -120,7 +120,7 @@ namespace Jal.Router.Impl
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = options.Origin,
+                Origin = endpoint.Origin,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
