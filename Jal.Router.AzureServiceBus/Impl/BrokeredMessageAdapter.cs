@@ -21,6 +21,11 @@ namespace Jal.Router.AzureServiceBus.Impl
                 context.From = message.Properties["from"].ToString();
             }
 
+            if (message.Properties.ContainsKey("version"))
+            {
+                context.Version = message.Properties["version"].ToString();
+            }
+
             if (message.Properties.ContainsKey("origin"))
             {
                 context.Origin = message.Properties["origin"].ToString();
@@ -51,6 +56,16 @@ namespace Jal.Router.AzureServiceBus.Impl
             if (!string.IsNullOrWhiteSpace(message.From))
             {
                 brokeredmessage.Properties.Add("from", message.From);
+            }
+
+            if (!string.IsNullOrWhiteSpace(message.Version))
+            {
+                brokeredmessage.Properties.Add("version", message.Version);
+            }
+
+            if (message.ScheduledEnqueueDateTimeUtc!=null)
+            {
+                brokeredmessage.ScheduledEnqueueTimeUtc = message.ScheduledEnqueueDateTimeUtc.Value;
             }
 
             if (!string.IsNullOrWhiteSpace(message.Origin))

@@ -22,6 +22,8 @@ namespace Jal.Router.Model
 
         public string Version { get; set; }
 
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+
         public IDictionary<string,string> Headers { get; set; }
 
     }

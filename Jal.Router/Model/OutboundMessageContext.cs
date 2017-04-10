@@ -16,5 +16,6 @@ namespace Jal.Router.Model
     {
         public string ToConnectionString { get; set; }
         public string ToPath { get; set; }
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
     }
 }

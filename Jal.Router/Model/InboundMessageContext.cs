@@ -8,10 +8,11 @@ namespace Jal.Router.Model
         public string From { get; set; }
         public string Origin { get; set; }
         public IDictionary<string, string> Headers { get; set; }
-
+        public string Version { get; set; }
         public InboundMessageContext()
         {
             Headers = new Dictionary<string, string>();
+            Version = "1";
         }
     }
 

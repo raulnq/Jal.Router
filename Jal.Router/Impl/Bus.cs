@@ -79,7 +79,9 @@ namespace Jal.Router.Impl
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = endpoint.Origin,
-                Headers = options.Headers
+                Headers = options.Headers,
+                Version = options.Version,
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
 
             Send(message, options);
@@ -119,7 +121,9 @@ namespace Jal.Router.Impl
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = options.Origin,
-                Headers = options.Headers
+                Headers = options.Headers,
+                Version = options.Version,
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
 
             Publish(message, options);
@@ -173,7 +177,9 @@ namespace Jal.Router.Impl
                 From = endpoint.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Headers = options.Headers
+                Headers = options.Headers,
+                Version = options.Version,
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
 
             Send(message, options);
