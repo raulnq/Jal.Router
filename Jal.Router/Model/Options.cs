@@ -24,5 +24,6 @@ namespace Jal.Router.Model
 
         public IDictionary<string,string> Headers { get; set; }
 
+        public string Origin { get; set; }
     }
 }

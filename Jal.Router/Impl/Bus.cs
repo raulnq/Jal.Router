@@ -84,6 +84,11 @@ namespace Jal.Router.Impl
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
 
+            if (!string.IsNullOrWhiteSpace(options.Origin))
+            {
+                message.Origin = options.Origin;
+            }
+
             Send(message, options);
         }
 
@@ -125,6 +130,11 @@ namespace Jal.Router.Impl
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
+
+            if (!string.IsNullOrWhiteSpace(options.Origin))
+            {
+                message.Origin = options.Origin;
+            }
 
             Publish(message, options);
         }

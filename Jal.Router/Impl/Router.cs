@@ -188,11 +188,13 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.OnException(context, ex);
+                var inner = ex.InnerException ?? ex;
 
-                Interceptor.OnException(context, ex);
+                Logger.OnException(context, inner);
 
-                throw;
+                Interceptor.OnException(context, inner);
+
+                throw inner;
             }
             finally
             {
