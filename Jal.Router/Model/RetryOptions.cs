@@ -6,7 +6,7 @@ namespace Jal.Router.Model
 {
     public class RetryOptions
     {
-        public RetryOptions(InboundMessageContext context, int maxretrycount, IRetryPolicy retrypolicy)
+        public RetryOptions(InboundMessageContext context, IRetryPolicy retrypolicy)
         {
             MessageId = context.Id;
             Correlation = context.Id;
@@ -16,12 +16,11 @@ namespace Jal.Router.Model
             From = context.From;
             Headers = context.Headers;
             RetryPolicy = retrypolicy;
-            MaxRetryCount = maxretrycount;
         }
 
         public IRetryPolicy RetryPolicy { get; }
 
-        public int MaxRetryCount { get; }
+        //public int MaxRetryCount { get; }
 
         public int RetryCount { get; }
 
