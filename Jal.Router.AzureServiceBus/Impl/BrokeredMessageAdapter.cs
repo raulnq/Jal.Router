@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
@@ -31,9 +33,14 @@ namespace Jal.Router.AzureServiceBus.Impl
                 context.Origin = message.Properties["origin"].ToString();
             }
 
+            if (message.Properties.ContainsKey("retrycount"))
+            {
+                context.RetryCount = Convert.ToInt32(message.Properties["retrycount"].ToString());
+            }
+
             if (message.Properties != null)
             {
-                foreach (var property in message.Properties)
+                foreach (var property in message.Properties.Where(x=>x.Key!= "from" && x.Key != "origin" && x.Key != "version" && x.Key != "retrycount"))
                 {
                     context.Headers.Add(property.Key, property.Value?.ToString());
                 }
@@ -77,6 +84,8 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 brokeredmessage.MessageId = message.Id;
             }
+
+            brokeredmessage.Properties.Add("retrycount", message.RetryCount.ToString());
 
             return brokeredmessage;
         }

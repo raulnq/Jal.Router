@@ -9,6 +9,7 @@ namespace Jal.Router.Model
         public string Origin { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Version { get; set; }
+        public int RetryCount { get; set; }
         public InboundMessageContext()
         {
             Headers = new Dictionary<string, string>();

@@ -92,6 +92,37 @@ namespace Jal.Router.Impl
             Send(message, options);
         }
 
+        public void Retry<TContent>(TContent content, RetryEndPointSetting retyrendpoint, RetryOptions retryoptions)
+        {
+            var interval = retryoptions.RetryPolicy.RetryInterval(retryoptions.RetryCount);
+
+            var message = new OutboundMessageContext<TContent>
+            {
+                Id = retryoptions.MessageId,
+                Content = content,
+                From = retryoptions.From,
+                ToConnectionString = retyrendpoint.ToConnectionString,
+                ToPath = retyrendpoint.ToPath,
+                Origin = retryoptions.Origin,
+                Headers = retryoptions.Headers,
+                Version = retryoptions.Version,
+                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(interval),
+                RetryCount = retryoptions.RetryCount + 1,
+            };
+
+            var options = new Options()
+            {
+                MessageId = retryoptions.MessageId,
+                Correlation = retryoptions.Correlation,
+                Headers = retryoptions.Headers,
+                Origin = retryoptions.Origin,
+                ScheduledEnqueueDateTimeUtc = message.ScheduledEnqueueDateTimeUtc,
+                Version = retryoptions.Version
+            };
+
+            Send(message, options);
+        }
+
         public void Send<TContent>(TContent content, Options options)
         {
             var endpoints = Provider.Provide<TContent>(options.EndPoint);

@@ -62,6 +62,8 @@
     <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
     <Compile Include="Impl\EndPointProvider.cs" />
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
+    <Compile Include="Impl\ExponentialRetryPolicy.cs" />
+    <Compile Include="Impl\LinearRetryPolicy.cs" />
     <Compile Include="Impl\NullBusInterceptor.cs" />
     <Compile Include="Impl\NullBusLogger.cs" />
     <Compile Include="Impl\NullPublisher.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Interface\IMessageAdapter.cs" />
     <Compile Include="Interface\IPublisher.cs" />
     <Compile Include="Interface\IQueue.cs" />
+    <Compile Include="Interface\IRetryPolicy.cs" />
     <Compile Include="Interface\IRouteProvider.cs" />
     <Compile Include="Impl\RouteProvider.cs" />
     <Compile Include="Interface\IBus.cs" />
@@ -88,6 +91,8 @@
     <Compile Include="Model\InboundMessageContext.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="Model\OutboundMessageContext.cs" />
+    <Compile Include="Model\RetryEndPointSetting.cs" />
+    <Compile Include="Model\RetryOptions.cs" />
     <Compile Include="Model\Route.cs" />
     <Compile Include="Model\RouteMethod.cs" />
     <Compile Include="Interface\IRouterConfigurationSource.cs" />

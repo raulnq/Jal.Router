@@ -15,5 +15,7 @@ namespace Jal.Router.Interface
         void Publish<TContent>(TContent content, Options options);
 
         void Publish<TContent>(TContent content, EndPointSetting endpoint, Options options);
+
+        void Retry<TContent>(TContent content, RetryEndPointSetting endpoint, RetryOptions options);
     }
 }
