@@ -7,14 +7,18 @@ namespace Jal.Router.Impl
     {
         private readonly int _seconds;
 
-        public ExponentialRetryPolicy(int seconds)
+        private readonly int _maxretrycount;
+
+        public ExponentialRetryPolicy(int seconds, int maxretrycount)
         {
             _seconds = seconds;
+
+            _maxretrycount = maxretrycount;
         }
 
         public bool CanRetry(int currentRetryCount, TimeSpan nextretryinterval)
         {
-            throw new NotImplementedException();
+            return currentRetryCount < _maxretrycount;
         }
 
         public TimeSpan RetryInterval(int currentRetryCount)
