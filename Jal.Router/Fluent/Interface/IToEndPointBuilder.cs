@@ -5,6 +5,6 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IToEndPointBuilder
     {
-        void To(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor);
+        void To(Func<IValueSettingFinder, string> connectionstringextractor, Func<IValueSettingFinder, string> pathextractor);
     }
 }

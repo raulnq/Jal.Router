@@ -2,12 +2,15 @@ using System;
 using System.Diagnostics;
 using Jal.Router.Interface;
 using Jal.Router.Model;
+using System.Linq;
 
 namespace Jal.Router.Impl
 {
     public class Bus : IBus
     {
-        public IEndPointProvider Provider { get; set; }
+        public IEndPointProvider EnpointProvider { get; set; }
+
+        public IRetryPolicyProvider RetryPolicyProvider { get; set; }
 
         public IQueue Queue { get; set; }
 
@@ -19,7 +22,7 @@ namespace Jal.Router.Impl
 
         public Bus(IEndPointProvider provider)
         {
-            Provider = provider;
+            EnpointProvider = provider;
 
             Queue = AbstractQueue.Instance;
 
@@ -69,103 +72,142 @@ namespace Jal.Router.Impl
             }
         }
 
-        public void Send<TContent>(TContent content, EndPointSetting endpoint, Options options)
+        public void Send<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
             var message = new OutboundMessageContext<TContent>
             {
-                Id = options.MessageId,
+                Id = options.Id,
                 Content = content,
-                From = endpoint.From,
+                From = origin.Name,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = endpoint.Origin,
+                Origin = origin.Key,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
 
-            if (!string.IsNullOrWhiteSpace(options.Origin))
-            {
-                message.Origin = options.Origin;
-            }
-
             Send(message, options);
         }
 
-        public void Retry<TContent>(TContent content, RetryEndPointSetting retyrendpoint, RetryOptions retryoptions)
+        public bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy)
         {
-            var interval = retryoptions.RetryPolicy.RetryInterval(retryoptions.RetryCount);
+            var interval = retrypolicy.RetryInterval(inboundmessagecontext.RetryCount);
+
+            if(!retrypolicy.CanRetry(inboundmessagecontext.RetryCount, interval))
+            {
+                return false;
+            }
 
             var message = new OutboundMessageContext<TContent>
             {
-                Id = retryoptions.MessageId,
+                Id = inboundmessagecontext.Id,
                 Content = content,
-                From = retryoptions.From,
-                ToConnectionString = retyrendpoint.ToConnectionString,
-                ToPath = retyrendpoint.ToPath,
-                Origin = retryoptions.Origin,
-                Headers = retryoptions.Headers,
-                Version = retryoptions.Version,
+                From = inboundmessagecontext.From,
+                ToConnectionString = endpoint.ToConnectionString,
+                ToPath = endpoint.ToPath,
+                Origin = inboundmessagecontext.Origin,
+                Headers = inboundmessagecontext.Headers,
+                Version = inboundmessagecontext.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(interval),
-                RetryCount = retryoptions.RetryCount + 1,
+                RetryCount = inboundmessagecontext.RetryCount + 1,
             };
 
             var options = new Options()
             {
-                MessageId = retryoptions.MessageId,
-                Correlation = retryoptions.Correlation,
-                Headers = retryoptions.Headers,
-                Origin = retryoptions.Origin,
+                Id = inboundmessagecontext.Id,
+                Correlation = inboundmessagecontext.Id,
+                Headers = inboundmessagecontext.Headers,
                 ScheduledEnqueueDateTimeUtc = message.ScheduledEnqueueDateTimeUtc,
-                Version = retryoptions.Version
+                Version = inboundmessagecontext.Version
             };
 
             Send(message, options);
+
+            return true;
+        }
+
+        public bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint)
+        {
+            var policy = RetryPolicyProvider.Provide<TContent>();
+
+            return Retry(content, inboundmessagecontext, endpoint, policy);
+        }
+
+        public bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext)
+        {
+            var endpoints = EnpointProvider.Provide<TContent>();
+
+            var setting = EnpointProvider.Provide(endpoints.Single(), content);
+
+            return Retry(content, inboundmessagecontext, setting);
         }
 
         public void Send<TContent>(TContent content, Options options)
         {
-            var endpoints = Provider.Provide<TContent>(options.EndPoint);
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = Provider.Provide(endpoint, content);
+                var setting = EnpointProvider.Provide(endpoint, content);
 
-                Send(content, setting, options);
+                var origin = endpoint.Origin;
+
+                Send(content, setting, origin, options);
             }
         }
 
+        public void Send<TContent>(TContent content, Origin origin, Options options)
+        {
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
+
+            foreach (var endpoint in endpoints)
+            {
+                var setting = EnpointProvider.Provide(endpoint, content);
+
+                Send(content, setting, origin, options);
+            }
+        } 
         public void Publish<TContent>(TContent content, Options options)
         {
-            var endpoints = Provider.Provide<TContent>(options.EndPoint);
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = Provider.Provide(endpoint, content);
+                var setting = EnpointProvider.Provide(endpoint, content);
 
-                Publish(content, setting, options);
+                var origin = endpoint.Origin;
+
+                Publish(content, setting, origin, options);
             }
         }
 
-        public void Publish<TContent>(TContent content, EndPointSetting endpoint, Options options)
+        public void Publish<TContent>(TContent content, Origin origin, Options options)
+        {
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
+
+            foreach (var endpoint in endpoints)
+            {
+                var setting = EnpointProvider.Provide(endpoint, content);
+
+                Publish(content, setting, origin, options);
+            }
+        }
+
+        public void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
             var message = new OutboundMessageContext<TContent>
             {
-                Id = options.MessageId,
+                Id = options.Id,
                 Content = content,
-                From = endpoint.From,
+                From = origin.Name,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = endpoint.Origin,
+                Origin = origin.Key,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
-
-            if (!string.IsNullOrWhiteSpace(options.Origin))
-            {
-                message.Origin = options.Origin;
-            }
 
             Publish(message, options);
         }
@@ -209,13 +251,13 @@ namespace Jal.Router.Impl
             }
         }
 
-        public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Options options)
+        public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
             var message = new OutboundMessageContext<TContent>
             {
-                Id = options.MessageId,
+                Id = options.Id,
                 Content = content,
-                From = endpoint.From,
+                From = origin.Name,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Headers = options.Headers,
@@ -228,13 +270,27 @@ namespace Jal.Router.Impl
 
         public void FireAndForget<TContent>(TContent content, Options options)
         {
-            var endpoints = Provider.Provide<TContent>(options.EndPoint);
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = Provider.Provide(endpoint, content);
+                var setting = EnpointProvider.Provide(endpoint, content);
 
-                FireAndForget(content, setting, options);
+                var origin = endpoint.Origin;
+
+                FireAndForget(content, setting, origin, options);
+            }
+        }
+
+        public void FireAndForget<TContent>(TContent content,Origin origin, Options options)
+        {
+            var endpoints = EnpointProvider.Provide<TContent>(options.EndPoint);
+
+            foreach (var endpoint in endpoints)
+            {
+                var setting = EnpointProvider.Provide(endpoint, content);
+
+                FireAndForget(content, setting, origin, options);
             }
         }
     }

@@ -18,9 +18,11 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
+            container.Register<IRetryPolicyProvider, RetryPolicyProvider>(new PerContainerLifetime());
+
             container.Register<IEndPointSettingFinderFactory, EndPointSettingFinderFactory>(new PerContainerLifetime());
 
-            container.Register<IEndPointValueSettingFinder, AppSettingEndPointValueSettingFinder>(typeof(AppSettingEndPointValueSettingFinder).FullName ,new PerContainerLifetime());
+            container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof(AppSettingValueSettingFinder).FullName ,new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof(EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
 
@@ -37,9 +39,9 @@ namespace Jal.Router.LightInject.Installer
                             container.Register(typeof(AbstractRouterConfigurationSource), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
 
-                        if (typeof(IEndPointValueSettingFinder).IsAssignableFrom(exportedType))
+                        if (typeof(IValueSettingFinder).IsAssignableFrom(exportedType))
                         {
-                            container.Register(typeof(IEndPointValueSettingFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
+                            container.Register(typeof(IValueSettingFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
 
                         if (exportedType.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)))

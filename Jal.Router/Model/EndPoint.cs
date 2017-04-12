@@ -8,18 +8,26 @@ namespace Jal.Router.Model
         {
             Name = name;
         }
-        public string Name { get; set; }
+        public Origin Origin { get; set; }
 
-        public string OriginKey { get; set; }
+        public string Name { get; set; }
 
         public Type ExtractorType { get; set; }
 
         public Type MessageType { get; set; }
 
-        public string OriginName { get; set; }
-
         public object ToConnectionStringExtractor { get; set; }
 
         public object ToPathExtractor { get; set; }
+    }
+
+    public class RetryPolicy
+    {
+        public Type ExtractorType { get; set; }
+
+        public Type MessageType { get; set; }
+
+        public object PolicyExtractor { get; set; }
+
     }
 }

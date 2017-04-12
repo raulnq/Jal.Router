@@ -22,11 +22,13 @@ namespace Jal.Router.Tests.Impl
 
             RegisterOrigin("From", "2CE8F3B2-6542-4D5C-8B08-E7E64EF57D22");
 
-            RegisterEndPoint<AppSettingEndPointValueSettingFinder>()
+            RegisterEndPoint<AppSettingValueSettingFinder>()
                 .ForMessage<Message>()
                 .To(x => x.Find("toconnectionstring"), x => x.Find("topath"));
 
-            RegisterEndPoint<EndPointSettingFinder, Message>();
+            //RegisterEndPoint<EndPointSettingFinder, Message>();
+
+            RegisterRetry<AppSettingValueSettingFinder>().ForMessage<Message>().UsePolicy(x => new LinearRetryPolicy(10));
 
             //RegisterFlow<Data>(s => s.Id).StartedByMessage<Request>(h => h.Name).UsingRoute("Tag1").FollowingBy(y =>
             //{

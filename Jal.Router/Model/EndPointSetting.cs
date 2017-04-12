@@ -4,7 +4,5 @@
     {
         public string ToConnectionString { get; set; }
         public string ToPath { get; set; }
-        public string From { get; set; }
-        public string Origin { get; set; }
     }
 }

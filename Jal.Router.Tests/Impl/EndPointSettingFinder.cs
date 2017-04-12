@@ -10,7 +10,7 @@ namespace Jal.Router.Tests.Impl
         {
             return new EndPointSetting()
             {
-                From = "example"
+                ToConnectionString = "example"
             };
         }
     }

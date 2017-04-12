@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, INameEndPointBuilder where TExtractor : IEndPointValueSettingFinder
+    public class EndPointBuilder<TExtractor> : IToEndPointBuilder, INameEndPointBuilder where TExtractor : IValueSettingFinder
     {
         private readonly EndPoint _endpoint;
 
@@ -24,7 +24,7 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public void To(Func<IEndPointValueSettingFinder, string> connectionstringextractor, Func<IEndPointValueSettingFinder, string> pathextractor)//TODO delete
+        public void To(Func<IValueSettingFinder, string> connectionstringextractor, Func<IValueSettingFinder, string> pathextractor)//TODO delete
         {
             if (connectionstringextractor == null)
             {

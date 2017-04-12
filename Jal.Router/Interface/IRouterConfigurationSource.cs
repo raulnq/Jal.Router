@@ -7,5 +7,7 @@ namespace Jal.Router.Interface
         Route[] GetRoutes();
 
         EndPoint[] GetEndPoints();
+
+        RetryPolicy[] GetRetryPolicies();
     }
 }

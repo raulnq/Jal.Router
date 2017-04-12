@@ -12,18 +12,16 @@ namespace Jal.Router.Model
             Headers=new Dictionary<string, string>();
             Version = "1";
         }
-        public string MessageId { get; set; }
+        public string Id { get; set; }
 
         public string Correlation { get; set; }
 
-        public string EndPoint { get; set; }
+        public string EndPointName { get; set; }
 
         public string Version { get; set; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
 
         public IDictionary<string,string> Headers { get; set; }
-
-        public string Origin { get; set; }
     }
 }

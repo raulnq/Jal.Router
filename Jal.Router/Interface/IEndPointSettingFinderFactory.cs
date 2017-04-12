@@ -4,7 +4,7 @@ namespace Jal.Router.Interface
 {
     public interface IEndPointSettingFinderFactory
     {
-        IEndPointValueSettingFinder Create(Type type);
+        IValueSettingFinder Create(Type type);
 
         IEndPointSettingFinder<TContent> Create<TContent>(Type type);
     }

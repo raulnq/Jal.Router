@@ -12,6 +12,11 @@ namespace Jal.Router.Impl
             _seconds = seconds;
         }
 
+        public bool CanRetry(int currentRetryCount, TimeSpan nextretryinterval)
+        {
+            throw new NotImplementedException();
+        }
+
         public TimeSpan RetryInterval(int currentRetryCount)
         {
             return TimeSpan.FromSeconds(_seconds);

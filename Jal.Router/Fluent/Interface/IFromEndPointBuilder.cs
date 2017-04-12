@@ -5,6 +5,6 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IFromEndPointBuilder : IToEndPointBuilder
     {
-        IToEndPointBuilder From(Func<IEndPointValueSettingFinder, string> fromextractor);
+        IToEndPointBuilder From(Func<IValueSettingFinder, string> fromextractor);
     }
 }

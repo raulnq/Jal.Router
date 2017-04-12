@@ -36,7 +36,7 @@ namespace Jal.Router.Impl
         public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)
         {
 
-            var isvaluefinder = typeof(IEndPointValueSettingFinder).IsAssignableFrom(endpoint.ExtractorType);
+            var isvaluefinder = typeof(IValueSettingFinder).IsAssignableFrom(endpoint.ExtractorType);
 
             var isfinder = typeof(IEndPointSettingFinder<TContent>).IsAssignableFrom(endpoint.ExtractorType);
 
@@ -61,9 +61,9 @@ namespace Jal.Router.Impl
             var extractor = Factory.Create(endpoint.ExtractorType);
 
             var toconnectionextractor =
-                endpoint.ToConnectionStringExtractor as Func<IEndPointValueSettingFinder, string>;
+                endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-            var topathextractor = endpoint.ToPathExtractor as Func<IEndPointValueSettingFinder, string>;
+            var topathextractor = endpoint.ToPathExtractor as Func<IValueSettingFinder, string>;
 
             if (toconnectionextractor != null && topathextractor != null)
             {
@@ -72,10 +72,6 @@ namespace Jal.Router.Impl
                 output.ToPath = topathextractor(extractor);
             }
 
-            output.From = endpoint.OriginName;
-
-            output.Origin = endpoint.OriginKey;
-
             return output;
         }
         private EndPointSetting Finder<T>(EndPoint endpoint, T record)
@@ -83,16 +79,6 @@ namespace Jal.Router.Impl
             var extractor = Factory.Create<T>(endpoint.ExtractorType);
 
             var output = extractor.Find(record);
-
-            if (string.IsNullOrWhiteSpace(output.From))
-            {
-                output.From = endpoint.OriginName;
-            }
-
-            if (string.IsNullOrWhiteSpace(output.Origin))
-            {
-                output.Origin = endpoint.OriginKey;
-            }
 
             return output;
         }

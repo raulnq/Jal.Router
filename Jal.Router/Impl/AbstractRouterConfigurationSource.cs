@@ -13,22 +13,25 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
-        private string _originname = string.Empty;
+        private readonly List<RetryPolicy> _policies = new List<RetryPolicy>();
 
-        private string _originkey = string.Empty;
+        private readonly Origin _origin = new Origin();
 
         public Route[] GetRoutes()
         {
             return _routes.ToArray();
         }
 
+        public RetryPolicy[] GetRetryPolicies()
+        {
+            return _policies.ToArray();
+        }
+
         public EndPoint[] GetEndPoints()
         {
             foreach (var endPoint in _enpoints)
             {
-                endPoint.OriginName = _originname;
-
-                endPoint.OriginKey = _originkey;
+                endPoint.Origin = _origin;
             }
             return _enpoints.ToArray();
         }
@@ -42,18 +45,29 @@ namespace Jal.Router.Impl
 
         public void RegisterOrigin(string name, string key="")
         {
-            _originname = name;
+            _origin.Name = name;
 
-            _originkey = key;
+            _origin.Key = key;
         }
 
-        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IEndPointValueSettingFinder
+        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IValueSettingFinder
         {
             var endpoint = new EndPoint(name);
 
             _enpoints.Add(endpoint);
 
             var builder = new EndPointBuilder<TExtractor>(endpoint);
+
+            return builder;
+        }
+
+        public INameRetryPolicyBuilder RegisterRetry<TExtractor>() where TExtractor : IValueSettingFinder
+        {
+            var policy = new RetryPolicy();
+
+            _policies.Add(policy);
+
+            var builder = new RetryPolicyBuilder<TExtractor>(policy);
 
             return builder;
         }

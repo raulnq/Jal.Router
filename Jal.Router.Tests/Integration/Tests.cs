@@ -60,7 +60,9 @@ namespace Jal.Router.Tests.Integration
 
             //_router.Route(message, new Response() {Status = "Hi"});
             
-            _bus.Send(message, new Options() {MessageId = "Id"});
+            _bus.Send(message, new Options() {Id = "Id"});
+
+            _bus.Retry(message, new InboundMessageContext());
 
             //_bus.Publish(message, new Options() { MessageId = "Id" });
         }

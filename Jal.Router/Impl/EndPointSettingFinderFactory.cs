@@ -13,9 +13,9 @@ namespace Jal.Router.Impl
             _serviceLocator = serviceLocator;
         }
 
-        public IEndPointValueSettingFinder Create(Type type)
+        public IValueSettingFinder Create(Type type)
         {
-            return _serviceLocator.Resolve<IEndPointValueSettingFinder>(type.FullName);
+            return _serviceLocator.Resolve<IValueSettingFinder>(type.FullName);
         }
 
         public IEndPointSettingFinder<T> Create<T>(Type type)
