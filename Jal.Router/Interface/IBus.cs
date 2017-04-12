@@ -22,10 +22,14 @@ namespace Jal.Router.Interface
 
         void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options);
 
-        bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy);
+        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy);
 
-        bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint);
+        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint);
 
-        bool Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext);
+        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext);
+
+        bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retrypolicy);
+
+        bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext);
     }
 }
