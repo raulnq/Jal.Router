@@ -27,6 +27,7 @@ namespace Jal.Router.Installer
             container.Register(Component.For(typeof(IEndPointProvider)).ImplementedBy(typeof(EndPointProvider)).LifestyleSingleton());
             container.Register(Component.For(typeof(IEndPointSettingFinderFactory)).ImplementedBy(typeof(EndPointSettingFinderFactory)).LifestyleSingleton());
             container.Register(Component.For(typeof(IValueSettingFinderFactory)).ImplementedBy(typeof(ValueSettingFinderFactory)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(AppSettingValueSettingFinder)).Named(typeof(AppSettingValueSettingFinder).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IBus)).ImplementedBy(typeof(Bus)).LifestyleSingleton());

@@ -127,13 +127,13 @@ namespace Jal.Router.Impl
 
     public class Router<TMessage> : IRouter<TMessage>
     {
-        public IHandlerFactory Factory { get; set; }
-
         public IRouteProvider Provider { get; set; }
 
         private readonly IValueSettingFinderFactory _finderFactory;
 
         private readonly IBus _bus;
+
+        private readonly IHandlerFactory _factory;
 
         public IRouterInterceptor Interceptor { get; set; }
 
@@ -141,13 +141,17 @@ namespace Jal.Router.Impl
 
         private readonly IMessageAdapter<TMessage> _adapter;
 
-        public Router(IMessageAdapter<TMessage> adapter, IValueSettingFinderFactory finderFactory, IBus bus)
+        public Router(IMessageAdapter<TMessage> adapter, IValueSettingFinderFactory finderFactory, IBus bus, IHandlerFactory factory, IRouteProvider provider)
         {
             _adapter = adapter;
 
             _finderFactory = finderFactory;
 
             _bus = bus;
+
+            _factory = factory;
+
+            Provider = provider;
 
             Interceptor = AbstractRouterInterceptor.Instance;
 
@@ -194,20 +198,10 @@ namespace Jal.Router.Impl
             }
         }
 
-        public Router(IHandlerFactory factory, IRouteProvider provider, IValueSettingFinderFactory finderFactory, IBus bus)
-        {
-            Factory = factory;
-
-            Provider = provider;
-
-            _finderFactory = finderFactory;
-
-            _bus = bus;
-        }
 
         public void InternalRoute<TContent, THandler>(TContent content, InboundMessageContext context, Route<TContent, THandler> route) where THandler : class
         {
-            var consumer = Factory.Create<THandler>(route.ConsumerType);
+            var consumer = _factory.Create<THandler>(route.ConsumerType);
 
             foreach (var routeMethod in route.RouteMethods)
             {
@@ -309,7 +303,7 @@ namespace Jal.Router.Impl
 
             foreach (var route in routes)
             {
-                var routemethod = typeof(Router).GetMethods().First(x => x.Name == "InternalRoute" && x.GetParameters().Count() == 3);
+                var routemethod = GetType().GetMethods().First(x => x.Name == "InternalRoute" && x.GetParameters().Count() == 3);
 
                 var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
 

@@ -60,6 +60,7 @@
     <Compile Include="Impl\AbstractQueue.cs" />
     <Compile Include="Impl\AbstractRouterLogger.cs" />
     <Compile Include="Impl\AppSettingValueSettingFinder.cs" />
+    <Compile Include="Impl\ConnectionStringValueSettingFinder.cs" />
     <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
     <Compile Include="Impl\EndPointProvider.cs" />
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />

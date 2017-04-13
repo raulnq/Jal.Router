@@ -57,13 +57,13 @@ namespace Jal.Router.Tests.Integration
 
             //_router.Route<Message>(message);
 
-            //_brokered.Route<Message>(bm);
+            _brokered.Route<Message>(bm);
 
             //_router.Route(message, new Response() {Status = "Hi"});
             
-            _bus.Send(message, new Options() {Id = "Id"});
+            //_bus.Send(message, new Options() {Id = "Id"});
 
-            _bus.Retry(message, new InboundMessageContext(), new LinearRetryPolicy(10,5));
+            //_bus.Retry(message, new InboundMessageContext(), new LinearRetryPolicy(10,5));
 
             //_bus.Publish(message, new Options() { MessageId = "Id" });
         }

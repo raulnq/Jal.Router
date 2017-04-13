@@ -43,13 +43,13 @@ namespace Jal.Router.Impl
             _origin.Key = key;
         }
 
-        public INameEndPointBuilder RegisterEndPoint<TExtractor>(string name = "") where TExtractor : IValueSettingFinder
+        public INameEndPointBuilder RegisterEndPoint(string name = "")
         {
             var endpoint = new EndPoint(name);
 
             _enpoints.Add(endpoint);
 
-            var builder = new EndPointBuilder<TExtractor>(endpoint);
+            var builder = new EndPointBuilder(endpoint);
 
             return builder;
         }

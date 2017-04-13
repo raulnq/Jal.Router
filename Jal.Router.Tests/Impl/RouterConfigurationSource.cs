@@ -23,9 +23,9 @@ namespace Jal.Router.Tests.Impl
 
             RegisterOrigin("From", "2CE8F3B2-6542-4D5C-8B08-E7E64EF57D22");
 
-            RegisterEndPoint<AppSettingValueSettingFinder>()
+            RegisterEndPoint()
                 .ForMessage<Message>()
-                .To(x => x.Find("toconnectionstring"), x => x.Find("topath"));
+                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("toconnectionstring"), x => x.Find("topath"));
 
             //RegisterEndPoint<EndPointSettingFinder, Message>();
 

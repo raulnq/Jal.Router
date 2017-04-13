@@ -45,40 +45,38 @@ namespace Jal.Router.Impl
         public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)
         {
 
-            var isvaluefinder = typeof(IValueSettingFinder).IsAssignableFrom(endpoint.ExtractorType);
-
-            var isfinder = typeof(IEndPointSettingFinder<TContent>).IsAssignableFrom(endpoint.ExtractorType);
-
-            if (isvaluefinder)
+            if (endpoint.ExtractorType == null)
             {
-                return ValueFinder(endpoint);
-            }
+                if (endpoint.ConnectionStringExtractorType!=null && endpoint.PathExtractorType!=null)
+                {
+                    return ValueFinder(endpoint);
+                }
 
-            if (isfinder)
+                return null;
+            }
+            else
             {
                 return Finder(endpoint, content);
             }
-
-            return null;
-
         }
 
         private EndPointSetting ValueFinder(EndPoint endpoint)
         {
             var output = new EndPointSetting();
 
-            var extractor = _valueSettingFinderFactory.Create(endpoint.ExtractorType);
+            var extractorconnectionstring = _valueSettingFinderFactory.Create(endpoint.ConnectionStringExtractorType);
 
-            var toconnectionextractor =
-                endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+            var extractorpath = _valueSettingFinderFactory.Create(endpoint.PathExtractorType);
+
+            var toconnectionextractor = endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
             var topathextractor = endpoint.ToPathExtractor as Func<IValueSettingFinder, string>;
 
             if (toconnectionextractor != null && topathextractor != null)
             {
-                output.ToConnectionString = toconnectionextractor(extractor);
+                output.ToConnectionString = toconnectionextractor(extractorconnectionstring);
 
-                output.ToPath = topathextractor(extractor);
+                output.ToPath = topathextractor(extractorpath);
             }
 
             return output;
