@@ -28,7 +28,7 @@ namespace Jal.Router.Fluent.Impl
         {
             _endpoint.ConnectionStringExtractorType = typeof(TExtractorConectionString);
 
-            _endpoint.PathExtractorType = typeof(IValueSettingFinder);
+            _endpoint.PathExtractorType = typeof(TExtractorPath);
 
             if (connectionstringextractor == null)
             {
