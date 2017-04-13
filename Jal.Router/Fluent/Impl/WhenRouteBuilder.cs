@@ -1,11 +1,11 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class WhenRouteBuilder<TBody, TConsumer> : IWhenMethodBuilder<TBody, TConsumer>
+    public class WhenRouteBuilder<TBody, TConsumer> : IWhenMethodBuilder<TBody, TConsumer>, IRetryUsingBuilder
     {
         private readonly RouteMethod<TBody, TConsumer> _routemethod;
 
@@ -20,7 +20,7 @@ namespace Jal.Router.Fluent.Impl
             _routemethod = routemethod;
         }
 
-        public void When(Func<TBody, TConsumer, bool> method)
+        public IRetryBuilder When(Func<TBody, TConsumer, bool> method)
         {
             if (method == null)
             {
@@ -28,9 +28,11 @@ namespace Jal.Router.Fluent.Impl
             }
 
             _routemethod.Evaluator = method;
+
+            return this;
         }
 
-        public void When<TContext>(Func<TBody, TConsumer, TContext, bool> method)
+        public IRetryBuilder When<TContext>(Func<TBody, TConsumer, TContext, bool> method)
         {
             if (method == null)
             {
@@ -40,6 +42,27 @@ namespace Jal.Router.Fluent.Impl
             Func<TBody, TConsumer, dynamic, bool> wrapper = (b, c, d) => method(b, c, d);
 
             _routemethod.EvaluatorWithContext = wrapper;
+
+            return this;
+        }
+
+        public IRetryUsingBuilder Retry<TExeption>() where TExeption : Exception
+        {
+            _routemethod.RetryExceptionType = typeof(TExeption);
+
+            return this;
+        }
+
+        public void Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        {
+            _routemethod.RetryExtractorType = typeof(TExtractor);
+
+            if (policycreator == null)
+            {
+                throw new ArgumentNullException(nameof(policycreator));
+            }
+
+            _routemethod.RetryPolicyExtractor = policycreator;
         }
     }
 }

@@ -4,6 +4,8 @@ namespace Jal.Router.Interface
 {
     public interface IBus
     {
+        IEndPointProvider Provider { get; }
+
         void Send<TContent>(TContent content, Options options);
 
         void Send<TContent>(TContent content, Origin origin, Options options);
@@ -24,12 +26,6 @@ namespace Jal.Router.Interface
 
         void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy);
 
-        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint);
-
-        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext);
-
-        bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retrypolicy);
-
-        bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext);
+        void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retrypolicy);
     }
 }

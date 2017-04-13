@@ -20,14 +20,4 @@ namespace Jal.Router.Model
 
         public object ToPathExtractor { get; set; }
     }
-
-    public class RetryPolicy
-    {
-        public Type ExtractorType { get; set; }
-
-        public Type MessageType { get; set; }
-
-        public object PolicyExtractor { get; set; }
-
-    }
 }

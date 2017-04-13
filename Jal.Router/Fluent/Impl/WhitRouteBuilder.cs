@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class WhitRouteBuilder<TBody, THandler> : IWhithMethodBuilder<TBody, THandler>
+    public class WhitRouteBuilder<TBody, THandler> : IWithMethodBuilder<TBody, THandler>
     {
         private readonly Route<TBody, THandler> _route;
 

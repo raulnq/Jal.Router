@@ -3,19 +3,6 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Interface
 {
-
-
-    //public interface IRouterInterceptor
-    //{
-    //    void OnEntry<TContent,THandler>(TContent content, THandler handler);
-
-    //    void OnExit<TContent, THandler>(TContent content, THandler handler);
-
-    //    void OnSuccess<TContent, THandler>(TContent content, THandler handler);
-
-    //    void OnError<TContent, THandler>(TContent content, THandler handler, Exception ex);
-    //}
-
     public interface IRouterInterceptor
     {
         void OnEntry(InboundMessageContext context);

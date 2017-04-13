@@ -1,6 +1,5 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
@@ -14,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public void ToBeHandledBy<TConcreteConsumer>(Action<IWhithMethodBuilder<TBody, THandler>> action) where TConcreteConsumer : THandler
+        public void ToBeHandledBy<TConcreteConsumer>(Action<IWithMethodBuilder<TBody, THandler>> action) where TConcreteConsumer : THandler
         {
             if (action == null)
             {

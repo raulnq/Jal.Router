@@ -4,7 +4,7 @@ namespace Jal.Router.Interface
 {
     public interface IRetryPolicy
     {
-        TimeSpan RetryInterval(int currentRetryCount);
+        TimeSpan NextRetryInterval(int currentRetryCount);
 
         bool CanRetry(int currentRetryCount, TimeSpan nextretryinterval);
     }

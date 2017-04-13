@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             return currentRetryCount < _maxretrycount;
         }
 
-        public TimeSpan RetryInterval(int currentRetryCount)
+        public TimeSpan NextRetryInterval(int currentRetryCount)
         {
             return TimeSpan.FromSeconds(Math.Pow(_seconds, currentRetryCount));
         }

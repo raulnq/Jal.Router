@@ -6,15 +6,12 @@
 
         void Route<TContent>(TContent content, dynamic context, string name = "");
 
-        IHandlerFactory Factory { get; }
-
         IRouteProvider Provider { get;}
-
-        //IRouterInterceptor Interceptor { get; }
     }
 
     public interface IRouter<in TMessage>
     {
+        IRouteProvider Provider { get; }
         void Route<TContent>(TMessage message, string name = "");
     }
 }

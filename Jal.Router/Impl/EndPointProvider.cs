@@ -8,9 +8,18 @@ namespace Jal.Router.Impl
 {
     public class EndPointProvider : IEndPointProvider
     {
+
+        private readonly IValueSettingFinderFactory _valueSettingFinderFactory;
+
+        private readonly IEndPointSettingFinderFactory _endPointSettingFinderFactory;
+
         private readonly EndPoint[] _endpoints;
-        public EndPointProvider(IRouterConfigurationSource[] sources)
+        public EndPointProvider(IRouterConfigurationSource[] sources, IValueSettingFinderFactory valueSettingFinderFactory, IEndPointSettingFinderFactory endPointSettingFinderFactory)
         {
+            _valueSettingFinderFactory = valueSettingFinderFactory;
+
+            _endPointSettingFinderFactory = endPointSettingFinderFactory;
+
             var routes = new List<EndPoint>();
 
             foreach (var source in sources)
@@ -31,7 +40,7 @@ namespace Jal.Router.Impl
             return _endpoints.Where(x => x.Name==name && x.MessageType == typeof(TContent)).ToArray();
         }
 
-        public IEndPointSettingFinderFactory Factory { get; set; }
+        
 
         public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)
         {
@@ -58,7 +67,7 @@ namespace Jal.Router.Impl
         {
             var output = new EndPointSetting();
 
-            var extractor = Factory.Create(endpoint.ExtractorType);
+            var extractor = _valueSettingFinderFactory.Create(endpoint.ExtractorType);
 
             var toconnectionextractor =
                 endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
@@ -76,7 +85,7 @@ namespace Jal.Router.Impl
         }
         private EndPointSetting Finder<T>(EndPoint endpoint, T record)
         {
-            var extractor = Factory.Create<T>(endpoint.ExtractorType);
+            var extractor = _endPointSettingFinderFactory.Create<T>(endpoint.ExtractorType);
 
             var output = extractor.Find(record);
 

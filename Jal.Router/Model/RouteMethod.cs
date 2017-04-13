@@ -1,4 +1,5 @@
 using System;
+using Jal.Router.Interface;
 
 namespace Jal.Router.Model
 {
@@ -21,5 +22,8 @@ namespace Jal.Router.Model
         public Action<TBody, TConsumer, dynamic> ConsumerWithContext { get; set; }
 
         public Func<TBody, TConsumer, dynamic, bool> EvaluatorWithContext { get; set; }
+        public Type RetryExceptionType { get; set; }
+        public Type RetryExtractorType { get; set; }
+        public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
     }
 }

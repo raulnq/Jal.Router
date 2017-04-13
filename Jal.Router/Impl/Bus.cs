@@ -8,9 +8,7 @@ namespace Jal.Router.Impl
 {
     public class Bus : IBus
     {
-        public IEndPointProvider EnpointProvider { get; set; }
-
-        public IRetryPolicyProvider RetryPolicyProvider { get; set; }
+        public IEndPointProvider Provider { get; set; }
 
         public IQueue Queue { get; set; }
 
@@ -22,7 +20,7 @@ namespace Jal.Router.Impl
 
         public Bus(IEndPointProvider provider)
         {
-            EnpointProvider = provider;
+            Provider = provider;
 
             Queue = AbstractQueue.Instance;
 
@@ -90,24 +88,9 @@ namespace Jal.Router.Impl
             Send(message, options);
         }
 
-        public bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retrypolicy)
+
+        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retryPolicy)
         {
-            var interval = retrypolicy.RetryInterval(inboundmessagecontext.RetryCount);
-
-            return retrypolicy.CanRetry(inboundmessagecontext.RetryCount, interval);
-        }
-
-        public bool CanRetry<TContent>(TContent content, InboundMessageContext inboundmessagecontext)
-        {
-            var policy = RetryPolicyProvider.Provide<TContent>();
-
-            return CanRetry(content, inboundmessagecontext, policy);
-        }
-
-        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy)
-        {
-            var interval = retrypolicy.RetryInterval(inboundmessagecontext.RetryCount);
-
             var message = new OutboundMessageContext<TContent>
             {
                 Id = inboundmessagecontext.Id,
@@ -118,7 +101,7 @@ namespace Jal.Router.Impl
                 Origin = inboundmessagecontext.Origin,
                 Headers = inboundmessagecontext.Headers,
                 Version = inboundmessagecontext.Version,
-                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(interval),
+                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(retryPolicy.NextRetryInterval(inboundmessagecontext.RetryCount)),
                 RetryCount = inboundmessagecontext.RetryCount + 1,
             };
 
@@ -134,29 +117,22 @@ namespace Jal.Router.Impl
             Send(message, options);
         }
 
-        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint)
+        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retryPolicy)
         {
-            var policy = RetryPolicyProvider.Provide<TContent>();
+            var endpoints = Provider.Provide<TContent>();
 
-            Retry(content, inboundmessagecontext, endpoint, policy);
-        }
+            var setting = Provider.Provide(endpoints.Single(), content);
 
-        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext)
-        {
-            var endpoints = EnpointProvider.Provide<TContent>();
-
-            var setting = EnpointProvider.Provide(endpoints.Single(), content);
-
-            Retry(content, inboundmessagecontext, setting);
+            Retry(content, inboundmessagecontext, setting, retryPolicy);
         }
 
         public void Send<TContent>(TContent content, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 var origin = endpoint.Origin;
 
@@ -166,11 +142,11 @@ namespace Jal.Router.Impl
 
         public void Send<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 if (string.IsNullOrWhiteSpace(origin.Name))
                 {
@@ -187,11 +163,11 @@ namespace Jal.Router.Impl
         } 
         public void Publish<TContent>(TContent content, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 var origin = endpoint.Origin;
 
@@ -201,11 +177,11 @@ namespace Jal.Router.Impl
 
         public void Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 if (string.IsNullOrWhiteSpace(origin.Name))
                 {
@@ -297,11 +273,11 @@ namespace Jal.Router.Impl
 
         public void FireAndForget<TContent>(TContent content, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 var origin = endpoint.Origin;
 
@@ -311,11 +287,11 @@ namespace Jal.Router.Impl
 
         public void FireAndForget<TContent>(TContent content,Origin origin, Options options)
         {
-            var endpoints = EnpointProvider.Provide<TContent>(options.EndPointName);
+            var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
             foreach (var endpoint in endpoints)
             {
-                var setting = EnpointProvider.Provide(endpoint, content);
+                var setting = Provider.Provide(endpoint, content);
 
                 if (string.IsNullOrWhiteSpace(origin.Name))
                 {

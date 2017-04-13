@@ -45,15 +45,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
-    <Compile Include="Fluent\Impl\RetryPolicyBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
-    <Compile Include="Fluent\Interface\IFromEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\INameRetryPolicyBuilder.cs" />
-    <Compile Include="Fluent\Interface\IPolicyRetryBuilder.cs" />
+    <Compile Include="Fluent\Interface\IRetryBuilder.cs" />
+    <Compile Include="Fluent\Interface\IRetryUsingBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
-    <Compile Include="Fluent\Interface\IWhithMethodBuilder.cs" />
+    <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\AbstractBusInterceptor.cs" />
@@ -72,12 +70,11 @@
     <Compile Include="Impl\NullPublisher.cs" />
     <Compile Include="Impl\NullQueue.cs" />
     <Compile Include="Impl\NullRouterLogger.cs" />
-    <Compile Include="Impl\RetryPolicyProvider.cs" />
+    <Compile Include="Impl\ValueSettingFinderFactory.cs" />
     <Compile Include="Interface\IBusInterceptor.cs" />
     <Compile Include="Interface\IBusLogger.cs" />
     <Compile Include="Interface\IEndPointProvider.cs" />
     <Compile Include="Interface\IEndPointSettingFinder.cs" />
-    <Compile Include="Interface\IRetryPolicyProvider.cs" />
     <Compile Include="Interface\IValueSettingFinder.cs" />
     <Compile Include="Interface\IEndPointSettingFinderFactory.cs" />
     <Compile Include="Interface\IHandlerFactory.cs" />
@@ -90,6 +87,7 @@
     <Compile Include="Interface\IBus.cs" />
     <Compile Include="Impl\Bus.cs" />
     <Compile Include="Interface\IRouterLogger.cs" />
+    <Compile Include="Interface\IValueSettingFinderFactory.cs" />
     <Compile Include="Model\EndPointSetting.cs" />
     <Compile Include="Model\EndPoint.cs" />
     <Compile Include="Model\Flow.cs" />

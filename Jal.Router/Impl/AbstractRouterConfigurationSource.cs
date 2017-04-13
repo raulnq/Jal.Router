@@ -13,18 +13,11 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
-        private readonly List<RetryPolicy> _policies = new List<RetryPolicy>();
-
         private readonly Origin _origin = new Origin();
 
         public Route[] GetRoutes()
         {
             return _routes.ToArray();
-        }
-
-        public RetryPolicy[] GetRetryPolicies()
-        {
-            return _policies.ToArray();
         }
 
         public EndPoint[] GetEndPoints()
@@ -57,17 +50,6 @@ namespace Jal.Router.Impl
             _enpoints.Add(endpoint);
 
             var builder = new EndPointBuilder<TExtractor>(endpoint);
-
-            return builder;
-        }
-
-        public INameRetryPolicyBuilder RegisterRetry<TExtractor>() where TExtractor : IValueSettingFinder
-        {
-            var policy = new RetryPolicy();
-
-            _policies.Add(policy);
-
-            var builder = new RetryPolicyBuilder<TExtractor>(policy);
 
             return builder;
         }

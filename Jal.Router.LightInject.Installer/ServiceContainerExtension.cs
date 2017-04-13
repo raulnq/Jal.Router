@@ -18,9 +18,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
-            container.Register<IRetryPolicyProvider, RetryPolicyProvider>(new PerContainerLifetime());
-
             container.Register<IEndPointSettingFinderFactory, EndPointSettingFinderFactory>(new PerContainerLifetime());
+
+            container.Register<IValueSettingFinderFactory, ValueSettingFinderFactory>(new PerContainerLifetime());
 
             container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof(AppSettingValueSettingFinder).FullName ,new PerContainerLifetime());
 

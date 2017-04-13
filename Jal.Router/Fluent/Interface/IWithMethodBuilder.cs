@@ -2,7 +2,7 @@
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IWhithMethodBuilder<out TBody, out THandler>
+    public interface IWithMethodBuilder<out TBody, out THandler>
     {
         IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler> method);
 
