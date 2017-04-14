@@ -3,7 +3,62 @@ Just another library to route in/out messages
 
 ## How to use?
 
+On asynchronous scenarios is often needed to send a message (command) to some queue and then wait for a message (event) with the result of the previous process.
+The following case will help us to understand how this library helps us to achieve this goal.
+
+1. The app "A" wants to send a Transfer command to the app "B".
+2. The app "B" will publish a Transferred event with the result of the processing.
+3. The app "A" will receive the Transferred event and will end the process.
+
+Note: The current explanation will use Azure Service Bus as messaging service.
+
 ### Send
+
+We are going to start with the App "A" implementing the "Sender" class.
+```
+public class Sender
+{
+    private readonly IBus _bus;
+
+    public Sender(IBus bus)
+    {
+        _router_bus = bus;
+    }
+
+    public void Send(Transfer transfer)
+    {
+        _bus.Send(transfer, new Options() {Id = "Some meaningful value"});
+    }
+}
+```
+The method Send receive two parameters, first the message to be send and an instance of the class Options that has these properties:
+* Id, The value that will be used to identify the message by the concrete messaging service.
+* Correlation, 
+* EndPointName, If we have more than one enpoint for the current message type and just one of them needs to be used here is the place to put the name.
+* Version, Current version of the message (by default is "1")
+* ScheduledEnqueueDateTimeUtc, If we want to defer the delibery of the message to some time in the future.
+* Headers, If some extra propereties are needed those can be put here.
+
+
+The interface IBus will send the message based on the configuration below:
+```
+public class RouterConfigurationSource : AbstractRouterConfigurationSource
+{
+    public RouterConfigurationSource()
+    {
+        RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbqueue"));
+
+		 RegisterOrigin("App A", "59D3EDDD-F8F4-4895-9A1C-FE7A6F9B71EE");
+	}
+}
+```
+* RegisterEndPoint, This method starts the registration of a target endpoint where the message will be sent.
+* ForMessage&lt;TMessage&gt;, The TMessage parameter indicates the type of message that could use this endpoint.
+* To&lt;TConnectionStringValueSettingFinder, TPathValueSettingFinder&gt;, This method allows us get the information about the connection string and path where our message will be sent. 
+The TConnectionStringValueSettingFinder and TPathValueSettingFinder parameters should be concrete implementations of the IValueSettingFinder interface. 
+Currently there are implementations of this inteface: ConnectionStringValueSettingFinder (to have access to the connection string section of the config file) and AppSettingValueSettingFinder (to have access to the app settings section of the config file).
+* RegisterOrigin, This method will register the name of the app and the unique id to identified it.
+
 
 ### Routing
 
@@ -160,8 +215,8 @@ container.Install(new ServiceLocatorInstaller());
 ```
 Install the Jal.Router and Jal.Router.AzureServiceBus library.
 ```
-    container.Install(new AzureServiceBusRouterInstaller());
-    container.Install(new RouterLoggerInstaller());
+container.Install(new AzureServiceBusRouterInstaller());
+container.Install(new RouterLoggerInstaller());
 ```
 Create a Handler interface and class
 ```
