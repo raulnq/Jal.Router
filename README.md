@@ -93,12 +93,43 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
         {
-		x.With(((transfer, handler) => handler.HandleWay1(transfer))).When(((message, handler) => handler.IsWay1(transfer)));
-		x.With(((transfer, handler) => handler.HandleWay2(transfer))).When(((message, handler) => !handler.IsWay1(transfer)));
+            x.With(((transfer, handler) => handler.HandleWay1(transfer))).When(((message, handler) => handler.IsWay1(transfer)));
+            x.With(((transfer, handler) => handler.HandleWay2(transfer))).When(((message, handler) => !handler.IsWay1(transfer)));
         });
     }
 }
 ```
+But in the most common scenarios you want to have access as well to the metadata of the original message. In order do that, the With and When method have a generic form to add a extra parameter to the equation.
+```
+public class TransferMessageHandler : IMessageHandler<Transfer>
+{
+    public void Handle(Transfer transfer, InboundMessageContext context)
+    {
+	//Do something
+    }
+}
+```
+```
+public class RouterConfigurationSource : AbstractRouterConfigurationSource
+{
+    public RouterConfigurationSource()
+    {
+        RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+        {
+            x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
+        });
+    }
+}
+```
+Now you can have access to the Inbound MessageContext class that contains the following properties:
+*Id, Id of the message.
+*From, Whom send us the message.
+*Origin, Unique Id of Whom send us the message.
+*Version, Version of the message.
+*Headers, Non standard properties of the message.
+*RetryCount, How many times the messages was retried.
+*LastRetry, It is true if we are in the last retry of the current message.
+
 
 ### Send
 
