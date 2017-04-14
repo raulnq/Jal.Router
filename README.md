@@ -12,7 +12,7 @@ The following case will help us to understand how this library helps us to achie
 
 Note: The current explanation will use Azure Service Bus as messaging service.
 
-### Send
+### Sending the message from A to B (App A)
 
 We are going to start with the App "A" implementing the "Sender" class.
 ```
@@ -60,7 +60,7 @@ Currently there are implementations of this inteface: ConnectionStringValueSetti
 * RegisterOrigin, This method will register the name of the app and the unique id to identified it.
 
 
-### Routing
+### Routing the message from A to B (App B)
 
 To receive the message in the app B we are using the Azure Webjob SDK and the following listener class.
 ```
@@ -117,10 +117,41 @@ Coming back to the handler class, apart of the Transfer message, you can have ac
 * RetryCount, How many times the message was retried.
 * LastRetry, It is true if we are in the last retry of the current message.
 
-### Publish
+### Publishing message from B to A (App B)
 
+Now is time to return a message to the sender app, to do that we need to modify the handler class.
+```
+public class TransferMessageHandler : IMessageHandler<Transfer>
+{
+    public void Handle(Transfer transfer, InboundMessageContext context)
+    {
+	//Do something
+	_bus.Publish(transferred, new Origin(){Id = context.Origin}, new Options() {Id = "Some meaningful value"});
+    }
+}
+```
+The Publish method has the same parameter of the Send method the difference lies on the kind of message that is delivering. 
+The Send method is to send commands and the Publis method is to send events. 
+Behind scenes the Send method uses as target a Queue and Publish uses a Topic.
+A new parameter is needed here: Origin, in order to mark this message as result of the call of the App "A". 
+Now to end with this we need to register the endpoint on the configuration class.
+```
+public class RouterConfigurationSource : AbstractRouterConfigurationSource
+{
+    public RouterConfigurationSource()
+    {
+        RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+        {
+            x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
+        });
 
-Suppose that now your handler has two methods to handle the message in different ways under different circumstances.
+        RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
+
+        RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
+    }
+}
+```
+### Routing the message from B to A (App A)
 ```
 public class TransferMessageHandler : IMessageHandler<Transfer>
 {
