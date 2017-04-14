@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (message.Properties.ContainsKey("from"))
             {
-                context.From = message.Properties["from"].ToString();
+                context.Origin.Name = message.Properties["from"].ToString();
             }
 
             if (message.Properties.ContainsKey("version"))
@@ -30,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (message.Properties.ContainsKey("origin"))
             {
-                context.Origin = message.Properties["origin"].ToString();
+                context.Origin.Key = message.Properties["origin"].ToString();
             }
 
             if (message.Properties.ContainsKey("retrycount"))
@@ -60,9 +60,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(header.Key, header.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(message.From))
+            if (!string.IsNullOrWhiteSpace(message.Origin.Name))
             {
-                brokeredmessage.Properties.Add("from", message.From);
+                brokeredmessage.Properties.Add("from", message.Origin.Name);
             }
 
             if (!string.IsNullOrWhiteSpace(message.Version))
@@ -75,9 +75,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.ScheduledEnqueueTimeUtc = message.ScheduledEnqueueDateTimeUtc.Value;
             }
 
-            if (!string.IsNullOrWhiteSpace(message.Origin))
+            if (!string.IsNullOrWhiteSpace(message.Origin.Key))
             {
-                brokeredmessage.Properties.Add("origin", message.Origin);
+                brokeredmessage.Properties.Add("origin", message.Origin.Key);
             }
 
             if (!string.IsNullOrWhiteSpace(message.Id))

@@ -76,10 +76,9 @@ namespace Jal.Router.Impl
             {
                 Id = options.Id,
                 Content = content,
-                From = origin.Name,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = origin.Key,
+                Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
@@ -95,7 +94,6 @@ namespace Jal.Router.Impl
             {
                 Id = inboundmessagecontext.Id,
                 Content = content,
-                From = inboundmessagecontext.From,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = inboundmessagecontext.Origin,
@@ -203,10 +201,9 @@ namespace Jal.Router.Impl
             {
                 Id = options.Id,
                 Content = content,
-                From = origin.Name,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
-                Origin = origin.Key,
+                Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
@@ -260,13 +257,15 @@ namespace Jal.Router.Impl
             {
                 Id = options.Id,
                 Content = content,
-                From = origin.Name,
+                Origin = origin,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
             };
+
+            message.Origin.Key = string.Empty;
 
             Send(message, options);
         }
