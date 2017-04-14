@@ -37,7 +37,7 @@ The method Send receive two parameters, first the message to be send and an inst
 * EndPointName, If we have more than one enpoint for the current message type and just one of them needs to be used here is the place to put the name.
 * Version, Current version of the message (by default is "1")
 * ScheduledEnqueueDateTimeUtc, If we want to defer the delibery of the message to some time in the future.
-* Headers, If some extra propereties are needed those can be put here.
+* Headers, If some extra properties are needed those can be put here.
 
 
 The interface IBus will send the message based on the configuration below:
@@ -48,7 +48,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbqueue"));
 
-		 RegisterOrigin("App A", "59D3EDDD-F8F4-4895-9A1C-FE7A6F9B71EE");
+        RegisterOrigin("App A", "59D3EDDD-F8F4-4895-9A1C-FE7A6F9B71EE");
 	}
 }
 ```
@@ -62,30 +62,7 @@ Currently there are implementations of this inteface: ConnectionStringValueSetti
 
 ### Routing
 
-When a messages arrives (event or command) this feature allows us to process it based on a routing configuration.
-For instance, if we want to process a Transfer command by the following class:
-```
-public class TransferMessageHandler : IMessageHandler<Transfer>
-{
-    public void Handle(Transfer transfer)
-    {
-	//Do something
-    }
-}
-```
-When the message is listen by the standard Azure Webjob SDK
-```
-public class Listener
-{
-    public void Listen([ServiceBusTrigger("somequeue")] BrokeredMessage message)
-    {
-	//Route message somewhere
-    }
-}
-```
-
-In order to achieve that we need to use the class IRouter&lt;T&gt; where T will be the BrokeredMessage class.
-The next step is use the method Route&lt;TContent&gt;> where TContent will be the object under the brokered message.
+To receive the message in the app B we are using the Azure Webjob SDK and the following listener class.
 ```
 public class Listener
 {
@@ -96,13 +73,23 @@ public class Listener
         _router = router;
     }
 
-    public void Listen([ServiceBusTrigger("somequeue")] BrokeredMessage message)
+    public void Listen([ServiceBusTrigger("appbqueue")] BrokeredMessage message)
     {
         _router.Route<Transfer>(message);
     }
 }
 ```
-The last step is setup the routing itself.
+When the "Transfer" message arrives the Route method dispatch it to this class.
+```
+public class TransferMessageHandler : IMessageHandler<Transfer>
+{
+    public void Handle(Transfer transfer, InboundMessageContext context)
+    {
+	//Do something
+    }
+}
+```
+In order to achieve that we need to setup the routing itself in the following class.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
@@ -110,7 +97,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
         {
-            x.With(((transfer, handler) => handler.Handle(transfer)));
+            x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
         });
     }
 }
@@ -120,6 +107,18 @@ Let's see every method used in the class above:
 * RegisterRoute, allows us to start the creation of a new route handled by the interface specified in the generic parameter.
 * ForMessage, indicates the object under the brokered message to be routed
 * ToBeHandledBy, This method will tell us the concrete class on charge to handle the message how and to handle this message usign this class (you can add as many ways as you want there).
+
+Coming back to the handler class, apart of the Transfer message, you can have access to the Inbound MessageContext class that contains the following properties:
+* Id, Id of the message.
+* From, Name of the app that send us the message.
+* Origin, Unique id of the app that send us the message.
+* Version, Version of the message.
+* Headers, Non standard properties of the message.
+* RetryCount, How many times the message was retried.
+* LastRetry, It is true if we are in the last retry of the current message.
+
+### Publish
+
 
 Suppose that now your handler has two methods to handle the message in different ways under different circumstances.
 ```
@@ -187,7 +186,6 @@ Now you can have access to the Inbound MessageContext class that contains the fo
 * RetryCount, How many times the messages was retried.
 * LastRetry, It is true if we are in the last retry of the current message.
 
-### Publish
 
 ### Retry
 
