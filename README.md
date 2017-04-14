@@ -27,7 +27,7 @@ public class Listener
 }
 ```
 
-In order to achive that we need to use the class IRouter&lt;T&gt; where T will be the BrokeredMessage class).
+In order to achive that we need to use the class IRouter&lt;T&gt; where T will be the BrokeredMessage class.
 The next step is use the method Route&lt;TContent&gt;> where TContent will be the object under the brokered message.
 ```
 public class Listener
@@ -64,7 +64,7 @@ Let's see every method used in the class above:
 * ForMessage, indicates the object under the brokered message to be routed
 * ToBeHandledBy, This method will tell us the concrete class on charge to handle the message how and to handle this message usign this class (you can add as many ways as you want there).
 
-Suppose that now you're handler has two method to handle the message in different ways under different circumstances.
+Suppose that now your handler has two methods to handle the message in different ways under different circumstances.
 ```
 public class TransferMessageHandler : IMessageHandler<Transfer>
 {
