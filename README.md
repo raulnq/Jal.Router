@@ -5,8 +5,8 @@ Just another library to route in/out messages
 
 ### Routing
 
-When a messages arrives (event or command) this feature allows us to handle it based on a routing configuration.
-For instance, if we want to handle a Transfer command by the following class:
+When a messages arrives (event or command) this feature allows us to process it based on a routing configuration.
+For instance, if we want to process a Transfer command by the following class:
 ```
 public class TransferMessageHandler : IMessageHandler<Transfer>
 {
@@ -27,7 +27,7 @@ public class Listener
 }
 ```
 
-In order to achive that we need to use the class IRouter&lt;T&gt; where T will be the BrokeredMessage class.
+In order to achieve that we need to use the class IRouter&lt;T&gt; where T will be the BrokeredMessage class.
 The next step is use the method Route&lt;TContent&gt;> where TContent will be the object under the brokered message.
 ```
 public class Listener
@@ -93,8 +93,8 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
         {
-			x.With(((transfer, handler) => handler.HandleWay1(transfer))).When(((message, handler) => handler.IsWay1(transfer)));
-			x.With(((transfer, handler) => handler.HandleWay2(transfer))).When(((message, handler) => !handler.IsWay1(transfer)));
+		x.With(((transfer, handler) => handler.HandleWay1(transfer))).When(((message, handler) => handler.IsWay1(transfer)));
+		x.With(((transfer, handler) => handler.HandleWay2(transfer))).When(((message, handler) => !handler.IsWay1(transfer)));
         });
     }
 }
