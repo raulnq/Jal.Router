@@ -122,13 +122,13 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 }
 ```
 Now you can have access to the Inbound MessageContext class that contains the following properties:
-*Id, Id of the message.
-*From, Whom send us the message.
-*Origin, Unique Id of Whom send us the message.
-*Version, Version of the message.
-*Headers, Non standard properties of the message.
-*RetryCount, How many times the messages was retried.
-*LastRetry, It is true if we are in the last retry of the current message.
+* Id, Id of the message.
+* From, Whom send us the message.
+* Origin, Unique Id of Whom send us the message.
+* Version, Version of the message.
+* Headers, Non standard properties of the message.
+* RetryCount, How many times the messages was retried.
+* LastRetry, It is true if we are in the last retry of the current message.
 
 
 ### Send
