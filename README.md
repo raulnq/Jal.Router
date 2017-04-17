@@ -29,7 +29,6 @@ public class Sender
 ```
 The "Send" method could receive two parameters, the first one is the content of the message and the second one is an instance of the "Options" class that has the following:
 * Id (Optional), The value that will be used to identify the message by the concrete messaging service.
-* Correlation (Optional), 
 * EndPointName (Optional), If we have more than one enpoint for the current message type and just one of them needs to be used here is the place to put the name.
 * Version (Optional), Current version of the message (by default is "1")
 * ScheduledEnqueueDateTimeUtc (Optional), If we want to defer the delivery of the message to some time in the future.
