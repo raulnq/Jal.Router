@@ -16,7 +16,7 @@ namespace Jal.Router.Logger
 
         public override void OnSendEntry(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Send, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Send, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
         }
 
         public override void OnSendExit(OutboundMessageContext context,Options options, long duration)
@@ -26,7 +26,7 @@ namespace Jal.Router.Logger
 
         public override void OnSendSuccess(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Send, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Send, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
         }
 
         public override void OnSendError(OutboundMessageContext context, Options options, Exception ex)
@@ -36,7 +36,7 @@ namespace Jal.Router.Logger
 
         public override void OnPublishEntry(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Publish, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Publish, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
         }
 
         public override void OnPublishExit(OutboundMessageContext context, Options options, long duration)
@@ -46,7 +46,7 @@ namespace Jal.Router.Logger
 
         public override void OnPublishSuccess(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Publish, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Publish, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
         }
 
         public override void OnPublishError(OutboundMessageContext context, Options options, Exception ex)
