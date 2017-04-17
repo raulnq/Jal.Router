@@ -12,8 +12,6 @@ namespace Jal.Router.Model
         }
         public string Id { get; set; }
 
-        public string Correlation { get; set; }
-
         public string EndPointName { get; set; }
 
         public string Version { get; set; }

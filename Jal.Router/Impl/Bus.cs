@@ -106,7 +106,6 @@ namespace Jal.Router.Impl
             var options = new Options()
             {
                 Id = inboundmessagecontext.Id,
-                Correlation = inboundmessagecontext.Id,
                 Headers = inboundmessagecontext.Headers,
                 ScheduledEnqueueDateTimeUtc = message.ScheduledEnqueueDateTimeUtc,
                 Version = inboundmessagecontext.Version

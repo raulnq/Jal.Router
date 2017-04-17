@@ -16,42 +16,42 @@ namespace Jal.Router.Logger
 
         public override void OnSendEntry(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Send, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
         }
 
         public override void OnSendExit(OutboundMessageContext context,Options options, long duration)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] End Call. Took {duration} ms.");
+            _log.Info($"[Bus.cs, Send, {context.Id}] End Call. Took {duration} ms.");
         }
 
         public override void OnSendSuccess(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Send, {options.Correlation}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Send, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
         }
 
         public override void OnSendError(OutboundMessageContext context, Options options, Exception ex)
         {
-            _log.Error($"[Bus.cs, Send, {options.Correlation}] Exception.", ex);
+            _log.Error($"[Bus.cs, Send, {context.Id}] Exception.", ex);
         }
 
         public override void OnPublishEntry(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Publish, {options.Correlation}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Publish, {context.Id}] Start Call. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
         }
 
         public override void OnPublishExit(OutboundMessageContext context, Options options, long duration)
         {
-            _log.Info($"[Bus.cs, Publish, {options.Correlation}] End Call. Took {duration} ms.");
+            _log.Info($"[Bus.cs, Publish, {context.Id}] End Call. Took {duration} ms.");
         }
 
         public override void OnPublishSuccess(OutboundMessageContext context, Options options)
         {
-            _log.Info($"[Bus.cs, Publish, {options.Correlation}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
+            _log.Info($"[Bus.cs, Publish, {context.Id}] Message sent. id: {context.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin}");
         }
 
         public override void OnPublishError(OutboundMessageContext context, Options options, Exception ex)
         {
-            _log.Error($"[Bus.cs, Publish, {options.Correlation}] Exception.", ex);
+            _log.Error($"[Bus.cs, Publish, {context.Id}] Exception.", ex);
         }
     }
 }
