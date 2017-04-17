@@ -226,6 +226,8 @@ public RouterConfigurationSource()
 
 		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
 
+        RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), a => a.Find("appbqueue"));
+
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
 }
 ```
