@@ -277,13 +277,11 @@ namespace Jal.Router.Impl
             {
                 var setting = Provider.Provide(endpoint, content);
 
-                var origin = endpoint.Origin;
-
-                FireAndForget(content, setting, origin, options);
+                FireAndForget(content, setting, new Origin() {Key = endpoint.Origin.Key, Name = endpoint.Origin.Name }, options);
             }
         }
 
-        public void FireAndForget<TContent>(TContent content,Origin origin, Options options)
+        public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoints = Provider.Provide<TContent>(options.EndPointName);
 
