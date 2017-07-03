@@ -4,7 +4,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class HandlerBuilder<TBody, THandler> : IHandlerBuilder<TBody, THandler>
+    public class HandlerBuilder<TBody, THandler> : IHandlerBuilder<TBody, THandler>, IWhenHandlerBuilder<TBody>
     {
         private readonly Route<TBody, THandler> _route;
 
@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public void ToBeHandledBy<TConcreteConsumer>(Action<IWithMethodBuilder<TBody, THandler>> action) where TConcreteConsumer : THandler
+        public IWhenHandlerBuilder<TBody> ToBeHandledBy<TConcreteConsumer>(Action<IWithMethodBuilder<TBody, THandler>> action) where TConcreteConsumer : THandler
         {
             if (action == null)
             {
@@ -25,6 +25,18 @@ namespace Jal.Router.Fluent.Impl
             var whitRouteBuilder = new WhitRouteBuilder<TBody, THandler>(_route);
 
             action(whitRouteBuilder);
+
+            return this;
+        }
+
+        public void When(Func<TBody, InboundMessageContext, bool> condition)
+        {
+            if (condition == null)
+            {
+                throw new ArgumentNullException(nameof(condition));
+            }
+
+            _route.When = condition;
         }
     }
 }

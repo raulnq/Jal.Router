@@ -23,6 +23,8 @@ namespace Jal.Router.Model
     {
         public List<RouteMethod<TBody, TConsumer>> RouteMethods { get; set; }
 
+        public Func<TBody, InboundMessageContext, bool> When { get; set; }
+
         public Type ConsumerType { get; set; }
 
         public Route(string name = "") : base(typeof(TBody), typeof(TConsumer), name)

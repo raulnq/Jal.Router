@@ -52,7 +52,7 @@ namespace Jal.Router.Tests.Integration
         public void Validate_WithoutRuleName_Valid()
         {
             var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
-
+            bm.Properties.Add("origin","AB");
             var message = new Message();
 
             //_router.Route<Message>(message);

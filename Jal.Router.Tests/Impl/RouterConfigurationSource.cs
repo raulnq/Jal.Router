@@ -12,7 +12,7 @@ namespace Jal.Router.Tests.Impl
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             {
                 x.With(((request, handler) => handler.Handle(request)));
-            });
+            }).When(((message, context) => context.Origin.Key == "A")); ;
 
 
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>

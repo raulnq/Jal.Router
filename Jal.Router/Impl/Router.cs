@@ -201,45 +201,69 @@ namespace Jal.Router.Impl
 
         public void InternalRoute<TContent, THandler>(TContent content, InboundMessageContext context, Route<TContent, THandler> route) where THandler : class
         {
-            var consumer = _factory.Create<THandler>(route.ConsumerType);
+            var when = true;
 
-            foreach (var routeMethod in route.RouteMethods)
+            if (route.When != null)
             {
-                IRetryPolicy policy = null;
+                when = route.When(content, context);
+            }
 
-                try
+            if (when)
+            {
+                var consumer = _factory.Create<THandler>(route.ConsumerType);
+
+                foreach (var routeMethod in route.RouteMethods)
                 {
-                    if (routeMethod.RetryExceptionType != null && routeMethod.RetryPolicyExtractor != null)
+                    IRetryPolicy policy = null;
+
+                    try
                     {
-                        var extractor = _finderFactory.Create(routeMethod.RetryExtractorType);
-
-                        policy = routeMethod.RetryPolicyExtractor(extractor);
-
-                        if (policy != null)
+                        if (routeMethod.RetryExceptionType != null && routeMethod.RetryPolicyExtractor != null)
                         {
-                            var interval = policy.NextRetryInterval(context.RetryCount);
+                            var extractor = _finderFactory.Create(routeMethod.RetryExtractorType);
 
-                            context.LastRetry = !policy.CanRetry(context.RetryCount, interval);
-                        }
-                    }
+                            policy = routeMethod.RetryPolicyExtractor(extractor);
 
-
-                    if (routeMethod.EvaluatorWithContext == null)
-                    {
-                        if (routeMethod.Evaluator == null)
-                        {
-                            if (routeMethod.ConsumerWithContext != null)
+                            if (policy != null)
                             {
-                                routeMethod.ConsumerWithContext(content, consumer, context);
+                                var interval = policy.NextRetryInterval(context.RetryCount);
+
+                                context.LastRetry = !policy.CanRetry(context.RetryCount, interval);
+                            }
+                        }
+
+
+                        if (routeMethod.EvaluatorWithContext == null)
+                        {
+                            if (routeMethod.Evaluator == null)
+                            {
+                                if (routeMethod.ConsumerWithContext != null)
+                                {
+                                    routeMethod.ConsumerWithContext(content, consumer, context);
+                                }
+                                else
+                                {
+                                    routeMethod.Consumer?.Invoke(content, consumer);
+                                }
                             }
                             else
                             {
-                                routeMethod.Consumer?.Invoke(content, consumer);
+                                if (routeMethod.Evaluator(content, consumer))
+                                {
+                                    if (routeMethod.ConsumerWithContext != null)
+                                    {
+                                        routeMethod.ConsumerWithContext(content, consumer, context);
+                                    }
+                                    else
+                                    {
+                                        routeMethod.Consumer?.Invoke(content, consumer);
+                                    }
+                                }
                             }
                         }
                         else
                         {
-                            if (routeMethod.Evaluator(content, consumer))
+                            if (routeMethod.EvaluatorWithContext(content, consumer, context))
                             {
                                 if (routeMethod.ConsumerWithContext != null)
                                 {
@@ -252,30 +276,20 @@ namespace Jal.Router.Impl
                             }
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        if (routeMethod.EvaluatorWithContext(content, consumer, context))
+                        if (policy!=null)
                         {
-                            if (routeMethod.ConsumerWithContext != null)
+                            if (routeMethod.RetryExceptionType == ex.GetType())
                             {
-                                routeMethod.ConsumerWithContext(content, consumer, context);
-                            }
-                            else
-                            {
-                                routeMethod.Consumer?.Invoke(content, consumer);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (policy!=null)
-                    {
-                        if (routeMethod.RetryExceptionType == ex.GetType())
-                        {
-                            if (!context.LastRetry)
-                            {
-                                _bus.Retry(content, context, policy);
+                                if (!context.LastRetry)
+                                {
+                                    _bus.Retry(content, context, policy);
+                                }
+                                else
+                                {
+                                    throw;
+                                }
                             }
                             else
                             {
@@ -286,10 +300,6 @@ namespace Jal.Router.Impl
                         {
                             throw;
                         }
-                    }
-                    else
-                    {
-                        throw;
                     }
                 }
             }

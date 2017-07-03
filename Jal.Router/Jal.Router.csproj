@@ -50,6 +50,7 @@
     <Compile Include="Fluent\Interface\IRetryBuilder.cs" />
     <Compile Include="Fluent\Interface\IRetryUsingBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IWhenHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
     <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
