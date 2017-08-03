@@ -1,5 +1,8 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
@@ -7,13 +10,57 @@ using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
+    internal static class StrictEncodings
+    {
+        public static UTF8Encoding Utf8 { get; } = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+    }
+
     public class BrokeredMessageAdapter : IMessageAdapter<BrokeredMessage>
     {
-        public InboundMessageContext<TContent> Read<TContent>(BrokeredMessage message)
+        public string GetBody(BrokeredMessage input)
         {
+            using (var stream = input.GetBody<Stream>())
+            {
+                if (stream == null)
+                {
+                    return null;
+                }
+                using (TextReader reader = new StreamReader(stream, StrictEncodings.Utf8))
+                {
+
+                    try
+                    {
+                        return reader.ReadToEnd();
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+
+                    var clonedMessage = input.Clone();
+                    try
+                    {
+                        return clonedMessage.GetBody<string>();
+                    }
+                    catch (Exception exception)
+                    {
+                        var contentType = input.ContentType ?? "null";
+
+                        var msg = string.Format(CultureInfo.InvariantCulture, "The BrokeredMessage with ContentType '{0}' failed to deserialize to a string with the message: '{1}'", contentType, exception.Message);
+
+                        throw new InvalidOperationException(msg, exception);
+                    }
+                    
+                }
+            }
+        }
+    
+    public InboundMessageContext<TContent> Read<TContent>(BrokeredMessage message)
+    {
+
             var context = new InboundMessageContext<TContent>
             {
-                Content = JsonConvert.DeserializeObject<TContent>(message.GetBody<string>()),
+                Content = JsonConvert.DeserializeObject<TContent>(GetBody(message)),
                 Id = message.MessageId
             };
 
