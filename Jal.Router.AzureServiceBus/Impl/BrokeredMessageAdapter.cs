@@ -57,10 +57,11 @@ namespace Jal.Router.AzureServiceBus.Impl
     
     public InboundMessageContext<TContent> Read<TContent>(BrokeredMessage message)
     {
+        var content = GetBody(message);
 
             var context = new InboundMessageContext<TContent>
             {
-                Content = JsonConvert.DeserializeObject<TContent>(GetBody(message)),
+                Content = JsonConvert.DeserializeObject<TContent>(content),
                 Id = message.MessageId
             };
 
