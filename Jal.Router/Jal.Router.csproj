@@ -44,9 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fluent\Impl\ContinueRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
+    <Compile Include="Fluent\Impl\StartNameRouteBuilder.cs" />
+    <Compile Include="Fluent\Impl\StartRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IStartNameRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IStartRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IRetryBuilder.cs" />
     <Compile Include="Fluent\Interface\IRetryUsingBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
@@ -66,6 +71,8 @@
     <Compile Include="Impl\EndPointProvider.cs" />
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
     <Compile Include="Impl\ExponentialRetryPolicy.cs" />
+    <Compile Include="Impl\NoTypedRouter.cs" />
+    <Compile Include="Interface\INoTypedRouter.cs" />
     <Compile Include="Impl\LinearRetryPolicy.cs" />
     <Compile Include="Impl\NullBusInterceptor.cs" />
     <Compile Include="Impl\NullBusLogger.cs" />
@@ -92,7 +99,7 @@
     <Compile Include="Interface\IValueSettingFinderFactory.cs" />
     <Compile Include="Model\EndPointSetting.cs" />
     <Compile Include="Model\EndPoint.cs" />
-    <Compile Include="Model\Flow.cs" />
+    <Compile Include="Model\Saga.cs" />
     <Compile Include="Model\InboundMessageContext.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="Model\Origin.cs" />

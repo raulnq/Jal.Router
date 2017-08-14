@@ -6,134 +6,11 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-
-    public class Router : IRouter
-    {
-        public IHandlerFactory Factory { get; set; }
-
-        public IRouteProvider Provider { get; set; }
-
-        public Router(IHandlerFactory factory, IRouteProvider provider)
-        {
-            Factory = factory;
-
-            Provider = provider;
-        }
-
-        public void InternalRoute<TContent, THandler>(TContent content, dynamic context, Route<TContent, THandler> route) where THandler : class
-        {
-            var consumer = Factory.Create<THandler>(route.ConsumerType);
-
-            foreach (var routeMethod in route.RouteMethods)
-            {
-                if (routeMethod.EvaluatorWithContext == null)
-                {
-                    if (routeMethod.Evaluator == null)
-                    {
-                        if (routeMethod.ConsumerWithContext != null)
-                        {
-                            routeMethod.ConsumerWithContext(content, consumer, context);
-                        }
-                        else
-                        {
-                            routeMethod.Consumer?.Invoke(content, consumer);
-                        }
-                    }
-                    else
-                    {
-                        if (routeMethod.Evaluator(content, consumer))
-                        {
-                            if (routeMethod.ConsumerWithContext != null)
-                            {
-                                routeMethod.ConsumerWithContext(content, consumer, context);
-                            }
-                            else
-                            {
-                                routeMethod.Consumer?.Invoke(content, consumer);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (routeMethod.EvaluatorWithContext(content, consumer, context))
-                    {
-                        if (routeMethod.ConsumerWithContext != null)
-                        {
-                            routeMethod.ConsumerWithContext(content, consumer, context);
-                        }
-                        else
-                        {
-                            routeMethod.Consumer?.Invoke(content, consumer);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void Route<TContent>(TContent content, string name = "")
-        {
-            var bodytype = typeof (TContent);
-
-            var routes = Provider.Provide(bodytype, name);
-
-            foreach (var route in routes)
-            {
-                var routemethod = typeof(Router).GetMethods().First(x => x.Name == "InternalRoute" && x.GetParameters().Count() == 2);
-
-                var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
-
-                genericroutemethod.Invoke(this, new[] { (object)content, route });
-            }
-        }
-
-        public void Route<TContent>(TContent content, dynamic context, string name = "")
-        {
-            var bodytype = typeof(TContent);
-
-            var routes = Provider.Provide(bodytype, name);
-
-            foreach (var route in routes)
-            {
-                var routemethod = typeof(Router).GetMethods().First(x => x.Name == "InternalRoute" && x.GetParameters().Count() == 3);
-
-                var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
-
-                genericroutemethod.Invoke(this, new object[] { content, context, route });
-            }
-        }
-
-        public void InternalRoute<TContent, THandler>(TContent content, Route<TContent, THandler> route) where THandler : class 
-        {
-            var consumer = Factory.Create<THandler>(route.ConsumerType);
-
-            foreach (var routeMethod in route.RouteMethods)
-            {
-
-                if (routeMethod.Evaluator == null)
-                {
-                    routeMethod.Consumer?.Invoke(content, consumer);
-                }
-                else
-                {
-                    if (routeMethod.Evaluator(content, consumer))
-                    {
-                        routeMethod.Consumer?.Invoke(content, consumer);
-                    }
-                }
-            }
-        }
-    }
-
     public class Router<TMessage> : IRouter<TMessage>
     {
         public IRouteProvider Provider { get; set; }
 
-        private readonly IValueSettingFinderFactory _finderFactory;
-
-        private readonly IBus _bus;
-
-        private readonly IHandlerFactory _factory;
+        private readonly INoTypedRouter _notypedrouter;
 
         public IRouterInterceptor Interceptor { get; set; }
 
@@ -141,24 +18,20 @@ namespace Jal.Router.Impl
 
         private readonly IMessageAdapter<TMessage> _adapter;
 
-        public Router(IMessageAdapter<TMessage> adapter, IValueSettingFinderFactory finderFactory, IBus bus, IHandlerFactory factory, IRouteProvider provider)
+        public Router(IMessageAdapter<TMessage> adapter, IRouteProvider provider, INoTypedRouter notypedrouter)
         {
             _adapter = adapter;
 
-            _finderFactory = finderFactory;
-
-            _bus = bus;
-
-            _factory = factory;
-
             Provider = provider;
+
+            _notypedrouter = notypedrouter;
 
             Interceptor = AbstractRouterInterceptor.Instance;
 
             Logger = AbstractRouterLogger.Instance;
         }
 
-        public void Route<TContent>(TMessage message, string name = "")
+        public void Route<TContent>(TMessage message, string routename = "")
         {
             var stopwatch = new Stopwatch();
 
@@ -172,7 +45,94 @@ namespace Jal.Router.Impl
 
             try
             {
-                Route(context.Content, context, name);
+                var bodytype = typeof(TContent);
+
+                var routes = Provider.Provide(bodytype, routename);
+
+                _notypedrouter.Route(context.Content, context, routes, null);
+
+                Logger.OnSuccess(context, context.Content);
+
+                Interceptor.OnSuccess(context, context.Content);
+            }
+            catch (Exception ex)
+            {
+                var inner = ex.InnerException ?? ex;
+
+                Logger.OnException(context, inner);
+
+                Interceptor.OnException(context, inner);
+
+                throw inner;
+            }
+            finally
+            {
+                stopwatch.Stop();
+
+                Logger.OnExit(context, stopwatch.ElapsedMilliseconds);
+
+                Interceptor.OnExit(context);
+            }
+        }
+    }
+
+    public interface ISagaRouter<in TMessage>
+    {
+        void Route<TContent>(TMessage message, string saganame = "");
+    }
+
+    public class SagaRouter<TMessage> : ISagaRouter<TMessage>
+    {
+        public ISagaProvider Provider { get; set; }
+
+        private readonly INoTypedRouter _notypedrouter;
+
+        public IRouterInterceptor Interceptor { get; set; }
+
+        public IRouterLogger Logger { get; set; }
+
+        private readonly IMessageAdapter<TMessage> _adapter;
+
+        public void Route<TContent>(TMessage message, string saganame = "")
+        {
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            var context = _adapter.Read<TContent>(message);
+
+            Logger.OnEntry(context);
+
+            Interceptor.OnEntry(context);
+
+            try
+            {
+                var bodytype = typeof(TContent);
+
+                //IsStart -> TContent + saganame
+
+                var sagas = Provider.Provide(bodytype, saganame);
+
+                foreach (var saga in sagas)
+                {
+                    var start = saga.Routes.Where(x => x.First && x.BodyType == typeof(TContent));
+
+                    var @continue = saga.Routes.Where(x => !x.First && x.BodyType == typeof(TContent));
+
+                    //if (first.BodyType == typeof (TContent))
+                    //{
+                    //    Start(context.Content, context, new [] { first });
+                    //}
+                    //else
+                    //{
+
+
+                    //    Continue(context.Content, context, new[] { first });
+                    //}
+
+                    
+                }
+
 
                 Logger.OnSuccess(context, context.Content);
 
@@ -198,127 +158,18 @@ namespace Jal.Router.Impl
             }
         }
 
-
-        public void InternalRoute<TContent, THandler>(TContent content, InboundMessageContext context, Route<TContent, THandler> route) where THandler : class
+        public void Continue<TContent>(TContent content, InboundMessageContext context, Route[] routes)
         {
-            var when = true;
-
-            if (route.When != null)
-            {
-                when = route.When(content, context);
-            }
-
-            if (when)
-            {
-                var consumer = _factory.Create<THandler>(route.ConsumerType);
-
-                foreach (var routeMethod in route.RouteMethods)
-                {
-                    IRetryPolicy policy = null;
-
-                    try
-                    {
-                        if (routeMethod.RetryExceptionType != null && routeMethod.RetryPolicyExtractor != null)
-                        {
-                            var extractor = _finderFactory.Create(routeMethod.RetryExtractorType);
-
-                            policy = routeMethod.RetryPolicyExtractor(extractor);
-
-                            if (policy != null)
-                            {
-                                var interval = policy.NextRetryInterval(context.RetryCount);
-
-                                context.LastRetry = !policy.CanRetry(context.RetryCount, interval);
-                            }
-                        }
-
-
-                        if (routeMethod.EvaluatorWithContext == null)
-                        {
-                            if (routeMethod.Evaluator == null)
-                            {
-                                if (routeMethod.ConsumerWithContext != null)
-                                {
-                                    routeMethod.ConsumerWithContext(content, consumer, context);
-                                }
-                                else
-                                {
-                                    routeMethod.Consumer?.Invoke(content, consumer);
-                                }
-                            }
-                            else
-                            {
-                                if (routeMethod.Evaluator(content, consumer))
-                                {
-                                    if (routeMethod.ConsumerWithContext != null)
-                                    {
-                                        routeMethod.ConsumerWithContext(content, consumer, context);
-                                    }
-                                    else
-                                    {
-                                        routeMethod.Consumer?.Invoke(content, consumer);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (routeMethod.EvaluatorWithContext(content, consumer, context))
-                            {
-                                if (routeMethod.ConsumerWithContext != null)
-                                {
-                                    routeMethod.ConsumerWithContext(content, consumer, context);
-                                }
-                                else
-                                {
-                                    routeMethod.Consumer?.Invoke(content, consumer);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (policy!=null)
-                        {
-                            if (routeMethod.RetryExceptionType == ex.GetType())
-                            {
-                                if (!context.LastRetry)
-                                {
-                                    _bus.Retry(content, context, policy);
-                                }
-                                else
-                                {
-                                    throw;
-                                }
-                            }
-                            else
-                            {
-                                throw;
-                            }
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-            }
+            //create data
+            //_notypedrouter.Route(context.Content, context, saga.Routes.ToArray());
+            //save data
         }
 
-        public void Route<TContent>(TContent content, InboundMessageContext context, string name = "")
+        public void Start<TContent>(TContent content, InboundMessageContext context, Route[] routes)
         {
-            var bodytype = typeof(TContent);
-
-            var routes = Provider.Provide(bodytype, name);
-
-            foreach (var route in routes)
-            {
-                var routemethod = GetType().GetMethods().First(x => x.Name == "InternalRoute" && x.GetParameters().Count() == 3);
-
-                var genericroutemethod = routemethod.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
-
-                genericroutemethod.Invoke(this, new object[] { content, context, route });
-            }
+            //get data
+            //_notypedrouter.Route(context.Content, context, saga.Routes.ToArray());
+            //save data
         }
     }
 }

@@ -32,16 +32,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IRetryBuilder When<TContext>(Func<TBody, TConsumer, TContext, bool> method)
+        public IRetryBuilder When(Func<TBody, TConsumer, InboundMessageContext, bool> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Func<TBody, TConsumer, dynamic, bool> wrapper = (b, c, d) => method(b, c, d);
-
-            _routemethod.EvaluatorWithContext = wrapper;
+            _routemethod.EvaluatorWithContext = method;
 
             return this;
         }

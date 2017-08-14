@@ -27,16 +27,14 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TBody, THandler> With<TContext>(Action<TBody, THandler, TContext> method)
+        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Action<TBody, THandler, dynamic> wrapper = (b,c,d) => method(b,c,d);
-
-            var routemethod = new RouteMethod<TBody, THandler>(wrapper);
+            var routemethod = new RouteMethod<TBody, THandler>(method);
 
             _route.RouteMethods.Add(routemethod);
 

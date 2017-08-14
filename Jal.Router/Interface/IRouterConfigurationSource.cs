@@ -6,6 +6,8 @@ namespace Jal.Router.Interface
     {
         Route[] GetRoutes();
 
+        Saga[] GetSagas();
+
         EndPoint[] GetEndPoints();
     }
 }

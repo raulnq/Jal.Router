@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Jal.Router.Fluent.Impl;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
@@ -13,11 +14,18 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
+        private readonly List<Saga> _sagas = new List<Saga>();
+
         private readonly Origin _origin = new Origin();
 
         public Route[] GetRoutes()
         {
             return _routes.ToArray();
+        }
+
+        public Saga[] GetSagas()
+        {
+            return _sagas.ToArray();
         }
 
         public EndPoint[] GetEndPoints()
@@ -34,6 +42,17 @@ namespace Jal.Router.Impl
             var builder = new NameRouteBuilder<THandler>(name, _routes);
 
             return builder;
+        }
+
+        public void RegisterSaga<TData>(string name, Action<IStartRegisterRouteBuilder<TData>> start, Action<IContinueRegisterRouteBuilder> @continue=null)
+        {
+            var saga = new Saga(name, typeof(TData));
+
+            start(new StartRegisterRouteBuilder<TData>(saga));
+
+            @continue?.Invoke(new ContinueRegisterRouteBuilder(saga));
+
+            _sagas.Add(saga);
         }
 
         public void RegisterOrigin(string name, string key="")

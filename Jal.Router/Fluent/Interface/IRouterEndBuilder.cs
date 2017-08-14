@@ -4,6 +4,6 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IRouterEndBuilder
     {
-        IRouter Create { get; }
+        IRouter<TMessage> Create<TMessage>();
     }
 }

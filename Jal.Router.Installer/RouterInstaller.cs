@@ -20,8 +20,8 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-
-            container.Register(Component.For(typeof(IRouter)).ImplementedBy(typeof(Impl.Router)).LifestyleSingleton());
+            
+            container.Register(Component.For(typeof(INoTypedRouter)).ImplementedBy(typeof(NoTypedRouter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IHandlerFactory)).ImplementedBy(typeof(HandlerFactory)).LifestyleSingleton());
             container.Register(Component.For(typeof(IRouteProvider)).ImplementedBy(typeof(RouteProvider)).LifestyleSingleton());
             container.Register(Component.For(typeof(IEndPointProvider)).ImplementedBy(typeof(EndPointProvider)).LifestyleSingleton());

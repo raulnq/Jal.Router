@@ -1,4 +1,5 @@
 using System;
+using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
@@ -6,6 +7,6 @@ namespace Jal.Router.Fluent.Interface
     {
         IRetryBuilder When(Func<TBody, THandler, bool> method);
 
-        IRetryBuilder When<TContext>(Func<TBody, THandler, TContext, bool> method);
+        IRetryBuilder When(Func<TBody, THandler, InboundMessageContext, bool> method);
     }
 }

@@ -22,8 +22,6 @@ namespace Jal.Router.Tests.Integration
     [TestFixture]
     public class Tests
     {
-        private IRouter _router;
-
         private IRouter<BrokeredMessage> _brokered;
 
         private IBus _bus;
@@ -42,7 +40,6 @@ namespace Jal.Router.Tests.Integration
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
             container.Install(new AzureServiceBusRouterInstaller());
             container.Install(new RouterLoggerInstaller());
-            _router = container.Resolve<IRouter>();
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             _bus = container.Resolve<IBus>();
             _brokered = container.Resolve<IRouter<BrokeredMessage>>();

@@ -36,16 +36,11 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-
-        public IRouter Create
+        public IRouter<TMessage> Create<TMessage>()
         {
-            get
-            {
-                var result = new Router.Impl.Router(_handlerFactory, _routeProvider);
+            //var result = new Router.Impl.Router(_handlerFactory, _routeProvider);
 
-                return result;
-            }
-            
+            return null;
         }
     }
 }

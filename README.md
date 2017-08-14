@@ -87,7 +87,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	{
 		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
 		{
-			x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
+			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
 		});
 	}
 }
@@ -128,7 +128,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	{
 		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
 		{
-			x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
+			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
 		});
 
 		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
@@ -183,7 +183,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	{
 		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
 		{
-			x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context)));
+			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
 		});
 
 		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
@@ -221,12 +221,12 @@ public RouterConfigurationSource()
 {
 		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
 		{
-			x.With<InboundMessageContext>(((transfer, handler, context) => handler.Handle(transfer, context))).Retry<ApplicationException>().Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(600, 3));
+			x.With(((transfer, handler, context) => handler.Handle(transfer, context))).Retry<ApplicationException>().Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(600, 3));
 		});
 
 		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
 
-        RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), a => a.Find("appbqueue"));
+		RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), a => a.Find("appbqueue"));
 
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
 }

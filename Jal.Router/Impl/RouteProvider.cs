@@ -21,12 +21,6 @@ namespace Jal.Router.Impl
             _routes = routes.ToArray();
         }
 
-
-        public Route<TContent, THandler>[] Provide<TContent, THandler>(string name)
-        {
-            return Provide(typeof (TContent), name).Where(x=>x.ConsumerInterfaceType==typeof(THandler)).OfType<Route<TContent, THandler>>().ToArray();
-        }
-
         public Route[] Provide(Type type, string name)
         {
             if (string.IsNullOrEmpty(name))

@@ -10,6 +10,7 @@ namespace Jal.Router.Model
             BodyType = bodytype;
             ConsumerInterfaceType = consumerinterfacetype;
             Name = name;
+            First = false;
 
         }
         public Type ConsumerInterfaceType { get; set; }
@@ -17,6 +18,8 @@ namespace Jal.Router.Model
         public string Name { get; set; }
 
         public Type BodyType { get; set; }
+
+        public bool First { get; set; }
     }
 
     public class Route<TBody, TConsumer> : Route
