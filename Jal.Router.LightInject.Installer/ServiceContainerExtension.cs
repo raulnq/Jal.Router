@@ -10,6 +10,12 @@ namespace Jal.Router.LightInject.Installer
     {
         public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies)
         {
+            container.Register<IRetryExecutor, RetryExecutor>(new PerContainerLifetime());
+
+            container.Register<IHandlerExecutor, HandlerExecutor>(new PerContainerLifetime());
+
+            container.Register<IRoutePicker, RoutePicker>(new PerContainerLifetime());
+
             container.Register<INoTypedRouter, NoTypedRouter>(new PerContainerLifetime());
 
             container.Register<IHandlerFactory, HandlerFactory>(new PerContainerLifetime());

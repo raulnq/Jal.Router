@@ -4,6 +4,8 @@ namespace Jal.Router.Interface
 {
     public interface INoTypedRouter
     {
-        void Route(object content, InboundMessageContext context, Route[] routes, object data);
+        void Route<TContent>(InboundMessageContext<TContent> context, Route[] routes);
+
+        void Route<TContent, TData>(InboundMessageContext<TContent> context, Route[] routes, TData data);
     }
 }

@@ -9,6 +9,8 @@ namespace Jal.Router.Impl
     public class RouteProvider : IRouteProvider
     {
         private readonly Route[] _routes;
+
+        private readonly Saga[] _sagas;
         public RouteProvider(IRouterConfigurationSource[] sources)
         {
             var routes = new List<Route>(); 

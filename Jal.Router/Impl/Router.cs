@@ -49,7 +49,7 @@ namespace Jal.Router.Impl
 
                 var routes = Provider.Provide(bodytype, routename);
 
-                _notypedrouter.Route(context.Content, context, routes, null);
+                _notypedrouter.Route(context, routes);
 
                 Logger.OnSuccess(context, context.Content);
 
@@ -78,8 +78,35 @@ namespace Jal.Router.Impl
 
     public interface ISagaRouter<in TMessage>
     {
-        void Route<TContent>(TMessage message, string saganame = "");
+        void Route<TContent>(TMessage message, string saganame = "", string routename = "");
     }
+
+    public interface IStorage
+    {
+        void Insert(SagaRecord sagarecord);
+
+        void Update(SagaRecord sagarecord);
+
+        SagaRecord Select(InboundMessageContext context);
+
+
+    }
+
+    
+    public class SagaRecord
+    {
+        public object Data { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime UtcCreationDateTime { get; set; }
+    }
+
+    public class MessageRecord
+    {
+        public InboundMessageContext Context { get; set; }
+    }
+
 
     public class SagaRouter<TMessage> : ISagaRouter<TMessage>
     {
@@ -93,7 +120,9 @@ namespace Jal.Router.Impl
 
         private readonly IMessageAdapter<TMessage> _adapter;
 
-        public void Route<TContent>(TMessage message, string saganame = "")
+        private readonly IStorage _storage;
+
+        public void Route<TContent>(TMessage message, string saganame = "", string routename = "")
         {
             var stopwatch = new Stopwatch();
 
@@ -109,28 +138,22 @@ namespace Jal.Router.Impl
             {
                 var bodytype = typeof(TContent);
 
-                //IsStart -> TContent + saganame
-
                 var sagas = Provider.Provide(bodytype, saganame);
 
                 foreach (var saga in sagas)
                 {
-                    var start = saga.Routes.Where(x => x.First && x.BodyType == typeof(TContent));
+                    if (Provider.IsTheFirst(saga, bodytype))
+                    {
+                        var route = Provider.GetFirst(saga, bodytype);
 
-                    var @continue = saga.Routes.Where(x => !x.First && x.BodyType == typeof(TContent));
+                        Start(context, route);
+                    }
+                    else
+                    {
+                        var routes = Provider.GetContinue(saga, bodytype, routename);
 
-                    //if (first.BodyType == typeof (TContent))
-                    //{
-                    //    Start(context.Content, context, new [] { first });
-                    //}
-                    //else
-                    //{
-
-
-                    //    Continue(context.Content, context, new[] { first });
-                    //}
-
-                    
+                        Continue(context, routes);
+                    }
                 }
 
 
@@ -158,15 +181,19 @@ namespace Jal.Router.Impl
             }
         }
 
-        public void Continue<TContent>(TContent content, InboundMessageContext context, Route[] routes)
+        public void Continue<TContent>(InboundMessageContext<TContent> context, Route route)
         {
+            
+            var record = new SagaRecord() {};
             //create data
-            //_notypedrouter.Route(context.Content, context, saga.Routes.ToArray());
+            //_notypedrouter.Route(content, context, new Route[] { route }, null);
             //save data
         }
 
-        public void Start<TContent>(TContent content, InboundMessageContext context, Route[] routes)
+        public void Start<TContent>(InboundMessageContext<TContent> context, Route route)
         {
+            var record = new SagaRecord() { };
+            _storage.Insert(record);
             //get data
             //_notypedrouter.Route(context.Content, context, saga.Routes.ToArray());
             //save data
