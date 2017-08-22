@@ -62,9 +62,9 @@ namespace Jal.Router.AzureServiceBus.Impl
             var context = new InboundMessageContext<TContent>
             {
                 Content = JsonConvert.DeserializeObject<TContent>(content),
-                Id = message.MessageId
+                Id = message.MessageId,
+                DateTimeUtc = DateTime.UtcNow
             };
-
 
             if (message.Properties.ContainsKey("from"))
             {

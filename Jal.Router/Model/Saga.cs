@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Jal.Router.Model
 {
@@ -13,12 +11,23 @@ namespace Jal.Router.Model
 
             DataType = datatype;
 
-            Routes = new List<Route>();
+            Continue = new List<Route>();
         }
         public string Name { get; set; }
 
         public Type DataType { get; set; }
 
-        public List<Route> Routes { get; set; }
+        public List<Route> Continue { get; set; }
+
+        public Route Start { get; set; }
+    }
+
+    public class Saga<TData> : Saga
+    {
+        public Func<TData, InboundMessageContext, string> DataKeyBuilder { get; set; }
+
+        public Saga(string name) : base(name, typeof(TData))
+        {
+        }
     }
 }

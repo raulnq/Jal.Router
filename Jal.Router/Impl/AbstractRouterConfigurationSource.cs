@@ -44,13 +44,28 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSaga<TData>(string name, Action<IStartRegisterRouteBuilder<TData>> start, Action<IContinueRegisterRouteBuilder> @continue=null)
+        public void RegisterSaga<TData>(string name, Action<IStartRegisterRouteBuilder<TData>> start, Action<IContinueRegisterRouteBuilder<TData>> @continue=null) where TData : class, new()
         {
-            var saga = new Saga(name, typeof(TData));
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (start==null)
+            {
+                throw new ArgumentNullException(nameof(start));
+            }
+
+            if (@continue == null)
+            {
+                throw new ArgumentNullException(nameof(@continue));
+            }
+
+            var saga = new Saga<TData>(name);
 
             start(new StartRegisterRouteBuilder<TData>(saga));
 
-            @continue?.Invoke(new ContinueRegisterRouteBuilder(saga));
+            @continue(new ContinueRegisterRouteBuilder<TData>(saga));
 
             _sagas.Add(saga);
         }

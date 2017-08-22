@@ -10,9 +10,19 @@ namespace Jal.Router.Model
             Consumer = consumer;
         }
 
+        public RouteMethod(Action<TBody, TConsumer, object> consumer)
+        {
+            ConsumerWithData = consumer;
+        }
+
         public RouteMethod(Action<TBody, TConsumer, InboundMessageContext> consumer)
         {
             ConsumerWithContext = consumer;
+        }
+
+        public RouteMethod(Action<TBody, TConsumer, InboundMessageContext, object> consumer)
+        {
+            ConsumerWithDataAndContext = consumer;
         }
 
         public Action<TBody, TConsumer> Consumer { get; set; }

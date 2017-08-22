@@ -20,10 +20,14 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For(typeof(ITypedSagaRouter)).ImplementedBy(typeof(TypedSagaRouter)).LifestyleSingleton());
+            container.Register(Component.For(typeof(ISagaRouterInvoker)).ImplementedBy(typeof(SagaRouterInvoker)).LifestyleSingleton());
+            container.Register(Component.For(typeof(ISagaRouterProvider)).ImplementedBy(typeof(SagaRouterProvider)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRouterInvoker)).ImplementedBy(typeof(RouterInvoker)).LifestyleSingleton());
             container.Register(Component.For(typeof(IRetryExecutor)).ImplementedBy(typeof(RetryExecutor)).LifestyleSingleton());
             container.Register(Component.For(typeof(IRoutePicker)).ImplementedBy(typeof(RoutePicker)).LifestyleSingleton());
             container.Register(Component.For(typeof(IHandlerExecutor)).ImplementedBy(typeof(HandlerExecutor)).LifestyleSingleton());
-            container.Register(Component.For(typeof(INoTypedRouter)).ImplementedBy(typeof(NoTypedRouter)).LifestyleSingleton());
+            container.Register(Component.For(typeof(ITypedRouter)).ImplementedBy(typeof(TypedRouter)).LifestyleSingleton());
             container.Register(Component.For(typeof(IHandlerFactory)).ImplementedBy(typeof(HandlerFactory)).LifestyleSingleton());
             container.Register(Component.For(typeof(IRouteProvider)).ImplementedBy(typeof(RouteProvider)).LifestyleSingleton());
             container.Register(Component.For(typeof(IEndPointProvider)).ImplementedBy(typeof(EndPointProvider)).LifestyleSingleton());

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
@@ -22,5 +23,6 @@ namespace Jal.Router.Model
     public class InboundMessageContext<TContent> : InboundMessageContext
     {
         public TContent Content { get; set; }
+        public DateTime DateTimeUtc { get; set; }
     }
 }

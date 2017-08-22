@@ -6,21 +6,26 @@ namespace Jal.Router.Tests.Impl
 {
     public class MessageHandler : IMessageHandler<Message>
     {
-        public void Handle(Message message)
+        public void Handle(Message message, Data response)
         {
             Console.WriteLine("Sender"+ message.Name);
+            response.Status = "Start";
         }
 
-        public void Handle(Message message, Response response)
+    }
+
+    public class Message1Handler : IMessageHandler<Message1>
+    {
+        public void Handle(Message1 message, Data response)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Sender1" + message.Name1);
+            response.Status = "End";
         }
+
     }
 
     public interface IMessageHandler<in T>
     {
-        void Handle(T message);
-
-        void Handle(T message, Response response);
+        void Handle(T message, Data response);
     }
 }

@@ -10,24 +10,29 @@ namespace Jal.Router.Fluent.Impl
         private readonly string _name;
 
         public List<Route> Routes { get; set; }
-        private readonly Saga _saga;
 
-        public StartNameRouteBuilder(Saga saga, string name)
+        private readonly Saga<TData> _saga;
+
+        public StartNameRouteBuilder(Saga<TData> saga, string name)
         {
             _saga = saga;
             _name = name;
         }
 
-        public IHandlerBuilder<TContent, THandler> ForMessage<TContent>(Func<TData, string> key)
+        public IHandlerBuilder<TContent, THandler, TData> ForMessage<TContent>(
+            Func<TData, InboundMessageContext, string> key)
         {
-            var value = new Route<TContent, THandler>(_name) { First = true };
+            var value = new Route<TContent, THandler>(_name);
 
-            var builder = new HandlerBuilder<TContent, THandler>(value);
+            _saga.DataKeyBuilder = key;
 
-            //Remove existing First
-            _saga.Routes.Add(value);
+            var builder = new HandlerBuilder<TContent, THandler, TData>(value);
+
+            _saga.Start = value;
 
             return builder;
         }
+
+
     }
 }

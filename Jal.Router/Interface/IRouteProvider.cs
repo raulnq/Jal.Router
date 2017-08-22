@@ -7,15 +7,4 @@ namespace Jal.Router.Interface
     {
         Route[] Provide(Type type, string name);
     }
-
-    public interface ISagaProvider
-    {
-        Saga[] Provide(Type type, string saganame);
-
-        bool IsTheFirst(Saga saga, Type type);
-
-        Route GetFirst(Saga saga, Type type);
-
-        Route GetContinue(Saga saga, Type type, string routername);
-    }
 }

@@ -44,10 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fluent\Impl\ContinueNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\ContinueRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
     <Compile Include="Fluent\Impl\StartNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\StartRegisterRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IContinueNameRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IContinueRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartNameRouteBuilder.cs" />
@@ -65,6 +68,7 @@
     <Compile Include="Impl\AbstractPublisher.cs" />
     <Compile Include="Impl\AbstractQueue.cs" />
     <Compile Include="Impl\AbstractRouterLogger.cs" />
+    <Compile Include="Impl\AbstractStorage.cs" />
     <Compile Include="Impl\AppSettingValueSettingFinder.cs" />
     <Compile Include="Impl\ConnectionStringValueSettingFinder.cs" />
     <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
@@ -72,11 +76,22 @@
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
     <Compile Include="Impl\ExponentialRetryPolicy.cs" />
     <Compile Include="Impl\HandlerExecutor.cs" />
-    <Compile Include="Impl\NoTypedRouter.cs" />
+    <Compile Include="Impl\SagaRouter.cs" />
+    <Compile Include="Interface\ISagaRouter.cs" />
+    <Compile Include="Impl\NullStorage.cs" />
+    <Compile Include="Interface\IStorage.cs" />
+    <Compile Include="Impl\TypedSagaRouter.cs" />
+    <Compile Include="Interface\ITypedSagaRouter.cs" />
+    <Compile Include="Impl\SagaRouterInvoker.cs" />
+    <Compile Include="Interface\ISagaRouterInvoker.cs" />
+    <Compile Include="Impl\RouterInvoker.cs" />
+    <Compile Include="Impl\SagaRouterProvider.cs" />
+    <Compile Include="Impl\TypedRouter.cs" />
     <Compile Include="Impl\RetryExecutor.cs" />
     <Compile Include="Impl\RoutePicker.cs" />
     <Compile Include="Interface\IHandlerExecutor.cs" />
-    <Compile Include="Interface\INoTypedRouter.cs" />
+    <Compile Include="Interface\ISagaRouterProvider.cs" />
+    <Compile Include="Interface\ITypedRouter.cs" />
     <Compile Include="Impl\LinearRetryPolicy.cs" />
     <Compile Include="Impl\NullBusInterceptor.cs" />
     <Compile Include="Impl\NullBusLogger.cs" />
@@ -90,6 +105,7 @@
     <Compile Include="Interface\IEndPointSettingFinder.cs" />
     <Compile Include="Interface\IRetryExecutor.cs" />
     <Compile Include="Interface\IRoutePicker.cs" />
+    <Compile Include="Interface\IRouterInvoker.cs" />
     <Compile Include="Interface\IValueSettingFinder.cs" />
     <Compile Include="Interface\IEndPointSettingFinderFactory.cs" />
     <Compile Include="Interface\IHandlerFactory.cs" />
@@ -120,13 +136,9 @@
     <Compile Include="Impl\AbstractRouterInterceptor.cs" />
     <Compile Include="Impl\HandlerFactory.cs" />
     <Compile Include="Impl\Router.cs" />
-    <Compile Include="Fluent\Interface\IRouterBuilder.cs" />
     <Compile Include="Interface\IRouter.cs" />
     <Compile Include="Interface\IRouterInterceptor.cs" />
-    <Compile Include="Fluent\Interface\IRouterStartBuilder.cs" />
-    <Compile Include="Fluent\Interface\IRouterEndBuilder.cs" />
     <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
-    <Compile Include="Fluent\Impl\RouterBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

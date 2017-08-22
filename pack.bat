@@ -15,4 +15,9 @@ packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.Logger\Ja
 packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
 
 packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
+
+packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
+
+packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
+
 pause;

@@ -10,7 +10,6 @@ namespace Jal.Router.Impl
     {
         private readonly Route[] _routes;
 
-        private readonly Saga[] _sagas;
         public RouteProvider(IRouterConfigurationSource[] sources)
         {
             var routes = new List<Route>(); 
@@ -33,7 +32,6 @@ namespace Jal.Router.Impl
             {
                 return _routes.Where(x => x.Name == name && x.BodyType == type).ToArray();
             }
-            
         }
     }
 }

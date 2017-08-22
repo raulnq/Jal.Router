@@ -3,19 +3,19 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class ContinueRegisterRouteBuilder : IContinueRegisterRouteBuilder
+    public class ContinueRegisterRouteBuilder<TData> : IContinueRegisterRouteBuilder<TData>
     {
-        private readonly Saga _saga;
+        private readonly Saga<TData> _saga;
 
-        public ContinueRegisterRouteBuilder(Saga saga)
+        public ContinueRegisterRouteBuilder(Saga<TData> saga)
         {
             _saga = saga;
         }
 
 
-        public INameRouteBuilder<THandler> RegisterRoute<THandler>(string name = "")
+        public IContinueNameRouteBuilder<THandler, TData> RegisterRoute<THandler>(string name = "")
         {
-            var builder = new NameRouteBuilder<THandler>(name, _saga.Routes);
+            var builder = new ContinueNameRouteBuilder<THandler, TData>(_saga, name);
 
             return builder;
         }
