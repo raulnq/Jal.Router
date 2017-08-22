@@ -1,4 +1,5 @@
-﻿using Jal.Router.Interface;
+﻿using System;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
@@ -25,6 +26,10 @@ namespace Jal.Router.Impl
                 _invoker.Invoke(context, new [] { route }, data);
 
                 Storage.Update(saga, context, route, data);
+            }
+            else
+            {
+                throw new ApplicationException($"No data {nameof(TData)} for {nameof(TContent)}, saga {saga.Name} and route {route.Name}");
             }
         }
 

@@ -88,12 +88,12 @@ namespace Jal.Router.Impl
         }
 
 
-        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retryPolicy)
+        public void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retryPolicy)
         {
             var message = new OutboundMessageContext<TContent>
             {
                 Id = inboundmessagecontext.Id,
-                Content = content,
+                Content = inboundmessagecontext.Content,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = inboundmessagecontext.Origin,
@@ -114,13 +114,13 @@ namespace Jal.Router.Impl
             Send(message, options);
         }
 
-        public void Retry<TContent>(TContent content, InboundMessageContext inboundmessagecontext, IRetryPolicy retryPolicy)
+        public void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, IRetryPolicy retryPolicy)
         {
             var endpoints = Provider.Provide<TContent>();
 
-            var setting = Provider.Provide(endpoints.Single(), content);
+            var setting = Provider.Provide(endpoints.Single(), inboundmessagecontext.Content);
 
-            Retry(content, inboundmessagecontext, setting, retryPolicy);
+            Retry(inboundmessagecontext, setting, retryPolicy);
         }
 
         public void Send<TContent>(TContent content, Options options)

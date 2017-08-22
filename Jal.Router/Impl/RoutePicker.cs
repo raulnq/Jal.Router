@@ -5,17 +5,17 @@ namespace Jal.Router.Impl
 {
     public class RoutePicker : IRoutePicker
     {
-        public bool Pick<TContent, THandler>(InboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routeMethod, THandler consumer) where THandler : class
+        public bool Pick<TContent, THandler>(InboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
         {
-            if (routeMethod.EvaluatorWithContext == null)
+            if (routemethod.EvaluatorWithContext == null)
             {
-                if (routeMethod.Evaluator == null)
+                if (routemethod.Evaluator == null)
                 {
                     return true;
                 }
                 else
                 {
-                    if (routeMethod.Evaluator(context.Content, consumer))
+                    if (routemethod.Evaluator(context.Content, handler))
                     {
                         return true;
                     }
@@ -23,7 +23,7 @@ namespace Jal.Router.Impl
             }
             else
             {
-                if (routeMethod.EvaluatorWithContext(context.Content, consumer, context))
+                if (routemethod.EvaluatorWithContext(context.Content, handler, context))
                 {
                     return true;
                 }

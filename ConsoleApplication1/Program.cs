@@ -66,11 +66,11 @@ namespace ConsoleApplication1
 
             var bm1 = new BrokeredMessage(@"{""Name1"":""Raul Naupari""}");
             bm1.Properties.Add("origin", "ABC");
-
+            //{"partitionkey":"20170822_saga_f0dd186a-3043-4f32-b437-3d5d283b8f88","rowkey":"e5a5c8be-ce35-45e4-9a8c-3d8b539513dc"}
             //{ "partitionkey":"20170821_944e53c5-b3eb-43f1-bc87-e5bd4260c21a","rowkey":"f274f66c-095e-48ce-8f3c-6fc7a2b0ef39"}
             //{"partitionkey":"20170821_737d3a2e-b22c-4ec0-92d9-82474df6757f","rowkey":"bd09b4ed-6485-4293-b568-8e021ec8179c"}
-            bm1.Properties.Add("partitionkey", "20170821_737d3a2e-b22c-4ec0-92d9-82474df6757f");
-            bm1.Properties.Add("rowkey", "bd09b4ed-6485-4293-b568-8e021ec8179c");
+            bm1.Properties.Add("partitionkey", "20170822_saga_f0dd186a-3043-4f32-b437-3d5d283b8f88");
+            bm1.Properties.Add("rowkey", "e5a5c8be-ce35-45e4-9a8c-3d8b539513dc");
             sagabrokered.Route<Message1>(bm1, "saga");
         }
     }

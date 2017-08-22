@@ -25,34 +25,42 @@ namespace Jal.Router.Impl
         {
             if (Can(context, route))
             {
-                var consumer = _factory.Create<THandler>(route.ConsumerType);
-
-                foreach (var method in route.RouteMethods)
+                if (route.RouteMethods != null)
                 {
-                    _retry.Execute(() => {
-                        if (_picker.Pick(context, method, consumer))
-                        {
-                            _executor.Execute(context, method, consumer);
-                        }
-                    }, method, context);                    
+                    var handler = _factory.Create<THandler>(route.ConsumerType);
+
+                    foreach (var method in route.RouteMethods)
+                    {
+                        _retry.Execute(() => {
+                            if (_picker.Pick(context, method, handler))
+                            {
+                                _executor.Execute(context, method, handler);
+                            }
+                        }, method, context);
+                    }
                 }
             }
         }
 
-        public void Route<TContent, THandler, TData>(InboundMessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class, new()
+        public void Route<TContent, THandler, TData>(InboundMessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
+            where TData : class, new()
         {
             if (Can(context, route))
             {
-                var consumer = _factory.Create<THandler>(route.ConsumerType);
-
-                foreach (var method in route.RouteMethods)
+                if (route.RouteMethods != null)
                 {
-                    _retry.Execute(() => {
-                        if (_picker.Pick(context, method, consumer))
+                    var consumer = _factory.Create<THandler>(route.ConsumerType);
+
+                    foreach (var method in route.RouteMethods)
+                    {
+                        _retry.Execute(() =>
                         {
-                            _executor.Execute(context, method, consumer, data);
-                        }
-                    }, method, context);
+                            if (_picker.Pick(context, method, consumer))
+                            {
+                                _executor.Execute(context, method, consumer, data);
+                            }
+                        }, method, context);
+                    }
                 }
             }
         }

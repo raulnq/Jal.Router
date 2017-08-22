@@ -24,7 +24,7 @@ namespace Jal.Router.Model
 
     public class Saga<TData> : Saga
     {
-        public Func<TData, InboundMessageContext, string> DataKeyBuilder { get; set; }
+        //public Func<TData, InboundMessageContext, string> DataKeyBuilder { get; set; }
 
         public Saga(string name) : base(name, typeof(TData))
         {

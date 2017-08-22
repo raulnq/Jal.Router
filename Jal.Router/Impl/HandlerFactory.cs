@@ -15,7 +15,14 @@ namespace Jal.Router.Impl
 
         public THandler Create<THandler>(Type type) where THandler : class
         {
-            return _serviceLocator.Resolve<THandler>(type.FullName);
+            try
+            {
+                return _serviceLocator.Resolve<THandler>(type.FullName);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the Handler {nameof(THandler)} creation using the Type {type.FullName}", ex);
+            }
         }
     }
 }

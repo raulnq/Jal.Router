@@ -15,7 +15,14 @@ namespace Jal.Router.Impl
 
         public IValueSettingFinder Create(Type type)
         {
-            return _serviceLocator.Resolve<IValueSettingFinder>(type.FullName);
+            try
+            {
+                return _serviceLocator.Resolve<IValueSettingFinder>(type.FullName);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the ValueSettingFinder {nameof(IValueSettingFinder)} creation using the Type {type.FullName}", ex);
+            }
         }
     }
 }

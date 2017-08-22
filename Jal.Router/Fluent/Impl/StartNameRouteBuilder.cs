@@ -19,12 +19,11 @@ namespace Jal.Router.Fluent.Impl
             _name = name;
         }
 
-        public IHandlerBuilder<TContent, THandler, TData> ForMessage<TContent>(
-            Func<TData, InboundMessageContext, string> key)
+        public IHandlerBuilder<TContent, THandler, TData> ForMessage<TContent>()
         {
             var value = new Route<TContent, THandler>(_name);
 
-            _saga.DataKeyBuilder = key;
+            //_saga.DataKeyBuilder = key;
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 

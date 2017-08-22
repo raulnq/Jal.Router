@@ -4,6 +4,6 @@ namespace Jal.Router.Interface
 {
     public interface IRoutePicker
     {
-        bool Pick<TContent, THandler>(InboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routeMethod, THandler consumer) where THandler : class;
+        bool Pick<TContent, THandler>(InboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class;
     }
 }

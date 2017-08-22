@@ -16,31 +16,35 @@ namespace Jal.Router.Impl
             _bus = bus;
         }
 
-        private IRetryPolicy GetRetryPolicy<TContent, THandler>(RouteMethod<TContent, THandler> routeMethod) where THandler : class
+        private IRetryPolicy GetRetryPolicy<TContent, THandler>(RouteMethod<TContent, THandler> routemethod) where THandler : class
         {
-            var extractor = _finderFactory.Create(routeMethod.RetryExtractorType);
+            var extractor = _finderFactory.Create(routemethod.RetryExtractorType);
 
-            return routeMethod.RetryPolicyExtractor(extractor);
+            return routemethod.RetryPolicyExtractor(extractor);
         }
-        private bool HasRetry<TContent, THandler>(RouteMethod<TContent, THandler> routeMethod) where THandler : class
+        private bool HasRetry<TContent, THandler>(RouteMethod<TContent, THandler> routemethod) where THandler : class
         {
-            return routeMethod.RetryExceptionType != null && routeMethod.RetryPolicyExtractor != null;
+            return routemethod.RetryExceptionType != null && routemethod.RetryPolicyExtractor != null;
         }
-        public void Execute<TContent, THandler>(Action action, RouteMethod<TContent, THandler> routeMethod, InboundMessageContext<TContent> context) where THandler : class
+        public void Execute<TContent, THandler>(Action action, RouteMethod<TContent, THandler> routemethod, InboundMessageContext<TContent> context) where THandler : class
         {
             IRetryPolicy policy = null;
 
             try
             {
-                if (HasRetry(routeMethod))
+                if (HasRetry(routemethod))
                 {
-                    policy = GetRetryPolicy(routeMethod);
+                    policy = GetRetryPolicy(routemethod);
 
                     if (policy != null)
                     {
                         var interval = policy.NextRetryInterval(context.RetryCount);
 
                         context.LastRetry = !policy.CanRetry(context.RetryCount, interval);
+                    }
+                    else
+                    {
+                        throw new ApplicationException("The retry policy cannot be null");
                     }
                 }
 
@@ -50,11 +54,11 @@ namespace Jal.Router.Impl
             {
                 if (policy != null)
                 {
-                    if (routeMethod.RetryExceptionType == ex.GetType())
+                    if (routemethod.RetryExceptionType == ex.GetType())
                     {
                         if (!context.LastRetry)
                         {
-                            _bus.Retry(context.Content, context, policy);
+                            _bus.Retry(context, policy);
                         }
                         else
                         {

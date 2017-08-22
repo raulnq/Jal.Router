@@ -57,7 +57,15 @@ namespace Jal.Router.Impl
                         {
                             _invoker.Continue(saga, context, continueroute);
                         }
+                        else
+                        {
+                            throw new ApplicationException($"No route to handle the Content {nameof(TContent)} and name {routename}");
+                        }
                     }
+                }
+                else
+                {
+                    throw new ApplicationException($"No saga to handle the Content {nameof(TContent)} and name {saganame}");
                 }
 
                 Logger.OnSuccess(context, context.Content);

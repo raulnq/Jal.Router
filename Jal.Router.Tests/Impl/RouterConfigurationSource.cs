@@ -11,7 +11,7 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterSaga<Data>("saga", start =>
             {
-                start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>(((i, context) => Guid.NewGuid().ToString())).ToBeHandledBy<MessageHandler>(x =>
+                start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
                 {
                     x.With((request, handler, data) => handler.Handle(request, data));
                 });

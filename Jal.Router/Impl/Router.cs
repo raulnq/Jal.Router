@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
@@ -43,11 +44,18 @@ namespace Jal.Router.Impl
 
             try
             {
-                var bodytype = typeof(TContent);
+                var contenttype = typeof(TContent);
 
-                var routes = Provider.Provide(bodytype, routename);
+                var routes = Provider.Provide(contenttype, routename);
 
-                _invoker.Invoke(context, routes);
+                if (routes != null && routes.Length > 0)
+                {
+                    _invoker.Invoke(context, routes);
+                }
+                else
+                {
+                    throw new ApplicationException($"No route to handle the Content {nameof(TContent)} and name {routename}");
+                }
 
                 Logger.OnSuccess(context, context.Content);
 

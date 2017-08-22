@@ -18,6 +18,8 @@ namespace Jal.Router.AzureStorage.Model
 
         public string Data { get; set; }
 
+        public string DataType { get; set; }
+
         public string Name { get; set; }
 
         public DateTime Created { get; set; }

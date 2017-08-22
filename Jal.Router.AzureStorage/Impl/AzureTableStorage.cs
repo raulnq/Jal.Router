@@ -12,16 +12,24 @@ namespace Jal.Router.AzureStorage.Impl
     {
         private readonly string _connectionstring;
 
-        private readonly string _sagatablename;
+        private readonly string _sagastoragename;
 
-        private readonly string _messagetablename;
-        public AzureTableStorage(string connectionstring)
+        private readonly string _messagestorgename;
+
+        private readonly string _partitionkeyheadername;
+
+        private readonly string _rowkeyheadername;
+        public AzureTableStorage(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string partitionkeyheadername = "partitionkey", string rowkeyheadername= "rowkey")
         {
             _connectionstring = connectionstring;
 
-            _sagatablename = "jalsagas";
+            _sagastoragename = sagastoragename;
 
-            _messagetablename = "jalmessages";
+            _messagestorgename = messagestorgename;
+
+            _partitionkeyheadername = partitionkeyheadername;
+
+            _rowkeyheadername = rowkeyheadername;
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -37,56 +45,76 @@ namespace Jal.Router.AzureStorage.Impl
 
         private SagaRecord CreateSaga<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, TData data)
         {
-            var table = GetCloudTable(_connectionstring, _sagatablename);
-
-            var record = new SagaRecord($"{context.DateTimeUtc.ToString("yyyyMMdd")}_{Guid.NewGuid()}", saga.DataKeyBuilder(data, context))
+            try
             {
-                Data = JsonConvert.SerializeObject(data),
-                Created = context.DateTimeUtc,
-                Name = saga.Name
-            };
+                var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-            table.Execute(TableOperation.Insert(record));
+                var record = new SagaRecord($"{context.DateTimeUtc.ToString("yyyyMMdd")}_{saga.Name}_{Guid.NewGuid()}", Guid.NewGuid().ToString())
+                {
+                    Data = JsonConvert.SerializeObject(data),
+                    Created = context.DateTimeUtc,
+                    Name = saga.Name,
+                    DataType = saga.DataType.Name
+                };
 
-            return record;
+                table.Execute(TableOperation.Insert(record));
+
+                return record;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the saga record creation saga {saga.Name}", ex);
+            }
         }
 
-        public MessageRecord CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route)
+        private void CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route)
         {
-            var table = GetCloudTable(_connectionstring, _messagetablename);
-
-            var record = new MessageRecord(saga.PartitionKey, $"{Guid.NewGuid()}")
+            try
             {
-                Content = JsonConvert.SerializeObject(context.Content),
-                ContentType = route.BodyType.Name,
-                Id = context.Id,
-                Version = context.Version,
-                RetryCount = context.RetryCount,
-                Origin = JsonConvert.SerializeObject(context.Origin),
-                Headers = JsonConvert.SerializeObject(context.Headers),
-                DateTimeUtc = context.DateTimeUtc,
-                Name = route.Name,
-                Data = saga.Data
-            };
+                var table = GetCloudTable(_connectionstring, _messagestorgename);
 
-            table.Execute(TableOperation.Insert(record));
+                var record = new MessageRecord(saga.PartitionKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
+                {
+                    Content = JsonConvert.SerializeObject(context.Content),
+                    ContentType = route.BodyType.Name,
+                    Id = context.Id,
+                    Version = context.Version,
+                    RetryCount = context.RetryCount,
+                    Origin = JsonConvert.SerializeObject(context.Origin),
+                    Headers = JsonConvert.SerializeObject(context.Headers),
+                    DateTimeUtc = context.DateTimeUtc,
+                    Name = route.Name,
+                    Data = saga.Data
+                };
 
-            return record;
+                table.Execute(TableOperation.Insert(record));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the message record creation saga {saga.Name} and route {route.Name}", ex);
+            }
         }
 
-        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context)
+        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context, Saga saga)
         {
-            if (context.Headers.ContainsKey("partitionkey") && context.Headers.ContainsKey("rowkey"))
+            try
             {
-                var table = GetCloudTable(_connectionstring, _sagatablename);
+                if (context.Headers.ContainsKey(_partitionkeyheadername) && context.Headers.ContainsKey(_rowkeyheadername))
+                {
+                    var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-                var partitionkey = context.Headers["partitionkey"];
+                    var partitionkey = context.Headers[_partitionkeyheadername];
 
-                var rowkey = context.Headers["rowkey"];
+                    var rowkey = context.Headers[_rowkeyheadername];
 
-                var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
+                    var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
-                return result.Result as SagaRecord;
+                    return result.Result as SagaRecord;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the saga record lookup saga {saga.Name}", ex);
             }
 
             return null;
@@ -101,26 +129,26 @@ namespace Jal.Router.AzureStorage.Impl
             CreateMessage(record, context, route); 
         }
 
-        private static void UpdateContext<TContent>(InboundMessageContext<TContent> context, SagaRecord record)
+        private void UpdateContext<TContent>(InboundMessageContext<TContent> context, SagaRecord record)
         {
-            if (context.Headers.ContainsKey("partitionkey"))
+            if (context.Headers.ContainsKey(_partitionkeyheadername))
             {
-                context.Headers.Remove("partitionkey");
+                context.Headers.Remove(_partitionkeyheadername);
             }
 
-            context.Headers.Add("partitionkey", record.PartitionKey);
+            context.Headers.Add(_partitionkeyheadername, record.PartitionKey);
 
-            if (context.Headers.ContainsKey("rowkey"))
+            if (context.Headers.ContainsKey(_rowkeyheadername))
             {
-                context.Headers.Remove("rowkey");
+                context.Headers.Remove(_rowkeyheadername);
             }
 
-            context.Headers.Add("rowkey", record.RowKey);
+            context.Headers.Add(_rowkeyheadername, record.RowKey);
         }
 
         public override void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
         {
-            var record = GetSaga(context);
+            var record = GetSaga(context, saga);
 
             if (record != null)
             {
@@ -132,23 +160,30 @@ namespace Jal.Router.AzureStorage.Impl
 
         private void UpdateSaga<TData>(SagaRecord record, TData data)
         {
-            record.Data = JsonConvert.SerializeObject(data);
+            try
+            {
+                record.Data = JsonConvert.SerializeObject(data);
 
-            var table = GetCloudTable(_connectionstring, _sagatablename);
+                var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-            table.Execute(TableOperation.Replace(record));
+                table.Execute(TableOperation.Replace(record));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the saga record updation saga {record.Name}", ex);
+            }
         }
 
         public override TData Find<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route)
         {
-            var record = GetSaga(context);
+            var record = GetSaga(context, saga);
 
             if (record!=null)
             {
                 return JsonConvert.DeserializeObject<TData>(record.Data);
             }
 
-            return default(TData);
+            return null;
         }
     }
 }
