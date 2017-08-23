@@ -125,8 +125,6 @@ namespace Jal.Router.AzureStorage.Impl
             var record = CreateSaga(saga, context, data);
 
             UpdateContext(context, record);
-
-            CreateMessage(record, context, route); 
         }
 
         private void UpdateContext<TContent>(InboundMessageContext<TContent> context, SagaRecord record)

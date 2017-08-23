@@ -37,9 +37,11 @@ namespace Jal.Router.Impl
         {
             var data = new TData();
 
+            Storage.Create(saga, context, route, data);
+
             _invoker.Invoke(context, new [] { route }, data);
 
-            Storage.Create(saga, context, route, data);
+            Storage.Update(saga, context, route, data);
         }
     }
 }
