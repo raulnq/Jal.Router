@@ -6,7 +6,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.AzureStorage.Installer
 {
-    public class AzureStorageInstaller : IWindsorInstaller
+    public class AzureStorageRouterInstaller : IWindsorInstaller
     {
         private readonly string _connectionstring;
 
@@ -17,7 +17,7 @@ namespace Jal.Router.AzureStorage.Installer
         private readonly string _partitionkeyheadername;
 
         private readonly string _rowkeyheadername;
-        public AzureStorageInstaller(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string partitionkeyheadername = "partitionkey", string rowkeyheadername = "rowkey")
+        public AzureStorageRouterInstaller(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string partitionkeyheadername = "partitionkey", string rowkeyheadername = "rowkey")
         {
             _connectionstring = connectionstring;
 
