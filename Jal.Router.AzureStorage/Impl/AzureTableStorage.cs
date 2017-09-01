@@ -54,7 +54,7 @@ namespace Jal.Router.AzureStorage.Impl
                     Data = JsonConvert.SerializeObject(data),
                     Created = context.DateTimeUtc,
                     Name = saga.Name,
-                    DataType = saga.DataType.Name
+                    DataType = saga.DataType.FullName
                 };
 
                 table.Execute(TableOperation.Insert(record));
@@ -76,7 +76,7 @@ namespace Jal.Router.AzureStorage.Impl
                 var record = new MessageRecord(saga.RowKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
                 {
                     Content = JsonConvert.SerializeObject(context.Content),
-                    ContentType = route.BodyType.Name,
+                    ContentType = route.BodyType.FullName,
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
