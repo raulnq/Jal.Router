@@ -49,7 +49,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-                var record = new SagaRecord($"{context.DateTimeUtc.ToString("yyyyMMdd")}_{saga.Name}_{Guid.NewGuid()}", Guid.NewGuid().ToString())
+                var record = new SagaRecord($"{context.DateTimeUtc.ToString("yyyyMMdd")}_{saga.Name}", Guid.NewGuid().ToString())
                 {
                     Data = JsonConvert.SerializeObject(data),
                     Created = context.DateTimeUtc,
@@ -73,7 +73,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var table = GetCloudTable(_connectionstring, _messagestorgename);
 
-                var record = new MessageRecord(saga.PartitionKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
+                var record = new MessageRecord(saga.RowKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
                 {
                     Content = JsonConvert.SerializeObject(context.Content),
                     ContentType = route.BodyType.Name,
