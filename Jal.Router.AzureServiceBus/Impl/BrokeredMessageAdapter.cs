@@ -101,7 +101,9 @@ namespace Jal.Router.AzureServiceBus.Impl
         {
             var json = JsonConvert.SerializeObject(message.Content);
 
-            var brokeredmessage = new BrokeredMessage(json) { ContentType = "application/json" };
+            var body = new MemoryStream(Encoding.UTF8.GetBytes(json)); 
+
+            var brokeredmessage = new BrokeredMessage(body, true) { ContentType = "application/json" };
 
             foreach (var header in message.Headers)
             {

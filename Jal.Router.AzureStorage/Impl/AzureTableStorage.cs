@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl;
 using Jal.Router.Model;
@@ -166,9 +167,20 @@ namespace Jal.Router.AzureStorage.Impl
 
                 table.Execute(TableOperation.Replace(record));
             }
+            catch (StorageException ex)
+            {
+                if (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+                {
+                    throw new ApplicationException($"Error during the saga update (Optimistic concurrency violation – entity has changed since it was retrieved) {record.Name}", ex);
+                }
+                else
+                {
+                    throw new ApplicationException($"Error during the saga update ({ex.RequestInformation.HttpStatusCode}) {record.Name}", ex);
+                }
+            }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record updation saga {record.Name}", ex);
+                throw new ApplicationException($"Error during the saga update {record.Name}", ex);
             }
         }
 
