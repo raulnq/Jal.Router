@@ -38,9 +38,9 @@ namespace Jal.Router.Impl
 
                     if (policy != null)
                     {
-                        var interval = policy.NextRetryInterval(context.RetryCount);
+                        var interval = policy.NextRetryInterval(context.RetryCount+1);
 
-                        context.LastRetry = !policy.CanRetry(context.RetryCount, interval);
+                        context.LastRetry = !policy.CanRetry(context.RetryCount+1, interval);
                     }
                     else
                     {

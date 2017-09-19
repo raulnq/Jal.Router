@@ -18,7 +18,7 @@ namespace Jal.Router.Impl
 
         public bool CanRetry(int currentRetryCount, TimeSpan nextretryinterval)
         {
-            return currentRetryCount < _maxretrycount;
+            return currentRetryCount <= _maxretrycount;
         }
 
         public TimeSpan NextRetryInterval(int currentRetryCount)

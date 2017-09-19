@@ -99,9 +99,11 @@ namespace Jal.Router.Impl
                 Origin = inboundmessagecontext.Origin,
                 Headers = inboundmessagecontext.Headers,
                 Version = inboundmessagecontext.Version,
-                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(retryPolicy.NextRetryInterval(inboundmessagecontext.RetryCount)),
+                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(retryPolicy.NextRetryInterval(inboundmessagecontext.RetryCount+1)),
                 RetryCount = inboundmessagecontext.RetryCount + 1,
             };
+
+
 
             var options = new Options()
             {
