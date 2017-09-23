@@ -59,13 +59,13 @@ namespace Jal.Router.Impl
                         }
                         else
                         {
-                            throw new ApplicationException($"No route to handle the Content {nameof(TContent)} and name {routename}");
+                            throw new ApplicationException($"No route to handle the Content {bodytype.FullName} and name {routename}");
                         }
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"No saga to handle the Content {nameof(TContent)} and name {saganame}");
+                    throw new ApplicationException($"No saga to handle the Content {bodytype.FullName} and name {saganame}");
                 }
 
                 Logger.OnSuccess(context, context.Content);

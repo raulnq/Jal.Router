@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the ValueSettingFinder {nameof(IValueSettingFinder)} creation using the Type {type.FullName}", ex);
+                throw new ApplicationException($"Error during the ValueSettingFinder {typeof(IValueSettingFinder).FullName} creation using the Type {type.FullName}", ex);
             }
         }
     }

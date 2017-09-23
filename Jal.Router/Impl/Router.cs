@@ -54,7 +54,7 @@ namespace Jal.Router.Impl
                 }
                 else
                 {
-                    throw new ApplicationException($"No route to handle the Content {nameof(TContent)} and name {routename}");
+                    throw new ApplicationException($"No route to handle the Content {contenttype.FullName} and name {routename}");
                 }
 
                 Logger.OnSuccess(context, context.Content);

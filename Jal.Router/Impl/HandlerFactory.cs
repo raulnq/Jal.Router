@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the Handler {nameof(THandler)} creation using the Type {type.FullName}", ex);
+                throw new ApplicationException($"Error during the Handler {typeof(THandler).FullName} creation using the Type {type.FullName}", ex);
             }
         }
     }

@@ -29,7 +29,7 @@ namespace Jal.Router.Impl
             }
             else
             {
-                throw new ApplicationException($"No data {nameof(TData)} for {nameof(TContent)}, saga {saga.Name} and route {route.Name}");
+                throw new ApplicationException($"No data {typeof(TData).FullName} for {typeof(TContent).FullName}, saga {saga.Name} and route {route.Name}");
             }
         }
 
