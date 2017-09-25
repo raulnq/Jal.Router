@@ -17,7 +17,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
     public class BrokeredMessageAdapter : IMessageAdapter<BrokeredMessage>
     {
-        public string GetBody(BrokeredMessage input)
+        public string ReadBody(BrokeredMessage input)
         {
             using (var stream = input.GetBody<Stream>())
             {
@@ -54,14 +54,19 @@ namespace Jal.Router.AzureServiceBus.Impl
                 }
             }
         }
-    
-    public InboundMessageContext<TContent> Read<TContent>(BrokeredMessage message)
-    {
-        var content = GetBody(message);
 
-            var context = new InboundMessageContext<TContent>
+        public TContent ReadContent<TContent>(BrokeredMessage message)
+        {
+            var content = ReadBody(message);
+
+            return JsonConvert.DeserializeObject<TContent>(content);
+        }
+
+        public InboundMessageContext ReadContext(BrokeredMessage message)
+        {
+
+            var context = new InboundMessageContext
             {
-                Content = JsonConvert.DeserializeObject<TContent>(content),
                 Id = message.MessageId,
                 DateTimeUtc = DateTime.UtcNow
             };
@@ -69,6 +74,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             if (message.Properties.ContainsKey("from"))
             {
                 context.Origin.Name = message.Properties["from"].ToString();
+            }
+
+            if (message.Properties.ContainsKey("sagaid"))
+            {
+                context.Saga.Id = message.Properties["sagaid"].ToString();
             }
 
             if (message.Properties.ContainsKey("version"))
@@ -118,6 +128,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             if (!string.IsNullOrWhiteSpace(message.Version))
             {
                 brokeredmessage.Properties.Add("version", message.Version);
+            }
+
+            if (!string.IsNullOrWhiteSpace(message.Saga.Id))
+            {
+                brokeredmessage.Properties.Add("sagaid", message.Saga.Id);
             }
 
             if (message.ScheduledEnqueueDateTimeUtc!=null)

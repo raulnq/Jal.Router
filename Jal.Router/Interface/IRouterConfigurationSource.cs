@@ -9,5 +9,11 @@ namespace Jal.Router.Interface
         Saga[] GetSagas();
 
         EndPoint[] GetEndPoints();
+
+        Subscription[] GetSubscriptions();
+
+        Topic[] GetTopics();
+
+        Queue[] GetQueues();
     }
 }

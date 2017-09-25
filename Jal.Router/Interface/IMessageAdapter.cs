@@ -4,7 +4,9 @@ namespace Jal.Router.Interface
 {
     public interface IMessageAdapter<T>
     {
-        InboundMessageContext<TContent> Read<TContent>(T message);
+        TContent ReadContent<TContent>(T message);
+
+        InboundMessageContext ReadContext(T message);
 
         T Write<TContent>(OutboundMessageContext<TContent> message);
     }

@@ -53,10 +53,11 @@
     <Compile Include="Fluent\Interface\IContinueRegisterRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
+    <Compile Include="Fluent\Interface\IOnErrorBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartRegisterRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IRetryBuilder.cs" />
-    <Compile Include="Fluent\Interface\IRetryUsingBuilder.cs" />
+    <Compile Include="Fluent\Interface\IOnRetryBuilder.cs" />
+    <Compile Include="Fluent\Interface\IOnRetryUsingBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\AbstractBusInterceptor.cs" />
     <Compile Include="Impl\AbstractBusLogger.cs" />
+    <Compile Include="Impl\AbstractManager.cs" />
     <Compile Include="Impl\AbstractPublisher.cs" />
     <Compile Include="Impl\AbstractQueue.cs" />
     <Compile Include="Impl\AbstractRouterLogger.cs" />
@@ -76,9 +78,13 @@
     <Compile Include="Impl\EndPointSettingFinderFactory.cs" />
     <Compile Include="Impl\ExponentialRetryPolicy.cs" />
     <Compile Include="Impl\HandlerExecutor.cs" />
+    <Compile Include="Impl\NullManager.cs" />
     <Compile Include="Impl\SagaRouter.cs" />
+    <Compile Include="Impl\Starter.cs" />
+    <Compile Include="Interface\IManager.cs" />
     <Compile Include="Interface\ISagaRouter.cs" />
     <Compile Include="Impl\NullStorage.cs" />
+    <Compile Include="Interface\IStarter.cs" />
     <Compile Include="Interface\IStorage.cs" />
     <Compile Include="Impl\TypedSagaRouter.cs" />
     <Compile Include="Interface\ITypedSagaRouter.cs" />
@@ -121,6 +127,7 @@
     <Compile Include="Interface\IValueSettingFinderFactory.cs" />
     <Compile Include="Model\EndPointSetting.cs" />
     <Compile Include="Model\EndPoint.cs" />
+    <Compile Include="Model\Queue.cs" />
     <Compile Include="Model\Saga.cs" />
     <Compile Include="Model\InboundMessageContext.cs" />
     <Compile Include="Model\Options.cs" />
@@ -139,6 +146,9 @@
     <Compile Include="Interface\IRouter.cs" />
     <Compile Include="Interface\IRouterInterceptor.cs" />
     <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
+    <Compile Include="Model\SagaSetting.cs" />
+    <Compile Include="Model\Subscription.cs" />
+    <Compile Include="Model\Topic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

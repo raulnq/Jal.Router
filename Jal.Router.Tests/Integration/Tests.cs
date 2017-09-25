@@ -31,6 +31,8 @@ namespace Jal.Router.Tests.Integration
 
         private IBus _bus;
 
+        private IStarter _starter;
+
         [SetUp]
         public void SetUp()
         {
@@ -51,6 +53,7 @@ namespace Jal.Router.Tests.Integration
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             _bus = container.Resolve<IBus>();
             _brokered = container.Resolve<IRouter<BrokeredMessage>>();
+            _starter = container.Resolve<IStarter>();
             //_sagabrokered = container.Resolve<ISagaRouter<BrokeredMessage>>();
         }
 
@@ -61,7 +64,7 @@ namespace Jal.Router.Tests.Integration
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-
+            _starter.Start();
 
             var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
             bm.Properties.Add("origin","AB");

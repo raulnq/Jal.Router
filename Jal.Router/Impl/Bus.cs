@@ -81,48 +81,12 @@ namespace Jal.Router.Impl
                 Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
+                RetryCount = options.RetryCount,
+                Saga = options.Saga
             };
 
             Send(message, options);
-        }
-
-
-        public void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retryPolicy)
-        {
-            var message = new OutboundMessageContext<TContent>
-            {
-                Id = inboundmessagecontext.Id,
-                Content = inboundmessagecontext.Content,
-                ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath,
-                Origin = inboundmessagecontext.Origin,
-                Headers = inboundmessagecontext.Headers,
-                Version = inboundmessagecontext.Version,
-                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(retryPolicy.NextRetryInterval(inboundmessagecontext.RetryCount+1)),
-                RetryCount = inboundmessagecontext.RetryCount + 1,
-            };
-
-
-
-            var options = new Options()
-            {
-                Id = inboundmessagecontext.Id,
-                Headers = inboundmessagecontext.Headers,
-                ScheduledEnqueueDateTimeUtc = message.ScheduledEnqueueDateTimeUtc,
-                Version = inboundmessagecontext.Version
-            };
-
-            Send(message, options);
-        }
-
-        public void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, IRetryPolicy retryPolicy)
-        {
-            var endpoints = Provider.Provide<TContent>();
-
-            var setting = Provider.Provide(endpoints.Single(), inboundmessagecontext.Content);
-
-            Retry(inboundmessagecontext, setting, retryPolicy);
         }
 
         public void Send<TContent>(TContent content, Options options)
@@ -207,7 +171,9 @@ namespace Jal.Router.Impl
                 Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
+                RetryCount = options.RetryCount,
+                Saga = options.Saga
             };
 
             Publish(message, options);
@@ -263,7 +229,9 @@ namespace Jal.Router.Impl
                 ToPath = endpoint.ToPath,
                 Headers = options.Headers,
                 Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc
+                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
+                RetryCount = options.RetryCount,
+                Saga = options.Saga
             };
 
             message.Origin.Key = string.Empty;

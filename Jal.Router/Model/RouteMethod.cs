@@ -38,6 +38,11 @@ namespace Jal.Router.Model
         public Func<TBody, TConsumer, InboundMessageContext, bool> EvaluatorWithContext { get; set; }
         public Type RetryExceptionType { get; set; }
         public Type RetryExtractorType { get; set; }
+
+        public string OnRetryEndPoint { get; set; }
+
+        public string OnErrorEndPoint { get; set; }
+
         public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
     }
 }

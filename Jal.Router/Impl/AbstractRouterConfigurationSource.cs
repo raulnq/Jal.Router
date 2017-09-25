@@ -14,6 +14,12 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
+        private readonly List<Subscription> _subscriptions = new List<Subscription>();
+
+        private readonly List<Topic> _topics = new List<Topic>();
+
+        private readonly List<Queue> _queues = new List<Queue>();
+
         private readonly List<Saga> _sagas = new List<Saga>();
 
         private readonly Origin _origin = new Origin();
@@ -37,11 +43,96 @@ namespace Jal.Router.Impl
             return _enpoints.ToArray();
         }
 
+        public Subscription[] GetSubscriptions()
+        {
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Origin = _origin;
+            }
+            return _subscriptions.ToArray();
+        }
+
+        public Queue[] GetQueues()
+        {
+            return _queues.ToArray();
+        }
+
+        public Topic[] GetTopics()
+        {
+            return _topics.ToArray();
+        }
+
+
         public INameRouteBuilder<THandler> RegisterRoute<THandler>(string name="")
         {
             var builder = new NameRouteBuilder<THandler>(name, _routes);
 
             return builder;
+        }
+
+        public void RegisterSubscription<TExtractorConectionString>(string name, string topicpath, Func<IValueSettingFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (string.IsNullOrWhiteSpace(topicpath))
+            {
+                throw new ArgumentNullException(nameof(topicpath));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            var subscription = new Subscription(name)
+            {
+                ConnectionStringExtractorType = typeof(TExtractorConectionString),
+                ToConnectionStringExtractor = connectionstringextractor,
+                TopicPath = topicpath
+            };
+
+            _subscriptions.Add(subscription);
+        }
+
+        public void RegisterQueue<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            var queue = new Queue(name)
+            {
+                ConnectionStringExtractorType = typeof (TExtractorConectionString),
+                ToConnectionStringExtractor = connectionstringextractor
+            };
+
+            _queues.Add(queue);
+        }
+
+        public void RegisterTopic<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueSettingFinder
+        { 
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            var topic = new Topic(name)
+            {
+                ConnectionStringExtractorType = typeof(TExtractorConectionString),
+                ToConnectionStringExtractor = connectionstringextractor
+            };
+
+            _topics.Add(topic);
         }
 
         public void RegisterSaga<TData>(string name, Action<IStartRegisterRouteBuilder<TData>> start, Action<IContinueRegisterRouteBuilder<TData>> @continue=null) where TData : class, new()

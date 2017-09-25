@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Jal.Router.Interface;
+using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
@@ -36,7 +37,7 @@ namespace Jal.Router.Impl
 
             stopwatch.Start();
 
-            var context = _adapter.Read<TContent>(message);
+            var context = _adapter.ReadContext(message);
 
             Logger.OnEntry(context);
 
@@ -48,18 +49,20 @@ namespace Jal.Router.Impl
 
                 var routes = Provider.Provide(contenttype, routename);
 
+                var content = _adapter.ReadContent<TContent>(message);
+
                 if (routes != null && routes.Length > 0)
                 {
-                    _invoker.Invoke(context, routes);
+                    _invoker.Invoke(new InboundMessageContext<TContent>(context, content), routes);
+
+                    Logger.OnSuccess(context, content);
+
+                    Interceptor.OnSuccess(context, content);
                 }
                 else
                 {
-                    throw new ApplicationException($"No route to handle the Content {contenttype.FullName} and name {routename}");
+                    throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and route name {routename}");
                 }
-
-                Logger.OnSuccess(context, context.Content);
-
-                Interceptor.OnSuccess(context, context.Content);
             }
             catch (Exception ex)
             {

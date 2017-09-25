@@ -23,9 +23,5 @@ namespace Jal.Router.Interface
         void Publish<TContent>(TContent content, Origin origin, Options options);
 
         void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options);
-
-        void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, EndPointSetting endpoint, IRetryPolicy retrypolicy);
-
-        void Retry<TContent>(InboundMessageContext<TContent> inboundmessagecontext, IRetryPolicy retrypolicy);
     }
 }

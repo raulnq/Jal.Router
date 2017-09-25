@@ -47,6 +47,7 @@ namespace Jal.Router.Installer
                     container.Register(assemblyDescriptor.BasedOn(typeof(IEndPointSettingFinder<>)).WithServiceAllInterfaces());
                 }
             }
+            container.Register(Component.For(typeof(IStarter)).ImplementedBy(typeof(Starter)).LifestyleSingleton());
         }
     }
 }

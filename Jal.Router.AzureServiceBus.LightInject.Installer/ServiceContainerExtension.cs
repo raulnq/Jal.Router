@@ -18,6 +18,8 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
             container.Register<IPublisher, AzureServiceBusTopic>(new PerContainerLifetime());
 
             container.Register<IQueue, AzureServiceBusQueue>(new PerContainerLifetime());
+
+            container.Register<IManager, AzureServiceBusManager>(new PerContainerLifetime());
         }
     }
 }

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Impl\AzureServiceBusManager.cs" />
     <Compile Include="Impl\AzureServiceBusTopic.cs" />
     <Compile Include="Impl\AzureServiceBusQueue.cs" />
     <Compile Include="Impl\BrokeredMessageAdapter.cs" />

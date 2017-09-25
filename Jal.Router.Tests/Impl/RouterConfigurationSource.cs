@@ -32,17 +32,32 @@ namespace Jal.Router.Tests.Impl
 
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
             {
-                x.With(((request, handler) => handler.Handle(request, null))).Retry<ApplicationException>().Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(10, 5));
+                x.With(((request, handler) => handler.Handle(request, null)))
+                .OnExceptionRetryFailedMessageTo<ApplicationException>("retry")
+                .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(10, 5))
+                .OnErrorSendFailedMessageTo("error");
             });
 
             RegisterOrigin("From", "2CE8F3B2-6542-4D5C-8B08-E7E64EF57D22");
 
-            RegisterEndPoint()
+            RegisterEndPoint("retry")
                 .ForMessage<Message>()
                 .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("toconnectionstring"), x => x.Find("topath"));
 
-            //RegisterEndPoint<EndPointSettingFinder, Message>();
+            RegisterEndPoint("error")
+                .ForMessage<Message>()
+                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("toconnectionstring"), x => x.Find("topath"));
 
+            RegisterEndPoint<EndPointSettingFinder, Message>();
+
+            RegisterSubscription<AppSettingValueSettingFinder>("subscripcion12", "testtopic", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
+
+            RegisterQueue<AppSettingValueSettingFinder>("errorqueue12", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
+
+
+            RegisterTopic<AppSettingValueSettingFinder>("errortopic12", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
+
+            //RegisterSubscription();
             //RegisterFlow<Data>(s => s.Id).StartedByMessage<Request>(h => h.Name).UsingRoute("Tag1").FollowingBy(y =>
             //{
             //    y.Message<Request>(r => r.Id).UsingRoute("");

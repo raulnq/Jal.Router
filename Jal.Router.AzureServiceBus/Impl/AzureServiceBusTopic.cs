@@ -1,3 +1,4 @@
+using System.Globalization;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
@@ -8,9 +9,12 @@ namespace Jal.Router.AzureServiceBus.Impl
     {
         private readonly IMessageAdapter<BrokeredMessage> _adapter;
 
-        public AzureServiceBusTopic(IMessageAdapter<BrokeredMessage> adapter)
+        private readonly IValueSettingFinderFactory _valueSettingFinderFactory;
+
+        public AzureServiceBusTopic(IMessageAdapter<BrokeredMessage> adapter, IValueSettingFinderFactory valueSettingFinderFactory)
         {
             _adapter = adapter;
+            _valueSettingFinderFactory = valueSettingFinderFactory;
         }
 
         public void Publish<TContent>(OutboundMessageContext<TContent> context)

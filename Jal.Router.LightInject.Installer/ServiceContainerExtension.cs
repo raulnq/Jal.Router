@@ -74,6 +74,8 @@ namespace Jal.Router.LightInject.Installer
                     }
                 }
             }
+
+            container.Register<IStarter, Starter>(new PerContainerLifetime());
         }
     }
 }

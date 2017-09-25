@@ -58,23 +58,93 @@ namespace Jal.Router.Impl
                     {
                         if (!context.LastRetry)
                         {
-                            _bus.Retry(context, policy);
+                            if (!string.IsNullOrWhiteSpace(routemethod.OnRetryEndPoint))
+                            {
+                                SendRetry(routemethod, context, policy);
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(routemethod.OnErrorEndPoint))
+                                {
+                                    SendError(routemethod, context);
+                                }
+                                else
+                                {
+                                    throw;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrWhiteSpace(routemethod.OnErrorEndPoint))
+                            {
+                                SendError(routemethod, context);
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(routemethod.OnErrorEndPoint))
+                        {
+                            SendError(routemethod, context);
                         }
                         else
                         {
                             throw;
                         }
                     }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(routemethod.OnErrorEndPoint))
+                    {
+                        SendError(routemethod, context);
+                    }
                     else
                     {
                         throw;
                     }
                 }
-                else
-                {
-                    throw;
-                }
             }
+        }
+
+        private void SendRetry<TContent, THandler>(RouteMethod<TContent, THandler> routemethod, InboundMessageContext<TContent> context, IRetryPolicy policy)
+            where THandler : class
+        {
+            var options = new Options()
+            {
+                EndPointName = routemethod.OnRetryEndPoint,
+                Headers = context.Headers,
+                Id = context.Id,
+                Version = context.Version,
+                ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
+                RetryCount = context.RetryCount + 1,
+                Saga = context.Saga
+            };
+
+            _bus.Send(context.Content, context.Origin, options);
+        }
+
+        private void SendError<TContent, THandler>(RouteMethod<TContent, THandler> routemethod, InboundMessageContext<TContent> context)
+            where THandler : class
+        {
+            var options = new Options()
+            {
+                EndPointName = routemethod.OnErrorEndPoint,
+                Headers = context.Headers,
+                Id = context.Id,
+                Version = context.Version,
+                Saga = context.Saga,
+            };
+
+            _bus.Send(context.Content, context.Origin, options);
+
+
         }
     }
 }

@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class WhenRouteBuilder<TBody, TConsumer> : IWhenMethodBuilder<TBody, TConsumer>, IRetryUsingBuilder
+    public class WhenRouteBuilder<TBody, TConsumer> : IWhenMethodBuilder<TBody, TConsumer>, IOnRetryUsingBuilder, IOnErrorBuilder
     {
         private readonly RouteMethod<TBody, TConsumer> _routemethod;
 
@@ -20,7 +20,7 @@ namespace Jal.Router.Fluent.Impl
             _routemethod = routemethod;
         }
 
-        public IRetryBuilder When(Func<TBody, TConsumer, bool> method)
+        public IOnRetryBuilder When(Func<TBody, TConsumer, bool> method)
         {
             if (method == null)
             {
@@ -32,7 +32,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IRetryBuilder When(Func<TBody, TConsumer, InboundMessageContext, bool> method)
+        public IOnRetryBuilder When(Func<TBody, TConsumer, InboundMessageContext, bool> method)
         {
             if (method == null)
             {
@@ -44,14 +44,21 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IRetryUsingBuilder Retry<TExeption>() where TExeption : Exception
+        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo<TExeption>(string endpointname) where TExeption : Exception
         {
+            if (string.IsNullOrWhiteSpace(endpointname))
+            {
+                throw new ArgumentNullException(nameof(endpointname));
+            }
+
             _routemethod.RetryExceptionType = typeof(TExeption);
+
+            _routemethod.OnRetryEndPoint = endpointname;
 
             return this;
         }
 
-        public void Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        public IOnErrorBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
         {
             _routemethod.RetryExtractorType = typeof(TExtractor);
 
@@ -61,6 +68,18 @@ namespace Jal.Router.Fluent.Impl
             }
 
             _routemethod.RetryPolicyExtractor = policycreator;
+
+            return this;
+        }
+
+        public void OnErrorSendFailedMessageTo(string endpointname)
+        {
+            if (string.IsNullOrWhiteSpace(endpointname))
+            {
+                throw new ArgumentNullException(nameof(endpointname));
+            }
+
+            _routemethod.OnErrorEndPoint = endpointname;
         }
     }
 }

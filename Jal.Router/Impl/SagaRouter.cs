@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Jal.Router.Interface;
+using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
@@ -31,7 +32,7 @@ namespace Jal.Router.Impl
 
             stopwatch.Start();
 
-            var context = _adapter.Read<TContent>(message);
+            var context = _adapter.ReadContext(message);
 
             Logger.OnEntry(context);
 
@@ -39,38 +40,47 @@ namespace Jal.Router.Impl
 
             try
             {
-                var bodytype = typeof(TContent);
+                var contenttype = typeof(TContent);
 
                 var saga = Provider.Provide(saganame);
 
                 if (saga != null)
                 {
-                    if (saga.Start!=null && saga.Start.BodyType == bodytype)
+                    if (saga.Start!=null && saga.Start.BodyType == contenttype)
                     {
-                        _invoker.Start(saga, context, saga.Start);
+                        var content = _adapter.ReadContent<TContent>(message);
+
+                        _invoker.Start(saga, new InboundMessageContext<TContent>(context, content), saga.Start);
+
+                        Logger.OnSuccess(context, content);
+
+                        Interceptor.OnSuccess(context, content);
                     }
                     else
                     {
-                        var continueroute = Provider.Provide(saga, bodytype, routename);
+                        var continueroute = Provider.Provide(saga, contenttype, routename);
 
                         if (continueroute != null)
                         {
-                            _invoker.Continue(saga, context, continueroute);
+                            var content = _adapter.ReadContent<TContent>(message);
+
+                            _invoker.Continue(saga, new InboundMessageContext<TContent>(context, content), continueroute);
+
+                            Logger.OnSuccess(context, content);
+
+                            Interceptor.OnSuccess(context, content);
                         }
                         else
                         {
-                            throw new ApplicationException($"No route to handle the Content {bodytype.FullName} and name {routename}");
+                            throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and route name {routename}");
                         }
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"No saga to handle the Content {bodytype.FullName} and name {saganame}");
+                    throw new ApplicationException($"No saga to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and saga name {saganame}");
                 }
 
-                Logger.OnSuccess(context, context.Content);
-
-                Interceptor.OnSuccess(context, context.Content);
             }
             catch (Exception ex)
             {

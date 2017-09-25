@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl;
 using Jal.Router.Model;
@@ -17,20 +18,13 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly string _messagestorgename;
 
-        private readonly string _partitionkeyheadername;
-
-        private readonly string _rowkeyheadername;
-        public AzureTableStorage(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string partitionkeyheadername = "partitionkey", string rowkeyheadername= "rowkey")
+        public AzureTableStorage(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages")
         {
             _connectionstring = connectionstring;
 
             _sagastoragename = sagastoragename;
 
             _messagestorgename = messagestorgename;
-
-            _partitionkeyheadername = partitionkeyheadername;
-
-            _rowkeyheadername = rowkeyheadername;
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -81,7 +75,9 @@ namespace Jal.Router.AzureStorage.Impl
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
+                    LastRetry = context.LastRetry,
                     Origin = JsonConvert.SerializeObject(context.Origin),
+                    Saga = JsonConvert.SerializeObject(context.Saga),
                     Headers = JsonConvert.SerializeObject(context.Headers),
                     DateTimeUtc = context.DateTimeUtc,
                     Name = route.Name,
@@ -100,17 +96,19 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                if (context.Headers.ContainsKey(_partitionkeyheadername) && context.Headers.ContainsKey(_rowkeyheadername))
+                var partitionkey = context.Saga.GetPartitionKey();
+
+                var rowkey = context.Saga.GetRowKey();
+
+                if (!string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
-                    var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-                    var partitionkey = context.Headers[_partitionkeyheadername];
+                        var table = GetCloudTable(_connectionstring, _sagastoragename);
 
-                    var rowkey = context.Headers[_rowkeyheadername];
+                        var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
-                    var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
-
-                    return result.Result as SagaRecord;
+                        return result.Result as SagaRecord;
+                    
                 }
             }
             catch (Exception ex)
@@ -125,25 +123,9 @@ namespace Jal.Router.AzureStorage.Impl
         {
             var record = CreateSaga(saga, context, data);
 
-            UpdateContext(context, record);
+            context.Saga.SetId(record.PartitionKey,record.RowKey);
         }
 
-        private void UpdateContext<TContent>(InboundMessageContext<TContent> context, SagaRecord record)
-        {
-            if (context.Headers.ContainsKey(_partitionkeyheadername))
-            {
-                context.Headers.Remove(_partitionkeyheadername);
-            }
-
-            context.Headers.Add(_partitionkeyheadername, record.PartitionKey);
-
-            if (context.Headers.ContainsKey(_rowkeyheadername))
-            {
-                context.Headers.Remove(_rowkeyheadername);
-            }
-
-            context.Headers.Add(_rowkeyheadername, record.RowKey);
-        }
 
         public override void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
         {
