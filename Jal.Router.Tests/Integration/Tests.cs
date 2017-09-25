@@ -64,13 +64,16 @@ namespace Jal.Router.Tests.Integration
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-            _starter.Start();
+            //_starter.Start();
 
             var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
             bm.Properties.Add("origin","AB");
             var message = new Message();
+            //_bus.Send(message, new Options() {EndPointName = "retry"});
+            _bus.Send(message, new Options() { EndPointName = "error" });
+            //_brokered.Route<Message>(bm,"retry");
 
-            //_router.Route<Message>(message);
+            //_brokered.Route<Message>(bm,"error");
 
             //_brokered.Route<Message>(bm);
 

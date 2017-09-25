@@ -9,5 +9,9 @@ namespace Jal.Router.Fluent.Interface
             where TExtractorConnectionString : IValueSettingFinder
             where TExtractorPath : IValueSettingFinder
             ;
+
+        void To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path)
+    where TExtractorConnectionString : IValueSettingFinder
+    ;
     }
 }

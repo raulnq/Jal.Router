@@ -23,5 +23,7 @@ namespace Jal.Router.Model
         public object ToConnectionStringExtractor { get; set; }
 
         public object ToPathExtractor { get; set; }
+
+        public string ToPath { get; set; }
     }
 }

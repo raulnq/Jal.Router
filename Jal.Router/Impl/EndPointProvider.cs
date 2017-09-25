@@ -47,7 +47,7 @@ namespace Jal.Router.Impl
 
             if (endpoint.ExtractorType == null)
             {
-                if (endpoint.ConnectionStringExtractorType!=null && endpoint.PathExtractorType!=null)
+                if (endpoint.ConnectionStringExtractorType!=null && (endpoint.PathExtractorType!=null || !string.IsNullOrWhiteSpace(endpoint.ToPath)))
                 {
                     return ValueFinder(endpoint);
                 }
@@ -64,19 +64,30 @@ namespace Jal.Router.Impl
         {
             var output = new EndPointSetting();
 
-            var extractorconnectionstring = _valueSettingFinderFactory.Create(endpoint.ConnectionStringExtractorType);
+            if (endpoint.PathExtractorType != null)
+            {
+                var extractorpath = _valueSettingFinderFactory.Create(endpoint.PathExtractorType);
 
-            var extractorpath = _valueSettingFinderFactory.Create(endpoint.PathExtractorType);
+                var topathextractor = endpoint.ToPathExtractor as Func<IValueSettingFinder, string>;
+
+                if (topathextractor != null)
+                {
+                    output.ToPath = topathextractor(extractorpath);
+                }
+            }
+            else
+            {
+                output.ToPath = endpoint.ToPath;
+            }
+
+            var extractorconnectionstring = _valueSettingFinderFactory.Create(endpoint.ConnectionStringExtractorType);
 
             var toconnectionextractor = endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-            var topathextractor = endpoint.ToPathExtractor as Func<IValueSettingFinder, string>;
 
-            if (toconnectionextractor != null && topathextractor != null)
+            if (toconnectionextractor != null)
             {
                 output.ToConnectionString = toconnectionextractor(extractorconnectionstring);
-
-                output.ToPath = topathextractor(extractorpath);
             }
 
             return output;

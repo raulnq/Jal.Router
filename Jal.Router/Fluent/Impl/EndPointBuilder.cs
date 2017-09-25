@@ -22,11 +22,11 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public void To<TExtractorConectionString, TExtractorPath>(Func<IValueSettingFinder, string> connectionstringextractor, Func<IValueSettingFinder, string> pathextractor) 
-            where TExtractorConectionString : IValueSettingFinder
+        public void To<TExtractorConnectionString, TExtractorPath>(Func<IValueSettingFinder, string> connectionstringextractor, Func<IValueSettingFinder, string> pathextractor) 
+            where TExtractorConnectionString : IValueSettingFinder
             where TExtractorPath : IValueSettingFinder
         {
-            _endpoint.ConnectionStringExtractorType = typeof(TExtractorConectionString);
+            _endpoint.ConnectionStringExtractorType = typeof(TExtractorConnectionString);
 
             _endpoint.PathExtractorType = typeof(TExtractorPath);
 
@@ -43,6 +43,25 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.ToConnectionStringExtractor = connectionstringextractor;
 
             _endpoint.ToPathExtractor = pathextractor;
+        }
+
+        public void To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        {
+            _endpoint.ConnectionStringExtractorType = typeof(TExtractorConnectionString);
+
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            _endpoint.ToConnectionStringExtractor = connectionstringextractor;
+
+            _endpoint.ToPath = path;
         }
     }
 }

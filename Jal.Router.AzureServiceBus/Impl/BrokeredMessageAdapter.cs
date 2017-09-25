@@ -98,7 +98,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (message.Properties != null)
             {
-                foreach (var property in message.Properties.Where(x=>x.Key!= "from" && x.Key != "origin" && x.Key != "version" && x.Key != "retrycount"))
+                foreach (var property in message.Properties.Where(x=>x.Key!= "from" && x.Key != "origin" && x.Key != "version" && x.Key != "retrycount" && x.Key != "sagaid"))
                 {
                     context.Headers.Add(property.Key, property.Value?.ToString());
                 }

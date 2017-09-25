@@ -42,11 +42,11 @@ namespace Jal.Router.Tests.Impl
 
             RegisterEndPoint("retry")
                 .ForMessage<Message>()
-                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("toconnectionstring"), x => x.Find("topath"));
+                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => "dadsa", x => "asdaxxx");
 
             RegisterEndPoint("error")
                 .ForMessage<Message>()
-                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("toconnectionstring"), x => x.Find("topath"));
+                .To<AppSettingValueSettingFinder>(x => "11111", "topath");
 
             RegisterEndPoint<EndPointSettingFinder, Message>();
 
