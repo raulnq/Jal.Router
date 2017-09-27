@@ -81,10 +81,12 @@
     <Compile Include="Impl\NullManager.cs" />
     <Compile Include="Impl\SagaRouter.cs" />
     <Compile Include="Impl\Starter.cs" />
+    <Compile Include="Impl\TransportSetupStep.cs" />
     <Compile Include="Interface\IManager.cs" />
     <Compile Include="Interface\ISagaRouter.cs" />
     <Compile Include="Impl\NullStorage.cs" />
     <Compile Include="Interface\IStarter.cs" />
+    <Compile Include="Interface\IStep.cs" />
     <Compile Include="Interface\IStorage.cs" />
     <Compile Include="Impl\TypedSagaRouter.cs" />
     <Compile Include="Interface\ITypedSagaRouter.cs" />

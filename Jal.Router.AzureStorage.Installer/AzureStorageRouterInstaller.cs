@@ -14,10 +14,8 @@ namespace Jal.Router.AzureStorage.Installer
 
         private readonly string _messagestorgename;
 
-        private readonly string _partitionkeyheadername;
-
-        private readonly string _rowkeyheadername;
-        public AzureStorageRouterInstaller(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string partitionkeyheadername = "partitionkey", string rowkeyheadername = "rowkey")
+        private readonly string _tablenamesufix;
+        public AzureStorageRouterInstaller(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
             _connectionstring = connectionstring;
 
@@ -25,13 +23,12 @@ namespace Jal.Router.AzureStorage.Installer
 
             _messagestorgename = messagestorgename;
 
-            _partitionkeyheadername = partitionkeyheadername;
-
-            _rowkeyheadername = rowkeyheadername;
+            _tablenamesufix = tablenamesufix;
         }
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(AzureTableStorage)).DependsOn(new { connectionstring =_connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, partitionkeyheadername= _partitionkeyheadername, rowkeyheadername = _rowkeyheadername }).LifestyleSingleton());
+            container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(AzureTableStorage)).DependsOn(new { connectionstring =_connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
+            container.Register(Component.For(typeof(IStep)).ImplementedBy(typeof(AzureStorageSetupStep)).Named(typeof(AzureStorageSetupStep).FullName).DependsOn(new { connectionstring = _connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
         }
     }
 }

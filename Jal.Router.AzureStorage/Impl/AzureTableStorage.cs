@@ -18,13 +18,17 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly string _messagestorgename;
 
-        public AzureTableStorage(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages")
+        private readonly string _currenttablenamesufix;
+
+        public AzureTableStorage(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
             _connectionstring = connectionstring;
 
             _sagastoragename = sagastoragename;
 
             _messagestorgename = messagestorgename;
+
+            _currenttablenamesufix = tablenamesufix;
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -38,13 +42,19 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        private SagaRecord CreateSaga<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, TData data)
+        private void CreateSaga<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, TData data)
         {
             try
             {
-                var table = GetCloudTable(_connectionstring, _sagastoragename);
+                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{saga.Name}";
 
-                var record = new SagaRecord($"{context.DateTimeUtc.ToString("yyyyMMdd")}_{saga.Name}", Guid.NewGuid().ToString())
+                var row = Guid.NewGuid().ToString();
+
+                context.Saga.SetId(partition, row, _currenttablenamesufix);
+
+                var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
+
+                var record = new SagaRecord(partition, row)
                 {
                     Data = JsonConvert.SerializeObject(data),
                     Created = context.DateTimeUtc,
@@ -53,8 +63,6 @@ namespace Jal.Router.AzureStorage.Impl
                 };
 
                 table.Execute(TableOperation.Insert(record));
-
-                return record;
             }
             catch (Exception ex)
             {
@@ -62,11 +70,11 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        private void CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route)
+        private void CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route, string tablenamesufix)
         {
             try
             {
-                var table = GetCloudTable(_connectionstring, _messagestorgename);
+                var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{tablenamesufix}");
 
                 var record = new MessageRecord(saga.RowKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
                 {
@@ -92,7 +100,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context, Saga saga)
+        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context, Saga saga, string tablenamesufix)
         {
             try
             {
@@ -103,7 +111,7 @@ namespace Jal.Router.AzureStorage.Impl
                 if (!string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
 
-                        var table = GetCloudTable(_connectionstring, _sagastoragename);
+                        var table = GetCloudTable(_connectionstring,$"{_sagastoragename}{tablenamesufix}");
 
                         var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
@@ -121,31 +129,31 @@ namespace Jal.Router.AzureStorage.Impl
 
         public override void Create<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
         {
-            var record = CreateSaga(saga, context, data);
-
-            context.Saga.SetId(record.PartitionKey,record.RowKey);
+            CreateSaga(saga, context, data);
         }
 
 
         public override void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
         {
-            var record = GetSaga(context, saga);
+            var tablenamesufix = context.Saga.GetTableNameSufix();
+
+            var record = GetSaga(context, saga, tablenamesufix);
 
             if (record != null)
             {
-                UpdateSaga(record, data);
+                UpdateSaga(record, data, tablenamesufix);
 
-                CreateMessage(record, context, route);
+                CreateMessage(record, context, route, tablenamesufix);
             }
         }
 
-        private void UpdateSaga<TData>(SagaRecord record, TData data)
+        private void UpdateSaga<TData>(SagaRecord record, TData data, string tablenamesufix)
         {
             try
             {
                 record.Data = JsonConvert.SerializeObject(data);
 
-                var table = GetCloudTable(_connectionstring, _sagastoragename);
+                var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 
                 table.Execute(TableOperation.Replace(record));
             }
@@ -168,7 +176,9 @@ namespace Jal.Router.AzureStorage.Impl
 
         public override TData Find<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route)
         {
-            var record = GetSaga(context, saga);
+            var tablenamesufix = context.Saga.GetTableNameSufix();
+
+            var record = GetSaga(context, saga, tablenamesufix);
 
             if (record!=null)
             {

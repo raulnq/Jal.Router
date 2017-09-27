@@ -76,6 +76,8 @@ namespace Jal.Router.LightInject.Installer
             }
 
             container.Register<IStarter, Starter>(new PerContainerLifetime());
+
+            container.Register<IStep, TransportSetupStep>(typeof(TransportSetupStep).FullName, new PerContainerLifetime());
         }
     }
 }

@@ -48,6 +48,7 @@ namespace Jal.Router.Installer
                 }
             }
             container.Register(Component.For(typeof(IStarter)).ImplementedBy(typeof(Starter)).LifestyleSingleton());
+            container.Register(Component.For(typeof(IStep)).ImplementedBy(typeof(TransportSetupStep)).LifestyleSingleton().Named(typeof(TransportSetupStep).FullName));
         }
     }
 }

@@ -41,11 +41,12 @@ namespace ConsoleApplication1
             container.Register(Component.For(typeof(IMessageHandler<Message1>)).ImplementedBy(typeof(Message1Handler)).Named(typeof(Message1Handler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
             container.Install(new AzureServiceBusRouterInstaller());
-            container.Install(new AzureStorageRouterInstaller("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA=="));
+            container.Install(new AzureStorageRouterInstaller("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==","sagatests","messagestests", DateTime.UtcNow.ToString("yyyyMMdd")));
             container.Install(new RouterLoggerInstaller());
             container.Register(Component.For(typeof(ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             var sagabrokered = container.Resolve<ISagaRouter<BrokeredMessage>>();
-
+            var starter = container.Resolve<IStarter>();
+            starter.Start();
             //var original = ServicePointManager.ServerCertificateValidationCallback;
 
             //ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) =>
@@ -69,9 +70,16 @@ namespace ConsoleApplication1
             //{"partitionkey":"20170822_saga_f0dd186a-3043-4f32-b437-3d5d283b8f88","rowkey":"e5a5c8be-ce35-45e4-9a8c-3d8b539513dc"}
             //{ "partitionkey":"20170821_944e53c5-b3eb-43f1-bc87-e5bd4260c21a","rowkey":"f274f66c-095e-48ce-8f3c-6fc7a2b0ef39"}
             //{"partitionkey":"20170821_737d3a2e-b22c-4ec0-92d9-82474df6757f","rowkey":"bd09b4ed-6485-4293-b568-8e021ec8179c"}
-            bm1.Properties.Add("partitionkey", "20170822_saga_f0dd186a-3043-4f32-b437-3d5d283b8f88");
-            bm1.Properties.Add("rowkey", "e5a5c8be-ce35-45e4-9a8c-3d8b539513dc");
+            bm1.Properties.Add("sagaid", "20170927_saga@69864a1a-defa-45c8-aa3c-c6b03b026b93@20170927");
             sagabrokered.Route<Message1>(bm1, "saga");
+
+            var bm2 = new BrokeredMessage(@"{""Name1"":""Raul Naupari""}");
+            bm2.Properties.Add("origin", "xcd");
+            //{"partitionkey":"20170822_saga_f0dd186a-3043-4f32-b437-3d5d283b8f88","rowkey":"e5a5c8be-ce35-45e4-9a8c-3d8b539513dc"}
+            //{ "partitionkey":"20170821_944e53c5-b3eb-43f1-bc87-e5bd4260c21a","rowkey":"f274f66c-095e-48ce-8f3c-6fc7a2b0ef39"}
+            //{"partitionkey":"20170821_737d3a2e-b22c-4ec0-92d9-82474df6757f","rowkey":"bd09b4ed-6485-4293-b568-8e021ec8179c"}
+            bm2.Properties.Add("sagaid", "20170927_saga@69864a1a-defa-45c8-aa3c-c6b03b026b93@20170927");
+            sagabrokered.Route<Message1>(bm2, "saga");
         }
     }
 }
