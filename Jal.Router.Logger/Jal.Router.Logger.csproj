@@ -44,9 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusLogger.cs" />
+    <Compile Include="Impl\BusLogger.cs" />
+    <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RouterLogger.cs" />
+    <Compile Include="Impl\RouterLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

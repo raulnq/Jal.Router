@@ -2,7 +2,8 @@
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Jal.Router.AzureStorage.Impl;
-using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound.Sagas;
+using Jal.Router.Interface.Management;
 
 namespace Jal.Router.AzureStorage.Installer
 {
@@ -27,8 +28,11 @@ namespace Jal.Router.AzureStorage.Installer
         }
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(AzureTableStorage)).DependsOn(new { connectionstring =_connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
-            container.Register(Component.For(typeof(IStep)).ImplementedBy(typeof(AzureStorageSetupStep)).Named(typeof(AzureStorageSetupStep).FullName).DependsOn(new { connectionstring = _connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
+            container.Register(Component.For<IStorage>().ImplementedBy<AzureTableStorage>().Named(typeof(AzureTableStorage).FullName).DependsOn(new { connectionstring =_connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
+
+            container.Register(Component.For<IStartupConfiguration>().ImplementedBy<AzureStorageStartupConfiguration>().Named(typeof(AzureStorageStartupConfiguration).FullName).DependsOn(new { connectionstring = _connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
         }
     }
+
+
 }

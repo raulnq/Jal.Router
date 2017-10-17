@@ -1,4 +1,5 @@
 ﻿using Jal.Router.Model;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Interface
 {
@@ -10,10 +11,10 @@ namespace Jal.Router.Interface
 
         EndPoint[] GetEndPoints();
 
-        Subscription[] GetSubscriptions();
+        SubscriptionToPublishSubscribeChannel[] GetSubscriptionsToPublishSubscribeChannel();
 
-        Topic[] GetTopics();
+        PublishSubscribeChannel[] GetPublishSubscribeChannels();
 
-        Queue[] GetQueues();
+        PointToPointChannel[] GetPointToPointChannels();
     }
 }

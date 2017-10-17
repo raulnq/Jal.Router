@@ -2,8 +2,9 @@
 using System.Net;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Model;
-using Jal.Router.Impl;
+using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
@@ -42,7 +43,7 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        private void CreateSaga<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, TData data)
+        private void CreateSaga<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, TData data)
         {
             try
             {
@@ -70,7 +71,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        private void CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route, string tablenamesufix)
+        private void CreateMessage<TContent>(SagaRecord saga, IndboundMessageContext<TContent> context, Route route, string tablenamesufix)
         {
             try
             {
@@ -100,7 +101,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context, Saga saga, string tablenamesufix)
+        public SagaRecord GetSaga<TContent>(IndboundMessageContext<TContent> context, Saga saga, string tablenamesufix)
         {
             try
             {
@@ -127,13 +128,13 @@ namespace Jal.Router.AzureStorage.Impl
             return null;
         }
 
-        public override void Create<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
+        public override void Create<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route, TData data)
         {
             CreateSaga(saga, context, data);
         }
 
 
-        public override void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
+        public override void Update<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route, TData data)
         {
             var tablenamesufix = context.Saga.GetTableNameSufix();
 
@@ -174,7 +175,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override TData Find<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route)
+        public override TData Find<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route)
         {
             var tablenamesufix = context.Saga.GetTableNameSufix();
 

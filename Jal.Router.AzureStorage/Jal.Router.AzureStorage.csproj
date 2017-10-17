@@ -68,7 +68,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\AzureStorageSetupStep.cs" />
+    <Compile Include="Extensions\ConfigurationExtensions.cs" />
+    <Compile Include="Impl\AzureStorageStartupConfiguration.cs" />
     <Compile Include="Impl\AzureTableStorage.cs" />
     <Compile Include="Extensions\SagaSettingExtensions.cs" />
     <Compile Include="Model\MessageRecord.cs" />

@@ -51,10 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\AbstractRouterConfigurationSourceExtensions.cs" />
     <Compile Include="Impl\AzureServiceBusManager.cs" />
     <Compile Include="Impl\AzureServiceBusTopic.cs" />
     <Compile Include="Impl\AzureServiceBusQueue.cs" />
-    <Compile Include="Impl\BrokeredMessageAdapter.cs" />
+    <Compile Include="Impl\BrokeredMessageBodyAdapter.cs" />
+    <Compile Include="Extensions\ConfigurationExtensions.cs" />
+    <Compile Include="Impl\JsonMessageBodySerializer.cs" />
+    <Compile Include="Impl\BrokeredMessageMetadataAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using Jal.Router.Interface;
+using Jal.Router.Interface.Management;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class AzureServiceBusManager : IManager
+    public class AzureServiceBusManager : IChannelManager
     {
         private const string ConnectionStringEndpoint = "endpoint";
         private const string ConnectionStringSharedAccessKeyName = "sharedaccesskeyname";
@@ -76,7 +76,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public void CreateSubscription(string connectionstring, string topicpath, string name, string origin)
+        public void CreateSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string name, string origin)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -84,11 +84,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    namespaceManager.GetSubscription(topicpath, name);
+                    namespaceManager.GetSubscription(path, name);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var subscriptiondescription = new SubscriptionDescription(topicpath, name)
+                    var subscriptiondescription = new SubscriptionDescription(path, name)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
                         LockDuration = TimeSpan.FromMinutes(5),
@@ -99,7 +99,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
         }
 
-        public void CreateTopic(string connectionstring, string name)
+        public void CreatePublishSubscribeChannel(string connectionstring, string name)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -121,7 +121,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
         }
 
-        public void CreateQueue(string connectionstring, string name)
+        public void CreatePointToPointChannel(string connectionstring, string name)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 

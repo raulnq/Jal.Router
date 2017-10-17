@@ -1,11 +1,10 @@
-﻿using System.Reflection;
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Jal.Router.AzureServiceBus.Impl;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model;
+using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Installer
@@ -14,12 +13,17 @@ namespace Jal.Router.AzureServiceBus.Installer
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For(typeof(IMessageAdapter<BrokeredMessage>)).ImplementedBy(typeof(BrokeredMessageAdapter)).LifestyleSingleton());
-            container.Register(Component.For(typeof(ISagaRouter<BrokeredMessage>)).ImplementedBy(typeof(SagaRouter<BrokeredMessage>)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IRouter<BrokeredMessage>)).ImplementedBy(typeof(Router<BrokeredMessage>)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IQueue)).ImplementedBy(typeof(AzureServiceBusQueue)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IPublisher)).ImplementedBy(typeof(AzureServiceBusTopic)).LifestyleSingleton());
-            container.Register(Component.For(typeof(IManager)).ImplementedBy(typeof(AzureServiceBusManager)).LifestyleSingleton());
+            container.Register(Component.For<IPointToPointChannel>().ImplementedBy<AzureServiceBusQueue>().Named(typeof(AzureServiceBusQueue).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<AzureServiceBusTopic>().Named(typeof(AzureServiceBusTopic).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IChannelManager>().ImplementedBy<AzureServiceBusManager>().Named(typeof(AzureServiceBusManager).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IMessageBodyAdapter>().ImplementedBy<BrokeredMessageBodyAdapter>().Named(typeof(BrokeredMessageBodyAdapter).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IMessageMetadataAdapter>().ImplementedBy<BrokeredMessageMetadataAdapter>().Named(typeof(BrokeredMessageMetadataAdapter).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IMessageBodySerializer>().ImplementedBy<JsonMessageBodySerializer>().Named(typeof(JsonMessageBodySerializer).FullName).LifestyleSingleton());
         }
     }
 }

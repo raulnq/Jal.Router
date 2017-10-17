@@ -1,5 +1,4 @@
 using System;
-using Jal.Router.Interface;
 
 namespace Jal.Router.Model
 {
@@ -15,12 +14,12 @@ namespace Jal.Router.Model
             ConsumerWithData = consumer;
         }
 
-        public RouteMethod(Action<TBody, TConsumer, InboundMessageContext> consumer)
+        public RouteMethod(Action<TBody, TConsumer, MessageContext> consumer)
         {
             ConsumerWithContext = consumer;
         }
 
-        public RouteMethod(Action<TBody, TConsumer, InboundMessageContext, object> consumer)
+        public RouteMethod(Action<TBody, TConsumer, MessageContext, object> consumer)
         {
             ConsumerWithDataAndContext = consumer;
         }
@@ -29,20 +28,12 @@ namespace Jal.Router.Model
 
         public Func<TBody, TConsumer, bool> Evaluator { get; set; }
 
-        public Action<TBody, TConsumer, InboundMessageContext> ConsumerWithContext { get; set; }
+        public Action<TBody, TConsumer, MessageContext> ConsumerWithContext { get; set; }
 
         public Action<TBody, TConsumer, object> ConsumerWithData { get; set; }
 
-        public Action<TBody, TConsumer, InboundMessageContext, object> ConsumerWithDataAndContext { get; set; }
+        public Action<TBody, TConsumer, MessageContext, object> ConsumerWithDataAndContext { get; set; }
 
-        public Func<TBody, TConsumer, InboundMessageContext, bool> EvaluatorWithContext { get; set; }
-        public Type RetryExceptionType { get; set; }
-        public Type RetryExtractorType { get; set; }
-
-        public string OnRetryEndPoint { get; set; }
-
-        public string OnErrorEndPoint { get; set; }
-
-        public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
+        public Func<TBody, TConsumer, MessageContext, bool> EvaluatorWithContext { get; set; }
     }
 }

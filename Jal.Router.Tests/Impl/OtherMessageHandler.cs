@@ -8,7 +8,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Message message, Data data)
         {
-            Console.WriteLine("Other Sender"+ message.Name);
+            Console.WriteLine("Other Sender");
         }
     }
 }

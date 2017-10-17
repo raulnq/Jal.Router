@@ -8,7 +8,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Message message, Data response)
         {
-            Console.WriteLine("Sender"+ message.Name);
+            Console.WriteLine("Sender");
             response.Status = "Start";
         }
 
@@ -18,8 +18,8 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Message1 message, Data response)
         {
-            Console.WriteLine("Sender1" + message.Name1);
-            response.Status = "End";
+            Console.WriteLine("Sender1");
+            //response.Status = "End";
         }
 
     }

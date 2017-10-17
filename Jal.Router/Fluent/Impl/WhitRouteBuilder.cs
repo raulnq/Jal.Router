@@ -27,7 +27,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext> method)
+        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method)
         {
             if (method == null)
             {
@@ -81,7 +81,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext> method)
+        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method)
         {
             if (method == null)
             {
@@ -95,14 +95,14 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TBody, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext, TData> method)
+        public IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext, TData> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Action<TBody, THandler, InboundMessageContext, object> wrapper = (b, h, i, d) => method(b, h, i,(TData)d);
+            Action<TBody, THandler, MessageContext, object> wrapper = (b, h, i, d) => method(b, h, i,(TData)d);
 
             var routemethod = new RouteMethod<TBody, THandler>(wrapper);
 

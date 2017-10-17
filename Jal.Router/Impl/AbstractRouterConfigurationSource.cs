@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Jal.Router.Fluent.Impl;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl
 {
@@ -14,11 +16,11 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
-        private readonly List<Subscription> _subscriptions = new List<Subscription>();
+        private readonly List<SubscriptionToPublishSubscribeChannel> _subscriptions = new List<SubscriptionToPublishSubscribeChannel>();
 
-        private readonly List<Topic> _topics = new List<Topic>();
+        private readonly List<PublishSubscribeChannel> _publishsubscriberchannels = new List<PublishSubscribeChannel>();
 
-        private readonly List<Queue> _queues = new List<Queue>();
+        private readonly List<PointToPointChannel> _pointtopointchannels = new List<PointToPointChannel>();
 
         private readonly List<Saga> _sagas = new List<Saga>();
 
@@ -43,7 +45,7 @@ namespace Jal.Router.Impl
             return _enpoints.ToArray();
         }
 
-        public Subscription[] GetSubscriptions()
+        public SubscriptionToPublishSubscribeChannel[] GetSubscriptionsToPublishSubscribeChannel()
         {
             foreach (var subscription in _subscriptions)
             {
@@ -52,14 +54,14 @@ namespace Jal.Router.Impl
             return _subscriptions.ToArray();
         }
 
-        public Queue[] GetQueues()
+        public PointToPointChannel[] GetPointToPointChannels()
         {
-            return _queues.ToArray();
+            return _pointtopointchannels.ToArray();
         }
 
-        public Topic[] GetTopics()
+        public PublishSubscribeChannel[] GetPublishSubscribeChannels()
         {
-            return _topics.ToArray();
+            return _publishsubscriberchannels.ToArray();
         }
 
 
@@ -70,32 +72,32 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscription<TExtractorConectionString>(string name, string topicpath, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string name, string path, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            if (string.IsNullOrWhiteSpace(topicpath))
+            if (string.IsNullOrWhiteSpace(path))
             {
-                throw new ArgumentNullException(nameof(topicpath));
+                throw new ArgumentNullException(nameof(path));
             }
             if (connectionstringextractor == null)
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var subscription = new Subscription(name)
+            var subscription = new SubscriptionToPublishSubscribeChannel(name)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor,
-                TopicPath = topicpath
+                TopicPath = path
             };
 
             _subscriptions.Add(subscription);
         }
 
-        public void RegisterQueue<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterPointToPointChannel<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -106,16 +108,16 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var queue = new Queue(name)
+            var queue = new PointToPointChannel(name)
             {
                 ConnectionStringExtractorType = typeof (TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor
             };
 
-            _queues.Add(queue);
+            _pointtopointchannels.Add(queue);
         }
 
-        public void RegisterTopic<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         { 
             if (string.IsNullOrWhiteSpace(name))
@@ -126,16 +128,16 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var topic = new Topic(name)
+            var topic = new PublishSubscribeChannel(name)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor
             };
 
-            _topics.Add(topic);
+            _publishsubscriberchannels.Add(topic);
         }
 
-        public void RegisterSaga<TData>(string name, Action<IStartRegisterRouteBuilder<TData>> start, Action<IContinueRegisterRouteBuilder<TData>> @continue=null) where TData : class, new()
+        public void RegisterSaga<TData>(string name, Action<IStartingRouteBuilder<TData>> start, Action<INextRouteBuilder<TData>> @continue=null) where TData : class, new()
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -154,9 +156,9 @@ namespace Jal.Router.Impl
 
             var saga = new Saga<TData>(name);
 
-            start(new StartRegisterRouteBuilder<TData>(saga));
+            start(new StartingRouteBuilder<TData>(saga));
 
-            @continue(new ContinueRegisterRouteBuilder<TData>(saga));
+            @continue(new NextRouteBuilder<TData>(saga));
 
             _sagas.Add(saga);
         }

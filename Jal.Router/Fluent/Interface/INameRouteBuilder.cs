@@ -1,6 +1,4 @@
-﻿using Jal.Router.Model;
-
-namespace Jal.Router.Fluent.Interface
+﻿namespace Jal.Router.Fluent.Interface
 {
     public interface INameRouteBuilder<THandler>
     {

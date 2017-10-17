@@ -145,6 +145,10 @@
       <Project>{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}</Project>
       <Name>Jal.Router.AzureStorage.Installer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj">
+      <Project>{9DDD8C4E-6C9A-4C8F-B558-84F656971990}</Project>
+      <Name>Jal.Router.AzureStorage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jal.Router.Installer\Jal.Router.Installer.csproj">
       <Project>{9C5F53E5-A886-42FD-83D4-5C780786E6C4}</Project>
       <Name>Jal.Router.Installer</Name>
@@ -152,6 +156,10 @@
     <ProjectReference Include="..\Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj">
       <Project>{3139BEBE-CB50-4C86-958E-AC77D2B7211C}</Project>
       <Name>Jal.Router.Logger.Installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jal.Router.Logger\Jal.Router.Logger.csproj">
+      <Project>{1BB1884D-3CC4-41B8-8055-64460AD09E60}</Project>
+      <Name>Jal.Router.Logger</Name>
     </ProjectReference>
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj">
       <Project>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</Project>

@@ -1,26 +1,29 @@
+using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model;
+using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
+using Jal.Router.Model.Outbount;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class AzureServiceBusQueue : IQueue
+    public class AzureServiceBusQueue : AbstractPointToPointChannel
     {
-        private readonly IMessageAdapter<BrokeredMessage> _adapter;
-        public AzureServiceBusQueue(IMessageAdapter<BrokeredMessage> adapter)
-        {
-            _adapter = adapter;
-        }
-
-        public void Enqueue<TContent>(OutboundMessageContext<TContent> context)
+        public override void Send<TContent>(OutboundMessageContext<TContent> context, IMessageBodyAdapter messageadapter, IMessageMetadataAdapter messagecontextadapter)
         {
             var queueclient = QueueClient.CreateFromConnectionString(context.ToConnectionString, context.ToPath);
 
-            var message = _adapter.Write(context);
+            var message = messageadapter.Write<TContent,BrokeredMessage>(context.Content);
+
+            message = messagecontextadapter.Create(context, message);
 
             queueclient.Send(message);
 
             queueclient.Close();
+        }
+
+        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration) : base(factory, configuration)
+        {
         }
     }
 }

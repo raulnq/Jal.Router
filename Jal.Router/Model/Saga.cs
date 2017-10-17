@@ -11,15 +11,15 @@ namespace Jal.Router.Model
 
             DataType = datatype;
 
-            Continue = new List<Route>();
+            NextRoutes = new List<Route>();
         }
         public string Name { get; set; }
 
         public Type DataType { get; set; }
 
-        public List<Route> Continue { get; set; }
+        public List<Route> NextRoutes { get; set; }
 
-        public Route Start { get; set; }
+        public Route StartingRoute { get; set; }
     }
 
     public class Saga<TData> : Saga

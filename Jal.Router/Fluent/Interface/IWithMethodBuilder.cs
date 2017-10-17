@@ -1,5 +1,6 @@
 ﻿using System;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Fluent.Interface
 {
@@ -7,7 +8,7 @@ namespace Jal.Router.Fluent.Interface
     {
         IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext> method);
+        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method);
     }
 
     public interface IWithMethodBuilder<out TBody, out THandler, out TData>
@@ -16,8 +17,8 @@ namespace Jal.Router.Fluent.Interface
 
         IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, TData> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext> method);
+        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, InboundMessageContext, TData> method);
+        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext, TData> method);
     }
 }

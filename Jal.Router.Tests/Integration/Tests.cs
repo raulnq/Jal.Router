@@ -7,11 +7,18 @@ using Common.Logging;
 using Jal.Finder.Atrribute;
 using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
+using Jal.Router.AzureServiceBus.Extensions;
+using Jal.Router.AzureServiceBus.Impl;
 using Jal.Router.AzureServiceBus.Installer;
 using Jal.Router.AzureStorage.Installer;
 using Jal.Router.Impl;
+using Jal.Router.Impl.Management;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
+using Jal.Router.Interface.Outbound;
+using Jal.Router.Logger.Extensions;
 using Jal.Router.Logger.Installer;
 using Jal.Router.Model;
 using Jal.Router.Tests.Impl;
@@ -25,13 +32,13 @@ namespace Jal.Router.Tests.Integration
     [TestFixture]
     public class Tests
     {
-        private IRouter<BrokeredMessage> _brokered;
+        private IRouter _brokered;
 
-        private ISagaRouter<BrokeredMessage> _sagabrokered;
+     
 
         private IBus _bus;
 
-        private IStarter _starter;
+        private IStartup _startup;
 
         [SetUp]
         public void SetUp()
@@ -46,23 +53,24 @@ namespace Jal.Router.Tests.Integration
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMessageHandler<Message1>)).ImplementedBy(typeof(Message1Handler)).Named(typeof(Message1Handler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
             container.Install(new AzureServiceBusRouterInstaller());
             //container.Install(new AzureStorageInstaller("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA=="));
             container.Install(new RouterLoggerInstaller());
             container.Register(Component.For(typeof (ILog)).Instance(LogManager.GetLogger("Cignium.Enigma.App")));
             _bus = container.Resolve<IBus>();
-            _brokered = container.Resolve<IRouter<BrokeredMessage>>();
-            _starter = container.Resolve<IStarter>();
+            _brokered = container.Resolve<IRouter>();
+            _startup = container.Resolve<IStartup>();
+            var config = container.Resolve<IConfiguration>();
+            config.UsingAzureServiceBus();
+            config.UsingCommonLogging();
             //_sagabrokered = container.Resolve<ISagaRouter<BrokeredMessage>>();
         }
 
         [Test]
         public void Validate_WithoutRuleName_Valid()
         {
-            var original = ServicePointManager.ServerCertificateValidationCallback;
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
             //_starter.Start();
 
@@ -70,22 +78,26 @@ namespace Jal.Router.Tests.Integration
             bm.Properties.Add("origin","AB");
             var message = new Message();
             //_bus.Send(message, new Options() {EndPointName = "retry"});
-            _bus.Send(message, new Options() { EndPointName = "error" });
-            //_brokered.Route<Message>(bm,"retry");
+            //_bus.Send(message, new Options() { EndPointName = "error" });
+            //_brokered.Route<Message, BrokeredMessage>(bm);
 
             //_brokered.Route<Message>(bm,"error");
 
             //_brokered.Route<Message>(bm);
 
-            //_sagabrokered.Route<Message>(bm, "saga");
+            //_brokered.RouteToSaga<Message, BrokeredMessage>(bm, "saga");
 
+            var bm1 = new BrokeredMessage(@"{""Name1"":""Raul""}");
+            bm1.Properties.Add("origin", "AB");
+
+            //_brokered.RouteToSaga<Message1, BrokeredMessage>(bm1, "saga");
             //_router.Route(message, new Response() {Status = "Hi"});
 
             _bus.Send(message, new Options() {Id = "Id"});
 
             //_bus.Retry(message, new InboundMessageContext(), new LinearRetryPolicy(10,5));
 
-            //_bus.Publish(message, new Options() { MessageId = "Id" });
+            _bus.Publish(message, new Options() { Id = "Id" });
         }
 
         //[Test]
