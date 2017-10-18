@@ -20,4 +20,6 @@ packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStor
 
 packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
 
+packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
+
 pause;
