@@ -58,7 +58,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
         {
             _route.RetryExtractorType = typeof(TExtractor);
 
@@ -72,7 +72,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
+        public IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
@@ -84,7 +84,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder Filter(Action<IFilterBuilder> action)
+        public IOnRouteOptionBuilder UsingFilter(Action<IFilterBuilder> action)
         {
             if (action == null)
             {
@@ -94,6 +94,18 @@ namespace Jal.Router.Fluent.Impl
             var builder = new FilterBuilder(_route);
 
             action(builder);
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder ForwardMessageTo(string endpointname)
+        {
+            if (string.IsNullOrWhiteSpace(endpointname))
+            {
+                throw new ArgumentNullException(nameof(endpointname));
+            }
+
+            _route.ForwardEndPoint = endpointname;
 
             return this;
         }
@@ -151,7 +163,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
         {
             _route.RetryExtractorType = typeof(TExtractor);
 
@@ -165,7 +177,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
+        public IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
@@ -177,9 +189,30 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnOptionBuilder Filter(Action<IFilterBuilder> action)
+        public IOnRouteOptionBuilder UsingFilter(Action<IFilterBuilder> action)
         {
-            throw new NotImplementedException();
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new FilterBuilder(_route);
+
+            action(builder);
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder ForwardMessageTo(string endpointname)
+        {
+            if (string.IsNullOrWhiteSpace(endpointname))
+            {
+                throw new ArgumentNullException(nameof(endpointname));
+            }
+
+            _route.ForwardEndPoint = endpointname;
+
+            return this;
         }
     }
 }

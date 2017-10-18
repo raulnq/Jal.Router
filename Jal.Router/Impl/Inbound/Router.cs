@@ -62,7 +62,7 @@ namespace Jal.Router.Impl.Inbound
 
                         var middlewares = new List<Type>(_configuration.FilterTypes);
 
-                        middlewares.AddRange(saga.StartingRoute.Filters);
+                        middlewares.AddRange(saga.StartingRoute.FilterTypes);
 
                         middlewares.Add(typeof(MessageExceptionHandler));
 
@@ -92,7 +92,7 @@ namespace Jal.Router.Impl.Inbound
 
                                 var middlewares = new List<Type>(_configuration.FilterTypes);
 
-                                middlewares.AddRange(route.Filters);
+                                middlewares.AddRange(route.FilterTypes);
 
                                 middlewares.Add(typeof(MessageExceptionHandler));
 
@@ -177,7 +177,7 @@ namespace Jal.Router.Impl.Inbound
 
                         var middlewares = new List<Type>(_configuration.FilterTypes);
 
-                        middlewares.AddRange(route.Filters);
+                        middlewares.AddRange(route.FilterTypes);
 
                         middlewares.Add(typeof(MessageExceptionHandler));
 

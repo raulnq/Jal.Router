@@ -55,7 +55,7 @@
     <Compile Include="Fluent\Interface\IFilterBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IOnOptionBuilder.cs" />
+    <Compile Include="Fluent\Interface\IOnRouteOptionBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRetryBuilder.cs" />

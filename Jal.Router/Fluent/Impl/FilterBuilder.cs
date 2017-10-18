@@ -14,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
 
         public void Add<TFilter>() where TFilter : IMiddleware
         {
-            _route.Filters.Add(typeof(TFilter));
+            _route.FilterTypes.Add(typeof(TFilter));
         }
     }
 }

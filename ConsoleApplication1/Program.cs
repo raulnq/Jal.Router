@@ -61,7 +61,7 @@ namespace ConsoleApplication1
             bm.Properties.Add("origin", "AB");
 
 
-            sagabrokered.RouteToSaga<Message, BrokeredMessage>(bm, "saga");
+            sagabrokered.Route<Message, BrokeredMessage>(bm);
 
             var bm1 = new BrokeredMessage(@"{""Name1"":""Raul Naupari""}");
             bm1.Properties.Add("origin", "ABC");

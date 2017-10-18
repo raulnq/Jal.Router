@@ -6,6 +6,11 @@ namespace Jal.Router.Impl.Inbound.Sagas
 {
     public abstract class AbstractStorage : IStorage
     {
+        public virtual void Create<TContent>(IndboundMessageContext<TContent> context, Route route)
+        {
+
+        }
+
         public virtual void Create<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
 

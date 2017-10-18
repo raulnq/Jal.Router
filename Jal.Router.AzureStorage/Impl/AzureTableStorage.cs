@@ -148,6 +148,36 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
+        public override void Create<TContent>(IndboundMessageContext<TContent> context, Route route)
+        {
+            try
+            {
+                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{route.BodyType.Name}";
+
+                var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+
+                var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
+                {
+                    Content = JsonConvert.SerializeObject(context.Content),
+                    ContentType = route.BodyType.FullName,
+                    Id = context.Id,
+                    Version = context.Version,
+                    RetryCount = context.RetryCount,
+                    LastRetry = context.LastRetry,
+                    Origin = JsonConvert.SerializeObject(context.Origin),
+                    Headers = JsonConvert.SerializeObject(context.Headers),
+                    DateTimeUtc = context.DateTimeUtc,
+                    Name = route.Name,
+                };
+
+                table.Execute(TableOperation.Insert(record));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the message record creation route {route.Name}", ex);
+            }
+        }
+
         private void UpdateSaga<TData>(SagaRecord record, TData data, string tablenamesufix)
         {
             try
