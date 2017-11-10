@@ -59,7 +59,7 @@ namespace Jal.Router.Impl.Inbound
                             {
                                 if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
                                 {
-                                    SendError(parameter.Route, context);
+                                    SendError(parameter.Route, context, ex);
                                 }
                                 else
                                 {
@@ -72,7 +72,7 @@ namespace Jal.Router.Impl.Inbound
                         {
                             if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
                             {
-                                SendError(parameter.Route, context);
+                                SendError(parameter.Route, context, ex);
                             }
                             else
                             {
@@ -84,7 +84,7 @@ namespace Jal.Router.Impl.Inbound
                     {
                         if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
                         {
-                            SendError(parameter.Route, context);
+                            SendError(parameter.Route, context, ex);
                         }
                         else
                         {
@@ -96,7 +96,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
                     {
-                        SendError(parameter.Route, context);
+                        SendError(parameter.Route, context, ex);
                     }
                     else
                     {
@@ -122,7 +122,7 @@ namespace Jal.Router.Impl.Inbound
             _bus.Send(context.Content, context.Origin, options);
         }
 
-        private void SendError<TContent>(Route route, IndboundMessageContext<TContent> context)
+        private void SendError<TContent>(Route route, IndboundMessageContext<TContent> context, Exception ex)
         {
             var options = new Options()
             {
@@ -132,7 +132,12 @@ namespace Jal.Router.Impl.Inbound
                 Version = context.Version,
                 Saga = context.Saga,
             };
-
+            if (ex != null)
+            {
+                options.Headers.Add("exceptionmessage", ex.Message);
+                options.Headers.Add("exceptionstacktrace", ex.StackTrace);
+            }
+                
             _bus.Send(context.Content, context.Origin, options);
 
 
