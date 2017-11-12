@@ -87,6 +87,12 @@
     <Compile Include="Impl\Outbound\EndPointProvider.cs" />
     <Compile Include="Impl\Inbound\ExponentialRetryPolicy.cs" />
     <Compile Include="Impl\Inbound\HandlerExecutor.cs" />
+    <Compile Include="Impl\Patterns\AbstractMessageHandler.cs" />
+    <Compile Include="Impl\Patterns\AbstractMessageHandlerWithData.cs" />
+    <Compile Include="Impl\Patterns\AbstractSplitterMessageHandlerWithData.cs" />
+    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandler.cs" />
+    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
+    <Compile Include="Impl\Patterns\AbstractSplitterMessageHandler.cs" />
     <Compile Include="Interface\IMessageBodySerializer.cs" />
     <Compile Include="Interface\Inbound\IMessageContextAdapter.cs" />
     <Compile Include="Interface\Inbound\IMessageRouter.cs" />
@@ -97,6 +103,8 @@
     <Compile Include="Impl\Management\Startup.cs" />
     <Compile Include="Impl\Management\ChannelStartupConfiguration.cs" />
     <Compile Include="Interface\IComponentFactory.cs" />
+    <Compile Include="Interface\Patterns\IMessageHandler.cs" />
+    <Compile Include="Interface\Patterns\IMessageHandlerWithData.cs" />
     <Compile Include="Interface\Management\IChannelManager.cs" />
     <Compile Include="Impl\Inbound\Sagas\NullStorage.cs" />
     <Compile Include="Interface\Management\IConfiguration.cs" />
