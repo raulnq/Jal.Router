@@ -13,29 +13,29 @@ namespace Jal.Router.Impl.Patterns
             _bus = bus;
         }
 
-        public abstract TSplittedMessage[] Split(TMessage message, TData data);
+        public abstract TSplittedMessage[] Split(TMessage message, MessageContext context, TData data);
 
         public override void Handle(TMessage message, MessageContext context, TData data)
         {
             try
             {
 
-                OnEntry(message, data);
+                OnEntry(message, context, data);
 
-                var messages = Split(message, data);
+                var messages = Split(message, context, data);
 
                 foreach (var m in messages)
                 {
-                    _bus.Send(m, CreateOptions(message, data));
+                    _bus.Send(m, CreateOptions(message, context, data));
                 }
             }
             catch (Exception ex)
             {
-                OnException(message, ex, data);
+                OnException(message, context, ex, data);
             }
             finally
             {
-                OnExit(message, data);
+                OnExit(message, context, data);
             }
         }
     }

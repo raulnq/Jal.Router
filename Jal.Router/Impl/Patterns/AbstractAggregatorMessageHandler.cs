@@ -13,34 +13,34 @@ namespace Jal.Router.Impl.Patterns
             _bus = bus;
         }
 
-        public abstract void Add(TMessage message);
+        public abstract void Add(TMessage message, MessageContext context);
 
-        public abstract bool IsCompleted(TMessage message);
+        public abstract bool IsCompleted(TMessage message, MessageContext context);
 
-        public abstract TAggregatedMessage CreateAgrgegatedMessage(TMessage message);
+        public abstract TAggregatedMessage CreateAgrgegatedMessage(TMessage message, MessageContext context);
 
         public override void Handle(TMessage message, MessageContext context)
         {
             try
             {
-                OnEntry(message);
+                OnEntry(message, context);
 
-                Add(message);
+                Add(message, context);
 
-                if (IsCompleted(message))
+                if (IsCompleted(message, context))
                 {
-                    var m = CreateAgrgegatedMessage(message);
+                    var m = CreateAgrgegatedMessage(message, context);
 
-                    _bus.Send(m, CreateOptions(message));
+                    _bus.Send(m, CreateOptions(message, context));
                 }
             }
             catch (Exception ex)
             {
-                OnException(message, ex);
+                OnException(message, context, ex);
             }
             finally
             {
-                OnExit(message);
+                OnExit(message, context);
             }
         }
     }

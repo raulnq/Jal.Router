@@ -41,7 +41,7 @@ namespace Jal.Router.Tests.Impl
             })
                 .OnExceptionRetryFailedMessageTo<ApplicationException>("retry")
                 .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(10, 5))
-                .OnErrorSendFailedMessageTo("error");
+                .OnErrorSendFailedMessageTo("error").ForwardMessageTo("");
                 //.UsingStorage<AzureTableStorage>()
                 //.UsingMessageChannel<AzureServiceBusQueue, AzureServiceBusTopic, AzureServiceBusManager>();
 

@@ -36,22 +36,22 @@ namespace Jal.Router.Impl.Patterns
 
         }
 
-        public virtual void OnEntry(TMessage message)
+        public virtual void OnEntry(TMessage message, MessageContext context)
         {
 
         }
 
-        public virtual void OnExit(TMessage message)
+        public virtual void OnExit(TMessage message, MessageContext context)
         {
 
         }
 
-        public virtual void OnException(TMessage message, Exception ex)
+        public virtual void OnException(TMessage message, MessageContext context, Exception ex)
         {
 
         }
 
-        public virtual Options CreateOptions(TMessage message)
+        public virtual Options CreateOptions(TMessage message, MessageContext context)
         {
             return new Options();
         }
