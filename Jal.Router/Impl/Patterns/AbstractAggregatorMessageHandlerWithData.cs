@@ -17,7 +17,7 @@ namespace Jal.Router.Impl.Patterns
 
         public abstract bool IsCompleted(TMessage message, MessageContext context, TData data);
 
-        public abstract TAggregatedMessage CreateAgrgegatedMessage(TMessage message, MessageContext context, TData data);
+        public abstract TAggregatedMessage CreateAggregatedMessage(TMessage message, MessageContext context, TData data);
 
 
         public override void Handle(TMessage message, MessageContext context, TData data)
@@ -30,7 +30,7 @@ namespace Jal.Router.Impl.Patterns
 
                 if (IsCompleted(message, context, data))
                 {
-                    var m = CreateAgrgegatedMessage(message, context, data);
+                    var m = CreateAggregatedMessage(message, context, data);
 
                     _bus.Send(m, CreateOptions(message, context, data));
                 }

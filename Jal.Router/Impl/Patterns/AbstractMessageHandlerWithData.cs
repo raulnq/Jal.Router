@@ -4,7 +4,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Patterns
 {
-    public abstract class AbstractMessageHandlerWithData<TMessage, TData> : AbstractMessageHandler<TMessage>
+    public abstract class AbstractMessageHandlerWithData<TMessage, TData> : AbstractMessageHandler<TMessage>, IMessageHandlerWithData<TMessage, TData>
     {
         public virtual void Handle(TMessage message, TData data)
         {

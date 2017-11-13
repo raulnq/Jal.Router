@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jal.Router.Model
 {
@@ -21,6 +22,11 @@ namespace Jal.Router.Model
             LastRetry = true;
             Origin = new Origin();
             Saga = new SagaSetting();
+        }
+
+        public Dictionary<string, string> CopyHeaders()
+        {
+            return Headers.ToDictionary(header => header.Key, header => header.Value);
         }
     }
 }
