@@ -47,7 +47,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 if (policy != null)
                 {
-                    if (parameter.Route.RetryExceptionType == ex.GetType())
+                    if (parameter.Route.RetryExceptionType == ex.GetType() || parameter.Route.RetryExceptionType == ex.InnerException?.GetType())
                     {
                         if (!context.LastRetry)
                         {
@@ -66,7 +66,6 @@ namespace Jal.Router.Impl.Inbound
                                     throw;
                                 }
                             }
-
                         }
                         else
                         {
@@ -136,6 +135,11 @@ namespace Jal.Router.Impl.Inbound
             {
                 options.Headers.Add("exceptionmessage", ex.Message);
                 options.Headers.Add("exceptionstacktrace", ex.StackTrace);
+                if (ex.InnerException!=null)
+                {
+                    options.Headers.Add("innerexceptionmessage", ex.InnerException.Message);
+                    options.Headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
+                }
             }
                 
             _bus.Send(context.Content, context.Origin, options);
