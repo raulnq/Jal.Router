@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
@@ -36,20 +37,22 @@ namespace Jal.Router.Impl.Inbound
 
             var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
 
-            var logger = _factory.Create<IRouterLogger>(_configuration.RouterLoggerType);
+            var loggers = _configuration.RouterLoggerTypes.Select(x => _factory.Create<IRouterLogger>(x)).ToArray();
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
             var context = metadataadapter.Create(message);
 
-            logger.OnEntry(context);
+            var contenttype = typeof(TContent);
+
+            context.ContentType = contenttype;
+
+            Array.ForEach(loggers, x => x.OnEntry(context));
 
             interceptor.OnEntry(context);
 
             try
             {
-                var contenttype = typeof(TContent);
-
                 var saga = _provider.Provide(saganame);
 
                 if (saga != null)
@@ -74,7 +77,7 @@ namespace Jal.Router.Impl.Inbound
 
                         pipeline.Excute();
 
-                        logger.OnSuccess(context, content);
+                        Array.ForEach(loggers, x => x.OnSuccess(context, content));
 
                         interceptor.OnSuccess(context, content);
                     }
@@ -105,7 +108,7 @@ namespace Jal.Router.Impl.Inbound
                                 pipeline.Excute();
                             }
 
-                            logger.OnSuccess(context, content);
+                            Array.ForEach(loggers, x => x.OnSuccess(context, content));
 
                             interceptor.OnSuccess(context, content);
                         }
@@ -125,7 +128,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 var inner = ex.InnerException ?? ex;
 
-                logger.OnException(context, inner);
+                Array.ForEach(loggers, x => x.OnException(context, inner));
 
                 interceptor.OnException(context, inner);
 
@@ -135,7 +138,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 stopwatch.Stop();
 
-                logger.OnExit(context, stopwatch.ElapsedMilliseconds);
+                Array.ForEach(loggers, x => x.OnExit(context, stopwatch.ElapsedMilliseconds));
 
                 interceptor.OnExit(context);
             }
@@ -149,7 +152,7 @@ namespace Jal.Router.Impl.Inbound
 
             var bodyadapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
 
-            var logger = _factory.Create<IRouterLogger>(_configuration.RouterLoggerType);
+            var loggers = _configuration.RouterLoggerTypes.Select(x => _factory.Create<IRouterLogger>(x)).ToArray();
 
             var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
 
@@ -157,14 +160,16 @@ namespace Jal.Router.Impl.Inbound
 
             var context = metadataadapter.Create(message);
 
-            logger.OnEntry(context);
+            var contenttype = typeof(TContent);
+
+            context.ContentType = contenttype;
+
+            Array.ForEach(loggers, x => x.OnEntry(context));
 
             interceptor.OnEntry(context);
 
             try
             {
-                var contenttype = typeof(TContent);
-
                 var routes = _provider.Provide(contenttype, routename);
 
                 var content = bodyadapter.Read<TContent, TMessage>(message);
@@ -190,7 +195,7 @@ namespace Jal.Router.Impl.Inbound
                         pipeline.Excute();
                     }
 
-                    logger.OnSuccess(context, content);
+                    Array.ForEach(loggers, x => x.OnSuccess(context, content));
 
                     interceptor.OnSuccess(context, content);
                 }
@@ -203,7 +208,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 var inner = ex.InnerException ?? ex;
 
-                logger.OnException(context, inner);
+                Array.ForEach(loggers, x => x.OnException(context, inner));
 
                 interceptor.OnException(context, inner);
 
@@ -213,7 +218,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 stopwatch.Stop();
 
-                logger.OnExit(context, stopwatch.ElapsedMilliseconds);
+                Array.ForEach(loggers, x => x.OnExit(context, stopwatch.ElapsedMilliseconds));
 
                 interceptor.OnExit(context);
             }

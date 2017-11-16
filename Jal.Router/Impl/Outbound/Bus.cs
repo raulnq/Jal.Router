@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -31,11 +33,11 @@ namespace Jal.Router.Impl.Outbound
 
             var channel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
 
-            var logger = _factory.Create<IBusLogger>(_configuration.BusLoggerType);
+            var loggers = _configuration.BusLoggerTypes.Select(x => _factory.Create<IBusLogger>(x)).ToArray();
 
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
-            logger.OnSendEntry(message, options);
+            Array.ForEach(loggers, x => x.OnSendEntry(message, options));
 
             interceptor.OnSendEntry(message, options);
 
@@ -45,14 +47,14 @@ namespace Jal.Router.Impl.Outbound
                 {
                     channel.Send(message);
 
-                    logger.OnSendSuccess(message, options);
+                    Array.ForEach(loggers, x => x.OnSendSuccess(message, options));
 
                     interceptor.OnSendSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                logger.OnSendError(message, options, ex);
+                Array.ForEach(loggers, x => x.OnSendError(message, options, ex));
 
                 interceptor.OnSendError(message, options, ex);
 
@@ -62,7 +64,7 @@ namespace Jal.Router.Impl.Outbound
             {
                 stopwatch.Stop();
 
-                logger.OnSendExit(message, options, stopwatch.ElapsedMilliseconds);
+                Array.ForEach(loggers, x => x.OnSendExit(message, options, stopwatch.ElapsedMilliseconds));
 
                 interceptor.OnSendExit(message, options);
             }
@@ -81,7 +83,8 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga
+                Saga = options.Saga,
+                ContentType = typeof(TContent)
             };
 
             Send(message, options);
@@ -171,7 +174,8 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga
+                Saga = options.Saga,
+                ContentType = typeof(TContent)
             };
 
             Publish(message, options);
@@ -185,11 +189,11 @@ namespace Jal.Router.Impl.Outbound
 
             var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 
-            var logger = _factory.Create<IBusLogger>(_configuration.BusLoggerType);
+            var loggers = _configuration.BusLoggerTypes.Select(x => _factory.Create<IBusLogger>(x)).ToArray();
 
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
-            logger.OnPublishEntry(message, options);
+            Array.ForEach(loggers, x => x.OnPublishEntry(message, options));
 
             interceptor.OnPublishEntry(message, options);
 
@@ -199,14 +203,14 @@ namespace Jal.Router.Impl.Outbound
                 {
                     channel.Send(message);
 
-                    logger.OnPublishSuccess(message, options);
+                    Array.ForEach(loggers, x => x.OnPublishSuccess(message, options));
 
                     interceptor.OnPublishSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                logger.OnPublishError(message, options, ex);
+                Array.ForEach(loggers, x => x.OnPublishError(message, options, ex));
 
                 interceptor.OnPublishError(message, options, ex);
 
@@ -216,7 +220,7 @@ namespace Jal.Router.Impl.Outbound
             {
                 stopwatch.Stop();
 
-                logger.OnPublishExit(message, options, stopwatch.ElapsedMilliseconds);
+                Array.ForEach(loggers, x => x.OnPublishExit(message, options, stopwatch.ElapsedMilliseconds));
 
                 interceptor.OnPublishExit(message, options);
             }
@@ -235,7 +239,8 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga
+                Saga = options.Saga,
+                ContentType = typeof(TContent)
             };
 
             message.Origin.Key = string.Empty;

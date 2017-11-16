@@ -14,9 +14,9 @@ namespace Jal.Router.Interface.Management
         Type StorageType { get;  }
         Type MessageBodyAdapterType { get; }
         Type MessageMetadataAdapterType { get; }
-        Type RouterLoggerType { get; }
+        IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; }
-        Type BusLoggerType { get; }
+        IList<Type> BusLoggerTypes { get; }
         Type BusInterceptorType { get; }
         Type MessageBodySerializerType { get; }
         IList<Type> MiddlewareTypes { get; }
@@ -24,12 +24,12 @@ namespace Jal.Router.Interface.Management
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
         void UsingMessageBodyAdapter<TMessageAdapter>() where TMessageAdapter : IMessageBodyAdapter;
-        void UsingRouterLogger<TRouterLogger>() where TRouterLogger : IRouterLogger;
+        void AddRouterLogger<TRouterLogger>() where TRouterLogger : IRouterLogger;
         void UsingStorage<TStorage>() where TStorage : IStorage;
         void AddMiddleware<TMiddleware>() where TMiddleware : IMiddleware;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        void UsingBusLogger<TBusLogger>() where TBusLogger : IBusLogger;
+        void AddBusLogger<TBusLogger>() where TBusLogger : IBusLogger;
         void UsingMessageBodySerializer<TSerializer>() where TSerializer : IMessageBodySerializer;
         void UsingMessageMetadataAdapter<TMessageContextAdapter>() where TMessageContextAdapter : IMessageMetadataAdapter;
     }

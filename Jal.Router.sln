@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "Cons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureStorage.LightInject.Installer", "Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj", "{30C19278-D519-4C95-BF1F-8BC59EDE44EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.ApplicationInsights", "Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj", "{96ABC8C4-06F2-4799-9946-E6C51EA51182}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96ABC8C4-06F2-4799-9946-E6C51EA51182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96ABC8C4-06F2-4799-9946-E6C51EA51182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96ABC8C4-06F2-4799-9946-E6C51EA51182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96ABC8C4-06F2-4799-9946-E6C51EA51182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

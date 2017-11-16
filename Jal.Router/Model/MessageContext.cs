@@ -15,6 +15,7 @@ namespace Jal.Router.Model
         public DateTime DateTimeUtc { get; set; }
         public SagaSetting Saga { get; set; }
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+        public Type ContentType { get; set; }
         public MessageContext()
         {
             Headers = new Dictionary<string, string>();

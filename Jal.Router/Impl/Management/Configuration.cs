@@ -18,9 +18,9 @@ namespace Jal.Router.Impl.Management
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
         public Type MessageBodyAdapterType { get; private set; }
-        public Type RouterLoggerType { get; private set; }
+        public IList<Type> RouterLoggerTypes { get; private set; }
         public Type RouterInterceptorType { get; private set; }
-        public Type BusLoggerType { get; private set; }
+        public IList<Type> BusLoggerTypes { get; private set; }
         public Type BusInterceptorType { get; private set; }
         public IList<Type> MiddlewareTypes { get; private set; }
         public Type MessageMetadataAdapterType { get; private set; }
@@ -54,9 +54,9 @@ namespace Jal.Router.Impl.Management
             MessageBodyAdapterType = typeof (TMessageAdapter);
         }
 
-        public void UsingRouterLogger<TRouterLogger>() where TRouterLogger : IRouterLogger
+        public void AddRouterLogger<TRouterLogger>() where TRouterLogger : IRouterLogger
         {
-            RouterLoggerType = typeof(TRouterLogger);
+            RouterLoggerTypes.Add(typeof(TRouterLogger));
         }
         public void UsingStorage<TStorage>() where TStorage : IStorage
         {
@@ -76,16 +76,14 @@ namespace Jal.Router.Impl.Management
         {
             BusInterceptorType = typeof(TBusInterceptor);
         }
-        public void UsingBusLogger<TBusLogger>() where TBusLogger : IBusLogger
+        public void AddBusLogger<TBusLogger>() where TBusLogger : IBusLogger
         {
-            BusLoggerType = typeof(TBusLogger);
+            BusLoggerTypes.Add(typeof(TBusLogger));
         }
         public Configuration()
         {
-            UsingRouterLogger<NullRouterLogger>();
             UsingRouterInterceptor<NullRouterInterceptor>();
             UsingBusInterceptor<NullBusInterceptor>();
-            UsingBusLogger<NullBusLogger>();
             UsingStorage<NullStorage>();
             UsingChannelManager<NullChannelManager>();
             UsingPointToPointChannel<NullPointToPointChannel>();
@@ -94,6 +92,8 @@ namespace Jal.Router.Impl.Management
             UsingMessageBodyAdapter<NullMessageBodyAdapter>();
             UsingMessageMetadataAdapter<NullMessageMetadataAdapter>();
             MiddlewareTypes = new List<Type>();
+            BusLoggerTypes = new List<Type>();
+            RouterLoggerTypes = new List<Type>();
         }
     }
 }
