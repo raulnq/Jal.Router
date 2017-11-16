@@ -7,8 +7,8 @@
     <ProjectGuid>{96ABC8C4-06F2-4799-9946-E6C51EA51182}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Jal.Router.Logger</RootNamespace>
-    <AssemblyName>Jal.Router.Logger</AssemblyName>
+    <RootNamespace>Jal.Router.ApplicationInsights</RootNamespace>
+    <AssemblyName>Jal.Router.ApplicationInsights</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

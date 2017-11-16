@@ -1,7 +1,7 @@
+using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface.Management;
-using Jal.Router.Logger.Impl;
 
-namespace Jal.Router.Logger.Extensions
+namespace Jal.Router.ApplicationInsights.Extensions
 {
     public static class ConfigurationExtensions
     {

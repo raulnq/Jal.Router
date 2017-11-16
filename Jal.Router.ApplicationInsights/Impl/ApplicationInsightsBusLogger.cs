@@ -6,7 +6,7 @@ using Jal.Router.Model.Outbount;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Jal.Router.Logger.Impl
+namespace Jal.Router.ApplicationInsights.Impl
 {
     public class ApplicationInsightsBusLogger : AbstractBusLogger
     {
