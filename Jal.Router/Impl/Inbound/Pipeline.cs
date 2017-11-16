@@ -9,7 +9,7 @@ namespace Jal.Router.Impl.Inbound
     {
         private readonly IComponentFactory _factory;
 
-        private readonly Type[] _filters;  
+        private readonly Type[] _middlewares;  
 
         private int _current;
 
@@ -17,10 +17,10 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly MiddlewareParameter _parameter;
 
-        public Pipeline(IComponentFactory factory, Type[] filters, IndboundMessageContext<TContent> context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory, Type[] middlewares, IndboundMessageContext<TContent> context, MiddlewareParameter parameter)
         {
             _factory = factory;
-            _filters = filters;
+            _middlewares = middlewares;
             _current = 0;
             _parameter = parameter;
             _context = context;
@@ -35,11 +35,11 @@ namespace Jal.Router.Impl.Inbound
         {
             return () =>
             {
-                if (_current < _filters.Length)
+                if (_current < _middlewares.Length)
                 {
-                    var filter = _factory.Create<IMiddleware>(_filters[_current]);
+                    var middleware = _factory.Create<IMiddleware>(_middlewares[_current]);
                     _current++;
-                    filter.Execute(_context, GetNext(), _parameter);
+                    middleware.Execute(_context, GetNext(), _parameter);
                 }
             };
         }

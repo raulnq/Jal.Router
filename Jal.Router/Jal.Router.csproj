@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fluent\Impl\FilterBuilder.cs" />
+    <Compile Include="Fluent\Impl\MiddlewareBuilder.cs" />
     <Compile Include="Fluent\Impl\NextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\NextRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
@@ -52,7 +52,7 @@
     <Compile Include="Fluent\Impl\StartingRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IFilterBuilder.cs" />
+    <Compile Include="Fluent\Interface\IMiddlewareBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRouteOptionBuilder.cs" />
@@ -68,6 +68,7 @@
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\AbstractMessageBodyAdapter.cs" />
     <Compile Include="Impl\AbstractMessageMetadataAdapter.cs" />
+    <Compile Include="Impl\Inbound\BasicAuthenticationHandler.cs" />
     <Compile Include="Impl\Inbound\MessageRouter.cs" />
     <Compile Include="Impl\Inbound\MessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\NextMessageHandler.cs" />

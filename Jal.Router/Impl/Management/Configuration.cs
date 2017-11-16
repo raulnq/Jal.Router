@@ -22,7 +22,7 @@ namespace Jal.Router.Impl.Management
         public Type RouterInterceptorType { get; private set; }
         public Type BusLoggerType { get; private set; }
         public Type BusInterceptorType { get; private set; }
-        public IList<Type> FilterTypes { get; private set; }
+        public IList<Type> MiddlewareTypes { get; private set; }
         public Type MessageMetadataAdapterType { get; private set; }
         public Type MessageBodySerializerType { get; private set; }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
@@ -65,7 +65,7 @@ namespace Jal.Router.Impl.Management
 
         public void AddMiddleware<TMiddleware>() where TMiddleware : IMiddleware
         {
-            FilterTypes.Add(typeof(TMiddleware));
+            MiddlewareTypes.Add(typeof(TMiddleware));
         }
 
         public void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
@@ -93,7 +93,7 @@ namespace Jal.Router.Impl.Management
             UsingMessageBodySerializer<NullMessageBodySerializer>();
             UsingMessageBodyAdapter<NullMessageBodyAdapter>();
             UsingMessageMetadataAdapter<NullMessageMetadataAdapter>();
-            FilterTypes = new List<Type>();
+            MiddlewareTypes = new List<Type>();
         }
     }
 }

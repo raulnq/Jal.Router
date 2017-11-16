@@ -12,7 +12,7 @@ namespace Jal.Router.Model
             BodyType = bodytype;
             ConsumerInterfaceType = consumerinterfacetype;
             Name = name;
-            FilterTypes = new List<Type>();
+            MiddlewareTypes = new List<Type>();
         }
         public Type ConsumerInterfaceType { get; set; }
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Model
 
         public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
 
-        public IList<Type> FilterTypes { get; set; }
+        public IList<Type> MiddlewareTypes { get; set; }
 
         public string ForwardEndPoint { get; set; }
     }

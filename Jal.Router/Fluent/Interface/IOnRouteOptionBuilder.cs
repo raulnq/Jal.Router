@@ -6,7 +6,7 @@ namespace Jal.Router.Fluent.Interface
     public interface IOnRouteOptionBuilder
     {
         IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname);
-        IOnRouteOptionBuilder UsingFilter(Action<IFilterBuilder> action);
+        IOnRouteOptionBuilder UsingMiddleware(Action<IMiddlewareBuilder> action);
         IOnRouteOptionBuilder ForwardMessageTo(string endpointname);
     }
 

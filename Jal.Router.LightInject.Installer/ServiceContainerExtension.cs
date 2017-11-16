@@ -64,6 +64,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddleware, MessageHandler>(typeof(MessageHandler).FullName,new PerContainerLifetime());
 
+            container.Register<IMiddleware, AppSettingsBasicAuthenticationHandler>(typeof(AppSettingsBasicAuthenticationHandler).FullName, new PerContainerLifetime());
+
             container.Register<IMiddleware, MessageExceptionHandler>(typeof(MessageExceptionHandler).FullName,new PerContainerLifetime());
 
             container.Register<IMiddleware, StartingMessageHandler>(typeof(StartingMessageHandler).FullName, new PerContainerLifetime());

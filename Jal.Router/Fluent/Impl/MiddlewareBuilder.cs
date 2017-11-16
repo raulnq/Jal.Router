@@ -4,17 +4,17 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class FilterBuilder : IFilterBuilder
+    public class MiddlewareBuilder : IMiddlewareBuilder
     {
         private readonly Route _route;
-        public FilterBuilder(Route route)
+        public MiddlewareBuilder(Route route)
         {
             _route = route;
         }
 
-        public void Add<TFilter>() where TFilter : IMiddleware
+        public void Add<TMiddleware>() where TMiddleware : IMiddleware
         {
-            _route.FilterTypes.Add(typeof(TFilter));
+            _route.MiddlewareTypes.Add(typeof(TMiddleware));
         }
     }
 }

@@ -72,6 +72,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
 
+            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(AppSettingsBasicAuthenticationHandler)).Named(typeof(AppSettingsBasicAuthenticationHandler).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageExceptionHandler)).Named(typeof(MessageExceptionHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(StartingMessageHandler)).Named(typeof(StartingMessageHandler).FullName).LifestyleSingleton());

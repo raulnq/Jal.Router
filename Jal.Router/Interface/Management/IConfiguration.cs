@@ -19,7 +19,7 @@ namespace Jal.Router.Interface.Management
         Type BusLoggerType { get; }
         Type BusInterceptorType { get; }
         Type MessageBodySerializerType { get; }
-        IList<Type> FilterTypes { get; }
+        IList<Type> MiddlewareTypes { get; }
         void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;

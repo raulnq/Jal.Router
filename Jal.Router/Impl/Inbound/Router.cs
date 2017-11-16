@@ -60,11 +60,11 @@ namespace Jal.Router.Impl.Inbound
 
                         var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
 
-                        var middlewares = new List<Type>(_configuration.FilterTypes);
+                        var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
-                        middlewares.AddRange(saga.StartingRoute.FilterTypes);
+                        middlewares.AddRange(_configuration.MiddlewareTypes);
 
-                        middlewares.Add(typeof(MessageExceptionHandler));
+                        middlewares.AddRange(saga.StartingRoute.MiddlewareTypes);
 
                         middlewares.Add(typeof(StartingMessageHandler));
 
@@ -90,11 +90,11 @@ namespace Jal.Router.Impl.Inbound
                             {
                                 var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
 
-                                var middlewares = new List<Type>(_configuration.FilterTypes);
+                                var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
-                                middlewares.AddRange(route.FilterTypes);
+                                middlewares.AddRange(_configuration.MiddlewareTypes);
 
-                                middlewares.Add(typeof(MessageExceptionHandler));
+                                middlewares.AddRange(route.MiddlewareTypes);
 
                                 middlewares.Add(typeof(NextMessageHandler));
 
@@ -175,11 +175,11 @@ namespace Jal.Router.Impl.Inbound
                     {
                         var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
 
-                        var middlewares = new List<Type>(_configuration.FilterTypes);
+                        var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
-                        middlewares.AddRange(route.FilterTypes);
+                        middlewares.AddRange(_configuration.MiddlewareTypes);
 
-                        middlewares.Add(typeof(MessageExceptionHandler));
+                        middlewares.AddRange(route.MiddlewareTypes);
 
                         middlewares.Add(typeof(MessageHandler));
 
