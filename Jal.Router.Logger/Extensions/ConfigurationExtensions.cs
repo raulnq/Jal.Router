@@ -1,5 +1,6 @@
 using Jal.Router.Interface.Management;
 using Jal.Router.Logger.Impl;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Logger.Extensions
 {
@@ -10,6 +11,8 @@ namespace Jal.Router.Logger.Extensions
             configuration.AddOutboundMiddleware<BusLogger>();
 
             configuration.AddInboundMiddleware<RouterLogger>();
+
+            configuration.AddLogger<HeartBeatLogger, HeartBeat>();
         }
     }
 }

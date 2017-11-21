@@ -121,6 +121,7 @@ namespace Jal.Router.Impl.Management
             StartupTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
+            AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
         }
     }
 }
