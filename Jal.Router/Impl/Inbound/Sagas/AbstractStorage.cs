@@ -6,22 +6,22 @@ namespace Jal.Router.Impl.Inbound.Sagas
 {
     public abstract class AbstractStorage : IStorage
     {
-        public virtual void Create<TContent>(IndboundMessageContext<TContent> context, Route route)
+        public virtual void Create<TContent>(InboundMessageContext<TContent> context, Route route)
         {
 
         }
 
-        public virtual void Create<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
+        public virtual void Create<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
 
         }
 
-        public virtual void Update<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
+        public virtual void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
 
         }
 
-        public virtual TData Find<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route) where TData : class, new()
+        public virtual TData Find<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route) where TData : class, new()
         {
             return default(TData);
         }

@@ -13,11 +13,11 @@ namespace Jal.Router.Impl.Inbound
 
         private int _current;
 
-        private readonly IndboundMessageContext<TContent> _context;
+        private readonly InboundMessageContext<TContent> _context;
 
         private readonly MiddlewareParameter _parameter;
 
-        public Pipeline(IComponentFactory factory, Type[] middlewares, IndboundMessageContext<TContent> context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory, Type[] middlewares, InboundMessageContext<TContent> context, MiddlewareParameter parameter)
         {
             _factory = factory;
             _middlewares = middlewares;

@@ -7,7 +7,7 @@ namespace Jal.Router.Interface.Inbound
     {
         void OnEntry(MessageContext context);
 
-        void OnSuccess<TContent>(MessageContext context, TContent content);
+        void OnSuccess(MessageContext context);
 
         void OnExit(MessageContext context);
 

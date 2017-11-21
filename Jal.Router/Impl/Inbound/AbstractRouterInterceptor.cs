@@ -11,7 +11,7 @@ namespace Jal.Router.Impl.Inbound
 
         }
 
-        public virtual void OnSuccess<TContent>(MessageContext context, TContent content)
+        public virtual void OnSuccess(MessageContext context)
         {
 
         }

@@ -26,17 +26,11 @@ namespace Jal.Router.Impl.Inbound
 
         public void RouteToSaga<TContent, TMessage>(TMessage message, string saganame, string routename = "")
         {
-            var bodyadapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
-
-            var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
+            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = metadataadapter.Create(message);
-
-            var contenttype = typeof(TContent);
-
-            context.ContentType = contenttype;
+            var context = adapter.Read<TContent, TMessage>(message);
 
             interceptor.OnEntry(context);
 
@@ -46,12 +40,8 @@ namespace Jal.Router.Impl.Inbound
 
                 if (saga != null)
                 {
-                    if (saga.StartingRoute != null && saga.StartingRoute.BodyType == contenttype)
+                    if (saga.StartingRoute != null && saga.StartingRoute.BodyType == context.ContentType)
                     {
-                        var content = bodyadapter.Read<TContent, TMessage>(message);
-
-                        var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
-
                         var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
                         middlewares.AddRange(_configuration.InboundMiddlewareTypes);
@@ -62,24 +52,20 @@ namespace Jal.Router.Impl.Inbound
 
                         var parameter = new MiddlewareParameter() { Route = saga.StartingRoute, Saga = saga};
 
-                        var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
+                        var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                         pipeline.Execute();
 
-                        interceptor.OnSuccess(context, content);
+                        interceptor.OnSuccess(context);
                     }
                     else
                     {
-                        var routes = _provider.Provide(saga.NextRoutes.ToArray(), contenttype, routename);
+                        var routes = _provider.Provide(saga.NextRoutes.ToArray(), context.ContentType, routename);
 
                         if (routes != null && routes.Length > 0)
                         {
-                            var content = bodyadapter.Read<TContent, TMessage>(message);
-
                             foreach (var route in routes)
                             {
-                                var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
-
                                 var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
                                 middlewares.AddRange(_configuration.InboundMiddlewareTypes);
@@ -90,22 +76,22 @@ namespace Jal.Router.Impl.Inbound
 
                                 var parameter = new MiddlewareParameter() { Route = route, Saga = saga};
 
-                                var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
+                                var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                                 pipeline.Execute();
                             }
 
-                            interceptor.OnSuccess(context, content);
+                            interceptor.OnSuccess(context);
                         }
                         else
                         {
-                            throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and route name {routename}");
+                            throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {context.ContentType.FullName} and route name {routename}");
                         }
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"No saga to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and saga name {saganame}");
+                    throw new ApplicationException($"No saga to handle the message {typeof(TMessage).FullName} with content {context.ContentType.FullName}  and saga name {saganame}");
                 }
 
             }
@@ -123,32 +109,22 @@ namespace Jal.Router.Impl.Inbound
 
         public void Route<TContent, TMessage>(TMessage message, string routename = "")
         {
-            var bodyadapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
-
-            var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
+            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = metadataadapter.Create(message);
-
-            var contenttype = typeof(TContent);
-
-            context.ContentType = contenttype;
+            var context = adapter.Read<TContent, TMessage>(message);
 
             interceptor.OnEntry(context);
 
             try
             {
-                var routes = _provider.Provide(contenttype, routename);
-
-                var content = bodyadapter.Read<TContent, TMessage>(message);
+                var routes = _provider.Provide(context.ContentType, routename);
 
                 if (routes != null && routes.Length > 0)
                 {
                     foreach (var route in routes)
                     {
-                        var contextpluscontent = new IndboundMessageContext<TContent>(context, content);
-
                         var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
                         middlewares.AddRange(_configuration.InboundMiddlewareTypes);
@@ -159,16 +135,16 @@ namespace Jal.Router.Impl.Inbound
 
                         var parameter = new MiddlewareParameter() {Route = route};
 
-                        var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
+                        var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                         pipeline.Execute();
                     }
 
-                    interceptor.OnSuccess(context, content);
+                    interceptor.OnSuccess(context);
                 }
                 else
                 {
-                    throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {contenttype.FullName} and route name {routename}");
+                    throw new ApplicationException($"No route to handle the message {typeof(TMessage).FullName} with content {context.ContentType.FullName} and route name {routename}");
                 }
             }
             catch (Exception ex)

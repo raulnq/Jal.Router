@@ -6,7 +6,7 @@ namespace Jal.Router.Impl.Inbound
 {
     public class RouteMethodSelector : IRouteMethodSelector
     {
-        public bool Select<TContent, THandler>(IndboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
+        public bool Select<TContent, THandler>(InboundMessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
         {
             if (routemethod.EvaluatorWithContext == null)
             {

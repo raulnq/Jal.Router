@@ -17,8 +17,7 @@ namespace Jal.Router.Interface.Management
         Type PointToPointChannelType { get; }
         Type PublishSubscribeChannelType { get; }
         Type StorageType { get;  }
-        Type MessageBodyAdapterType { get; }
-        Type MessageMetadataAdapterType { get; }
+        Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; }
         Type BusInterceptorType { get; }
@@ -28,14 +27,13 @@ namespace Jal.Router.Interface.Management
         void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
-        void UsingMessageBodyAdapter<TMessageAdapter>() where TMessageAdapter : IMessageBodyAdapter;
+        void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         void UsingStorage<TStorage>() where TStorage : IStorage;
         void AddInboundMiddleware<TMiddleware>() where TMiddleware : Inbound.IMiddleware;
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         void UsingMessageBodySerializer<TSerializer>() where TSerializer : IMessageBodySerializer;
-        void UsingMessageMetadataAdapter<TMessageContextAdapter>() where TMessageContextAdapter : IMessageMetadataAdapter;
         void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
         void AdStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;

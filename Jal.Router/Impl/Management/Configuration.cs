@@ -22,21 +22,20 @@ namespace Jal.Router.Impl.Management
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
-        public Type MessageBodyAdapterType { get; private set; }
+        public Type MessageAdapterType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; private set; }
         public Type RouterInterceptorType { get; private set; }
         public Type BusInterceptorType { get; private set; }
         public IList<Type> InboundMiddlewareTypes { get; private set; }
         public IList<Type> OutboundMiddlewareTypes { get; private set; }
-        public Type MessageMetadataAdapterType { get; private set; }
         public Type MessageBodySerializerType { get; private set; }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
         {
             PublishSubscribeChannelType = typeof(TPublishSubscribeChannel);
         }
-        public void UsingMessageMetadataAdapter<TMessageContextAdapter>() where TMessageContextAdapter : IMessageMetadataAdapter
+        public void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter
         {
-            MessageMetadataAdapterType = typeof(TMessageContextAdapter);
+            MessageAdapterType = typeof(TMessageAdapter);
         }
 
         public void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
@@ -54,22 +53,17 @@ namespace Jal.Router.Impl.Management
             MessageBodySerializerType = typeof(TMessageBodySerializer);
         }
 
-        public void UsingMessageBodyAdapter<TMessageAdapter>() where TMessageAdapter : IMessageBodyAdapter
-        {
-            MessageBodyAdapterType = typeof (TMessageAdapter);
-        }
-
         public void UsingStorage<TStorage>() where TStorage : IStorage
         {
             StorageType = typeof(TStorage);
         }
 
-        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : Jal.Router.Interface.Inbound.IMiddleware
+        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : Interface.Inbound.IMiddleware
         {
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
         }
 
-        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Jal.Router.Interface.Outbound.IMiddleware
+        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Interface.Outbound.IMiddleware
         {
             OutboundMiddlewareTypes.Add(typeof(TMiddleware));
         }
@@ -113,8 +107,7 @@ namespace Jal.Router.Impl.Management
             UsingPointToPointChannel<NullPointToPointChannel>();
             UsingPublishSubscribeChannel<NullPublishSubscribeChannel>();
             UsingMessageBodySerializer<NullMessageBodySerializer>();
-            UsingMessageBodyAdapter<NullMessageBodyAdapter>();
-            UsingMessageMetadataAdapter<NullMessageMetadataAdapter>();
+            UsingMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
             MonitoringTaskTypes = new List<MonitoringTaskMetadata>();

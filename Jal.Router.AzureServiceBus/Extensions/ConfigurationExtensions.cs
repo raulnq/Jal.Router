@@ -13,9 +13,7 @@ namespace Jal.Router.AzureServiceBus.Extensions
 
             configuration.UsingChannelManager<AzureServiceBusManager>();
 
-            configuration.UsingMessageBodyAdapter<BrokeredMessageBodyAdapter>();
-
-            configuration.UsingMessageMetadataAdapter<BrokeredMessageMetadataAdapter>();
+            configuration.UsingMessageAdapter<BrokeredMessageAdapter>();
 
             configuration.UsingMessageBodySerializer<JsonMessageBodySerializer>();
         }

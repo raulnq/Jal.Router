@@ -27,7 +27,8 @@ namespace Jal.Router.ApplicationInsights.Impl
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
                 Target = context.ToPath,
-                Type = parameter.OutboundType,
+                Data = context.Body,
+                Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
                 Properties =
                 {
                     new KeyValuePair<string, string>("from", context.Origin.Name),
@@ -40,9 +41,9 @@ namespace Jal.Router.ApplicationInsights.Impl
                     new KeyValuePair<string, double>("retry", context.RetryCount)
                 }
             };
-
+            
             telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-
+            telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
             foreach (var h in context.Headers)
             {
                 telemetry.Properties.Add(h.Key, h.Value);
@@ -59,8 +60,8 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.ResultCode = "500";
 
                 var telemetryexception = new ExceptionTelemetry(exception);
-                telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-
+                telemetryexception.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
+                telemetryexception.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
                 _client.TrackException(telemetryexception);
 
                 throw;

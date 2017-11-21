@@ -18,15 +18,13 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public abstract void Send<TContent>(OutboundMessageContext<TContent> context, IMessageBodyAdapter messageadapter, IMessageMetadataAdapter messagecontextadapter);
+        public abstract void Send<TContent>(OutboundMessageContext<TContent> context, IMessageAdapter adapter);
 
         public void Send<TContent>(OutboundMessageContext<TContent> context)
         {
-            var adapter = Factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
+            var adapter = Factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
-            var contextadapter = Factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
-
-            Send(context, adapter, contextadapter);
+            Send(context, adapter);
         }
     }
 }

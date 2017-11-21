@@ -24,7 +24,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(IndboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var routemethod = typeof(NextMessageHandler).GetMethods().First(x => x.Name == nameof(NextMessageHandler.Continue));
 
@@ -35,7 +35,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             next();
         }
 
-        public void Continue<TContent, TData>(Saga<TData> saga, IndboundMessageContext<TContent> context, Route route) where TData : class, new()
+        public void Continue<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route) where TData : class, new()
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 

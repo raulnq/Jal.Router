@@ -22,7 +22,7 @@ namespace Jal.Router.Impl.Inbound
             _executor = executor;
         }
 
-        public void Route<TContent>(IndboundMessageContext<TContent> context, Route route)
+        public void Route<TContent>(InboundMessageContext<TContent> context, Route route)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Route<TContent, TData>(IndboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
+        public void Route<TContent, TData>(InboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
             try
             {
@@ -56,7 +56,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler>(IndboundMessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class
+        public void Execute<TContent, THandler>(InboundMessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class
         {
             if (Can(context, route))
             {
@@ -75,7 +75,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler, TData>(IndboundMessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
+        public void Execute<TContent, THandler, TData>(InboundMessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
             if (Can(context, route))
@@ -95,7 +95,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        private bool Can<TContent, THandler>(IndboundMessageContext<TContent> context, Route<TContent, THandler> route)
+        private bool Can<TContent, THandler>(InboundMessageContext<TContent> context, Route<TContent, THandler> route)
             where THandler : class
         {
             var when = true;

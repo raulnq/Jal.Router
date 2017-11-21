@@ -27,7 +27,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
-            interceptor.OnSendEntry(message, options);
+            interceptor.OnEntry(message, options);
 
             try
             {
@@ -45,23 +45,25 @@ namespace Jal.Router.Impl.Outbound
 
                     pipeline.Execute();
 
-                    interceptor.OnSendSuccess(message, options);
+                    interceptor.OnSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                interceptor.OnSendError(message, options, ex);
+                interceptor.OnError(message, options, ex);
 
                 throw;
             }
             finally
             {
-                interceptor.OnSendExit(message, options);
+                interceptor.OnExit(message, options);
             }
         }
 
         public void Send<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+
             var message = new OutboundMessageContext<TContent>
             {
                 Id = options.Id,
@@ -76,7 +78,8 @@ namespace Jal.Router.Impl.Outbound
                 Saga = options.Saga,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
-            };
+                Body = serializer.Serialize(content)
+        };
 
             Send(message, options);
         }
@@ -154,6 +157,8 @@ namespace Jal.Router.Impl.Outbound
 
         public void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+
             var message = new OutboundMessageContext<TContent>
             {
                 Id = options.Id,
@@ -168,6 +173,7 @@ namespace Jal.Router.Impl.Outbound
                 Saga = options.Saga,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
+                Body = serializer.Serialize(content)
             };
 
             Publish(message, options);
@@ -177,7 +183,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
-            interceptor.OnPublishEntry(message, options);
+            interceptor.OnEntry(message, options);
 
             try
             {
@@ -195,23 +201,25 @@ namespace Jal.Router.Impl.Outbound
 
                     pipeline.Execute();
 
-                    interceptor.OnPublishSuccess(message, options);
+                    interceptor.OnSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                interceptor.OnPublishError(message, options, ex);
+                interceptor.OnError(message, options, ex);
 
                 throw;
             }
             finally
             {
-                interceptor.OnPublishExit(message, options);
+                interceptor.OnExit(message, options);
             }
         }
 
         public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+
             var message = new OutboundMessageContext<TContent>
             {
                 Id = options.Id,
@@ -226,6 +234,7 @@ namespace Jal.Router.Impl.Outbound
                 Saga = options.Saga,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
+                Body = serializer.Serialize(content)
             };
 
             message.Origin.Key = string.Empty;

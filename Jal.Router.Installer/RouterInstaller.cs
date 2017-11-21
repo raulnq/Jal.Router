@@ -60,9 +60,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMessageBodySerializer>().ImplementedBy<NullMessageBodySerializer>().LifestyleSingleton().Named(typeof(NullMessageBodySerializer).FullName));
 
-            container.Register(Component.For<IMessageBodyAdapter>().ImplementedBy<NullMessageBodyAdapter>().LifestyleSingleton().Named(typeof(NullMessageBodyAdapter).FullName));
-
-            container.Register(Component.For<IMessageMetadataAdapter>().ImplementedBy<NullMessageMetadataAdapter>().LifestyleSingleton().Named(typeof(NullMessageMetadataAdapter).FullName));
+            container.Register(Component.For<IMessageAdapter>().ImplementedBy<NullMessageAdapter>().LifestyleSingleton().Named(typeof(NullMessageAdapter).FullName));
 
             container.Register(Component.For(typeof(IRouterInterceptor)).ImplementedBy(typeof(NullRouterInterceptor)).Named(typeof(NullRouterInterceptor).FullName).LifestyleSingleton());
 
@@ -88,9 +86,9 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(NextMessageHandler)).Named(typeof(NextMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<Jal.Router.Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
+            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
 
-            container.Register(Component.For<Jal.Router.Interface.Outbound.IMiddleware>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
+            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
 
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
 

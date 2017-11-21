@@ -9,13 +9,11 @@ namespace Jal.Router.AzureServiceBus.Impl
 {
     public class AzureServiceBusQueue : AbstractPointToPointChannel
     {
-        public override void Send<TContent>(OutboundMessageContext<TContent> context, IMessageBodyAdapter messageadapter, IMessageMetadataAdapter messagecontextadapter)
+        public override void Send<TContent>(OutboundMessageContext<TContent> context, IMessageAdapter adapter)
         {
             var queueclient = QueueClient.CreateFromConnectionString(context.ToConnectionString, context.ToPath);
 
-            var message = messageadapter.Write<TContent,BrokeredMessage>(context.Content);
-
-            message = messagecontextadapter.Create(context, message);
+            var message = adapter.Write<TContent, BrokeredMessage>(context);
 
             queueclient.Send(message);
 

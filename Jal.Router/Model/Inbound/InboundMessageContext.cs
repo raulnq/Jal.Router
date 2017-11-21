@@ -1,10 +1,10 @@
 ﻿namespace Jal.Router.Model.Inbound
 {
-    public class IndboundMessageContext<TContent> : MessageContext
+    public class InboundMessageContext<TContent> : MessageContext
     {
         public TContent Content { get; set; }
 
-        public IndboundMessageContext(MessageContext context, TContent content)
+        public InboundMessageContext(MessageContext context, TContent content)
         {
             Id = context.Id;
             Headers = context.Headers;
@@ -16,6 +16,7 @@
             Content = content;
             Saga = context.Saga;
             ContentType = context.ContentType;
+            Body = context.Body;
         }
     }
 }

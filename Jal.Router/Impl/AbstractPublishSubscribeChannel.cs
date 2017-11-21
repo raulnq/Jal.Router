@@ -1,5 +1,4 @@
-﻿using System;
-using Jal.Router.Interface;
+﻿using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Outbound;
@@ -18,15 +17,13 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public abstract void Send<TContent>(OutboundMessageContext<TContent> context, IMessageBodyAdapter messageadapter, IMessageMetadataAdapter messagecontextadapter);
+        public abstract void Send<TContent>(OutboundMessageContext<TContent> context, IMessageAdapter adapter);
 
         public void Send<TContent>(OutboundMessageContext<TContent> context)
         {
-            var adapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
+            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
-            var contextadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
-
-            Send(context, adapter, contextadapter);
+            Send(context, adapter);
         }
     }
 }

@@ -52,9 +52,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMessageBodySerializer, NullMessageBodySerializer>(typeof(NullMessageBodySerializer).FullName, new PerContainerLifetime());
 
-            container.Register<IMessageBodyAdapter, NullMessageBodyAdapter>(typeof(NullMessageBodyAdapter).FullName, new PerContainerLifetime());
-
-            container.Register<IMessageMetadataAdapter, NullMessageMetadataAdapter>(typeof(NullMessageMetadataAdapter).FullName, new PerContainerLifetime());
+            container.Register<IMessageAdapter, NullMessageAdapter>(typeof(NullMessageAdapter).FullName, new PerContainerLifetime());
 
             container.Register<IRouterInterceptor, NullRouterInterceptor>(typeof(NullRouterInterceptor).FullName, new PerContainerLifetime());
 
@@ -80,9 +78,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddleware, NextMessageHandler>(typeof(NextMessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<Jal.Router.Interface.Outbound.IMiddleware, PointToPointHandler>(typeof(PointToPointHandler).FullName, new PerContainerLifetime());
+            container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof(PointToPointHandler).FullName, new PerContainerLifetime());
 
-            container.Register<Jal.Router.Interface.Outbound.IMiddleware, PublishSubscribeHandler>(typeof(PublishSubscribeHandler).FullName, new PerContainerLifetime());
+            container.Register<Interface.Outbound.IMiddleware, PublishSubscribeHandler>(typeof(PublishSubscribeHandler).FullName, new PerContainerLifetime());
 
             container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof(AppSettingValueSettingFinder).FullName ,new PerContainerLifetime());
 

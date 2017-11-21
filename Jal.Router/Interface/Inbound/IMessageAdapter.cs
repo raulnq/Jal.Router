@@ -1,9 +1,12 @@
+using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Outbound;
+
 namespace Jal.Router.Interface.Inbound
 {
-    public interface IMessageBodyAdapter
+    public interface IMessageAdapter
     {
-        TContent Read<TContent, TMessage>(TMessage message);
+        InboundMessageContext<TContent> Read<TContent, TMessage>(TMessage message);
 
-        TMessage Write<TContent, TMessage>(TContent content);        
+        TMessage Write<TContent, TMessage>(OutboundMessageContext<TContent> context);
     }
 }
