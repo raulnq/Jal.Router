@@ -9,6 +9,8 @@ namespace Jal.Router.Tests.Impl
         public void Handle(Message message, Data data)
         {
             Console.WriteLine("Other Sender");
+
+            throw new ApplicationException();
         }
     }
 }

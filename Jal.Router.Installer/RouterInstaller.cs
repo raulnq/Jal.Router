@@ -12,6 +12,8 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model.Management;
+using IMiddleware = Jal.Router.Interface.Inbound.IMiddleware;
 
 namespace Jal.Router.Installer
 {
@@ -46,7 +48,15 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IConfiguration>().ImplementedBy<Configuration>().LifestyleSingleton());
 
-            container.Register(Component.For<IStartupConfiguration>().ImplementedBy<ChannelStartupConfiguration>().LifestyleSingleton().Named(typeof(ChannelStartupConfiguration).FullName));
+            container.Register(Component.For<IStartupTask>().ImplementedBy<ChannelStartupTask>().LifestyleSingleton().Named(typeof(ChannelStartupTask).FullName));
+
+            container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
+
+            container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
+
+            container.Register(Component.For<IMonitoringTask>().ImplementedBy<SubscriptionToPublishSubscribeChannelMonitor>().LifestyleSingleton().Named(typeof(SubscriptionToPublishSubscribeChannelMonitor).FullName));
+
+            container.Register(Component.For<IMonitoringTask>().ImplementedBy<HeartBeatMonitor>().LifestyleSingleton().Named(typeof(HeartBeatMonitor).FullName));
 
             container.Register(Component.For<IMessageBodySerializer>().ImplementedBy<NullMessageBodySerializer>().LifestyleSingleton().Named(typeof(NullMessageBodySerializer).FullName));
 
@@ -56,15 +66,13 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IRouterInterceptor)).ImplementedBy(typeof(NullRouterInterceptor)).Named(typeof(NullRouterInterceptor).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IRouterLogger)).ImplementedBy(typeof(NullRouterLogger)).Named(typeof(NullRouterLogger).FullName).LifestyleSingleton());
-
             container.Register(Component.For(typeof(IPointToPointChannel)).ImplementedBy(typeof(NullPointToPointChannel)).Named(typeof(NullPointToPointChannel).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IPublishSubscribeChannel)).ImplementedBy(typeof(NullPublishSubscribeChannel)).Named(typeof(NullPublishSubscribeChannel).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IChannelManager>().ImplementedBy<NullChannelManager>().LifestyleSingleton().Named(typeof(NullChannelManager).FullName));
 
-            container.Register(Component.For(typeof(IBusLogger)).ImplementedBy(typeof(NullBusLogger)).Named(typeof(NullBusLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ILogger<HeartBeat>)).ImplementedBy(typeof(ConsoleHeartBeatLogger)).Named(typeof(ConsoleHeartBeatLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(NullBusInterceptor)).Named(typeof(NullBusInterceptor).FullName).LifestyleSingleton());
 
@@ -79,7 +87,11 @@ namespace Jal.Router.Installer
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(StartingMessageHandler)).Named(typeof(StartingMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(NextMessageHandler)).Named(typeof(NextMessageHandler).FullName).LifestyleSingleton());
-           
+
+            container.Register(Component.For<Jal.Router.Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
+
+            container.Register(Component.For<Jal.Router.Interface.Outbound.IMiddleware>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
+
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(AppSettingValueSettingFinder)).Named(typeof(AppSettingValueSettingFinder).FullName).LifestyleSingleton());

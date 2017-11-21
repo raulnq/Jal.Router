@@ -1,3 +1,5 @@
+using Jal.Router.Model.Management;
+
 namespace Jal.Router.Interface.Management
 {
     public interface IChannelManager
@@ -7,5 +9,11 @@ namespace Jal.Router.Interface.Management
         void CreatePublishSubscribeChannel(string connectionstring, string name);
 
         void CreatePointToPointChannel(string connectionstring, string name);
+
+        PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string name);
+
+        PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string name);
+
+        SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string name);
     }
 }

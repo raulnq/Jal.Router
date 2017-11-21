@@ -1,68 +1,66 @@
 using System;
-using System.Collections.Generic;
-using Jal.Router.Impl.Inbound;
-using Jal.Router.Model;
+using System.Diagnostics;
+using Jal.Router.Interface.Inbound;
+using Jal.Router.Model.Inbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsRouterLogger : AbstractRouterLogger
+    public class ApplicationInsightsRouterLogger : IMiddleware
     {
         private readonly TelemetryClient _client;
         public ApplicationInsightsRouterLogger(TelemetryClient client)
         {
             _client = client;
         }
-
-        public override void OnEntry(MessageContext context)
+        public void Execute<TContent>(IndboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
-            var e = new EventTelemetry()
+            var telemetry = new RequestTelemetry();
+
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            try
             {
-                Name = context.ContentType.Name,
-                Properties =
+                telemetry.Timestamp = context.DateTimeUtc;
+                telemetry.Id = context.Id;
+                telemetry.Name = context.ContentType.Name;
+                telemetry.Properties.Add("from", context.Origin.Name);
+                telemetry.Properties.Add("version", context.Version);
+                telemetry.Properties.Add("origin", context.Origin.Key);
+                telemetry.Properties.Add("saga", context.Saga?.Id);
+                telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
+                foreach (var h in context.Headers)
                 {
-                    new KeyValuePair<string, string>("origin", context.Origin.Name),
-                    new KeyValuePair<string, string>("key", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.Saga?.Id)
-                },
-                Metrics =
-                {
-                    new KeyValuePair<string, double>("retry", context.RetryCount)
+                    telemetry.Properties.Add(h.Key, h.Value);
                 }
-            };
-            _client.TrackEvent(e);
-        }
 
-        public override void OnExit(MessageContext context, long duration)
-        {
+                telemetry.Metrics.Add("retry", context.RetryCount);
 
-            var rt = new RequestTelemetry()
+                next();
+
+                telemetry.ResponseCode = "200";
+                telemetry.Success = true;
+                    
+            }
+            catch (Exception exception)
             {
-                Name = context.ContentType.Name,
-                Duration = TimeSpan.FromMilliseconds(duration),
-                ResponseCode = "200",
-                Success = true,
-                Id = context.Id,
-                Timestamp = context.DateTimeUtc,
-                Properties =
-                {
-                    new KeyValuePair<string, string>("origin", context.Origin.Name),
-                    new KeyValuePair<string, string>("key", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.Saga?.Id)
-                },
-                Metrics =
-                {
-                    new KeyValuePair<string, double>("retry", context.RetryCount) 
-                }
-            };
+                telemetry.ResponseCode = "500";
+                telemetry.Success = false;
 
-            _client.TrackRequest(rt);
-        }
+                var telemetryexception = new ExceptionTelemetry(exception);
+                telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
 
-        public override void OnException(MessageContext context, Exception exception)
-        {
-            _client.TrackException(exception);
+                _client.TrackException(telemetryexception);
+                throw;
+            }
+            finally
+            {
+                telemetry.Duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+                _client.TrackRequest(telemetry);
+            }
         }
     }
 }

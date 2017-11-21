@@ -1,7 +1,4 @@
-﻿using System;
-using Jal.Router.Model.Inbound;
-
-namespace Jal.Router.Model.Outbount
+﻿namespace Jal.Router.Model.Outbound
 {
 
     public class OutboundMessageContext<TContent> : OutboundMessageContext

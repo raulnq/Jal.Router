@@ -5,7 +5,6 @@ using Jal.Router.AzureServiceBus.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Installer
 {

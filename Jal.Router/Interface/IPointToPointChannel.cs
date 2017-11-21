@@ -1,4 +1,4 @@
-using Jal.Router.Model.Outbount;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Interface
 {

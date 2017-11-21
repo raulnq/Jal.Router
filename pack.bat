@@ -24,5 +24,7 @@ packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.AzureStor
 
 packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
 
+packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
+
 
 pause;

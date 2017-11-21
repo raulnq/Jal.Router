@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Inbound;
-
 namespace Jal.Router.Impl.Inbound
 {
     public class Router : IRouter
@@ -29,15 +26,9 @@ namespace Jal.Router.Impl.Inbound
 
         public void RouteToSaga<TContent, TMessage>(TMessage message, string saganame, string routename = "")
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
             var bodyadapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
 
             var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
-
-            var loggers = _configuration.RouterLoggerTypes.Select(x => _factory.Create<IRouterLogger>(x)).ToArray();
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
@@ -46,8 +37,6 @@ namespace Jal.Router.Impl.Inbound
             var contenttype = typeof(TContent);
 
             context.ContentType = contenttype;
-
-            Array.ForEach(loggers, x => x.OnEntry(context));
 
             interceptor.OnEntry(context);
 
@@ -65,7 +54,7 @@ namespace Jal.Router.Impl.Inbound
 
                         var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
-                        middlewares.AddRange(_configuration.MiddlewareTypes);
+                        middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
                         middlewares.AddRange(saga.StartingRoute.MiddlewareTypes);
 
@@ -75,9 +64,7 @@ namespace Jal.Router.Impl.Inbound
 
                         var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
 
-                        pipeline.Excute();
-
-                        Array.ForEach(loggers, x => x.OnSuccess(context, content));
+                        pipeline.Execute();
 
                         interceptor.OnSuccess(context, content);
                     }
@@ -95,7 +82,7 @@ namespace Jal.Router.Impl.Inbound
 
                                 var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
-                                middlewares.AddRange(_configuration.MiddlewareTypes);
+                                middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
                                 middlewares.AddRange(route.MiddlewareTypes);
 
@@ -105,10 +92,8 @@ namespace Jal.Router.Impl.Inbound
 
                                 var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
 
-                                pipeline.Excute();
+                                pipeline.Execute();
                             }
-
-                            Array.ForEach(loggers, x => x.OnSuccess(context, content));
 
                             interceptor.OnSuccess(context, content);
                         }
@@ -126,33 +111,19 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
-                var inner = ex.InnerException ?? ex;
+                interceptor.OnException(context, ex);
 
-                Array.ForEach(loggers, x => x.OnException(context, inner));
-
-                interceptor.OnException(context, inner);
-
-                throw inner;
+                throw;
             }
             finally
             {
-                stopwatch.Stop();
-
-                Array.ForEach(loggers, x => x.OnExit(context, stopwatch.ElapsedMilliseconds));
-
                 interceptor.OnExit(context);
             }
         }
 
         public void Route<TContent, TMessage>(TMessage message, string routename = "")
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
             var bodyadapter = _factory.Create<IMessageBodyAdapter>(_configuration.MessageBodyAdapterType);
-
-            var loggers = _configuration.RouterLoggerTypes.Select(x => _factory.Create<IRouterLogger>(x)).ToArray();
 
             var metadataadapter = _factory.Create<IMessageMetadataAdapter>(_configuration.MessageMetadataAdapterType);
 
@@ -163,8 +134,6 @@ namespace Jal.Router.Impl.Inbound
             var contenttype = typeof(TContent);
 
             context.ContentType = contenttype;
-
-            Array.ForEach(loggers, x => x.OnEntry(context));
 
             interceptor.OnEntry(context);
 
@@ -182,7 +151,7 @@ namespace Jal.Router.Impl.Inbound
 
                         var middlewares = new List<Type> {typeof (MessageExceptionHandler)};
 
-                        middlewares.AddRange(_configuration.MiddlewareTypes);
+                        middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
                         middlewares.AddRange(route.MiddlewareTypes);
 
@@ -192,10 +161,8 @@ namespace Jal.Router.Impl.Inbound
 
                         var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), contextpluscontent, parameter);
 
-                        pipeline.Excute();
+                        pipeline.Execute();
                     }
-
-                    Array.ForEach(loggers, x => x.OnSuccess(context, content));
 
                     interceptor.OnSuccess(context, content);
                 }
@@ -206,20 +173,12 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
-                var inner = ex.InnerException ?? ex;
+                interceptor.OnException(context, ex);
 
-                Array.ForEach(loggers, x => x.OnException(context, inner));
-
-                interceptor.OnException(context, inner);
-
-                throw inner;
+                throw;
             }
             finally
             {
-                stopwatch.Stop();
-
-                Array.ForEach(loggers, x => x.OnExit(context, stopwatch.ElapsedMilliseconds));
-
                 interceptor.OnExit(context);
             }
         }

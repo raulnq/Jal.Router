@@ -1,7 +1,7 @@
 ﻿using System;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbount;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {

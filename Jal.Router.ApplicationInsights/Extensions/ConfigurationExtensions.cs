@@ -7,9 +7,9 @@ namespace Jal.Router.ApplicationInsights.Extensions
     {
         public static void UsingApplicationInsights(this IConfiguration configuration)
         {
-            configuration.AddBusLogger<ApplicationInsightsBusLogger>();
+            configuration.AddOutboundMiddleware<ApplicationInsightsBusLogger>();
 
-            configuration.AddRouterLogger<ApplicationInsightsRouterLogger>();
+            configuration.AddInboundMiddleware<ApplicationInsightsRouterLogger>();
         }
     }
 }

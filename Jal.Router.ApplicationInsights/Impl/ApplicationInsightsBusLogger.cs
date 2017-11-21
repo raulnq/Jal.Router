@@ -1,81 +1,75 @@
 using System;
 using System.Collections.Generic;
-using Jal.Router.Impl.Outbound;
-using Jal.Router.Model;
-using Jal.Router.Model.Outbount;
+using System.Diagnostics;
+using Jal.Router.Interface.Outbound;
+using Jal.Router.Model.Outbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsBusLogger : AbstractBusLogger
+    public class ApplicationInsightsBusLogger : IMiddleware
     {
         private readonly TelemetryClient _client;
         public ApplicationInsightsBusLogger(TelemetryClient client)
         {
             _client = client;
         }
-
-        public override void OnSendExit(OutboundMessageContext context, Options options, long duration)
+        public void Execute<TContent>(OutboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
-            var dt = new DependencyTelemetry()
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+
+            var telemetry = new DependencyTelemetry()
             {
                 Name = context.ContentType.Name,
-                Duration = TimeSpan.FromMilliseconds(duration),
-                Success = true,
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
                 Target = context.ToPath,
-                ResultCode = "200",
-                Type = "PointToPoint",
+                Type = parameter.OutboundType,
                 Properties =
                 {
-                    new KeyValuePair<string, string>("origin", context.Origin.Name),
-                    new KeyValuePair<string, string>("key", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.Saga?.Id)
-                },
-                Metrics =
-                {
-                    new KeyValuePair<string, double>("retry", context.RetryCount)
-                }
-            }; 
-            _client.TrackDependency(dt);  
-        }
-
-        public override void OnSendError(OutboundMessageContext context, Options options, Exception ex)
-        {
-            _client.TrackException(ex);
-        }
-
-        public override void OnPublishExit(OutboundMessageContext context, Options options, long duration)
-        {
-            var dt = new DependencyTelemetry()
-            {
-                Name = context.ContentType.Name,
-                Duration = TimeSpan.FromMilliseconds(duration),
-                Success = true,
-                Id = context.Id,
-                Timestamp = context.DateTimeUtc,
-                Target = context.ToPath,
-                ResultCode = "200",
-                Type = "PublishSubscriber",
-                Properties =
-                {
-                    new KeyValuePair<string, string>("origin", context.Origin.Name),
-                    new KeyValuePair<string, string>("key", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.Saga?.Id)
+                    new KeyValuePair<string, string>("from", context.Origin.Name),
+                    new KeyValuePair<string, string>("origin", context.Origin.Key),
+                    new KeyValuePair<string, string>("saga",context.Saga?.Id),
+                    new KeyValuePair<string, string>("version", context.Version),
                 },
                 Metrics =
                 {
                     new KeyValuePair<string, double>("retry", context.RetryCount)
                 }
             };
-            _client.TrackDependency(dt);
-        }
 
-        public override void OnPublishError(OutboundMessageContext context, Options options, Exception ex)
-        {
-            _client.TrackException(ex);
+            telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
+
+            foreach (var h in context.Headers)
+            {
+                telemetry.Properties.Add(h.Key, h.Value);
+            }
+            try
+            {
+                next();
+                telemetry.Success = true;
+                telemetry.ResultCode = "200";
+            }
+            catch (Exception exception)
+            {
+                telemetry.Success = false;
+                telemetry.ResultCode = "500";
+
+                var telemetryexception = new ExceptionTelemetry(exception);
+                telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
+
+                _client.TrackException(telemetryexception);
+
+                throw;
+            }
+            finally
+            {
+                telemetry.Duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
+                _client.TrackDependency(telemetry);
+            }
         }
     }
 }

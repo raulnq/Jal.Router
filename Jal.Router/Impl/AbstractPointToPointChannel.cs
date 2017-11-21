@@ -2,7 +2,7 @@
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model.Outbount;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl
 {

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Jal.Router.Interface.Management;
+using Jal.Router.Model.Management;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
@@ -119,6 +120,93 @@ namespace Jal.Router.AzureServiceBus.Impl
                     namespaceManager.CreateTopic(topicDescription);
                 }
             }
+        }
+
+
+
+        public PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string name)
+        {
+            var namespaceManager = GetNamespaceManager(connectionstring);
+
+            if (namespaceManager != null)
+            {
+                try
+                {
+                    var entity = namespaceManager.GetTopic(name);
+                    var info = new PublishSubscribeChannelInfo(name)
+                    {
+                        MessageCount = entity.MessageCountDetails.ActiveMessageCount,
+                        DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
+                        ScheduledMessageCount = entity.MessageCountDetails.ScheduledMessageCount,
+                        SizeInBytes = entity.SizeInBytes
+                    };
+
+                    return info;
+
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return null;
+        }
+
+        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string name)
+        {
+            var namespaceManager = GetNamespaceManager(connectionstring);
+
+            if (namespaceManager != null)
+            {
+                try
+                {
+                    var entity = namespaceManager.GetSubscription(path, name);
+                    var info = new SubscriptionToPublishSubscribeChannelInfo(name, path)
+                    {
+                        DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
+                        MessageCount = entity.MessageCountDetails.ActiveMessageCount,
+                        ScheduledMessageCount = entity.MessageCountDetails.ScheduledMessageCount
+                    };
+
+                    return info;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return null;
+        }
+
+        public PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string name)
+        {
+            var namespaceManager = GetNamespaceManager(connectionstring);
+
+            if (namespaceManager != null)
+            {
+                try
+                {
+                    var entity = namespaceManager.GetQueue(name);
+
+                    var info = new PointToPointChannelInfo(name)
+                    {
+                        DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
+                        MessageCount = entity.MessageCountDetails.ActiveMessageCount,
+                        ScheduledMessageCount = entity.MessageCountDetails.ScheduledMessageCount,
+                        SizeInBytes = entity.SizeInBytes
+                    };
+
+                    return info;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return null;
         }
 
         public void CreatePointToPointChannel(string connectionstring, string name)

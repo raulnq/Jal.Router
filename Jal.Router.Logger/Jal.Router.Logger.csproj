@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Impl\BusLogger.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
+    <Compile Include="Impl\HeartBeatLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\RouterLogger.cs" />
   </ItemGroup>

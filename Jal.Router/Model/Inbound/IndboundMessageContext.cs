@@ -15,7 +15,7 @@
             DateTimeUtc = context.DateTimeUtc;
             Content = content;
             Saga = context.Saga;
-
+            ContentType = context.ContentType;
         }
     }
 }

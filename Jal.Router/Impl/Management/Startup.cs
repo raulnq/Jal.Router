@@ -4,16 +4,16 @@ namespace Jal.Router.Impl.Management
 {
     public class Startup : IStartup
     {
-        private readonly IStartupConfiguration[] _startupConfigurations;
+        private readonly IStartupTask[] _startupTasks;
 
-        public Startup(IStartupConfiguration[] startupConfigurations)
+        public Startup(IStartupTask[] startupTasks)
         {
-            _startupConfigurations = startupConfigurations;
+            _startupTasks = startupTasks;
         }
 
         public void Start()
         {
-            foreach (var configuration in _startupConfigurations)
+            foreach (var configuration in _startupTasks)
             {
                 configuration.Run();
             }

@@ -5,7 +5,7 @@ using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl.Management
 {
-    public class ChannelStartupConfiguration : IStartupConfiguration
+    public class ChannelStartupTask : IStartupTask
     {
         private readonly IRouterConfigurationSource[] _sources;
 
@@ -13,7 +13,7 @@ namespace Jal.Router.Impl.Management
 
         private readonly IConfiguration _configuration;
 
-        public ChannelStartupConfiguration(IRouterConfigurationSource[] sources, IComponentFactory factory, IConfiguration configuration)
+        public ChannelStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory, IConfiguration configuration)
         {
             _sources = sources;
             _factory = factory;

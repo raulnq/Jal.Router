@@ -4,6 +4,7 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using IMiddleware = Jal.Router.Interface.Inbound.IMiddleware;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -47,7 +48,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 if (policy != null)
                 {
-                    if (parameter.Route.RetryExceptionType == ex.GetType() || parameter.Route.RetryExceptionType == ex.InnerException?.GetType())
+                    if (parameter.Route.RetryExceptionType == ex.GetType())
                     {
                         if (!context.LastRetry)
                         {

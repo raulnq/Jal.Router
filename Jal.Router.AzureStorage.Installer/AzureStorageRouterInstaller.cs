@@ -30,7 +30,7 @@ namespace Jal.Router.AzureStorage.Installer
         {
             container.Register(Component.For<IStorage>().ImplementedBy<AzureTableStorage>().Named(typeof(AzureTableStorage).FullName).DependsOn(new { connectionstring =_connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
 
-            container.Register(Component.For<IStartupConfiguration>().ImplementedBy<AzureStorageStartupConfiguration>().Named(typeof(AzureStorageStartupConfiguration).FullName).DependsOn(new { connectionstring = _connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
+            container.Register(Component.For<IStartupTask>().ImplementedBy<AzureStorageStartupTask>().Named(typeof(AzureStorageStartupTask).FullName).DependsOn(new { connectionstring = _connectionstring, sagastoragename = _sagastoragename, messagestorgename = _messagestorgename, tablenamesufix = _tablenamesufix }).LifestyleSingleton());
         }
     }
 

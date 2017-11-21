@@ -69,7 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
-    <Compile Include="Impl\AzureStorageStartupConfiguration.cs" />
+    <Compile Include="Impl\AzureStorageStartupTask.cs" />
     <Compile Include="Impl\AzureTableStorage.cs" />
     <Compile Include="Extensions\SagaSettingExtensions.cs" />
     <Compile Include="Model\MessageRecord.cs" />

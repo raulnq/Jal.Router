@@ -1,12 +1,10 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
+using System.Collections.Generic;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbount;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
@@ -27,17 +25,7 @@ namespace Jal.Router.Impl.Outbound
 
         private void Send<TContent>(OutboundMessageContext<TContent> message, Options options)
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
-            var channel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
-
-            var loggers = _configuration.BusLoggerTypes.Select(x => _factory.Create<IBusLogger>(x)).ToArray();
-
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
-
-            Array.ForEach(loggers, x => x.OnSendEntry(message, options));
 
             interceptor.OnSendEntry(message, options);
 
@@ -45,27 +33,29 @@ namespace Jal.Router.Impl.Outbound
             {
                 if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath))
                 {
-                    channel.Send(message);
+                    var middlewares = new List<Type>();
 
-                    Array.ForEach(loggers, x => x.OnSendSuccess(message, options));
+                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+
+                    middlewares.Add(typeof(PointToPointHandler));
+
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Send"};
+
+                    var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), message, parameter);
+
+                    pipeline.Execute();
 
                     interceptor.OnSendSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                Array.ForEach(loggers, x => x.OnSendError(message, options, ex));
-
                 interceptor.OnSendError(message, options, ex);
 
                 throw;
             }
             finally
             {
-                stopwatch.Stop();
-
-                Array.ForEach(loggers, x => x.OnSendExit(message, options, stopwatch.ElapsedMilliseconds));
-
                 interceptor.OnSendExit(message, options);
             }
         }
@@ -84,7 +74,8 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 Saga = options.Saga,
-                ContentType = typeof(TContent)
+                ContentType = typeof(TContent),
+                DateTimeUtc = DateTime.UtcNow,
             };
 
             Send(message, options);
@@ -175,7 +166,8 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 Saga = options.Saga,
-                ContentType = typeof(TContent)
+                ContentType = typeof(TContent),
+                DateTimeUtc = DateTime.UtcNow,
             };
 
             Publish(message, options);
@@ -183,17 +175,7 @@ namespace Jal.Router.Impl.Outbound
 
         private void Publish<TContent>(OutboundMessageContext<TContent> message, Options options)
         {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
-            var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
-
-            var loggers = _configuration.BusLoggerTypes.Select(x => _factory.Create<IBusLogger>(x)).ToArray();
-
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
-
-            Array.ForEach(loggers, x => x.OnPublishEntry(message, options));
 
             interceptor.OnPublishEntry(message, options);
 
@@ -201,27 +183,29 @@ namespace Jal.Router.Impl.Outbound
             {
                 if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath))
                 {
-                    channel.Send(message);
+                    var middlewares = new List<Type>();
 
-                    Array.ForEach(loggers, x => x.OnPublishSuccess(message, options));
+                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+
+                    middlewares.Add(typeof(PublishSubscribeHandler));
+
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
+
+                    var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), message, parameter);
+
+                    pipeline.Execute();
 
                     interceptor.OnPublishSuccess(message, options);
                 }
             }
             catch (Exception ex)
             {
-                Array.ForEach(loggers, x => x.OnPublishError(message, options, ex));
-
                 interceptor.OnPublishError(message, options, ex);
 
                 throw;
             }
             finally
             {
-                stopwatch.Stop();
-
-                Array.ForEach(loggers, x => x.OnPublishExit(message, options, stopwatch.ElapsedMilliseconds));
-
                 interceptor.OnPublishExit(message, options);
             }
         }
@@ -240,7 +224,8 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 Saga = options.Saga,
-                ContentType = typeof(TContent)
+                ContentType = typeof(TContent),
+                DateTimeUtc = DateTime.UtcNow,
             };
 
             message.Origin.Key = string.Empty;

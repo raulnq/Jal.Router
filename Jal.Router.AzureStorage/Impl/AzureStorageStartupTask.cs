@@ -4,7 +4,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Jal.Router.AzureStorage.Impl
 {
-    public class AzureStorageStartupConfiguration : IStartupConfiguration
+    public class AzureStorageStartupTask : IStartupTask
     {
         private readonly string _connectionstring;
 
@@ -14,7 +14,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly string _tablenamesufix;
 
-        public AzureStorageStartupConfiguration(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
+        public AzureStorageStartupTask(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
             _connectionstring = connectionstring;
 

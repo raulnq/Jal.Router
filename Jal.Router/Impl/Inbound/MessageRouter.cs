@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
@@ -23,21 +24,36 @@ namespace Jal.Router.Impl.Inbound
 
         public void Route<TContent>(IndboundMessageContext<TContent> context, Route route)
         {
-            var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 2);
+            try
+            {
+                var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 2);
 
-            var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
+                var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
 
-            genericroutemethod?.Invoke(this, new object[] { context, route });
-
+                genericroutemethod?.Invoke(this, new object[] { context, route });
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null) throw ex.InnerException;
+                else throw;
+            }
         }
 
         public void Route<TContent, TData>(IndboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
-            var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 3);
+            try
+            {
+                var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 3);
 
-            var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType, typeof(TData));
+                var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType, typeof(TData));
 
-            genericroutemethod?.Invoke(this, new object[] { context, route, data });
+                genericroutemethod?.Invoke(this, new object[] { context, route, data });
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null) throw ex.InnerException;
+                else throw;
+            }
         }
 
         public void Execute<TContent, THandler>(IndboundMessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class

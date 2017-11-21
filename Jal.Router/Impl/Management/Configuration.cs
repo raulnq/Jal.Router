@@ -8,11 +8,16 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
+        public string ApplicationName { get; set; }
+        public IDictionary<Type, IList<Type>> LoggerTypes { get; private set; }
+        public IList<Type> StartupTaskTypes { get; private set; }
+        public IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; private set; }
         public Type ChannelManagerType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
@@ -20,9 +25,9 @@ namespace Jal.Router.Impl.Management
         public Type MessageBodyAdapterType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; private set; }
         public Type RouterInterceptorType { get; private set; }
-        public IList<Type> BusLoggerTypes { get; private set; }
         public Type BusInterceptorType { get; private set; }
-        public IList<Type> MiddlewareTypes { get; private set; }
+        public IList<Type> InboundMiddlewareTypes { get; private set; }
+        public IList<Type> OutboundMiddlewareTypes { get; private set; }
         public Type MessageMetadataAdapterType { get; private set; }
         public Type MessageBodySerializerType { get; private set; }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
@@ -54,18 +59,19 @@ namespace Jal.Router.Impl.Management
             MessageBodyAdapterType = typeof (TMessageAdapter);
         }
 
-        public void AddRouterLogger<TRouterLogger>() where TRouterLogger : IRouterLogger
-        {
-            RouterLoggerTypes.Add(typeof(TRouterLogger));
-        }
         public void UsingStorage<TStorage>() where TStorage : IStorage
         {
             StorageType = typeof(TStorage);
         }
 
-        public void AddMiddleware<TMiddleware>() where TMiddleware : IMiddleware
+        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : Jal.Router.Interface.Inbound.IMiddleware
         {
-            MiddlewareTypes.Add(typeof(TMiddleware));
+            InboundMiddlewareTypes.Add(typeof(TMiddleware));
+        }
+
+        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Jal.Router.Interface.Outbound.IMiddleware
+        {
+            OutboundMiddlewareTypes.Add(typeof(TMiddleware));
         }
 
         public void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
@@ -76,9 +82,27 @@ namespace Jal.Router.Impl.Management
         {
             BusInterceptorType = typeof(TBusInterceptor);
         }
-        public void AddBusLogger<TBusLogger>() where TBusLogger : IBusLogger
+
+        public void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>
         {
-            BusLoggerTypes.Add(typeof(TBusLogger));
+            if (LoggerTypes.ContainsKey(typeof (TInfo)))
+            {
+                var list = LoggerTypes[typeof (TInfo)];
+                list.Add(typeof(TLogger));
+            }
+            else
+            {
+                LoggerTypes.Add(typeof(TInfo), new List<Type>() {typeof(TLogger)});
+            }
+        }
+
+        public void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask
+        {
+            MonitoringTaskTypes.Add(new MonitoringTaskMetadata() {Type = typeof(TMonitoringTask), Interval = interval });
+        }
+        public void AdStartupTask<TStartupTask>() where TStartupTask : IStartupTask
+        {
+            StartupTaskTypes.Add(typeof(TStartupTask));
         }
         public Configuration()
         {
@@ -91,9 +115,12 @@ namespace Jal.Router.Impl.Management
             UsingMessageBodySerializer<NullMessageBodySerializer>();
             UsingMessageBodyAdapter<NullMessageBodyAdapter>();
             UsingMessageMetadataAdapter<NullMessageMetadataAdapter>();
-            MiddlewareTypes = new List<Type>();
-            BusLoggerTypes = new List<Type>();
+            InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
+            MonitoringTaskTypes = new List<MonitoringTaskMetadata>();
+            StartupTaskTypes = new List<Type>();
+            LoggerTypes = new Dictionary<Type, IList<Type>>();
+            OutboundMiddlewareTypes = new List<Type>();
         }
     }
 }

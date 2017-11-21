@@ -11,7 +11,7 @@ namespace Jal.Router.AzureStorage.LightInject.Installer
         {
             container.Register<IStorage>(x=> new AzureTableStorage(connectionstring, sagastoragename, messagestorgename, tablenamesufix), typeof(AzureTableStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupConfiguration>(x=> new AzureStorageStartupConfiguration(connectionstring, sagastoragename, messagestorgename, tablenamesufix) , typeof(AzureStorageStartupConfiguration).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask>(x=> new AzureStorageStartupTask(connectionstring, sagastoragename, messagestorgename, tablenamesufix) , typeof(AzureStorageStartupTask).FullName, new PerContainerLifetime());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
@@ -21,6 +22,7 @@ using Jal.Router.Interface.Outbound;
 using Jal.Router.Logger.Extensions;
 using Jal.Router.Logger.Installer;
 using Jal.Router.Model;
+using Jal.Router.Model.Management;
 using Jal.Router.Tests.Impl;
 using Jal.Router.Tests.Model;
 using Jal.Settings.Installer;
@@ -29,6 +31,13 @@ using NUnit.Framework;
 
 namespace Jal.Router.Tests.Integration
 {
+    public class Logger : ILogger<PointToPointChannelInfo>
+    {
+        public void Log(PointToPointChannelInfo info, DateTime date)
+        {
+            Console.WriteLine("Hi 23");
+        }
+    }
     [TestFixture]
     public class Tests
     {
@@ -55,6 +64,7 @@ namespace Jal.Router.Tests.Integration
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Message1>)).ImplementedBy(typeof(Message1Handler)).Named(typeof(Message1Handler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ILogger<PointToPointChannelInfo>)).ImplementedBy(typeof(Logger)).Named(typeof(Logger).FullName).LifestyleSingleton());
             container.Install(new AzureServiceBusRouterInstaller());
             //container.Install(new AzureStorageInstaller("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA=="));
             container.Install(new RouterLoggerInstaller());
@@ -63,8 +73,13 @@ namespace Jal.Router.Tests.Integration
             _brokered = container.Resolve<IRouter>();
             _startup = container.Resolve<IStartup>();
             var config = container.Resolve<IConfiguration>();
-            config.UsingAzureServiceBus();
-            config.UsingCommonLogging();
+            var monitor = container.Resolve<IMonitor>();
+            config.AddMonitoringTask<PointToPointChannelMonitor>(5000);
+            config.AddLogger<Logger, PointToPointChannelInfo>();
+            monitor.Start();
+            
+            //config.UsingAzureServiceBus();
+            //config.UsingCommonLogging();
             //_sagabrokered = container.Resolve<ISagaRouter<BrokeredMessage>>();
         }
 
@@ -73,7 +88,8 @@ namespace Jal.Router.Tests.Integration
         {
 
             //_starter.Start();
-
+            Thread.Sleep(
+                30000);
             var bm = new BrokeredMessage(@"{""Name"":""Raul""}");
             bm.Properties.Add("origin","AB");
             var message = new Message();
@@ -83,7 +99,7 @@ namespace Jal.Router.Tests.Integration
 
             //_brokered.Route<Message>(bm,"error");
 
-            //_brokered.Route<Message>(bm);
+            _brokered.Route<Message, BrokeredMessage>(bm);
 
             //_brokered.RouteToSaga<Message, BrokeredMessage>(bm, "saga");
 

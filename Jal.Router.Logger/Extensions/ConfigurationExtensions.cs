@@ -7,9 +7,9 @@ namespace Jal.Router.Logger.Extensions
     {
         public static void UsingCommonLogging(this IConfiguration configuration)
         {
-            configuration.AddBusLogger<BusLogger>();
+            configuration.AddOutboundMiddleware<BusLogger>();
 
-            configuration.AddRouterLogger<RouterLogger>();
+            configuration.AddInboundMiddleware<RouterLogger>();
         }
     }
 }

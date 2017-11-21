@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound
             _context = context;
         }
 
-        public void Excute()
+        public void Execute()
         {
             GetNext().Invoke();
         }

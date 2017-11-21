@@ -14,25 +14,25 @@ namespace Jal.Router.Tests.Impl
     {
         public RouterConfigurationSource()
         {
-            RegisterSaga<Data>("saga", start =>
-            {
-                start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
-                {
-                    x.With((request, handler, data) => handler.Handle(request, data));
-                });
-            }, @continue =>
-            {
-                @continue.RegisterRoute<IMessageHandler<Message1>>().ForMessage<Message1>().ToBeHandledBy<Message1Handler>(x =>
-                {
-                    x.With(((request, handler, data) => handler.Handle(request, data)));
-                });
-            }
-            );
+            //RegisterSaga<Data>("saga", start =>
+            //{
+            //    start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
+            //    {
+            //        x.With((request, handler, data) => handler.Handle(request, data));
+            //    });
+            //}, @continue =>
+            //{
+            //    @continue.RegisterRoute<IMessageHandler<Message1>>().ForMessage<Message1>().ToBeHandledBy<Message1Handler>(x =>
+            //    {
+            //        x.With(((request, handler, data) => handler.Handle(request, data)));
+            //    });
+            //}
+            //);
 
-            RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
-            {
-                x.With(((request, handler) => handler.Handle(request, null)));
-            }).When(((message, context) => context.Origin.Key == "A")); ;
+            //RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
+            //{
+            //    x.With(((request, handler) => handler.Handle(request, null)));
+            //}).When(((message, context) => context.Origin.Key == "A")); ;
 
 
             RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
@@ -41,7 +41,7 @@ namespace Jal.Router.Tests.Impl
             })
                 .OnExceptionRetryFailedMessageTo<ApplicationException>("retry")
                 .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(10, 5))
-                .OnErrorSendFailedMessageTo("error").ForwardMessageTo("").UsingMiddleware(x=>x.Add<AppSettingsBasicAuthenticationHandler>());
+                .OnErrorSendFailedMessageTo("error");
                 //.UsingStorage<AzureTableStorage>()
                 //.UsingMessageChannel<AzureServiceBusQueue, AzureServiceBusTopic, AzureServiceBusManager>();
 
