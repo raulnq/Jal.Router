@@ -22,6 +22,12 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
+            var name = parameter.Route.Name;
+            if (!string.IsNullOrWhiteSpace(parameter.Saga?.Name))
+            {
+                name = $"{parameter.Saga?.Name}_{parameter.Route.Name}";
+            }
+
             try
             {
                 telemetry.Timestamp = context.DateTimeUtc;
@@ -32,6 +38,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Properties.Add("origin", context.Origin.Key);
                 telemetry.Properties.Add("saga", context.Saga?.Id);
                 telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
+                telemetry.Context.Operation.Name = name;
                 foreach (var h in context.Headers)
                 {
                     telemetry.Properties.Add(h.Key, h.Value);
