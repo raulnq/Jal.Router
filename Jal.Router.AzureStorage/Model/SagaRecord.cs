@@ -23,9 +23,9 @@ namespace Jal.Router.AzureStorage.Model
         public string Name { get; set; }
 
         public DateTime Created { get; set; }
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
 
         public string Status { get; set; }
     }

@@ -34,7 +34,7 @@ namespace Jal.Router.Impl
         {
             var context = Create(message);
 
-            context.ContentType = typeof (TMessage);
+            context.ContentType = typeof (TContent);
 
             var body = ReadBody(message);
 
