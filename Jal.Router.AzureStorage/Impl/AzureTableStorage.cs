@@ -59,8 +59,11 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     Data = JsonConvert.SerializeObject(data),
                     Created = context.DateTimeUtc,
+                    Updated = context.DateTimeUtc,
                     Name = saga.Name,
-                    DataType = saga.DataType.FullName
+                    DataType = saga.DataType.FullName,
+                    Timeout = saga.Timeout,
+                    Status = "STARTED"
                 };
 
                 table.Execute(TableOperation.Insert(record));
@@ -142,7 +145,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             if (record != null)
             {
-                UpdateSaga(record, data, tablenamesufix);
+                UpdateSaga(record, data, tablenamesufix, context.DateTimeUtc);
 
                 CreateMessage(record, context, route, tablenamesufix);
             }
@@ -178,11 +181,13 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        private void UpdateSaga<TData>(SagaRecord record, TData data, string tablenamesufix)
+        private void UpdateSaga<TData>(SagaRecord record, TData data, string tablenamesufix, DateTime datetime)
         {
             try
             {
                 record.Data = JsonConvert.SerializeObject(data);
+
+                record.Updated = datetime;
 
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 

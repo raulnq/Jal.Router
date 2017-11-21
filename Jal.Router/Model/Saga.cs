@@ -17,6 +17,8 @@ namespace Jal.Router.Model
 
         public Type DataType { get; set; }
 
+        public int Timeout { get; set; }
+
         public List<Route> NextRoutes { get; set; }
 
         public Route StartingRoute { get; set; }

@@ -14,20 +14,20 @@ namespace Jal.Router.Tests.Impl
     {
         public RouterConfigurationSource()
         {
-            //RegisterSaga<Data>("saga", start =>
-            //{
-            //    start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
-            //    {
-            //        x.With((request, handler, data) => handler.Handle(request, data));
-            //    });
-            //}, @continue =>
-            //{
-            //    @continue.RegisterRoute<IMessageHandler<Message1>>().ForMessage<Message1>().ToBeHandledBy<Message1Handler>(x =>
-            //    {
-            //        x.With(((request, handler, data) => handler.Handle(request, data)));
-            //    });
-            //}
-            //);
+            RegisterSaga<Data>("saga", start =>
+            {
+                start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
+                {
+                    x.With((request, handler, data) => handler.Handle(request, data));
+                });
+            }, @continue =>
+            {
+                @continue.RegisterRoute<IMessageHandler<Message1>>().ForMessage<Message1>().ToBeHandledBy<Message1Handler>(x =>
+                {
+                    x.With(((request, handler, data) => handler.Handle(request, data)));
+                });
+            }
+            );//.WithTimeout(100);
 
             //RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
             //{
