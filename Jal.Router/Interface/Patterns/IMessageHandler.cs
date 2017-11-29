@@ -6,13 +6,13 @@ namespace Jal.Router.Interface.Patterns
     {
         void Handle(TMessage message);
 
-        void Handle(TMessage message, MessageContext context);
+        void HandleWithContext(TMessage message, MessageContext context);
 
-        bool IsSuccessful(TMessage message, MessageContext context);
+        bool IsSuccessfulWithContext(TMessage message, MessageContext context);
 
         bool IsSuccessful(TMessage message);
 
-        void Compensate(TMessage message, MessageContext context);
+        void CompensateWithContext(TMessage message, MessageContext context);
 
         void Compensate(TMessage message);
     }

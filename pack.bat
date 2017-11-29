@@ -26,5 +26,6 @@ packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.Applicati
 
 packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
 
+packages\NuGet.CommandLine.3.4.4-rtm-final\tools\nuget pack Jal.Router.ApplicationInsights.Installer\Jal.Router.ApplicationInsights.Installer.csproj -Properties "Configuration=Release;Platform=AnyCPU;OutputPath=bin\Release" -Build -IncludeReferencedProjects -OutputDirectory Jal.Router.Nuget
 
 pause;

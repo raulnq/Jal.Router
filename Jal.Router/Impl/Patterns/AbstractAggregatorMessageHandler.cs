@@ -17,9 +17,14 @@ namespace Jal.Router.Impl.Patterns
 
         public abstract bool IsCompleted(TMessage message, MessageContext context);
 
+        public virtual Origin CreateOrigin(TMessage message, MessageContext context)
+        {
+            return null;
+        }
+
         public abstract TAggregatedMessage CreateAgrgegatedMessage(TMessage message, MessageContext context);
 
-        public override void Handle(TMessage message, MessageContext context)
+        public override void HandleWithContext(TMessage message, MessageContext context)
         {
             try
             {
@@ -31,7 +36,16 @@ namespace Jal.Router.Impl.Patterns
                 {
                     var m = CreateAgrgegatedMessage(message, context);
 
-                    _bus.Send(m, CreateOptions(message, context));
+                    var origin = CreateOrigin(message, context);
+
+                    if (origin == null)
+                    {
+                        _bus.Publish(m, CreateOptions(message, context));
+                    }
+                    else
+                    {
+                        _bus.Publish(m, origin, CreateOptions(message, context));
+                    }
                 }
             }
             catch (Exception ex)

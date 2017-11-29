@@ -11,12 +11,12 @@ namespace Jal.Router.Impl.Patterns
             
         }
 
-        public virtual void Handle(TMessage message, MessageContext context)
+        public virtual void HandleWithContext(TMessage message, MessageContext context)
         {
 
         }
 
-        public virtual bool IsSuccessful(TMessage message, MessageContext context)
+        public virtual bool IsSuccessfulWithContext(TMessage message, MessageContext context)
         {
             return true;
         }
@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Patterns
             return true;
         }
 
-        public virtual void Compensate(TMessage message, MessageContext context)
+        public virtual void CompensateWithContext(TMessage message, MessageContext context)
         {
             
         }

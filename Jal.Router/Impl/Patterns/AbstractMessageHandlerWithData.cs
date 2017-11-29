@@ -6,22 +6,22 @@ namespace Jal.Router.Impl.Patterns
 {
     public abstract class AbstractMessageHandlerWithData<TMessage, TData> : AbstractMessageHandler<TMessage>, IMessageHandlerWithData<TMessage, TData>
     {
-        public virtual void Handle(TMessage message, TData data)
+        public virtual void HandleWithData(TMessage message, TData data)
         {
 
         }
 
-        public virtual void Handle(TMessage message, MessageContext context, TData data)
+        public virtual void HandleWithContextAndData(TMessage message, MessageContext context, TData data)
         {
 
         }
 
-        public virtual void Compensate(TMessage message, MessageContext context, TData data)
+        public virtual void CompensateWithContextAndData(TMessage message, MessageContext context, TData data)
         {
 
         }
 
-        public virtual void Compensate(TMessage message, TData data)
+        public virtual void CompensateWithData(TMessage message, TData data)
         {
 
         }

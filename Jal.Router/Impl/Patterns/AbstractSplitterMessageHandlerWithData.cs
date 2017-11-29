@@ -15,7 +15,12 @@ namespace Jal.Router.Impl.Patterns
 
         public abstract TSplittedMessage[] Split(TMessage message, MessageContext context, TData data);
 
-        public override void Handle(TMessage message, MessageContext context, TData data)
+        public virtual Origin CreateOrigin(TMessage message, MessageContext context, TData data)
+        {
+            return null;
+        }
+
+        public override void HandleWithContextAndData(TMessage message, MessageContext context, TData data)
         {
             try
             {
@@ -26,7 +31,16 @@ namespace Jal.Router.Impl.Patterns
 
                 foreach (var m in messages)
                 {
-                    _bus.Send(m, CreateOptions(message, context, data));
+                    var origin = CreateOrigin(message, context, data);
+
+                    if (origin == null)
+                    {
+                        _bus.Send(m, CreateOptions(message, context, data));
+                    }
+                    else
+                    {
+                        _bus.Send(m, origin, CreateOptions(message, context, data));
+                    }
                 }
             }
             catch (Exception ex)

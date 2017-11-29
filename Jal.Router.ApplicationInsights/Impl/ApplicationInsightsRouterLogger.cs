@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
 using Jal.Router.Model.Inbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -10,10 +11,15 @@ namespace Jal.Router.ApplicationInsights.Impl
     public class ApplicationInsightsRouterLogger : IMiddleware
     {
         private readonly TelemetryClient _client;
-        public ApplicationInsightsRouterLogger(TelemetryClient client)
+
+        private readonly IConfiguration _configuration;
+
+        public ApplicationInsightsRouterLogger(TelemetryClient client, IConfiguration configuration)
         {
             _client = client;
+            _configuration = configuration;
         }
+
         public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var telemetry = new RequestTelemetry();
@@ -41,6 +47,11 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Context.Operation.Name = name;
                 telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
                 telemetry.Source = context.Origin.Name;
+                if (!string.IsNullOrWhiteSpace(_configuration.ApplicationName))
+                {
+                    telemetry.Context.Cloud.RoleName = _configuration.ApplicationName;
+                }
+
                 foreach (var h in context.Headers)
                 {
                     telemetry.Properties.Add(h.Key, h.Value);
@@ -52,7 +63,6 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 telemetry.ResponseCode = "200";
                 telemetry.Success = true;
-                    
             }
             catch (Exception exception)
             {
