@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Jal.Router.Impl;
+using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
@@ -41,7 +42,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
-                    context.Saga.Id = brokeredmessage.Properties[SagaId].ToString();
+                    context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(Version))
@@ -137,9 +138,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(Version, context.Version);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Saga.Id))
+            if (!string.IsNullOrWhiteSpace(context.SagaInfo.Id))
             {
-                brokeredmessage.Properties.Add(SagaId, context.Saga.Id);
+                brokeredmessage.Properties.Add(SagaId, context.SagaInfo.Id);
             }
 
             if (context.ScheduledEnqueueDateTimeUtc != null)

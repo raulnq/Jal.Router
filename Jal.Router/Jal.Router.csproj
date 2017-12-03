@@ -66,15 +66,17 @@
     <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
-    <Compile Include="Impl\AbstractMessageAdapter.cs" />
+    <Compile Include="Impl\Inbound\AbstractMessageAdapter.cs" />
     <Compile Include="Impl\ConsoleHeartBeatLogger.cs" />
     <Compile Include="Impl\Inbound\BasicAuthenticationHandler.cs" />
     <Compile Include="Impl\Inbound\MessageRouter.cs" />
     <Compile Include="Impl\Inbound\MessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\NextMessageHandler.cs" />
+    <Compile Include="Impl\Inbound\Sagas\StorageFacade.cs" />
     <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
     <Compile Include="Impl\Management\Monitor.cs" />
     <Compile Include="Impl\Management\PointToPointChannelMonitor.cs" />
+    <Compile Include="Model\Management\StorageConfiguration.cs" />
     <Compile Include="Impl\Management\SubscriptionToPublishSubscribeChannelMonitor.cs" />
     <Compile Include="Impl\NullMessageAdapter.cs" />
     <Compile Include="Impl\Outbound\AbstractBusInterceptor.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="Impl\Management\ChannelStartupTask.cs" />
     <Compile Include="Interface\IComponentFactory.cs" />
     <Compile Include="Interface\Inbound\IRouterInterceptor.cs" />
+    <Compile Include="Interface\Inbound\Sagas\IStorageFacade.cs" />
     <Compile Include="Interface\Management\IMonitor.cs" />
     <Compile Include="Interface\Management\IMonitoringTask.cs" />
     <Compile Include="Interface\Outbound\IMiddleware.cs" />
@@ -170,7 +173,7 @@
     <Compile Include="Impl\Inbound\Router.cs" />
     <Compile Include="Interface\Inbound\IRouter.cs" />
     <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
-    <Compile Include="Model\SagaSetting.cs" />
+    <Compile Include="Model\SagaInfo.cs" />
     <Compile Include="Model\Management\SubscriptionToPublishSubscribeChannel.cs" />
     <Compile Include="Model\Management\PublishSubscribeChannel.cs" />
     <Compile Include="Impl\NullMessageBodySerializer.cs" />

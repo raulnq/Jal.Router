@@ -14,6 +14,7 @@ namespace Jal.Router.Impl.Inbound
         {
             if (!IsValid(context))
             {
+                Console.WriteLine("Unauthorized");
                 throw new SecurityException("Unauthorized");
             }
             next();

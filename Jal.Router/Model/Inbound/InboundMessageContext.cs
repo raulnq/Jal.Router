@@ -14,7 +14,8 @@
             Origin = context.Origin;
             DateTimeUtc = context.DateTimeUtc;
             Content = content;
-            Saga = context.Saga;
+            SagaInfo = context.SagaInfo;
+            Route = context.Route;
             ContentType = context.ContentType;
             Body = context.Body;
         }

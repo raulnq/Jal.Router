@@ -44,6 +44,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
+            container.Register<IStorageFacade, StorageFacade>(new PerContainerLifetime());
+
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof(PointToPointChannelMonitor).FullName, new PerContainerLifetime());
 
             container.Register<IMonitoringTask, SubscriptionToPublishSubscribeChannelMonitor>(typeof(SubscriptionToPublishSubscribeChannelMonitor).FullName, new PerContainerLifetime());

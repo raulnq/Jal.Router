@@ -14,6 +14,7 @@ namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
+        public StorageConfiguration Storage { get; set; }
         public string ApplicationName { get; set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; private set; }
         public IList<Type> StartupTaskTypes { get; private set; }
@@ -115,6 +116,7 @@ namespace Jal.Router.Impl.Management
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
             AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
+            Storage = new StorageConfiguration();
         }
     }
 }

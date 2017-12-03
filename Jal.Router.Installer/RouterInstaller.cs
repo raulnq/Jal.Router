@@ -52,6 +52,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
+            container.Register(Component.For<IStorageFacade>().ImplementedBy<StorageFacade>().LifestyleSingleton());
+
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<SubscriptionToPublishSubscribeChannelMonitor>().LifestyleSingleton().Named(typeof(SubscriptionToPublishSubscribeChannelMonitor).FullName));

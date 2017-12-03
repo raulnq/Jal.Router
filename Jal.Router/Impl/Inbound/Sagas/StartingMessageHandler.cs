@@ -41,11 +41,14 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            storage.Create(saga, context, route, data);
+            storage.Create(context, data);
 
             _router.Route(context, route, data);
 
-            storage.Update(saga, context, route, data);
+            if (!_configuration.Storage.ManualSagaSave)
+            {
+                storage.Update(context, data);
+            }            
         }
     }
 }

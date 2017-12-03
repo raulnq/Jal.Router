@@ -39,13 +39,16 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var data = storage.Find(saga, context, route);
+            var data = storage.Find<TData>(context);
 
             if (data != null)
             {
                 _router.Route(context, route, data);
 
-                storage.Update(saga, context, route, data);
+                if (!_configuration.Storage.ManualSagaSave)
+                {
+                    storage.Update(context, data);
+                }
             }
             else
             {

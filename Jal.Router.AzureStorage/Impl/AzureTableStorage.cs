@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
+using System.Text;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl.Inbound.Sagas;
+using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Microsoft.WindowsAzure.Storage;
@@ -43,7 +46,7 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        private void CreateSaga<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, TData data)
+        private void CreateSaga<TData>(Saga saga, MessageContext context, TData data)
         {
             try
             {
@@ -51,7 +54,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var row = Guid.NewGuid().ToString();
 
-                context.Saga.SetId(partition, row, _currenttablenamesufix);
+                context.SagaInfo.SetId(partition, row, _currenttablenamesufix);
 
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
 
@@ -74,7 +77,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        private void CreateMessage<TContent>(SagaRecord saga, InboundMessageContext<TContent> context, Route route, string tablenamesufix)
+        private void CreateMessage(SagaRecord saga, MessageContext context, Route route, string tablenamesufix)
         {
             try
             {
@@ -82,19 +85,26 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var record = new MessageRecord(saga.RowKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
                 {
-                    Content = JsonConvert.SerializeObject(context.Content),
+                    Content = context.Body,
                     ContentType = route.BodyType.FullName,
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
                     LastRetry = context.LastRetry,
                     Origin = JsonConvert.SerializeObject(context.Origin),
-                    Saga = JsonConvert.SerializeObject(context.Saga),
+                    Saga = JsonConvert.SerializeObject(context.SagaInfo),
                     Headers = JsonConvert.SerializeObject(context.Headers),
                     DateTimeUtc = context.DateTimeUtc,
                     Name = route.Name,
                     Data = saga.Data
                 };
+
+                var size = Encoding.UTF8.GetByteCount(record.Content);
+
+                if (size >= 64000)
+                {
+                    record.Content = LimitByteLength(record.Content, 63000)+ "...";
+                }
 
                 table.Execute(TableOperation.Insert(record));
             }
@@ -104,13 +114,26 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public SagaRecord GetSaga<TContent>(InboundMessageContext<TContent> context, Saga saga, string tablenamesufix)
+        public static string LimitByteLength(string input, int maxLength)
+        {
+            for (int i = input.Length - 1; i >= 0; i--)
+            {
+                if (Encoding.UTF8.GetByteCount(input.Substring(0, i + 1)) <= maxLength)
+                {
+                    return input.Substring(0, i + 1);
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public SagaRecord GetSaga(MessageContext context, Saga saga, string tablenamesufix)
         {
             try
             {
-                var partitionkey = context.Saga.GetPartitionKey();
+                var partitionkey = context.SagaInfo.GetPartitionKey();
 
-                var rowkey = context.Saga.GetRowKey();
+                var rowkey = context.SagaInfo.GetRowKey();
 
                 if (!string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
@@ -131,38 +154,38 @@ namespace Jal.Router.AzureStorage.Impl
             return null;
         }
 
-        public override void Create<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
+        public override void Create<TData>(MessageContext context, TData data)
         {
-            CreateSaga(saga, context, data);
+            CreateSaga(context.Saga, context, data);
         }
 
 
-        public override void Update<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route, TData data)
+        public override void Update<TData>(MessageContext context, TData data)
         {
-            var tablenamesufix = context.Saga.GetTableNameSufix();
+            var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
-            var record = GetSaga(context, saga, tablenamesufix);
+            var record = GetSaga(context, context.Saga, tablenamesufix);
 
             if (record != null)
             {
                 UpdateSaga(record, data, tablenamesufix, context.DateTimeUtc);
 
-                CreateMessage(record, context, route, tablenamesufix);
+                CreateMessage(record, context, context.Route, tablenamesufix);
             }
         }
 
-        public override void Create<TContent>(InboundMessageContext<TContent> context, Route route)
+        public override void Create(MessageContext context)
         {
             try
             {
-                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{route.BodyType.Name}";
+                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Route.BodyType.Name}";
 
                 var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
 
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
-                    Content = JsonConvert.SerializeObject(context.Content),
-                    ContentType = route.BodyType.FullName,
+                    Content =context.Body,
+                    ContentType = context.Route.BodyType.FullName,
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
@@ -170,14 +193,14 @@ namespace Jal.Router.AzureStorage.Impl
                     Origin = JsonConvert.SerializeObject(context.Origin),
                     Headers = JsonConvert.SerializeObject(context.Headers),
                     DateTimeUtc = context.DateTimeUtc,
-                    Name = route.Name,
+                    Name = context.Route.Name,
                 };
 
                 table.Execute(TableOperation.Insert(record));
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation route {route.Name}", ex);
+                throw new ApplicationException($"Error during the message record creation route {context.Route.Name}", ex);
             }
         }
 
@@ -188,6 +211,8 @@ namespace Jal.Router.AzureStorage.Impl
                 record.Data = JsonConvert.SerializeObject(data);
 
                 record.Updated = datetime;
+
+                record.ETag = "*";
 
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 
@@ -210,11 +235,11 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override TData Find<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route)
+        public override TData Find<TData>(MessageContext context)
         {
-            var tablenamesufix = context.Saga.GetTableNameSufix();
+            var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
-            var record = GetSaga(context, saga, tablenamesufix);
+            var record = GetSaga(context, context.Saga, tablenamesufix);
 
             if (record!=null)
             {

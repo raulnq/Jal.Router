@@ -23,11 +23,11 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Start Call. id: {context.Id} sagaid: {context.Saga?.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Start Call. id: {context.Id} sagaid: {context.SagaInfo?.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
 
                 next();
 
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Message sent. id: {context.Id} sagaid: {context.Saga?.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Message sent. id: {context.Id} sagaid: {context.SagaInfo?.Id} toconnectionstring: {context.ToConnectionString} topath: {context.ToPath} with origin: {context.Origin.Key}");
             }
             catch (Exception exception)
             {

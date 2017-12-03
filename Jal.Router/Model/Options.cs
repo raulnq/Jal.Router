@@ -10,11 +10,11 @@ namespace Jal.Router.Model
             Headers=new Dictionary<string, string>();
             Version = "1";
             RetryCount = 0;
-            Saga = new SagaSetting();
+            SagaInfo = new SagaInfo();
         }
         public string Id { get; set; }
 
-        public SagaSetting Saga { get; set; }
+        public SagaInfo SagaInfo { get; set; }
 
         public string EndPointName { get; set; }
 

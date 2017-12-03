@@ -23,11 +23,11 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Router.cs, Route, {context.Id}] Start Call. Message arrived. id: {context.Id} sagaid: {context.Saga?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
+                _log.Info($"[Router.cs, Route, {context.Id}] Start Call. Message arrived. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
 
                 next();
 
-                _log.Info($"[Router.cs, Route, {context.Id}] Message routed. id: {context.Id} sagaid: {context.Saga?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
+                _log.Info($"[Router.cs, Route, {context.Id}] Message routed. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
             }
             catch (Exception exception)
             {
@@ -39,7 +39,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Router.cs, Route, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. Message routed. id: {context.Id} sagaid: {context.Saga?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
+                _log.Info($"[Router.cs, Route, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. Message routed. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.Name} origin: {context.Origin.Key} retry: {context.RetryCount}");
             }
         }
     }

@@ -11,9 +11,12 @@ namespace Jal.Router.Model
         public string Version { get; set; }
         public int RetryCount { get; set; }
         public bool LastRetry { get; set; }
+        public Route Route { get; set; }
+        
         public Origin Origin { get; set; }
         public DateTime DateTimeUtc { get; set; }
-        public SagaSetting Saga { get; set; }
+        public SagaInfo SagaInfo { get; set; }
+        public Saga Saga { get; set; }
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
         public string Body { get; set; }
@@ -23,7 +26,7 @@ namespace Jal.Router.Model
             Version = "1";
             LastRetry = true;
             Origin = new Origin();
-            Saga = new SagaSetting();
+            SagaInfo = new SagaInfo();
         }
 
         public Dictionary<string, string> CopyHeaders()

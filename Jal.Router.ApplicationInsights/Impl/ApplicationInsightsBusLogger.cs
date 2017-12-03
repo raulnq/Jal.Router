@@ -33,7 +33,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 {
                     new KeyValuePair<string, string>("from", context.Origin.Name),
                     new KeyValuePair<string, string>("origin", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.Saga?.Id),
+                    new KeyValuePair<string, string>("saga",context.SagaInfo?.Id),
                     new KeyValuePair<string, string>("version", context.Version),
                 },
                 Metrics =

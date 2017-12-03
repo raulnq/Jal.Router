@@ -5,7 +5,7 @@ using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 
-namespace Jal.Router.Impl
+namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractMessageAdapter : IMessageAdapter
     {

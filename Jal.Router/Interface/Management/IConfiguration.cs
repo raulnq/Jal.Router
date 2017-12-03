@@ -9,6 +9,7 @@ namespace Jal.Router.Interface.Management
 {
     public interface IConfiguration
     {
+        StorageConfiguration Storage { get; set; }
         string ApplicationName { get; set; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IList<Type> StartupTaskTypes { get; }

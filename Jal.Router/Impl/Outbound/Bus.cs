@@ -50,6 +50,8 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+
                 interceptor.OnError(message, options, ex);
 
                 throw;
@@ -75,7 +77,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga,
+                SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
                 Body = serializer.Serialize(content)
@@ -170,7 +172,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga,
+                SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
                 Body = serializer.Serialize(content)
@@ -206,6 +208,8 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+
                 interceptor.OnError(message, options, ex);
 
                 throw;
@@ -231,7 +235,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                Saga = options.Saga,
+                SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
                 Body = serializer.Serialize(content)

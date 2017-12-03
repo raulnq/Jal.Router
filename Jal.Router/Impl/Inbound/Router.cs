@@ -52,6 +52,10 @@ namespace Jal.Router.Impl.Inbound
 
                         var parameter = new MiddlewareParameter() { Route = saga.StartingRoute, Saga = saga};
 
+                        context.Route = parameter.Route;
+
+                        context.Saga = saga;
+
                         var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                         pipeline.Execute();
@@ -76,6 +80,10 @@ namespace Jal.Router.Impl.Inbound
 
                                 var parameter = new MiddlewareParameter() { Route = route, Saga = saga};
 
+                                context.Route = route;
+
+                                context.Saga = saga;
+
                                 var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                                 pipeline.Execute();
@@ -97,6 +105,8 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+
                 interceptor.OnException(context, ex);
 
                 throw;
@@ -135,6 +145,8 @@ namespace Jal.Router.Impl.Inbound
 
                         var parameter = new MiddlewareParameter() {Route = route};
 
+                        context.Route = route;
+
                         var pipeline = new Pipeline<TContent>(_factory, middlewares.ToArray(), context, parameter);
 
                         pipeline.Execute();
@@ -149,6 +161,8 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+
                 interceptor.OnException(context, ex);
 
                 throw;

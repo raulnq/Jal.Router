@@ -38,6 +38,7 @@ namespace Jal.Router.Impl.Inbound
                     }
                     else
                     {
+                        Console.WriteLine("The retry policy cannot be null");
                         throw new ApplicationException("The retry policy cannot be null");
                     }
                 }
@@ -116,7 +117,7 @@ namespace Jal.Router.Impl.Inbound
                 Version = context.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
                 RetryCount = context.RetryCount + 1,
-                Saga = context.Saga
+                SagaInfo = context.SagaInfo
             };
 
             _bus.Send(context.Content, context.Origin, options);
@@ -130,7 +131,7 @@ namespace Jal.Router.Impl.Inbound
                 Headers = context.Headers,
                 Id = context.Id,
                 Version = context.Version,
-                Saga = context.Saga,
+                SagaInfo = context.SagaInfo,
             };
             if (ex != null)
             {

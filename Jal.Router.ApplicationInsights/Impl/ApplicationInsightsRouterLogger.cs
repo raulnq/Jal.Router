@@ -42,7 +42,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Properties.Add("from", context.Origin.Name);
                 telemetry.Properties.Add("version", context.Version);
                 telemetry.Properties.Add("origin", context.Origin.Key);
-                telemetry.Properties.Add("saga", context.Saga?.Id);
+                telemetry.Properties.Add("saga", context.SagaInfo?.Id);
                 telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
                 telemetry.Context.Operation.Name = name;
                 telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";

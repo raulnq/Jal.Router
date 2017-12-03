@@ -4,12 +4,12 @@ namespace Jal.Router.AzureStorage.Extensions
 {
     public static class SagaSettingExtensions
     {
-        public static void SetId(this SagaSetting saga, string partitionkey, string rowkey, string tablenamesufix)
+        public static void SetId(this SagaInfo saga, string partitionkey, string rowkey, string tablenamesufix)
         {
             saga.Id = $"{partitionkey}@{rowkey}@{tablenamesufix}";
         }
 
-        public static string GetPartitionKey(this SagaSetting saga)
+        public static string GetPartitionKey(this SagaInfo saga)
         {
             if (!string.IsNullOrWhiteSpace(saga.Id))
             {
@@ -24,7 +24,7 @@ namespace Jal.Router.AzureStorage.Extensions
             return string.Empty;
         }
 
-        public static string GetRowKey(this SagaSetting saga)
+        public static string GetRowKey(this SagaInfo saga)
         {
             if (!string.IsNullOrWhiteSpace(saga.Id))
             {
@@ -39,7 +39,7 @@ namespace Jal.Router.AzureStorage.Extensions
             return string.Empty;
         }
 
-        public static string GetTableNameSufix(this SagaSetting saga)
+        public static string GetTableNameSufix(this SagaInfo saga)
         {
             if (!string.IsNullOrWhiteSpace(saga.Id))
             {
