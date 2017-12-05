@@ -15,6 +15,8 @@ namespace Jal.Router.Logger.LightInject.Installer
             container.Register<Interface.Inbound.IMiddleware, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
 
             container.Register<ILogger<HeartBeat>, HeartBeatLogger>(typeof(HeartBeatLogger).FullName, new PerContainerLifetime());
+
+            container.Register<ILogger<StartupBeat>, StartupBeatLogger>(typeof(StartupBeatLogger).FullName, new PerContainerLifetime());
         }
     }
 }

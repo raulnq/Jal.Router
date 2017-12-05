@@ -52,6 +52,7 @@
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Impl\ApplicationInsightsPointToPointChannelInfoLogger.cs" />
     <Compile Include="Impl\ApplicationInsightsPublishSubscribeChannelInfoLogger.cs" />
+    <Compile Include="Impl\ApplicationInsightsStartupBeatLogger.cs" />
     <Compile Include="Impl\ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger.cs" />
     <Compile Include="Impl\ApplicationInsightsHeartBeatLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

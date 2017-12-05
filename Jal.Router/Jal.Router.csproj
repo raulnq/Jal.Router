@@ -66,6 +66,7 @@
     <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
+    <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
     <Compile Include="Impl\Inbound\AbstractMessageAdapter.cs" />
     <Compile Include="Impl\ConsoleHeartBeatLogger.cs" />
     <Compile Include="Impl\Inbound\BasicAuthenticationHandler.cs" />
@@ -76,6 +77,8 @@
     <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
     <Compile Include="Impl\Management\Monitor.cs" />
     <Compile Include="Impl\Management\PointToPointChannelMonitor.cs" />
+    <Compile Include="Impl\Management\StartupTask.cs" />
+    <Compile Include="Model\Management\StartupBeat.cs" />
     <Compile Include="Model\Management\StorageConfiguration.cs" />
     <Compile Include="Impl\Management\SubscriptionToPublishSubscribeChannelMonitor.cs" />
     <Compile Include="Impl\NullMessageAdapter.cs" />

@@ -14,6 +14,8 @@ namespace Jal.Router.ApplicationInsights.LightInject.Installer
 
             container.Register<ILogger<HeartBeat>, ApplicationInsightsHeartBeatLogger>(typeof(ApplicationInsightsHeartBeatLogger).FullName, new PerContainerLifetime());
 
+            container.Register<ILogger<StartupBeat>, ApplicationInsightsStartupBeatLogger>(typeof(ApplicationInsightsStartupBeatLogger).FullName, new PerContainerLifetime());
+
             container.Register<ILogger<SubscriptionToPublishSubscribeChannelInfo>, ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger>(typeof(ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger).FullName, new PerContainerLifetime());
 
             container.Register<ILogger<PublishSubscribeChannelInfo>, ApplicationInsightsPublishSubscribeChannelInfoLogger>(typeof(ApplicationInsightsPublishSubscribeChannelInfoLogger).FullName, new PerContainerLifetime());

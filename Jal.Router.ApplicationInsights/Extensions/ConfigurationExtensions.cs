@@ -14,6 +14,8 @@ namespace Jal.Router.ApplicationInsights.Extensions
 
             configuration.AddLogger<ApplicationInsightsHeartBeatLogger, HeartBeat>();
 
+            configuration.AddLogger<ApplicationInsightsStartupBeatLogger, StartupBeat>();
+
             configuration.AddLogger<ApplicationInsightsPointToPointChannelInfoLogger, PointToPointChannelInfo>();
 
             configuration.AddLogger<ApplicationInsightsPublishSubscribeChannelInfoLogger, PublishSubscribeChannelInfo>();

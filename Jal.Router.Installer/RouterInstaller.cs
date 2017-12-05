@@ -50,6 +50,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<ChannelStartupTask>().LifestyleSingleton().Named(typeof(ChannelStartupTask).FullName));
 
+            container.Register(Component.For<IStartupTask>().ImplementedBy<StartupTask>().LifestyleSingleton().Named(typeof(StartupTask).FullName));
+
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
             container.Register(Component.For<IStorageFacade>().ImplementedBy<StorageFacade>().LifestyleSingleton());
@@ -73,6 +75,8 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IChannelManager>().ImplementedBy<NullChannelManager>().LifestyleSingleton().Named(typeof(NullChannelManager).FullName));
 
             container.Register(Component.For(typeof(ILogger<HeartBeat>)).ImplementedBy(typeof(ConsoleHeartBeatLogger)).Named(typeof(ConsoleHeartBeatLogger).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(ILogger<StartupBeat>)).ImplementedBy(typeof(ConsoleStartupBeatLogger)).Named(typeof(ConsoleStartupBeatLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(NullBusInterceptor)).Named(typeof(NullBusInterceptor).FullName).LifestyleSingleton());
 

@@ -18,6 +18,8 @@ namespace Jal.Router.ApplicationInsights.Installer
 
             container.Register(Component.For<ILogger<HeartBeat>> ().ImplementedBy<ApplicationInsightsHeartBeatLogger>().Named(typeof(ApplicationInsightsHeartBeatLogger).FullName).LifestyleSingleton());
 
+            container.Register(Component.For<ILogger<StartupBeat>>().ImplementedBy<ApplicationInsightsStartupBeatLogger>().Named(typeof(ApplicationInsightsStartupBeatLogger).FullName).LifestyleSingleton());
+
             container.Register(Component.For<ILogger<SubscriptionToPublishSubscribeChannelInfo>>().ImplementedBy<ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger>().Named(typeof(ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For<ILogger<PublishSubscribeChannelInfo>>().ImplementedBy<ApplicationInsightsPublishSubscribeChannelInfoLogger>().Named(typeof(ApplicationInsightsPublishSubscribeChannelInfoLogger).FullName).LifestyleSingleton());

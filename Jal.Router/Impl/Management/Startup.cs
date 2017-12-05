@@ -1,22 +1,31 @@
+using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
 namespace Jal.Router.Impl.Management
 {
     public class Startup : IStartup
     {
-        private readonly IStartupTask[] _startupTasks;
+        private readonly IComponentFactory _factory;
 
-        public Startup(IStartupTask[] startupTasks)
+        private readonly IConfiguration _configuration;
+
+        public Startup(IComponentFactory factory, IConfiguration configuration)
         {
-            _startupTasks = startupTasks;
+            _factory = factory;
+            _configuration = configuration;
         }
+
 
         public void Start()
         {
-            foreach (var configuration in _startupTasks)
+            foreach (var type in _configuration.StartupTaskTypes)
             {
-                configuration.Run();
+                var task = _factory.Create<IStartupTask>(type);
+
+                task.Run();
+
             }
+
         }
     }
 }

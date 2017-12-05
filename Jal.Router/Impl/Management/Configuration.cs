@@ -95,7 +95,7 @@ namespace Jal.Router.Impl.Management
         {
             MonitoringTaskTypes.Add(new MonitoringTaskMetadata() {Type = typeof(TMonitoringTask), Interval = interval });
         }
-        public void AdStartupTask<TStartupTask>() where TStartupTask : IStartupTask
+        public void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
         {
             StartupTaskTypes.Add(typeof(TStartupTask));
         }
@@ -116,6 +116,8 @@ namespace Jal.Router.Impl.Management
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
             AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
+            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();
+            AddStartupTask<StartupTask>();
             Storage = new StorageConfiguration();
         }
     }

@@ -42,6 +42,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IStartupTask, ChannelStartupTask>(typeof(ChannelStartupTask).FullName, new PerContainerLifetime());
 
+            container.Register<IStartupTask, StartupTask>(typeof(StartupTask).FullName, new PerContainerLifetime());
+
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
             container.Register<IStorageFacade, StorageFacade>(new PerContainerLifetime());
@@ -67,6 +69,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof(NullBusInterceptor).FullName, new PerContainerLifetime());
 
             container.Register<ILogger<HeartBeat>, ConsoleHeartBeatLogger>(typeof(ConsoleHeartBeatLogger).FullName, new PerContainerLifetime());
+
+            container.Register<ILogger<StartupBeat>, ConsoleStartupBeatLogger>(typeof(ConsoleStartupBeatLogger).FullName, new PerContainerLifetime());
 
             container.Register<IStorage, NullStorage>(typeof(NullStorage).FullName, new PerContainerLifetime());
 

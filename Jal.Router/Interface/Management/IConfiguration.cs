@@ -36,7 +36,7 @@ namespace Jal.Router.Interface.Management
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         void UsingMessageBodySerializer<TSerializer>() where TSerializer : IMessageBodySerializer;
         void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
-        void AdStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
+        void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;
     }
 }

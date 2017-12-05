@@ -8,6 +8,8 @@ namespace Jal.Router.AzureStorage.Extensions
         public static void UsingAzureStorage(this IConfiguration configuration)
         {
             configuration.UsingStorage<AzureTableStorage>();
+
+            configuration.AddStartupTask<AzureStorageStartupTask>();
         }
     }
 }

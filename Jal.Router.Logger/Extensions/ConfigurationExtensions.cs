@@ -13,6 +13,8 @@ namespace Jal.Router.Logger.Extensions
             configuration.AddInboundMiddleware<RouterLogger>();
 
             configuration.AddLogger<HeartBeatLogger, HeartBeat>();
+
+            configuration.AddLogger<StartupBeatLogger, StartupBeat>();
         }
     }
 }
