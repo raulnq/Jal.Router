@@ -34,7 +34,7 @@ namespace Jal.Router.Impl.Management
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            Console.WriteLine($"Monitor exception {ex}");
                         }
                         Thread.Sleep(type.Interval);
                     }

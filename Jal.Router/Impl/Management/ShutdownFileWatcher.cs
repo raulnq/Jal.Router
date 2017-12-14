@@ -34,9 +34,11 @@ namespace Jal.Router.Impl.Management
             {
                 _watcher = new FileSystemWatcher(directoryname);
             }
-            catch (ArgumentException)
+            catch (Exception ex)
             {
-                return;
+                Console.WriteLine($"Watcher exception {ex}");
+
+                throw;
             }
 
             FileSystemEventHandler onchange = (o, e) =>

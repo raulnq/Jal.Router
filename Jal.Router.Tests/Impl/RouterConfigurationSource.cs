@@ -21,7 +21,9 @@ namespace Jal.Router.Tests.Impl
                 .ForMessage<Message>().ToBeHandledBy<SagaInput1HandlerMessageHandler>(x =>
                 {
                     x.With((request, handler, context, data) => handler.Handle(context, request, data));
-                });
+                }).OnExceptionRetryFailedMessageTo<Exception>("retry")
+                .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(60, 5))
+                .OnErrorSendFailedMessageTo("error");
             }, @continue =>
             {
                 @continue.RegisterRoute<IMessageSagaHandler<Message>>("route2saga")
@@ -80,9 +82,9 @@ namespace Jal.Router.Tests.Impl
                 .ForMessage<Message>()
                 .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "sagainputtopic2");
 
-            //RegisterEndPoint("retry")
-            //    .ForMessage<Message>()
-            //    .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => "dadsa", x => "asdaxxx");
+            RegisterEndPoint("retry")
+                .ForMessage<Message>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "sagainputqueue");
 
             RegisterEndPoint("error")
                 .ForMessage<Message>()

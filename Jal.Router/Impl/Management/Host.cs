@@ -95,6 +95,8 @@ namespace Jal.Router.Impl.Management
 
             _watcher.Stop();
 
+            _cancellationtokensource.Dispose();
+
             Console.WriteLine("Host Stopped");
 
             return Task.FromResult(0);

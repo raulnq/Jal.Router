@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -20,9 +21,18 @@ namespace Jal.Router.Impl.Management
         {
             foreach (var type in _configuration.StartupTaskTypes)
             {
-                var task = _factory.Create<IStartupTask>(type);
+                try
+                {
+                    var task = _factory.Create<IStartupTask>(type);
 
-                task.Run();
+                    task.Run();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Startup exception {ex}");
+
+                    throw;
+                }
             }
 
         }

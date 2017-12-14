@@ -181,8 +181,6 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-
                 interceptor.OnException(context, ex);
 
                 throw;
@@ -225,8 +223,6 @@ namespace Jal.Router.Impl.Inbound
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-
                 interceptor.OnException(context, ex);
 
                 throw;

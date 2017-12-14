@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -19,9 +20,18 @@ namespace Jal.Router.Impl.Management
         {
             foreach (var type in _configuration.ShutdownTaskTypes)
             {
-                var task = _factory.Create<IShutdownTask>(type);
+                try
+                {
+                    var task = _factory.Create<IShutdownTask>(type);
 
-                task.Run();
+                    task.Run();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Shutdown exception {ex}");
+                    throw;
+                }
+
             }
         }
     }

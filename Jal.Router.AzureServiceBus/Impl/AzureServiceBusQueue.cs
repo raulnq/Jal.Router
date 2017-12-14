@@ -50,7 +50,6 @@ namespace Jal.Router.AzureServiceBus.Impl
                     }
                     catch (Exception ex)
                     {
-
                         if (saga != null)
                         {
                             Console.WriteLine($"Message {brokeredmessage.MessageId} failed to point to point channel {saga.Name}/{route.Name}/{path} {ex}");

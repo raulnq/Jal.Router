@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -26,13 +27,21 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
-            var routemethod = typeof(StartingMessageHandler).GetMethods().First(x => x.Name == nameof(StartingMessageHandler.Start));
+            try
+            {
+                var routemethod = typeof(StartingMessageHandler).GetMethods().First(x => x.Name == nameof(StartingMessageHandler.Start));
 
-            var genericroutemethod = routemethod?.MakeGenericMethod(parameter.Route.ContentType, parameter.Saga.DataType);
+                var genericroutemethod = routemethod?.MakeGenericMethod(parameter.Route.ContentType, parameter.Saga.DataType);
 
-            genericroutemethod?.Invoke(this, new object[] { parameter.Saga, context, parameter.Route });
+                genericroutemethod?.Invoke(this, new object[] { parameter.Saga, context, parameter.Route });
 
-            next();
+                next();
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null) throw ex.InnerException;
+                else throw;
+            }
         }
 
         public void Start<TContent, TData>(Saga<TData> saga, MessageContext<TContent> context, Route route) where TData : class, new()
