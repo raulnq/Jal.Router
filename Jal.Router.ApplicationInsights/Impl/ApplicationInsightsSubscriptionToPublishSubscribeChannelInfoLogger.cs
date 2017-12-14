@@ -15,9 +15,9 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void Log(SubscriptionToPublishSubscribeChannelInfo info, DateTime datetime)
         {
-            _client.TrackMetric($"{info.Path}/{info.Name} - MessageCount", info.MessageCount);
-            _client.TrackMetric($"{info.Path}/{info.Name} - DeadLetterMessageCount", info.DeadLetterMessageCount);
-            _client.TrackMetric($"{info.Path}/{info.Name} - ScheduledMessageCount", info.ScheduledMessageCount);
+            _client.TrackMetric($"{info.Path}/{info.Subscription} - MessageCount", info.MessageCount);
+            _client.TrackMetric($"{info.Path}/{info.Subscription} - DeadLetterMessageCount", info.DeadLetterMessageCount);
+            _client.TrackMetric($"{info.Path}/{info.Subscription} - ScheduledMessageCount", info.ScheduledMessageCount);
         }
     }
 }

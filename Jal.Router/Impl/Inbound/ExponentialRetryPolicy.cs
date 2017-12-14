@@ -16,14 +16,14 @@ namespace Jal.Router.Impl.Inbound
             _maxretrycount = maxretrycount;
         }
 
-        public bool CanRetry(int currentRetryCount, TimeSpan nextretryinterval)
+        public bool CanRetry(int currentretrycount, TimeSpan nextretryinterval)
         {
-            return currentRetryCount <= _maxretrycount;
+            return currentretrycount <= _maxretrycount;
         }
 
-        public TimeSpan NextRetryInterval(int currentRetryCount)
+        public TimeSpan NextRetryInterval(int currentretrycount)
         {
-            return TimeSpan.FromSeconds(Math.Pow(_seconds, currentRetryCount));
+            return TimeSpan.FromSeconds(Math.Pow(_seconds, currentretrycount));
         }
     }
 }

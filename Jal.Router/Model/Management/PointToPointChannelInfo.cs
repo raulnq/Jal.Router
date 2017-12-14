@@ -2,12 +2,12 @@ namespace Jal.Router.Model.Management
 {
     public class PointToPointChannelInfo
     {
-        public PointToPointChannelInfo(string name)
+        public PointToPointChannelInfo(string path)
         {
-            Name = name;
+            Path = path;
         }
 
-        public string Name { get; set; }
+        public string Path { get; set; }
 
         public long MessageCount { get; set; }
 

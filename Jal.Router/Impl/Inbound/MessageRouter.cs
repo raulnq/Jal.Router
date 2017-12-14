@@ -3,7 +3,6 @@ using System.Reflection;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -22,13 +21,13 @@ namespace Jal.Router.Impl.Inbound
             _executor = executor;
         }
 
-        public void Route<TContent>(InboundMessageContext<TContent> context, Route route)
+        public void Route<TContent>(MessageContext<TContent> context, Route route)
         {
             try
             {
                 var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 2);
 
-                var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType);
+                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType);
 
                 genericroutemethod?.Invoke(this, new object[] { context, route });
             }
@@ -39,13 +38,13 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Route<TContent, TData>(InboundMessageContext<TContent> context, Route route, TData data) where TData : class, new()
+        public void Route<TContent, TData>(MessageContext<TContent> context, Route route, TData data) where TData : class, new()
         {
             try
             {
                 var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 3);
 
-                var genericroutemethod = routemethod?.MakeGenericMethod(route.BodyType, route.ConsumerInterfaceType, typeof(TData));
+                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType, typeof(TData));
 
                 genericroutemethod?.Invoke(this, new object[] { context, route, data });
             }
@@ -56,7 +55,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler>(InboundMessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class
+        public void Execute<TContent, THandler>(MessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class
         {
             if (Can(context, route))
             {
@@ -75,7 +74,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler, TData>(InboundMessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
+        public void Execute<TContent, THandler, TData>(MessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
             if (Can(context, route))
@@ -95,7 +94,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        private bool Can<TContent, THandler>(InboundMessageContext<TContent> context, Route<TContent, THandler> route)
+        private bool Can<TContent, THandler>(MessageContext<TContent> context, Route<TContent, THandler> route)
             where THandler : class
         {
             var when = true;

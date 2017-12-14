@@ -1,5 +1,6 @@
 ﻿using System;
 using Jal.Router.Impl;
+using Jal.Router.Model;
 using Jal.Router.Tests.Model;
 
 namespace Jal.Router.Tests.Impl
@@ -27,5 +28,10 @@ namespace Jal.Router.Tests.Impl
     public interface IMessageHandler<in T>
     {
         void Handle(T message, Data response);
+    }
+
+    public interface IMessageSagaHandler<in T>
+    {
+        void Handle(MessageContext context, T message, Data response);
     }
 }

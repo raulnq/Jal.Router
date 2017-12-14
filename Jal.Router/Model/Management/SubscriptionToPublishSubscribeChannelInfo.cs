@@ -2,13 +2,13 @@ namespace Jal.Router.Model.Management
 {
     public class SubscriptionToPublishSubscribeChannelInfo
     {
-        public SubscriptionToPublishSubscribeChannelInfo(string name, string path)
+        public SubscriptionToPublishSubscribeChannelInfo(string subscription, string path)
         {
-            Name = name;
+            Subscription = subscription;
             Path = path;
         }
 
-        public string Name { get; set; }
+        public string Subscription { get; set; }
 
         public string Path { get; set; }
 

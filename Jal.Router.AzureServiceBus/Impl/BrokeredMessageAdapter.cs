@@ -3,19 +3,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Jal.Router.Impl;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
     internal static class StrictEncodings
     {
-        public static UTF8Encoding Utf8 { get; } = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+        public static UTF8Encoding Utf8 { get; } = new UTF8Encoding(false, true);
     }
     public class BrokeredMessageAdapter : AbstractMessageAdapter
     {
@@ -117,9 +115,9 @@ namespace Jal.Router.AzureServiceBus.Impl
             throw new ApplicationException($"Invalid message type {typeof(TMessage).FullName}");
         }
 
-        public override TMessage Write<TContent, TMessage>(OutboundMessageContext<TContent> context)
+        public override TMessage Write<TContent, TMessage>(MessageContext<TContent> context)
         {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(context.Body));
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(context.ContentAsString));
 
             var brokeredmessage = new BrokeredMessage(stream, true) { ContentType = "application/json" };
 

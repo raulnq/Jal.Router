@@ -34,28 +34,14 @@ namespace Jal.Router.Impl.Inbound
             _sagas = sagas.ToArray();
         }
 
-        public Route[] Provide(Type type, string routename)
+        public Route[] Provide(Type type)
         {
-            if (string.IsNullOrEmpty(routename))
-            {
-                return _routes.Where(x => x.BodyType == type).ToArray();
-            }
-            else
-            {
-                return _routes.Where(x => x.Name == routename && x.BodyType == type).ToArray();
-            }
+            return _routes.Where(x => x.ContentType == type).ToArray();
         }
 
-        public Route[] Provide(Route[] routes, Type type, string routename)
+        public Route[] Provide(Route[] routes, Type type)
         {
-            if (string.IsNullOrEmpty(routename))
-            {
-                return routes.Where(x => x.BodyType == type).ToArray();
-            }
-            else
-            {
-                return routes.Where(x => x.Name == routename && x.BodyType == type).ToArray();
-            }
+            return routes.Where(x => x.ContentType == type).ToArray();
         }
 
         public Saga Provide(string saganame)

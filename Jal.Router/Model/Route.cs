@@ -7,18 +7,29 @@ namespace Jal.Router.Model
 {
     public class Route
     {
-        public Route(Type bodytype, Type consumerinterfacetype, string name="")
+        public Route(string name, Type contenttype, Type consumerinterfacetype)
         {
-            BodyType = bodytype;
+            ContentType = contenttype;
             ConsumerInterfaceType = consumerinterfacetype;
-            Name = name;
             MiddlewareTypes = new List<Type>();
+            Name = name;
         }
+
+        public Type ConnectionStringExtractorType { get; set; }
+
+        public object ToConnectionStringExtractor { get; set; }
+
+        public string ToConnectionString { get; set; }
+
+        public string ToPath { get; set; }
+
+        public string ToSubscription { get; set; }
+
         public Type ConsumerInterfaceType { get; set; }
 
         public string Name { get; set; }
 
-        public Type BodyType { get; set; }
+        public Type ContentType { get; set; }
 
         public Type RetryExceptionType { get; set; }
 
@@ -33,19 +44,21 @@ namespace Jal.Router.Model
         public IList<Type> MiddlewareTypes { get; set; }
 
         public string ForwardEndPoint { get; set; }
+
+        public Action ShutdownAction { get; set; }
     }
 
-    public class Route<TBody, TConsumer> : Route
+    public class Route<TContent, TConsumer> : Route
     {
-        public List<RouteMethod<TBody, TConsumer>> RouteMethods { get; set; }
+        public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; set; }
 
-        public Func<TBody, MessageContext, bool> When { get; set; }
+        public Func<TContent, MessageContext, bool> When { get; set; }
 
         public Type ConsumerType { get; set; }
 
-        public Route(string name = "") : base(typeof(TBody), typeof(TConsumer), name)
+        public Route(string name) : base(name, typeof(TContent), typeof(TConsumer))
         {
-            RouteMethods = new List<RouteMethod<TBody, TConsumer>>();
+            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
         }
     }
 }

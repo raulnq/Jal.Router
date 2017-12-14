@@ -4,13 +4,14 @@ namespace Jal.Router.Model.Management
 {
     public class SubscriptionToPublishSubscribeChannel
     {
-        public SubscriptionToPublishSubscribeChannel(string name)
+        public SubscriptionToPublishSubscribeChannel(string subscription, string path)
         {
-            Name = name;
+            Subscription = subscription;
+            Path = path;
         }
         public Origin Origin { get; set; }
 
-        public string Name { get; set; }
+        public string Subscription { get; set; }
 
         public Type PathExtractorType { get; set; }
 
@@ -18,6 +19,6 @@ namespace Jal.Router.Model.Management
 
         public object ToConnectionStringExtractor { get; set; }
 
-        public string TopicPath { get; set; }
+        public string Path { get; set; }
     }
 }

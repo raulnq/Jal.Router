@@ -77,7 +77,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public void CreateSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string name, string origin)
+        public void CreateSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -85,11 +85,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    namespaceManager.GetSubscription(path, name);
+                    namespaceManager.GetSubscription(path, subscription);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var subscriptiondescription = new SubscriptionDescription(path, name)
+                    var subscriptiondescription = new SubscriptionDescription(path, subscription)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
                         LockDuration = TimeSpan.FromMinutes(5),
@@ -100,7 +100,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             }
         }
 
-        public void CreatePublishSubscribeChannel(string connectionstring, string name)
+        public void CreatePublishSubscribeChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -108,11 +108,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    namespaceManager.GetTopic(name);
+                    namespaceManager.GetTopic(path);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var topicDescription = new TopicDescription(name)
+                    var topicDescription = new TopicDescription(path)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
                         SupportOrdering = true
@@ -124,7 +124,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
 
 
-        public PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string name)
+        public PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -132,8 +132,8 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    var entity = namespaceManager.GetTopic(name);
-                    var info = new PublishSubscribeChannelInfo(name)
+                    var entity = namespaceManager.GetTopic(path);
+                    var info = new PublishSubscribeChannelInfo(path)
                     {
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
@@ -153,7 +153,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string name)
+        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -161,8 +161,8 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    var entity = namespaceManager.GetSubscription(path, name);
-                    var info = new SubscriptionToPublishSubscribeChannelInfo(name, path)
+                    var entity = namespaceManager.GetSubscription(path, subscription);
+                    var info = new SubscriptionToPublishSubscribeChannelInfo(subscription, path)
                     {
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
@@ -180,7 +180,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string name)
+        public PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -188,9 +188,9 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    var entity = namespaceManager.GetQueue(name);
+                    var entity = namespaceManager.GetQueue(path);
 
-                    var info = new PointToPointChannelInfo(name)
+                    var info = new PointToPointChannelInfo(path)
                     {
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
@@ -209,7 +209,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public void CreatePointToPointChannel(string connectionstring, string name)
+        public void CreatePointToPointChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -217,11 +217,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 try
                 {
-                    namespaceManager.GetQueue(name);
+                    namespaceManager.GetQueue(path);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var queueDescription = new QueueDescription(name)
+                    var queueDescription = new QueueDescription(path)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
                         LockDuration = TimeSpan.FromMinutes(5),

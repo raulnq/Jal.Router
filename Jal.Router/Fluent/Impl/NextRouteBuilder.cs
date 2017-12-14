@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public INextNameRouteBuilder<THandler, TData> RegisterRoute<THandler>(string name = "")
+        public INextListenerRouteBuilder<THandler, TData> RegisterRoute<THandler>(string name)
         {
             var builder = new NextNameRouteBuilder<THandler, TData>(_saga, name);
 

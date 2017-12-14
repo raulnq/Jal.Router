@@ -1,25 +1,24 @@
 ﻿using System;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
     public abstract class AbstractBusInterceptor : IBusInterceptor
     {
-        public virtual void OnEntry(OutboundMessageContext context, Options options)
+        public virtual void OnEntry(MessageContext context, Options options)
         {
         }
 
-        public virtual void OnExit(OutboundMessageContext context, Options options)
+        public virtual void OnExit(MessageContext context, Options options)
         {
         }
 
-        public virtual void OnSuccess(OutboundMessageContext context, Options options)
+        public virtual void OnSuccess(MessageContext context, Options options)
         {
         }
 
-        public virtual void OnError(OutboundMessageContext context, Options options, Exception ex)
+        public virtual void OnError(MessageContext context, Options options, Exception ex)
         {
         }
     }

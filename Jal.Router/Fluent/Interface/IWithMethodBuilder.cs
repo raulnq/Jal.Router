@@ -1,24 +1,23 @@
 ﻿using System;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IWithMethodBuilder<out TBody, out THandler>
+    public interface IWithMethodBuilder<out TContent, out THandler>
     {
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method);
     }
 
-    public interface IWithMethodBuilder<out TBody, out THandler, out TData>
+    public interface IWithMethodBuilder<out TContent, out THandler, out TData>
     {
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, TData> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, TData> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method);
 
-        IWhenMethodBuilder<TBody, THandler> With(Action<TBody, THandler, MessageContext, TData> method);
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method);
     }
 }

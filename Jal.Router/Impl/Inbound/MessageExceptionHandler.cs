@@ -20,7 +20,7 @@ namespace Jal.Router.Impl.Inbound
             _bus = bus;
         }
 
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             IRetryPolicy policy = null;
 
@@ -107,7 +107,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        private void SendRetry<TContent>(Route route, InboundMessageContext<TContent> context, IRetryPolicy policy)
+        private void SendRetry<TContent>(Route route, MessageContext<TContent> context, IRetryPolicy policy)
         {
             var options = new Options()
             {
@@ -123,7 +123,7 @@ namespace Jal.Router.Impl.Inbound
             _bus.Send(context.Content, context.Origin, options);
         }
 
-        private void SendError<TContent>(Route route, InboundMessageContext<TContent> context, Exception ex)
+        private void SendError<TContent>(Route route, MessageContext<TContent> context, Exception ex)
         {
             var options = new Options()
             {

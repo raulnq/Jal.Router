@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using Common.Logging;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Logger.Impl
@@ -15,7 +16,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var stopwatch = new Stopwatch();
 

@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Outbound
             _configuration = configuration;
         }
 
-        private void Send<TContent>(OutboundMessageContext<TContent> message, Options options)
+        private void Send<TContent>(MessageContext<TContent> message, Options options)
         {
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
@@ -66,7 +66,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            var message = new OutboundMessageContext<TContent>
+            var message = new MessageContext<TContent>
             {
                 Id = options.Id,
                 Content = content,
@@ -80,7 +80,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
-                Body = serializer.Serialize(content)
+                ContentAsString = serializer.Serialize(content)
         };
 
             Send(message, options);
@@ -161,7 +161,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            var message = new OutboundMessageContext<TContent>
+            var message = new MessageContext<TContent>
             {
                 Id = options.Id,
                 Content = content,
@@ -175,13 +175,13 @@ namespace Jal.Router.Impl.Outbound
                 SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
-                Body = serializer.Serialize(content)
+                ContentAsString = serializer.Serialize(content)
             };
 
             Publish(message, options);
         }
 
-        private void Publish<TContent>(OutboundMessageContext<TContent> message, Options options)
+        private void Publish<TContent>(MessageContext<TContent> message, Options options)
         {
             var interceptor = _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
 
@@ -224,7 +224,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            var message = new OutboundMessageContext<TContent>
+            var message = new MessageContext<TContent>
             {
                 Id = options.Id,
                 Content = content,
@@ -238,7 +238,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaInfo = options.SagaInfo,
                 ContentType = typeof(TContent),
                 DateTimeUtc = DateTime.UtcNow,
-                Body = serializer.Serialize(content)
+                ContentAsString = serializer.Serialize(content)
             };
 
             message.Origin.Key = string.Empty;

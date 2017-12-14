@@ -1,6 +1,7 @@
 using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
@@ -13,11 +14,11 @@ namespace Jal.Router.Impl.Inbound
 
         private int _current;
 
-        private readonly InboundMessageContext<TContent> _context;
+        private readonly MessageContext<TContent> _context;
 
         private readonly MiddlewareParameter _parameter;
 
-        public Pipeline(IComponentFactory factory, Type[] middlewares, InboundMessageContext<TContent> context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext<TContent> context, MiddlewareParameter parameter)
         {
             _factory = factory;
             _middlewares = middlewares;

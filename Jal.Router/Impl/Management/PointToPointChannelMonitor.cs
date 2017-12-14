@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
 
@@ -59,7 +58,7 @@ namespace Jal.Router.Impl.Management
 
                 if (toconnectionextractor != null)
                 {
-                    return channelmanager.GetPointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Name);
+                    return channelmanager.GetPointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Path);
                 }
             }
 

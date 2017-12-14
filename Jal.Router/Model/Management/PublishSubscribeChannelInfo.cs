@@ -2,12 +2,12 @@ namespace Jal.Router.Model.Management
 {
     public class PublishSubscribeChannelInfo
     {
-        public PublishSubscribeChannelInfo(string name)
+        public PublishSubscribeChannelInfo(string path)
         {
-            Name = name;
+            Path = path;
         }
 
-        public string Name { get; set; }
+        public string Path { get; set; }
 
         public long MessageCount { get; set; }
 

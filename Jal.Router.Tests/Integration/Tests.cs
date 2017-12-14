@@ -99,7 +99,7 @@ namespace Jal.Router.Tests.Integration
 
             //_brokered.Route<Message>(bm,"error");
 
-            _brokered.Route<Message, BrokeredMessage>(bm);
+            //_brokered.Route<Message, BrokeredMessage>(bm);
 
             //_brokered.RouteToSaga<Message, BrokeredMessage>(bm, "saga");
 

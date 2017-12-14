@@ -57,9 +57,9 @@ namespace Jal.Router.Impl.Management
 
                 var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.TopicPath))
+                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path))
                 {
-                    return channelmanager.GetSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.TopicPath, subscriptionToPublishSubscribeChannel.Name);
+                    return channelmanager.GetSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription);
                 }
             }
             return null;

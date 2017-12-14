@@ -4,11 +4,11 @@ namespace Jal.Router.Model.Management
 {
     public class PublishSubscribeChannel
     {
-        public PublishSubscribeChannel(string name)
+        public PublishSubscribeChannel(string path)
         {
-            Name = name;
+            Path = path;
         }
-        public string Name { get; set; }
+        public string Path { get; set; }
 
         public Type ConnectionStringExtractorType { get; set; }
 

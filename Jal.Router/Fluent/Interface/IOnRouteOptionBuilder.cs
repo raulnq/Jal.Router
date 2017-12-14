@@ -9,15 +9,4 @@ namespace Jal.Router.Fluent.Interface
         IOnRouteOptionBuilder UsingMiddleware(Action<IMiddlewareBuilder> action);
         IOnRouteOptionBuilder ForwardMessageTo(string endpointname);
     }
-
-    public interface IOnEndpointOptionBuilder
-    {
-        //IOnOptionBuilder UsingBodySerializer()
-        //IOnOptionBuilder UsingMetadataAdapter();
-        //IOnOptionBuilder UsingBodyAdapter();
-        //IOnOptionBuilder UsingLogger();
-        //IOnOptionBuilder UsingInterceptor();
-        //IOnOptionBuilder UsingPointToPointChannel();
-        //IOnOptionBuilder UsingPublishSubscribe();
-    }
 }

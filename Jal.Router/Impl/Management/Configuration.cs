@@ -16,19 +16,21 @@ namespace Jal.Router.Impl.Management
     {
         public StorageConfiguration Storage { get; set; }
         public string ApplicationName { get; set; }
-        public IDictionary<Type, IList<Type>> LoggerTypes { get; private set; }
-        public IList<Type> StartupTaskTypes { get; private set; }
-        public IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; private set; }
+        public IDictionary<Type, IList<Type>> LoggerTypes { get; }
+        public IList<Type> StartupTaskTypes { get; }
+        public IList<Type> ShutdownTaskTypes { get; }
+        public IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; }
         public Type ChannelManagerType { get; private set; }
+        public Type ShutdownWatcherType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
-        public IList<Type> RouterLoggerTypes { get; private set; }
+        public IList<Type> RouterLoggerTypes { get; }
         public Type RouterInterceptorType { get; private set; }
         public Type BusInterceptorType { get; private set; }
-        public IList<Type> InboundMiddlewareTypes { get; private set; }
-        public IList<Type> OutboundMiddlewareTypes { get; private set; }
+        public IList<Type> InboundMiddlewareTypes { get; }
+        public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageBodySerializerType { get; private set; }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
         {
@@ -47,6 +49,11 @@ namespace Jal.Router.Impl.Management
         public void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager
         {
             ChannelManagerType = typeof(TChannelManager);
+        }
+
+        public void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher
+        {
+            ShutdownWatcherType = typeof(TShutdownWatcher);
         }
 
         public void UsingMessageBodySerializer<TMessageBodySerializer>() where TMessageBodySerializer : IMessageBodySerializer
@@ -99,6 +106,12 @@ namespace Jal.Router.Impl.Management
         {
             StartupTaskTypes.Add(typeof(TStartupTask));
         }
+
+        public void AddShutdownTask<TShutdownTask>() where TShutdownTask : IShutdownTask
+        {
+            ShutdownTaskTypes.Add(typeof(TShutdownTask));
+        }
+
         public Configuration()
         {
             UsingRouterInterceptor<NullRouterInterceptor>();
@@ -113,11 +126,16 @@ namespace Jal.Router.Impl.Management
             RouterLoggerTypes = new List<Type>();
             MonitoringTaskTypes = new List<MonitoringTaskMetadata>();
             StartupTaskTypes = new List<Type>();
+            ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
             AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
-            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();
+            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();          
+            AddStartupTask<ConfigurationSanityCheckStartupTask>();
+            AddStartupTask<ListenerStartupTask>();
             AddStartupTask<StartupTask>();
+            AddShutdownTask<ListenerShutdownTask>();
+            UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();
         }
     }

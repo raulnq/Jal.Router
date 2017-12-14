@@ -64,9 +64,11 @@ namespace Jal.Router.Impl.Management
 
                 var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.TopicPath) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key))
+                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key))
                 {
-                    channelmanager.CreateSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.TopicPath, subscriptionToPublishSubscribeChannel.Name, subscriptionToPublishSubscribeChannel.Origin.Key);
+                    channelmanager.CreateSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key);
+
+                    Console.WriteLine($"Created subscription to {toconnectionextractor}/{subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} publish subscriber channel");
                 }
             }
 
@@ -83,7 +85,9 @@ namespace Jal.Router.Impl.Management
 
                 if (toconnectionextractor != null)
                 {
-                    channelmanager.CreatePointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Name);
+                    channelmanager.CreatePointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Path);
+
+                    Console.WriteLine($"Created {toconnectionextractor}/{pointToPointChannel.Path} point to point channel");
                 }
             }
         }
@@ -98,7 +102,9 @@ namespace Jal.Router.Impl.Management
 
                 if (toconnectionextractor != null)
                 {
-                    channelmanager.CreatePublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), publishSubscribeChannel.Name);
+                    channelmanager.CreatePublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), publishSubscribeChannel.Path);
+
+                    Console.WriteLine($"Created {toconnectionextractor}/{publishSubscribeChannel.Path} publish subscriber channel");
                 }
             }
         }

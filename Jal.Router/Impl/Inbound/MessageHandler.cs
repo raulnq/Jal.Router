@@ -3,6 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
@@ -23,7 +24,7 @@ namespace Jal.Router.Impl.Inbound
         }
 
 
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 

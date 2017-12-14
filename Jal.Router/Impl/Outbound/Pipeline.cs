@@ -1,6 +1,7 @@
 using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
@@ -13,11 +14,11 @@ namespace Jal.Router.Impl.Outbound
 
         private int _current;
 
-        private readonly OutboundMessageContext<TContent> _context;
+        private readonly MessageContext<TContent> _context;
 
         private readonly MiddlewareParameter _parameter;
 
-        public Pipeline(IComponentFactory factory, Type[] middlewares, OutboundMessageContext<TContent> context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext<TContent> context, MiddlewareParameter parameter)
         {
             _factory = factory;
             _middlewares = middlewares;

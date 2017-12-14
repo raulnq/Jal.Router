@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Jal.Router</RootNamespace>
     <AssemblyName>Jal.Router</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Jal.Locator, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
@@ -50,12 +53,14 @@
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\INextListenerRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IMiddlewareBuilder.cs" />
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRouteOptionBuilder.cs" />
+    <Compile Include="Fluent\Interface\IStartingListenerRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRetryBuilder.cs" />
@@ -67,6 +72,10 @@
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
+    <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
+    <Compile Include="Impl\Management\Host.cs" />
+    <Compile Include="Fluent\Interface\IListenerRouteBuilder.cs" />
+    <Compile Include="Impl\Inbound\ListenerStartupTask.cs" />
     <Compile Include="Impl\Inbound\AbstractMessageAdapter.cs" />
     <Compile Include="Impl\ConsoleHeartBeatLogger.cs" />
     <Compile Include="Impl\Inbound\BasicAuthenticationHandler.cs" />
@@ -74,10 +83,18 @@
     <Compile Include="Impl\Inbound\MessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\NextMessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\StorageFacade.cs" />
+    <Compile Include="Impl\Management\ConfigurationSanityCheckStartupTask.cs" />
     <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
+    <Compile Include="Impl\Management\ShutdownNullWatcher.cs" />
+    <Compile Include="Impl\Management\ShutdownFileWatcher.cs" />
+    <Compile Include="Interface\Management\IShutdownWatcher.cs" />
     <Compile Include="Impl\Management\Monitor.cs" />
     <Compile Include="Impl\Management\PointToPointChannelMonitor.cs" />
+    <Compile Include="Impl\Management\Shutdown.cs" />
     <Compile Include="Impl\Management\StartupTask.cs" />
+    <Compile Include="Interface\Management\IHost.cs" />
+    <Compile Include="Interface\Management\IShutdown.cs" />
+    <Compile Include="Interface\Management\IShutdownTask.cs" />
     <Compile Include="Model\Management\StartupBeat.cs" />
     <Compile Include="Model\Management\StorageConfiguration.cs" />
     <Compile Include="Impl\Management\SubscriptionToPublishSubscribeChannelMonitor.cs" />
@@ -161,10 +178,8 @@
     <Compile Include="Model\Management\PointToPointChannel.cs" />
     <Compile Include="Model\Outbound\MiddlewareParameter.cs" />
     <Compile Include="Model\Saga.cs" />
-    <Compile Include="Model\Inbound\InboundMessageContext.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="Model\Origin.cs" />
-    <Compile Include="Model\Outbound\OutboundMessageContext.cs" />
     <Compile Include="Model\Route.cs" />
     <Compile Include="Model\RouteMethod.cs" />
     <Compile Include="Interface\IRouterConfigurationSource.cs" />

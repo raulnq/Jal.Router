@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -15,7 +16,7 @@ namespace Jal.Router.ApplicationInsights.Impl
         {
             _client = client;
         }
-        public void Execute<TContent>(OutboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var stopwatch = new Stopwatch();
 
@@ -27,7 +28,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
                 Target = context.ToPath,
-                Data = context.Body,
+                Data = context.ContentAsString,
                 Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
                 Properties =
                 {

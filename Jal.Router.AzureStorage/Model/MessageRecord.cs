@@ -33,9 +33,7 @@ namespace Jal.Router.AzureStorage.Model
         public string Origin { get; set; }
         public string Saga { get; set; }
         public string Headers { get; set; }
-
-        public string ContentType { get; set; }
-
         public string Name { get; set; }
+        public string ContentType { get; set; }
     }
 }

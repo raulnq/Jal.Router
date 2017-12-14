@@ -16,15 +16,25 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterSaga<Data>("saga", start =>
             {
-                start.RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<MessageHandler>(x =>
+                start.RegisterRoute<IMessageSagaHandler<Message>>("route1saga")
+                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("sagainputqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().ToBeHandledBy<SagaInput1HandlerMessageHandler>(x =>
                 {
-                    x.With((request, handler, data) => handler.Handle(request, data));
+                    x.With((request, handler, context, data) => handler.Handle(context, request, data));
                 });
             }, @continue =>
             {
-                @continue.RegisterRoute<IMessageHandler<Message1>>().ForMessage<Message1>().ToBeHandledBy<Message1Handler>(x =>
+                @continue.RegisterRoute<IMessageSagaHandler<Message>>("route2saga")
+                .ToListenPublishSubscribeChannel<AppSettingValueSettingFinder>("sagainputtopic", "subscription", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().ToBeHandledBy<SagaInputTopicHandlerMessageHandler>(x =>
                 {
-                    x.With(((request, handler, data) => handler.Handle(request, data)));
+                    x.With(((request, handler, context, data) => handler.Handle(context, request, data)));
+                });
+                @continue.RegisterRoute<IMessageSagaHandler<Message>>("route3saga")
+                .ToListenPublishSubscribeChannel<AppSettingValueSettingFinder>("sagainputtopic2", "subscription", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().ToBeHandledBy<SagaInputTopic2HandlerMessageHandler>(x =>
+                {
+                    x.With(((request, handler, context, data) => handler.Handle(context, request, data)));
                 });
             }
             );//.WithTimeout(100);
@@ -35,10 +45,20 @@ namespace Jal.Router.Tests.Impl
             //}).When(((message, context) => context.Origin.Key == "A")); ;
 
 
-            RegisterRoute<IMessageHandler<Message>>().ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
+            RegisterRoute<IMessageHandler<Message>>("route1")
+                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("inputqueue", x=> "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
             {
                 x.With(((request, handler) => handler.Handle(request, null)));
-            })
+            });
+
+
+            RegisterRoute<IMessageHandler<Message>>("route2")
+                .ToListenPublishSubscribeChannel<AppSettingValueSettingFinder>("testtopic", "subscripcion1", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
+                {
+                    x.With(((request, handler) => handler.Handle(request, null)));
+                })
                 .OnExceptionRetryFailedMessageTo<ApplicationException>("retry")
                 .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(10, 5))
                 .OnErrorSendFailedMessageTo("error");
@@ -47,15 +67,28 @@ namespace Jal.Router.Tests.Impl
 
             RegisterOrigin("From", "2CE8F3B2-6542-4D5C-8B08-E7E64EF57D22");
 
-            RegisterEndPoint("retry")
+            RegisterEndPoint()
                 .ForMessage<Message>()
-                .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => "dadsa", x => "asdaxxx");
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+
+            
+            RegisterEndPoint("SagaInputTopicHandlerMessageHandler")
+                .ForMessage<Message>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "sagainputtopic");
+
+            RegisterEndPoint("SagaInputTopic2HandlerMessageHandler")
+                .ForMessage<Message>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "sagainputtopic2");
+
+            //RegisterEndPoint("retry")
+            //    .ForMessage<Message>()
+            //    .To<AppSettingValueSettingFinder, AppSettingValueSettingFinder>(x => "dadsa", x => "asdaxxx");
 
             RegisterEndPoint("error")
                 .ForMessage<Message>()
-                .To<AppSettingValueSettingFinder>(x => "11111", "topath");
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "errorqueue");
 
-            RegisterEndPoint<EndPointSettingFinder, Message>();
+            //RegisterEndPoint<EndPointSettingFinder, Message>();
 
             RegisterSubscriptionToPublishSubscriberChannel<AppSettingValueSettingFinder>("subscripcion12", "testtopic", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
 

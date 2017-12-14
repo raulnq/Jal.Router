@@ -18,8 +18,10 @@ namespace Jal.Router.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies)
+        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies, string shutdownfile)
         {
+            container.Register<IHost, Host>(new PerContainerLifetime());
+
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
 
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
@@ -40,9 +42,21 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IStartup, Startup>(new PerContainerLifetime());
 
+            container.Register<IShutdown, Shutdown>(new PerContainerLifetime());
+
             container.Register<IStartupTask, ChannelStartupTask>(typeof(ChannelStartupTask).FullName, new PerContainerLifetime());
 
             container.Register<IStartupTask, StartupTask>(typeof(StartupTask).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, ConfigurationSanityCheckStartupTask>(typeof(ConfigurationSanityCheckStartupTask).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, ListenerStartupTask>(typeof(ListenerStartupTask).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownTask, ListenerShutdownTask>(typeof(ListenerShutdownTask).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownWatcher, ShutdownNullWatcher>(typeof(ShutdownNullWatcher).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownWatcher>(x=> new ShutdownFileWatcher(shutdownfile),typeof(ShutdownFileWatcher).FullName, new PerContainerLifetime());
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 

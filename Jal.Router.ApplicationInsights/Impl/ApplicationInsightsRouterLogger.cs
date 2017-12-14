@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -20,7 +21,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var telemetry = new RequestTelemetry();
 
@@ -28,10 +29,11 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
-            var name = parameter.Route.Name;
+            var name = parameter.Route.ContentType.Name;
+
             if (!string.IsNullOrWhiteSpace(parameter.Saga?.Name))
             {
-                name = $"{parameter.Saga?.Name}_{parameter.Route.Name}";
+                name = $"{parameter.Saga?.Name}_{name}";
             }
 
             try

@@ -10,7 +10,7 @@ namespace Jal.Router.Impl.Inbound
 {
     public class AppSettingsBasicAuthenticationHandler : IMiddleware
     {
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             if (!IsValid(context))
             {

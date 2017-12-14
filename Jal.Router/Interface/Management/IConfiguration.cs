@@ -13,8 +13,10 @@ namespace Jal.Router.Interface.Management
         string ApplicationName { get; set; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IList<Type> StartupTaskTypes { get; }
+        IList<Type> ShutdownTaskTypes { get; }
         IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; }
         Type ChannelManagerType { get; }
+        Type ShutdownWatcherType { get; }
         Type PointToPointChannelType { get; }
         Type PublishSubscribeChannelType { get; }
         Type StorageType { get;  }
@@ -30,6 +32,7 @@ namespace Jal.Router.Interface.Management
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
         void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         void UsingStorage<TStorage>() where TStorage : IStorage;
+        void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         void AddInboundMiddleware<TMiddleware>() where TMiddleware : Inbound.IMiddleware;
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
@@ -37,6 +40,7 @@ namespace Jal.Router.Interface.Management
         void UsingMessageBodySerializer<TSerializer>() where TSerializer : IMessageBodySerializer;
         void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
         void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
+        void AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;
         void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;
     }
 }

@@ -23,7 +23,6 @@ namespace Jal.Router.Impl.Management
                 var task = _factory.Create<IStartupTask>(type);
 
                 task.Run();
-
             }
 
         }

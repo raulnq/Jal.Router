@@ -15,10 +15,10 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void Log(PublishSubscribeChannelInfo info, DateTime datetime)
         {
-            _client.TrackMetric($"{info.Name} - MessageCount", info.MessageCount);
-            _client.TrackMetric($"{info.Name} - SizeInBytes", info.SizeInBytes);
-            _client.TrackMetric($"{info.Name} - DeadLetterMessageCount", info.DeadLetterMessageCount);
-            _client.TrackMetric($"{info.Name} - ScheduledMessageCount", info.ScheduledMessageCount);
+            _client.TrackMetric($"{info.Path} - MessageCount", info.MessageCount);
+            _client.TrackMetric($"{info.Path} - SizeInBytes", info.SizeInBytes);
+            _client.TrackMetric($"{info.Path} - DeadLetterMessageCount", info.DeadLetterMessageCount);
+            _client.TrackMetric($"{info.Path} - ScheduledMessageCount", info.ScheduledMessageCount);
         }
     }
 }

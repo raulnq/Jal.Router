@@ -5,9 +5,9 @@ namespace Jal.Router.Interface.Inbound
 {
     public interface IRouteProvider
     {
-        Route[] Provide(Type type, string routename);
+        Route[] Provide(Type type);
 
-        Route[] Provide(Route[] routes, Type type, string routename);
+        Route[] Provide(Route[] routes, Type type);
 
         Saga Provide(string saganame);
     }

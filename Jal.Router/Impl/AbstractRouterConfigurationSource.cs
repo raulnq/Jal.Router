@@ -9,7 +9,6 @@ using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl
 {
-
     public abstract class AbstractRouterConfigurationSource : IRouterConfigurationSource
     {
         private readonly List<Route> _routes = new List<Route>();
@@ -65,19 +64,24 @@ namespace Jal.Router.Impl
         }
 
 
-        public INameRouteBuilder<THandler> RegisterRoute<THandler>(string name="")
-        {
-            var builder = new NameRouteBuilder<THandler>(name, _routes);
-
-            return builder;
-        }
-
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string name, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public IListenerRouteBuilder<THandler> RegisterRoute<THandler>(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
+            }
+
+            var builder = new NameRouteBuilder<THandler>(_routes, name);
+
+            return builder;
+        }
+
+        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(subscription))
+            {
+                throw new ArgumentNullException(nameof(subscription));
             }
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -87,54 +91,53 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var subscription = new SubscriptionToPublishSubscribeChannel(name)
+            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor,
-                TopicPath = path
             };
 
-            _subscriptions.Add(subscription);
+            _subscriptions.Add(channel);
         }
 
-        public void RegisterPointToPointChannel<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(path))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException(nameof(path));
             }
             if (connectionstringextractor == null)
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var queue = new PointToPointChannel(name)
+            var channel = new PointToPointChannel(path)
             {
                 ConnectionStringExtractorType = typeof (TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor
             };
 
-            _pointtopointchannels.Add(queue);
+            _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string name, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         { 
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(path))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException(nameof(path));
             }
             if (connectionstringextractor == null)
             {
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
-            var topic = new PublishSubscribeChannel(name)
+            var channel = new PublishSubscribeChannel(path)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor
             };
 
-            _publishsubscriberchannels.Add(topic);
+            _publishsubscriberchannels.Add(channel);
         }
 
         public void RegisterSaga<TData>(string name, Action<IStartingRouteBuilder<TData>> start, Action<INextRouteBuilder<TData>> @continue=null) where TData : class, new()

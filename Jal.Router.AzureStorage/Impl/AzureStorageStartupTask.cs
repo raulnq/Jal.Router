@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -42,9 +43,13 @@ namespace Jal.Router.AzureStorage.Impl
 
             sagatable.CreateIfNotExists();
 
+            Console.WriteLine($"Created {sagatable} table");
+
             var messagetable = GetCloudTable(_connectionstring, $"{_messagestorgename}{_tablenamesufix}");
 
             messagetable.CreateIfNotExists();
+
+            Console.WriteLine($"Created {messagetable} table");
         }
     }
 }

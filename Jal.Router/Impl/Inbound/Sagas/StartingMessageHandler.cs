@@ -24,18 +24,18 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(InboundMessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
         {
             var routemethod = typeof(StartingMessageHandler).GetMethods().First(x => x.Name == nameof(StartingMessageHandler.Start));
 
-            var genericroutemethod = routemethod?.MakeGenericMethod(parameter.Route.BodyType, parameter.Saga.DataType);
+            var genericroutemethod = routemethod?.MakeGenericMethod(parameter.Route.ContentType, parameter.Saga.DataType);
 
             genericroutemethod?.Invoke(this, new object[] { parameter.Saga, context, parameter.Route });
 
             next();
         }
 
-        public void Start<TContent, TData>(Saga<TData> saga, InboundMessageContext<TContent> context, Route route) where TData : class, new()
+        public void Start<TContent, TData>(Saga<TData> saga, MessageContext<TContent> context, Route route) where TData : class, new()
         {
             var data = new TData();
 

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Text;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl.Inbound.Sagas;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
@@ -82,11 +79,11 @@ namespace Jal.Router.AzureStorage.Impl
             try
             {
                 var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{tablenamesufix}");
-
-                var record = new MessageRecord(saga.RowKey, $"{route.BodyType.Name}_{Guid.NewGuid()}")
+                
+                var record = new MessageRecord(saga.RowKey, $"{route.Name}_{Guid.NewGuid()}")
                 {
-                    Content = context.Body,
-                    ContentType = route.BodyType.FullName,
+                    Content = context.ContentAsString,
+                    ContentType = route.ContentType.FullName,
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
@@ -95,8 +92,8 @@ namespace Jal.Router.AzureStorage.Impl
                     Saga = JsonConvert.SerializeObject(context.SagaInfo),
                     Headers = JsonConvert.SerializeObject(context.Headers),
                     DateTimeUtc = context.DateTimeUtc,
+                    Data = saga.Data,
                     Name = route.Name,
-                    Data = saga.Data
                 };
 
                 var size = Encoding.UTF8.GetByteCount(record.Content);
@@ -110,7 +107,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation saga {saga.Name} and route {route.Name}", ex);
+                throw new ApplicationException($"Error during the message record creation saga {saga.Name} with content {context.ContentType.FullName} ", ex);
             }
         }
 
@@ -137,12 +134,11 @@ namespace Jal.Router.AzureStorage.Impl
 
                 if (!string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
+                    var table = GetCloudTable(_connectionstring,$"{_sagastoragename}{tablenamesufix}");
 
-                        var table = GetCloudTable(_connectionstring,$"{_sagastoragename}{tablenamesufix}");
+                    var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
-                        var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
-
-                        return result.Result as SagaRecord;
+                    return result.Result as SagaRecord;
                     
                 }
             }
@@ -178,14 +174,14 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Route.BodyType.Name}";
+                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Route.Name}";
 
                 var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
 
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
-                    Content =context.Body,
-                    ContentType = context.Route.BodyType.FullName,
+                    Content =context.ContentAsString,
+                    ContentType = context.Route.ContentType.FullName,
                     Id = context.Id,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
@@ -193,14 +189,14 @@ namespace Jal.Router.AzureStorage.Impl
                     Origin = JsonConvert.SerializeObject(context.Origin),
                     Headers = JsonConvert.SerializeObject(context.Headers),
                     DateTimeUtc = context.DateTimeUtc,
-                    Name = context.Route.Name,
+                    Name = context.Route.Name
                 };
 
                 table.Execute(TableOperation.Insert(record));
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation route {context.Route.Name}", ex);
+                throw new ApplicationException($"Error during the message record creation with content {context.ContentType.FullName}", ex);
             }
         }
 

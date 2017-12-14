@@ -1,12 +1,22 @@
+using System;
 using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class StartingNameRouteBuilder<THandler, TData> : IStartingNameRouteBuilder<THandler, TData>
+    public class StartingNameRouteBuilder<THandler, TData> : IStartingNameRouteBuilder<THandler, TData>, IStartingListenerRouteBuilder<THandler, TData>
     {
         private readonly string _name;
+
+        private string _tosubscription;
+
+        private string _topath;
+
+        private Type _connectionstringextractortype;
+
+        private object _toconnectionstringextractor;
 
         public List<Route> Routes { get; set; }
 
@@ -20,9 +30,16 @@ namespace Jal.Router.Fluent.Impl
 
         public IHandlerBuilder<TContent, THandler, TData> ForMessage<TContent>()
         {
-            var value = new Route<TContent, THandler>(_name);
+            var value = new Route<TContent, THandler>(_name)
+            {
+                ToPath = _topath,
 
-            //_saga.DataKeyBuilder = key;
+                ToSubscription = _tosubscription,
+
+                ConnectionStringExtractorType = _connectionstringextractortype,
+
+                ToConnectionStringExtractor = _toconnectionstringextractor
+            };
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 
@@ -32,5 +49,51 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
+        public IStartingNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            _topath = path;
+
+            _toconnectionstringextractor = connectionstringextractor;
+
+            _connectionstringextractortype = typeof(TExtractorConectionString);
+
+            return this;
+        }
+
+        public IStartingNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
+            Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            if (subscription == null)
+            {
+                throw new ArgumentNullException(nameof(subscription));
+            }
+
+            _topath = path;
+
+            _toconnectionstringextractor = connectionstringextractor;
+
+            _connectionstringextractortype = typeof(TExtractorConectionString);
+
+            _tosubscription = subscription;
+
+            return this;
+        }
     }
 }
