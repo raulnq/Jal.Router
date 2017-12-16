@@ -18,6 +18,8 @@ namespace Jal.Router.Impl.Management
 
         public void Start(CancellationTokenSource tokensource)
         {
+            Console.WriteLine($"Watcher {_shutdownfile}");
+
             if (string.IsNullOrWhiteSpace(_shutdownfile))
             {
                 return;
@@ -25,14 +27,10 @@ namespace Jal.Router.Impl.Management
 
             var directoryname = Path.GetDirectoryName(_shutdownfile);
 
-            if (string.IsNullOrWhiteSpace(directoryname))
-            {
-                return;
-            }
-
             try
             {
                 _watcher = new FileSystemWatcher(directoryname);
+                
             }
             catch (Exception ex)
             {

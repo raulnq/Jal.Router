@@ -18,7 +18,7 @@ namespace Jal.Router.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies, string shutdownfile)
+        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies, string shutdownfile="")
         {
             container.Register<IHost, Host>(new PerContainerLifetime());
 
