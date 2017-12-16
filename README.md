@@ -39,7 +39,9 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-		RegisterEndPoint().ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbqueue"));
+		RegisterEndPoint()
+        .ForMessage<Transfer>()
+        .To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbqueue");
 
 		RegisterOrigin("App A", "59D3EDDD-F8F4-4895-9A1C-FE7A6F9B71EE");
 	}
@@ -47,48 +49,26 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 ```
 * RegisterEndPoint, This method starts the registration of a endpoint.
 * ForMessage&lt;TMessage&gt;, The TMessage parameter indicates the type of message that could use this endpoint.
-* To&lt;TConnectionStringValueSettingFinder, TPathValueSettingFinder&gt;, This method allows us get the information about the connection string and path where our message will be sent. 
-The TConnectionStringValueSettingFinder and TPathValueSettingFinder parameters are concrete implementations of the "IValueSettingFinder" interface. 
+* To&lt;TConnectionStringValueSettingFinder&gt;, This method allows us get the information about the connection string and path where our message will be sent. 
+The TConnectionStringValueSettingFinder parameter is the concrete implementations of the "IValueSettingFinder" interface. 
 Currently there are two implementations of this inteface: "ConnectionStringValueSettingFinder" (to have access to the connection string section of the config file) and "AppSettingValueSettingFinder" (to have access to the app settings section of the config file).
 * RegisterOrigin, This method will register the name of the app and the unique id to identified it.
 ### Routing the message on the "App B" ("App B")
-To receive the message in the "App B" we are using the Azure Webjob SDK to implement the "Listener" class.
-```
-public class Listener
-{
-	private readonly IRouter<BrokeredMessage> _router;
-
-	public Listener(IRouter<BrokeredMessage> router)
-	{
-		_router = router;
-	}
-
-	public void Listen([ServiceBusTrigger("appbqueue")] BrokeredMessage message)
-	{
-		_router.Route<Transfer>(message);
-	}
-}
-```
-When the message arrives the "Route" method dispatch it to the corresponding handler method.
-```
-public class TransferMessageHandler : IMessageHandler<Transfer>
-{
-	public void Handle(Transfer transfer, InboundMessageContext context)
-	{
-	//Do something
-	}
-}
-```
-In order to achieve that we need to setup the routing logic in the following class.
+To receive the message in the "App B"  we need to setup the routing logic in the following class.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
-		{
-			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
-		});
+        RegisterRoute<IMessageHandler<Transfer>>("transfer")
+            .ToListenPointToPointChannel<ConnectionStringValueSettingFinder>("appbqueue", c => c.Find("AzureWebJobsServiceBus"))
+            .ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+        {
+            x.With(((transfer, step, context) => step.Handle(transfer, context)));
+        })
+        .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint")
+        .Using<AppSettingValueSettingFinder>(y => new ExponentialRetryPolicy(6, 5))
+        .OnErrorSendFailedMessageTo("errorendpoint");
 	}
 }
 ```
@@ -104,6 +84,16 @@ Coming back to the handler class, apart of the Transfer message, you can have ac
 * Headers, Non standard properties of the message.
 * RetryCount, How many times the message was retried.
 * LastRetry, It is true if we are in the last retry of the current message.
+When the message arrives the "Route" method dispatch it to the corresponding handler method.
+```
+public class TransferMessageHandler : IMessageHandler<Transfer>
+{
+	public void Handle(Transfer transfer, InboundMessageContext context)
+	{
+	//Do something
+	}
+}
+
 ### Publishing the message from "App B" to "App A" (App B)
 Now is time to return a message back to the sender app, to do that we need to modify the handler class.
 ```

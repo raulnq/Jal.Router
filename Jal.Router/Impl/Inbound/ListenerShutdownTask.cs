@@ -46,7 +46,7 @@ namespace Jal.Router.Impl.Inbound
                     Console.WriteLine($"Shutdown {route.Name}/{route.ToPath} point to point channel");
                 }
 
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
                     route.ShutdownAction();
 
@@ -66,7 +66,7 @@ namespace Jal.Router.Impl.Inbound
                     Console.WriteLine($"Shutdown {saga.Name}/{route.Name}/{route.ToPath} point to point channel");
                 }
 
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
                     route.ShutdownAction();
 
