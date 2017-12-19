@@ -132,6 +132,7 @@ namespace Jal.Router.Impl.Management
             AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
             AddLogger<ConsoleStartupBeatLogger, StartupBeat>();          
             AddStartupTask<ConfigurationSanityCheckStartupTask>();
+            AddStartupTask<ChannelStartupTask>();
             AddStartupTask<ListenerStartupTask>();
             AddStartupTask<StartupTask>();
             AddShutdownTask<ListenerShutdownTask>();
