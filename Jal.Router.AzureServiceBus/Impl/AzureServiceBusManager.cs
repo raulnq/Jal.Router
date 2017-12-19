@@ -77,7 +77,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public void CreateSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
+        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -86,21 +86,30 @@ namespace Jal.Router.AzureServiceBus.Impl
                 try
                 {
                     namespaceManager.GetSubscription(path, subscription);
+
+                    return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
                     var subscriptiondescription = new SubscriptionDescription(path, subscription)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
+
                         LockDuration = TimeSpan.FromMinutes(5),
                     };
+
                     var ruledescriptor = new RuleDescription("Default", new SqlFilter($"origin='{origin}'"));
+
                     namespaceManager.CreateSubscription(subscriptiondescription, ruledescriptor);
+
+                    return true;
                 }
             }
+
+            return false;
         }
 
-        public void CreatePublishSubscribeChannel(string connectionstring, string path)
+        public bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -109,17 +118,25 @@ namespace Jal.Router.AzureServiceBus.Impl
                 try
                 {
                     namespaceManager.GetTopic(path);
+
+                    return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
                     var topicDescription = new TopicDescription(path)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
+
                         SupportOrdering = true
                     };
+
                     namespaceManager.CreateTopic(topicDescription);
+
+                    return true;
                 }
             }
+
+            return false;
         }
 
 
@@ -209,7 +226,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public void CreatePointToPointChannel(string connectionstring, string path)
+        public bool CreateIfNotExistPointToPointChannel(string connectionstring, string path)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -218,6 +235,8 @@ namespace Jal.Router.AzureServiceBus.Impl
                 try
                 {
                     namespaceManager.GetQueue(path);
+
+                    return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
@@ -228,8 +247,12 @@ namespace Jal.Router.AzureServiceBus.Impl
                         SupportOrdering = true
                     };
                     namespaceManager.CreateQueue(queueDescription);
+
+                    return true;
                 }
             }
+
+            return false;
         }
     }
 }

@@ -5,19 +5,19 @@ namespace Jal.Router.Impl.Management
 {
     public abstract class AbstractChannelManager : IChannelManager
     {
-        public virtual void CreateSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
+        public virtual bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
         {
-            
+            return false;
         }
 
-        public virtual void CreatePublishSubscribeChannel(string connectionstring, string path)
+        public virtual bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path)
         {
-
+            return false;
         }
 
-        public virtual void CreatePointToPointChannel(string connectionstring, string path)
+        public virtual bool CreateIfNotExistPointToPointChannel(string connectionstring, string path)
         {
-
+            return false;
         }
 
         public virtual PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string path)

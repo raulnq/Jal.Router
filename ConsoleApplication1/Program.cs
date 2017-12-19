@@ -43,7 +43,7 @@ namespace ConsoleApplication1
             IWindsorContainer container = new WindsorContainer();
             var assemblies = AssemblyFinder.Current.GetAssembliesTagged<AssemblyTagAttribute>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
-            container.Install(new RouterInstaller(assemblies, "shutdown/file.txt"));
+            container.Install(new RouterInstaller(assemblies, "/"));
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
             container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());

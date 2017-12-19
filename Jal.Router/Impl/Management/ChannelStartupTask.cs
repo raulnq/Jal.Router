@@ -59,16 +59,31 @@ namespace Jal.Router.Impl.Management
         {
             if (subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType != null)
             {
-
                 var extractorconnectionstring = _factory.Create<IValueSettingFinder>(subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType);
 
                 var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
                 if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key))
                 {
-                    channelmanager.CreateSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key);
+                    try
+                    {
+                        var connectionstring = toconnectionextractor(extractorconnectionstring);
 
-                    Console.WriteLine($"Created subscription to {toconnectionextractor}/{subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} publish subscriber channel");
+                        var created = channelmanager.CreateIfNotExistSubscriptionToPublishSubscribeChannel(connectionstring, subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key);
+
+                        if (created)
+                        {
+                            Console.WriteLine($"Created subscription to {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} publish subscriber channel");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Subscription to publish subscriber channel {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} already exists");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} subscription to publish subscriber channel: {ex}");
+                    }
                 }
             }
 
@@ -85,9 +100,26 @@ namespace Jal.Router.Impl.Management
 
                 if (toconnectionextractor != null)
                 {
-                    channelmanager.CreatePointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Path);
+                    try
+                    {
+                        var connectionstring = toconnectionextractor(extractorconnectionstring);
 
-                    Console.WriteLine($"Created {toconnectionextractor}/{pointToPointChannel.Path} point to point channel");
+                        var created = channelmanager.CreateIfNotExistPointToPointChannel(connectionstring, pointToPointChannel.Path);
+
+                        if (created)
+                        {
+                            Console.WriteLine($"Created {pointToPointChannel.Path} point to point channel");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Point to point channel {pointToPointChannel.Path} already exists");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception {pointToPointChannel.Path} point to point channel: {ex}");
+                    }
+
                 }
             }
         }
@@ -102,9 +134,25 @@ namespace Jal.Router.Impl.Management
 
                 if (toconnectionextractor != null)
                 {
-                    channelmanager.CreatePublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), publishSubscribeChannel.Path);
+                    try
+                    {
+                        var connectionstring = toconnectionextractor(extractorconnectionstring);
 
-                    Console.WriteLine($"Created {toconnectionextractor}/{publishSubscribeChannel.Path} publish subscriber channel");
+                        var created = channelmanager.CreateIfNotExistPublishSubscribeChannel(connectionstring, publishSubscribeChannel.Path);
+
+                        if (created)
+                        {
+                            Console.WriteLine($"Created {publishSubscribeChannel.Path} publish subscriber channel");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Publish subscriber channel {publishSubscribeChannel.Path} already exists");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception {publishSubscribeChannel.Path} publish subscriber channel: {ex}");
+                    }
                 }
             }
         }

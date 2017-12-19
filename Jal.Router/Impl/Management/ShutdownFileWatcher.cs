@@ -18,7 +18,7 @@ namespace Jal.Router.Impl.Management
 
         public void Start(CancellationTokenSource tokensource)
         {
-            Console.WriteLine($"Watcher {_shutdownfile}");
+            Console.WriteLine($"Starting shutdown file watcher, path: {_shutdownfile}");
 
             if (string.IsNullOrWhiteSpace(_shutdownfile))
             {
@@ -27,14 +27,18 @@ namespace Jal.Router.Impl.Management
 
             var directoryname = Path.GetDirectoryName(_shutdownfile);
 
+            if (directoryname == null)
+            {
+                return;
+            }
+
             try
             {
                 _watcher = new FileSystemWatcher(directoryname);
-                
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Watcher exception {ex}");
+                Console.WriteLine($"Exception on shutdown file watcher: {ex}");
 
                 throw;
             }
@@ -55,6 +59,8 @@ namespace Jal.Router.Impl.Management
             _watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.LastWrite;
             _watcher.IncludeSubdirectories = false;
             _watcher.EnableRaisingEvents = true;
+
+            Console.WriteLine("Shutdown file watcher started correctly");
         }
 
         public void Stop()
