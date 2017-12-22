@@ -76,7 +76,7 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor, bool all=false)
             where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
@@ -95,6 +95,7 @@ namespace Jal.Router.Impl
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
                 ToConnectionStringExtractor = connectionstringextractor,
+                All = all
             };
 
             _subscriptions.Add(channel);

@@ -5,7 +5,7 @@ namespace Jal.Router.Impl.Management
 {
     public abstract class AbstractChannelManager : IChannelManager
     {
-        public virtual bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
+        public virtual bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin, bool all)
         {
             return false;
         }

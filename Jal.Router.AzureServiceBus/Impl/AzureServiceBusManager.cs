@@ -77,7 +77,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin)
+        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin, bool all)
         {
             var namespaceManager = GetNamespaceManager(connectionstring);
 
@@ -98,9 +98,17 @@ namespace Jal.Router.AzureServiceBus.Impl
                         LockDuration = TimeSpan.FromMinutes(5),
                     };
 
-                    var ruledescriptor = new RuleDescription("Default", new SqlFilter($"origin='{origin}'"));
+                    if (!all)
+                    {
+                        var ruledescriptor = new RuleDescription("Default", new SqlFilter($"origin='{origin}'"));
 
-                    namespaceManager.CreateSubscription(subscriptiondescription, ruledescriptor);
+                        namespaceManager.CreateSubscription(subscriptiondescription, ruledescriptor);
+                    }
+                    else
+                    {
+                        namespaceManager.CreateSubscription(subscriptiondescription);
+                    }
+
 
                     return true;
                 }

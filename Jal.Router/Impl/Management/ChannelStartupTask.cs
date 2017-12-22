@@ -69,7 +69,7 @@ namespace Jal.Router.Impl.Management
                     {
                         var connectionstring = toconnectionextractor(extractorconnectionstring);
 
-                        var created = channelmanager.CreateIfNotExistSubscriptionToPublishSubscribeChannel(connectionstring, subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key);
+                        var created = channelmanager.CreateIfNotExistSubscriptionToPublishSubscribeChannel(connectionstring, subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key, subscriptionToPublishSubscribeChannel.All);
 
                         if (created)
                         {

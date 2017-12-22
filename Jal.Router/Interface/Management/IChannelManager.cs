@@ -4,7 +4,7 @@ namespace Jal.Router.Interface.Management
 {
     public interface IChannelManager
     {
-        bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin);
+        bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin, bool all);
 
         bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path);
 

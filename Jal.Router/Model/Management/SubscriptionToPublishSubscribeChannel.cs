@@ -11,6 +11,8 @@ namespace Jal.Router.Model.Management
         }
         public Origin Origin { get; set; }
 
+        public bool All { get; set; }
+
         public string Subscription { get; set; }
 
         public Type PathExtractorType { get; set; }
