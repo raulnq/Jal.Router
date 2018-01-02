@@ -63,7 +63,7 @@ namespace Jal.Router.Impl.Management
 
                 var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key))
+                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Subscription) && ((subscriptionToPublishSubscribeChannel.All==false && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key)) || subscriptionToPublishSubscribeChannel.All==true))
                 {
                     try
                     {
