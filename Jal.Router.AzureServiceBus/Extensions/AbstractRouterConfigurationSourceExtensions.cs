@@ -20,10 +20,10 @@ namespace Jal.Router.AzureServiceBus.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name, string path,
-            Func<IValueSettingFinder, string> connectionstringextractor)
+            Func<IValueSettingFinder, string> connectionstringextractor, bool all = false)
             where TExtractorConectionString : IValueSettingFinder
         {
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(name, path, connectionstringextractor);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(name, path, connectionstringextractor, all);
         }
     }
 }

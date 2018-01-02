@@ -48,7 +48,7 @@ namespace Jal.Router.Tests.Impl
 
 
             RegisterRoute<IMessageHandler<Message>>("route1")
-                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("inputqueue", x=> "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ToListenQueue<IMessageHandler<Message>, AppSettingValueSettingFinder >("inputqueue", x=> "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<Message>().ToBeHandledBy<OtherMessageHandler>(x =>
             {
                 x.With(((request, handler) => handler.Handle(request, null)));
