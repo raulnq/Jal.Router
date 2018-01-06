@@ -135,12 +135,40 @@ namespace Jal.Router.Impl.Inbound
             };
             if (ex != null)
             {
-                options.Headers.Add("exceptionmessage", ex.Message);
-                options.Headers.Add("exceptionstacktrace", ex.StackTrace);
+                if (options.Headers.ContainsKey("exceptionmessage"))
+                {
+                    options.Headers["exceptionmessage"] = ex.Message;
+                }
+                else
+                {
+                    options.Headers.Add("exceptionmessage", ex.Message);
+                }
+                if (options.Headers.ContainsKey("exceptionstacktrace"))
+                {
+                    options.Headers["exceptionstacktrace"] = ex.StackTrace;
+                }
+                else
+                {
+                    options.Headers.Add("exceptionstacktrace", ex.StackTrace);
+                }
                 if (ex.InnerException!=null)
                 {
-                    options.Headers.Add("innerexceptionmessage", ex.InnerException.Message);
-                    options.Headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
+                    if (options.Headers.ContainsKey("innerexceptionmessage"))
+                    {
+                        options.Headers["innerexceptionmessage"] = ex.InnerException.Message;
+                    }
+                    else
+                    {
+                        options.Headers.Add("innerexceptionmessage", ex.InnerException.Message);
+                    }
+                    if (options.Headers.ContainsKey("innerexceptionstacktrace"))
+                    {
+                        options.Headers["innerexceptionstacktrace"] = ex.InnerException.StackTrace;
+                    }
+                    else
+                    {
+                        options.Headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
+                    }
                 }
             }
                 
