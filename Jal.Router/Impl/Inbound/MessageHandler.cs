@@ -24,7 +24,7 @@ namespace Jal.Router.Impl.Inbound
         }
 
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 

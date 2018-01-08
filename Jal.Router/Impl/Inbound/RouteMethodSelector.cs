@@ -5,7 +5,7 @@ namespace Jal.Router.Impl.Inbound
 {
     public class RouteMethodSelector : IRouteMethodSelector
     {
-        public bool Select<TContent, THandler>(MessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
+        public bool Select<TContent, THandler>(MessageContext context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
         {
             if (routemethod.EvaluatorWithContext == null)
             {
@@ -15,7 +15,7 @@ namespace Jal.Router.Impl.Inbound
                 }
                 else
                 {
-                    if (routemethod.Evaluator(context.Content, handler))
+                    if (routemethod.Evaluator((TContent)context.Content, handler))
                     {
                         return true;
                     }
@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
             }
             else
             {
-                if (routemethod.EvaluatorWithContext(context.Content, handler, context))
+                if (routemethod.EvaluatorWithContext((TContent)context.Content, handler, context))
                 {
                     return true;
                 }

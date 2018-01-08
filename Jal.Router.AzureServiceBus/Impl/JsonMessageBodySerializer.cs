@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface;
 using Newtonsoft.Json;
 
@@ -10,7 +11,17 @@ namespace Jal.Router.AzureServiceBus.Impl
             return JsonConvert.DeserializeObject<TContent>(content);
         }
 
+        public object Deserialize(string content, Type type)
+        {
+            return JsonConvert.DeserializeObject(content, type);
+        }
+
         public string Serialize<TContent>(TContent content)
+        {
+            return JsonConvert.SerializeObject(content);
+        }
+
+        public string Serialize(object content)
         {
             return JsonConvert.SerializeObject(content);
         }

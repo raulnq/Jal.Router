@@ -10,19 +10,19 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         }
 
-        public virtual void Create<TData>(MessageContext context, TData data) where TData : class, new()
+        public virtual void Create(MessageContext context, object data)
         {
 
         }
 
-        public virtual void Update<TData>(MessageContext context,TData data) where TData : class, new()
+        public virtual void Update(MessageContext context, object data)
         {
 
         }
 
-        public virtual TData Find<TData>(MessageContext context) where TData : class, new()
+        public virtual object Find(MessageContext context)
         {
-            return default(TData);
+            return null;
         }
     }
 }

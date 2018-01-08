@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 
@@ -14,24 +15,20 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IRouterConfigurationSource[] _sources;
 
-        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources)
+        private readonly IRouter _router;
+
+        private readonly IChannelPathBuilder _builder;
+
+        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, IChannelPathBuilder builder)
         {
             _factory = factory;
             _configuration = configuration;
             _sources = sources;
+            _router = router;
+            _builder = builder;
         }
 
-        public void ListenPointToPointChannel(IPointToPointChannel channel, string connectionstring, string path, Saga saga,
-            Route route, bool startingroute)
-        {
-            channel.Listen(connectionstring, path, saga, route, startingroute);
-        }
 
-        public void ListenPublishSubscriberChannel(IPublishSubscribeChannel channel, string connectionstring, string path,
-            string subscription, Saga saga, Route route, bool startingroute)
-        {
-            channel.Listen(connectionstring, path, subscription, saga, route, startingroute);
-        }
         public void Run()
         {
             var pointtopointchannel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
@@ -57,16 +54,20 @@ namespace Jal.Router.Impl.Inbound
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        ListenPointToPointChannel(pointtopointchannel, route.ToConnectionString, route.ToPath, saga, route, true);
+                        var channelpath = _builder.Build(saga, route);
 
-                        Console.WriteLine($"Listening {saga.Name}/{route.Name}/{route.ToPath} point to point channel");
+                        pointtopointchannel.Listen(route, message => _router.RouteToStartingSaga(message, saga, route), channelpath);
+
+                        Console.WriteLine($"Listening {channelpath} point to point channel");
                     }
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        ListenPublishSubscriberChannel(publishsubscriberchannel, route.ToConnectionString, route.ToPath, route.ToSubscription, saga, route, true);
+                        var channelpath = _builder.Build(saga, route);
 
-                        Console.WriteLine($"Listening {saga.Name}/{route.Name}/{route.ToPath}/{route.ToSubscription} publish subscriber channel");
+                        publishsubscriberchannel.Listen(route, message => _router.RouteToStartingSaga(message, saga, route), channelpath);
+
+                        Console.WriteLine($"Listening {channelpath} publish subscriber channel");
                     }
                 }
 
@@ -74,16 +75,20 @@ namespace Jal.Router.Impl.Inbound
                 {
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        ListenPointToPointChannel(pointtopointchannel, route.ToConnectionString, route.ToPath, saga, route, false);
+                        var channelpath = _builder.Build(saga, route);
 
-                        Console.WriteLine($"Listening {saga.Name}/{route.Name}/{route.ToPath} point to point channel");
+                        pointtopointchannel.Listen(route, message => _router.RouteToContinueSaga(message, saga, route), channelpath);
+
+                        Console.WriteLine($"Listening {channelpath} point to point channel");
                     }
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        ListenPublishSubscriberChannel(publishsubscriberchannel, route.ToConnectionString, route.ToPath, route.ToSubscription, saga, route, false);
+                        var channelpath = _builder.Build(saga, route);
 
-                        Console.WriteLine($"Listening {saga.Name}/{route.Name}/{route.ToPath}/{route.ToSubscription} publish subscriber channel");
+                        publishsubscriberchannel.Listen(route, message => _router.RouteToContinueSaga(message, saga, route), channelpath);
+
+                        Console.WriteLine($"Listening {channelpath} publish subscriber channel");
                     }
                 }
             }
@@ -93,16 +98,20 @@ namespace Jal.Router.Impl.Inbound
             {
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
-                    ListenPointToPointChannel(pointtopointchannel, route.ToConnectionString, route.ToPath, null, route, false);
+                    var channelpath = _builder.Build(route);
 
-                    Console.WriteLine($"Listening {route.Name}/{route.ToPath} point to point channel");
+                    pointtopointchannel.Listen(route, message => _router.Route(message, route), channelpath);
+
+                    Console.WriteLine($"Listening {channelpath} point to point channel");
                 }
 
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
-                    ListenPublishSubscriberChannel(publishsubscriberchannel, route.ToConnectionString, route.ToPath, route.ToSubscription, null, route, false);
+                    var channelpath = _builder.Build(route);
 
-                    Console.WriteLine($"Listening {route.Name}/{route.ToPath}/{route.ToSubscription} publish subscriber channel");
+                    publishsubscriberchannel.Listen(route, message => _router.Route(message, route), channelpath);
+
+                    Console.WriteLine($"Listening {channelpath} publish subscriber channel");
                 }
             }
         }

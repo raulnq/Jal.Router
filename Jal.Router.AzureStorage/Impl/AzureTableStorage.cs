@@ -150,13 +150,13 @@ namespace Jal.Router.AzureStorage.Impl
             return null;
         }
 
-        public override void Create<TData>(MessageContext context, TData data)
+        public override void Create(MessageContext context, object data)
         {
             CreateSaga(context.Saga, context, data);
         }
 
 
-        public override void Update<TData>(MessageContext context, TData data)
+        public override void Update(MessageContext context, object data)
         {
             var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
@@ -200,7 +200,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        private void UpdateSaga<TData>(SagaRecord record, TData data, string tablenamesufix, DateTime datetime)
+        private void UpdateSaga(SagaRecord record, object data, string tablenamesufix, DateTime datetime)
         {
             try
             {
@@ -231,7 +231,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override TData Find<TData>(MessageContext context)
+        public override object Find(MessageContext context)
         {
             var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
@@ -239,7 +239,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             if (record!=null)
             {
-                return JsonConvert.DeserializeObject<TData>(record.Data);
+                return JsonConvert.DeserializeObject(record.Data, context.Saga.DataType);
             }
 
             return null;

@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -28,27 +29,29 @@ namespace Jal.Router.Impl.Inbound
             _factory = factory;
             _configuration = configuration;
         }
-        public MessageContext<TContent> Read<TContent, TMessage>(TMessage message)
+        public MessageContext Read(object message, Type contenttype)
         {
-            var context = Create(message);
+            var context = Read(message);
 
-            context.ContentType = typeof (TContent);
+            context.ContentType = contenttype;
 
-            var body = ReadBody(message);
+            var body = GetBody(message);
 
             context.ContentAsString = body;
 
             var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            var content = serializer.Deserialize<TContent>(body);
+            var content = serializer.Deserialize(body, contenttype);
 
-            return new MessageContext<TContent>(context, content);
+            context.Content = content;
+
+            return context;
         }
 
-        public abstract TMessage Write<TContent, TMessage>(MessageContext<TContent> context);
+        public abstract object Write(MessageContext context);
 
-        public abstract MessageContext Create<TMessage>(TMessage message);
+        public abstract MessageContext Read(object message);
 
-        public abstract string ReadBody<TMessage>(TMessage message);
+        public abstract string GetBody(object message);
     }
 }

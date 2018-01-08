@@ -7,13 +7,13 @@ using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
-    public class PointToPointHandler : IMiddleware
+    public class RequestReplyHandler : IMiddleware
     {
         private readonly IComponentFactory _factory;
 
         private readonly IConfiguration _configuration;
 
-        public PointToPointHandler(IComponentFactory factory, IConfiguration configuration)
+        public RequestReplyHandler(IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
             _configuration = configuration;
@@ -21,9 +21,11 @@ namespace Jal.Router.Impl.Outbound
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
-            var channel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
+            var channel = _factory.Create<IRequestReplyChannel>(_configuration.RequestReplyChannelType);
 
-            channel.Send(context);
+            var result = channel.Reply(context, parameter.ResultType);
+
+            parameter.Result = result;
         }
     }
 }

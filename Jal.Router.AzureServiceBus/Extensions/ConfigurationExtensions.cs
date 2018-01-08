@@ -11,6 +11,8 @@ namespace Jal.Router.AzureServiceBus.Extensions
 
             configuration.UsingPublishSubscribeChannel<AzureServiceBusTopic>();
 
+            configuration.UsingRequestReplyChannel<AzureServiceBusSession>();
+
             configuration.UsingChannelManager<AzureServiceBusManager>();
 
             configuration.UsingMessageAdapter<BrokeredMessageAdapter>();

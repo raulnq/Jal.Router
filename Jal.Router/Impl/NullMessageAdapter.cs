@@ -1,3 +1,4 @@
+using System;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
@@ -5,14 +6,19 @@ namespace Jal.Router.Impl
 {
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext<TContent> Read<TContent, TMessage>(TMessage message)
+        public MessageContext Read(object message, Type contenttype)
         {
-            return new MessageContext<TContent>(new MessageContext(), default(TContent));
+            return new MessageContext();
         }
 
-        public TMessage Write<TContent, TMessage>(MessageContext<TContent> context)
+        public string GetBody(object message)
         {
-            return default(TMessage);
+            return string.Empty;
+        }
+
+        public object Write(MessageContext context)
+        {
+            return null;
         }
     }
 }

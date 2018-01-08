@@ -10,7 +10,7 @@ namespace Jal.Router.Fluent.Impl
     {
         public List<Route> Routes { get; set; }
 
-        private readonly Saga<TData> _saga;
+        private readonly Saga _saga;
 
         private readonly string _name;
 
@@ -22,7 +22,7 @@ namespace Jal.Router.Fluent.Impl
 
         private object _toconnectionstringextractor;
 
-        public NextNameRouteBuilder(Saga<TData> saga, string name)
+        public NextNameRouteBuilder(Saga saga, string name)
         {
             _saga = saga;
             _name = name;

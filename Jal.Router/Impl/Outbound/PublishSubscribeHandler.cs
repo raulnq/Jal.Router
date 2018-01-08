@@ -19,7 +19,7 @@ namespace Jal.Router.Impl.Outbound
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 

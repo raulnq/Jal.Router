@@ -16,7 +16,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             var stopwatch = new Stopwatch();
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -25,35 +23,15 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
-        {
-            try
-            {
-                var routemethod = typeof(NextMessageHandler).GetMethods().First(x => x.Name == nameof(NextMessageHandler.Continue));
-
-                var genericroutemethod = routemethod?.MakeGenericMethod(parameter.Route.ContentType, parameter.Saga.DataType);
-
-                genericroutemethod?.Invoke(this, new object[] { parameter.Saga, context, parameter.Route });
-
-                next();
-            }
-            catch (TargetInvocationException ex)
-            {
-                if (ex.InnerException != null) throw ex.InnerException;
-                else throw;
-            }
-
-        }
-
-        public void Continue<TContent, TData>(Saga<TData> saga, MessageContext<TContent> context, Route route) where TData : class, new()
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var data = storage.Find<TData>(context);
+            var data = storage.Find(context);
 
             if (data != null)
             {
-                _router.Route(context, route, data);
+                _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
 
                 if (!_configuration.Storage.ManualSagaSave)
                 {
@@ -62,7 +40,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             }
             else
             {
-                throw new ApplicationException($"No data {typeof(TData).FullName} for {typeof(TContent).FullName}, saga {saga.Name}");
+                throw new ApplicationException($"No data {parameter.Saga.DataType.FullName} for {parameter.Route.ContentType.FullName}, saga {parameter.Saga.Name}");
             }
         }
     }

@@ -23,11 +23,4 @@ namespace Jal.Router.Model
 
         public Route StartingRoute { get; set; }
     }
-
-    public class Saga<TData> : Saga
-    {
-        public Saga(string name) : base(name, typeof(TData))
-        {
-        }
-    }
 }

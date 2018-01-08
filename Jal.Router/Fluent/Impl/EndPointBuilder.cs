@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, INameEndPointBuilder
+    public class EndPointBuilder : IToEndPointBuilder, INameEndPointBuilder, IAndWaitReplyFromEndPointBuilder
     {
         private readonly EndPoint _endpoint;
 
@@ -21,31 +21,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-
-        public void To<TExtractorConnectionString, TExtractorPath>(Func<IValueSettingFinder, string> connectionstringextractor, Func<IValueSettingFinder, string> pathextractor) 
-            where TExtractorConnectionString : IValueSettingFinder
-            where TExtractorPath : IValueSettingFinder
-        {
-            _endpoint.ConnectionStringExtractorType = typeof(TExtractorConnectionString);
-
-            _endpoint.PathExtractorType = typeof(TExtractorPath);
-
-            if (connectionstringextractor == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
-            }
-
-            if (pathextractor == null)
-            {
-                throw new ArgumentNullException(nameof(pathextractor));
-            }
-
-            _endpoint.ToConnectionStringExtractor = connectionstringextractor;
-
-            _endpoint.ToPathExtractor = pathextractor;
-        }
-
-        public void To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        public IAndWaitReplyFromEndPointBuilder To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
         {
             _endpoint.ConnectionStringExtractorType = typeof(TExtractorConnectionString);
 
@@ -62,6 +38,54 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.ToConnectionStringExtractor = connectionstringextractor;
 
             _endpoint.ToPath = path;
+
+            return this;
+        }
+
+        public void AndWaitReplyFromPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            _endpoint.ToReplyPath = path;
+
+            _endpoint.ToReplyConnectionStringExtractor = connectionstringextractor;
+
+            _endpoint.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+
+            _endpoint.ToReplyTimeOut = timeout;
+        }
+
+        public void AndWaitReplyFromPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
+            Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+            if (subscription == null)
+            {
+                throw new ArgumentNullException(nameof(subscription));
+            }
+
+            _endpoint.ToReplyPath = path;
+
+            _endpoint.ToReplyConnectionStringExtractor = connectionstringextractor;
+
+            _endpoint.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+
+            _endpoint.ToReplySubscription = subscription;
+
+            _endpoint.ToReplyTimeOut = timeout;
         }
     }
 }

@@ -6,10 +6,10 @@ namespace Jal.Router.Interface.Inbound.Sagas
     {
         void Create(MessageContext context);
 
-        void Create<TData>(MessageContext context, TData data) where TData : class, new();
+        void Create(MessageContext context, object data);
 
-        void Update<TData>(MessageContext context, TData data) where TData : class, new();
+        void Update(MessageContext context, object data);
 
-        TData Find<TData>(MessageContext context) where TData : class, new();
+        object Find(MessageContext context);
     }
 }

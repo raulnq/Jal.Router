@@ -22,6 +22,7 @@ namespace Jal.Router.Impl.Management
         public IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; }
         public Type ChannelManagerType { get; private set; }
         public Type ShutdownWatcherType { get; private set; }
+        public Type RequestReplyChannelType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
@@ -44,6 +45,11 @@ namespace Jal.Router.Impl.Management
         public void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
         {
             PointToPointChannelType = typeof(TPointToPointChannel);
+        }
+
+        public void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel
+        {
+            RequestReplyChannelType = typeof(TRequestReplyChannel);
         }
 
         public void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager
@@ -120,6 +126,7 @@ namespace Jal.Router.Impl.Management
             UsingChannelManager<NullChannelManager>();
             UsingPointToPointChannel<NullPointToPointChannel>();
             UsingPublishSubscribeChannel<NullPublishSubscribeChannel>();
+            UsingRequestReplyChannel<NullRequestReplyChannel>();
             UsingMessageBodySerializer<NullMessageBodySerializer>();
             UsingMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();

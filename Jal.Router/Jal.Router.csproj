@@ -53,6 +53,7 @@
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IAndWaitReplyFromEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\INextListenerRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextRouteBuilder.cs" />
@@ -71,7 +72,9 @@
     <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
+    <Compile Include="Impl\AbstractChannel.cs" />
     <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
+    <Compile Include="Impl\ChannelPathBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
     <Compile Include="Impl\Management\Host.cs" />
     <Compile Include="Fluent\Interface\IListenerRouteBuilder.cs" />
@@ -87,6 +90,10 @@
     <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
     <Compile Include="Impl\Management\ShutdownNullWatcher.cs" />
     <Compile Include="Impl\Management\ShutdownFileWatcher.cs" />
+    <Compile Include="Impl\NullRequestReplyChannel.cs" />
+    <Compile Include="Impl\Outbound\RequestReplyHandler.cs" />
+    <Compile Include="Interface\IChannelPathBuilder.cs" />
+    <Compile Include="Interface\IRequestReplyChannel.cs" />
     <Compile Include="Interface\Management\IShutdownWatcher.cs" />
     <Compile Include="Impl\Management\Monitor.cs" />
     <Compile Include="Impl\Management\PointToPointChannelMonitor.cs" />
@@ -161,8 +168,6 @@
     <Compile Include="Interface\IPublishSubscribeChannel.cs" />
     <Compile Include="Interface\IPointToPointChannel.cs" />
     <Compile Include="Interface\Inbound\IRetryPolicy.cs" />
-    <Compile Include="Interface\Inbound\IRouteProvider.cs" />
-    <Compile Include="Impl\Inbound\RouteProvider.cs" />
     <Compile Include="Interface\Outbound\IBus.cs" />
     <Compile Include="Impl\Outbound\Bus.cs" />
     <Compile Include="Impl\Management\Configuration.cs" />

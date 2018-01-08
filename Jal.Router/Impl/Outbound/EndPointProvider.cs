@@ -27,22 +27,16 @@ namespace Jal.Router.Impl.Outbound
             _endpoints = routes.ToArray();
         }
 
-        public EndPoint[] Provide<TContent>(string name = "")
+        public EndPoint Provide<TContent>(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return _endpoints.Where(x => x.MessageType == typeof(TContent)).ToArray();
-            }
-
-            return _endpoints.Where(x => x.Name==name && x.MessageType == typeof(TContent)).ToArray();
+            return _endpoints.Single(x => x.Name==name && x.MessageType == typeof(TContent));
         }
 
         public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)
         {
-
             if (endpoint.ExtractorType == null)
             {
-                if (endpoint.ConnectionStringExtractorType!=null && (endpoint.PathExtractorType!=null || !string.IsNullOrWhiteSpace(endpoint.ToPath)))
+                if (endpoint.ConnectionStringExtractorType!=null && !string.IsNullOrWhiteSpace(endpoint.ToPath))
                 {
                     return ValueFinder(endpoint);
                 }
@@ -51,47 +45,53 @@ namespace Jal.Router.Impl.Outbound
             }
             else
             {
-                return Finder(endpoint, content);
+                return EndPointFinder(endpoint, content);
             }
         }
 
         private EndPointSetting ValueFinder(EndPoint endpoint)
         {
-            var output = new EndPointSetting();
-
-            if (endpoint.PathExtractorType != null)
+            var output = new EndPointSetting
             {
-                var extractorpath = _factory.Create<IValueSettingFinder>(endpoint.PathExtractorType);
+                EndPointName = endpoint.Name,
 
-                var topathextractor = endpoint.ToPathExtractor as Func<IValueSettingFinder, string>;
+                ToPath = endpoint.ToPath,
 
-                if (topathextractor != null)
-                {
-                    output.ToPath = topathextractor(extractorpath);
-                }
-            }
-            else
-            {
-                output.ToPath = endpoint.ToPath;
-            }
+                ToReplyPath = endpoint.ToReplyPath,
+
+                ToReplySubscription = endpoint.ToReplySubscription,
+
+                ToReplyTimeOut = endpoint.ToReplyTimeOut
+            };
 
             var extractorconnectionstring = _factory.Create<IValueSettingFinder>(endpoint.ConnectionStringExtractorType);
 
             var toconnectionextractor = endpoint.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
 
             if (toconnectionextractor != null)
             {
                 output.ToConnectionString = toconnectionextractor(extractorconnectionstring);
             }
 
+            if (endpoint.ToReplyConnectionStringExtractor != null)
+            {
+                var finder = _factory.Create<IValueSettingFinder>(endpoint.ReplyConnectionStringExtractorType);
+
+                var extractor = endpoint.ToReplyConnectionStringExtractor as Func<IValueSettingFinder, string>;
+
+                if (extractor != null)
+                {
+                    output.ToReplyConnectionString = extractor(finder);
+                }
+            }
+
             return output;
         }
-        private EndPointSetting Finder<T>(EndPoint endpoint, T record)
+        private EndPointSetting EndPointFinder<TContent>(EndPoint endpoint, TContent record)
         {
-            var extractor = _factory.Create<IEndPointSettingFinder<T>>(endpoint.ExtractorType);
+            var endpointfinder = _factory.Create<IEndPointSettingFinder<TContent>>(endpoint.ExtractorType);
 
-            var output = extractor.Find(record);
+            var output = endpointfinder.Find(record);
 
             return output;
         }

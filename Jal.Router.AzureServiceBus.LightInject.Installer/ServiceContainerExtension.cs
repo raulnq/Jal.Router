@@ -17,9 +17,11 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
 
             container.Register<IMessageBodySerializer, JsonMessageBodySerializer>(typeof(JsonMessageBodySerializer).FullName, new PerContainerLifetime());
 
-            container.Register<IPointToPointChannel>(x => new AzureServiceBusQueue(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IRouter>(), maxconcurrentcalls, autorenewtimeout), typeof(AzureServiceBusQueue).FullName, new PerContainerLifetime());
+            container.Register<IPointToPointChannel>(x => new AzureServiceBusQueue(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IChannelPathBuilder>(), maxconcurrentcalls, autorenewtimeout), typeof(AzureServiceBusQueue).FullName, new PerContainerLifetime());
 
-            container.Register<IPublishSubscribeChannel>(x => new AzureServiceBusTopic(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IRouter>(), maxconcurrentcalls, autorenewtimeout), typeof(AzureServiceBusTopic).FullName, new PerContainerLifetime());
+            container.Register<IRequestReplyChannel>(x => new AzureServiceBusSession(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IChannelPathBuilder>()), typeof(AzureServiceBusSession).FullName, new PerContainerLifetime());
+
+            container.Register<IPublishSubscribeChannel>(x => new AzureServiceBusTopic(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IChannelPathBuilder>(), maxconcurrentcalls, autorenewtimeout), typeof(AzureServiceBusTopic).FullName, new PerContainerLifetime());
         }
     }
 }

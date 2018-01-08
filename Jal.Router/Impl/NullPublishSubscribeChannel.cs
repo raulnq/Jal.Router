@@ -1,18 +1,19 @@
-﻿using Jal.Router.Interface;
+﻿using System;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
     public class NullPublishSubscribeChannel : IPublishSubscribeChannel
     {
-        public void Send<TContent>(MessageContext<TContent> context)
+        public void Send(MessageContext context)
         {
             
         }
 
-        public void Listen(string connectionstring, string path, string subscription, Saga saga, Route route, bool startingroute)
+        public void Listen(Route route, Action<object> routeaction, string channelpath)
         {
-            
+
         }
     }
 }

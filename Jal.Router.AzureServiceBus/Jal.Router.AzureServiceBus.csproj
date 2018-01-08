@@ -54,6 +54,7 @@
     <Compile Include="Extensions\AbstractRouterConfigurationSourceExtensions.cs" />
     <Compile Include="Extensions\ListenerRouteBuilderExtensions.cs" />
     <Compile Include="Impl\AzureServiceBusManager.cs" />
+    <Compile Include="Impl\AzureServiceBusSession.cs" />
     <Compile Include="Impl\AzureServiceBusTopic.cs" />
     <Compile Include="Impl\AzureServiceBusQueue.cs" />
     <Compile Include="Impl\BrokeredMessageAdapter.cs" />

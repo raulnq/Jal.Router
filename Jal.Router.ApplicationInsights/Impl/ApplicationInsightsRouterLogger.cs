@@ -21,7 +21,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             _configuration = configuration;
         }
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             var telemetry = new RequestTelemetry();
 

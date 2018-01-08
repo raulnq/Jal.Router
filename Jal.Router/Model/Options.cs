@@ -11,6 +11,8 @@ namespace Jal.Router.Model
             Version = "1";
             RetryCount = 0;
             SagaInfo = new SagaInfo();
+            RequestId = string.Empty;
+            ReplyToRequestId = string.Empty;
         }
         public string Id { get; set; }
 
@@ -19,6 +21,8 @@ namespace Jal.Router.Model
         public string EndPointName { get; set; }
 
         public string Version { get; set; }
+        public string RequestId { get; set; }
+        public string ReplyToRequestId { get; set; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
 

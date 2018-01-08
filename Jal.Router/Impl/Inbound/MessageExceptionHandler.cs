@@ -20,7 +20,7 @@ namespace Jal.Router.Impl.Inbound
             _bus = bus;
         }
 
-        public void Execute<TContent>(MessageContext<TContent> context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             IRetryPolicy policy = null;
 
@@ -39,6 +39,7 @@ namespace Jal.Router.Impl.Inbound
                     else
                     {
                         Console.WriteLine("The retry policy cannot be null");
+
                         throw new ApplicationException("The retry policy cannot be null");
                     }
                 }
@@ -107,7 +108,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        private void SendRetry<TContent>(Route route, MessageContext<TContent> context, IRetryPolicy policy)
+        private void SendRetry(Route route, MessageContext context, IRetryPolicy policy)
         {
             var options = new Options()
             {
@@ -117,13 +118,15 @@ namespace Jal.Router.Impl.Inbound
                 Version = context.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
                 RetryCount = context.RetryCount + 1,
-                SagaInfo = context.SagaInfo
+                SagaInfo = context.SagaInfo,
+                ReplyToRequestId = context.ReplyToRequestId,
+                RequestId = context.RequestId,
             };
 
             _bus.Send(context.Content, context.Origin, options);
         }
 
-        private void SendError<TContent>(Route route, MessageContext<TContent> context, Exception ex)
+        private void SendError(Route route, MessageContext context, Exception ex)
         {
             var options = new Options()
             {
@@ -132,6 +135,8 @@ namespace Jal.Router.Impl.Inbound
                 Id = context.Id,
                 Version = context.Version,
                 SagaInfo = context.SagaInfo,
+                ReplyToRequestId = context.ReplyToRequestId,
+                RequestId = context.RequestId,
             };
             if (ex != null)
             {

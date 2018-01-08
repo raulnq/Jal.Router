@@ -6,6 +6,7 @@ namespace Jal.Router.Model
 {
     public class MessageContext
     {
+        public string EndPointName { get; set; }
         public string ToConnectionString { get; set; }
         public string ToSubscription { get; set; }
         public string ToPath { get; set; }
@@ -22,6 +23,13 @@ namespace Jal.Router.Model
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
         public string ContentAsString { get; set; }
+        public string ToReplyConnectionString { get; set; }
+        public string ToReplyPath { get; set; }
+        public int ToReplyTimeOut { get; set; }
+        public string ToReplySubscription { get; set; }
+        public string ReplyToRequestId { get; set; }
+        public string RequestId { get; set; }
+        public object Content { get; set; }
         public MessageContext()
         {
             Headers = new Dictionary<string, string>();
@@ -34,33 +42,6 @@ namespace Jal.Router.Model
         public Dictionary<string, string> CopyHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
-        }
-    }
-
-    public class MessageContext<TContent> : MessageContext
-    {
-        public TContent Content { get; set; }
-
-        public MessageContext()
-        {
-            
-        }
-
-        public MessageContext(MessageContext context, TContent content)
-        {
-            Id = context.Id;
-            Headers = context.Headers;
-            Version = context.Version;
-            RetryCount = context.RetryCount;
-            LastRetry = context.LastRetry;
-            Origin = context.Origin;
-            DateTimeUtc = context.DateTimeUtc;
-            Content = content;
-            SagaInfo = context.SagaInfo;
-            Route = context.Route;
-            Saga = context.Saga;
-            ContentType = context.ContentType;
-            ContentAsString = context.ContentAsString;
         }
     }
 }

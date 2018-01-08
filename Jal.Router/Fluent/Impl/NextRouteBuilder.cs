@@ -5,9 +5,9 @@ namespace Jal.Router.Fluent.Impl
 {
     public class NextRouteBuilder<TData> : INextRouteBuilder<TData>
     {
-        private readonly Saga<TData> _saga;
+        private readonly Saga _saga;
 
-        public NextRouteBuilder(Saga<TData> saga)
+        public NextRouteBuilder(Saga saga)
         {
             _saga = saga;
         }

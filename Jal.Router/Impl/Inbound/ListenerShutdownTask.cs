@@ -9,9 +9,12 @@ namespace Jal.Router.Impl.Inbound
     {
         private readonly IRouterConfigurationSource[] _sources;
 
-        public ListenerShutdownTask(IRouterConfigurationSource[] sources)
+        private readonly IChannelPathBuilder _builder;
+
+        public ListenerShutdownTask(IRouterConfigurationSource[] sources, IChannelPathBuilder builder)
         {
             _sources = sources;
+            _builder = builder;
         }
 
         public void Run()
@@ -43,14 +46,18 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    Console.WriteLine($"Shutdown {route.Name}/{route.ToPath} point to point channel");
+                    var channelpath = _builder.Build(route);
+
+                    Console.WriteLine($"Shutdown {channelpath} point to point channel");
                 }
 
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
                     route.ShutdownAction();
 
-                    Console.WriteLine($"Shutdown {route.Name}/{route.ToPath}/{route.ToSubscription} publish subscriber channel");
+                    var channelpath = _builder.Build(route);
+
+                    Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
                 }
             }
         }
@@ -63,14 +70,18 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    Console.WriteLine($"Shutdown {saga.Name}/{route.Name}/{route.ToPath} point to point channel");
+                    var channelpath = _builder.Build(saga, route);
+
+                    Console.WriteLine($"Shutdown {channelpath} point to point channel");
                 }
 
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
                     route.ShutdownAction();
 
-                    Console.WriteLine($"Shutdown {saga.Name}/{route.Name}/{route.ToPath}/{route.ToSubscription} publish subscriber channel");
+                    var channelpath = _builder.Build(saga, route);
+
+                    Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
                 }
             }
         }

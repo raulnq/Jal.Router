@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using Jal.Router.Interface;
@@ -21,7 +22,7 @@ namespace Jal.Router.Impl.Inbound
             _executor = executor;
         }
 
-        public void Route<TContent>(MessageContext<TContent> context, Route route)
+        public void Route(MessageContext context, Route route)
         {
             try
             {
@@ -34,28 +35,28 @@ namespace Jal.Router.Impl.Inbound
             catch (TargetInvocationException ex)
             {
                 if (ex.InnerException != null) throw ex.InnerException;
-                else throw;
+                throw;
             }
         }
 
-        public void Route<TContent, TData>(MessageContext<TContent> context, Route route, TData data) where TData : class, new()
+        public void Route(MessageContext context, Route route, object data, Type datatype)
         {
             try
             {
                 var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 3);
 
-                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType, typeof(TData));
+                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType, datatype);
 
-                genericroutemethod?.Invoke(this, new object[] { context, route, data });
+                genericroutemethod?.Invoke(this, new [] { context, route, data });
             }
             catch (TargetInvocationException ex)
             {
                 if (ex.InnerException != null) throw ex.InnerException;
-                else throw;
+                throw;
             }
         }
 
-        public void Execute<TContent, THandler>(MessageContext<TContent> context, Route<TContent, THandler> route) where THandler : class
+        public void Execute<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
         {
             if (Can(context, route))
             {
@@ -74,7 +75,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler, TData>(MessageContext<TContent> context, Route<TContent, THandler> route, TData data) where THandler : class
+        public void Execute<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
             if (Can(context, route))
@@ -94,14 +95,14 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        private bool Can<TContent, THandler>(MessageContext<TContent> context, Route<TContent, THandler> route)
+        private bool Can<TContent, THandler>(MessageContext context, Route<TContent, THandler> route)
             where THandler : class
         {
             var when = true;
 
             if (route.When != null)
             {
-                when = route.When(context.Content, context);
+                when = route.When((TContent)context.Content, context);
             }
             return when;
         }

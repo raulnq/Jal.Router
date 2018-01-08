@@ -5,38 +5,38 @@ namespace Jal.Router.Impl.Inbound
 {
     public class HandlerExecutor : IHandlerExecutor
     {
-        public void Execute<TContent, THandler>(MessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
+        public void Execute<TContent, THandler>(MessageContext context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
         {
             if (routemethod.ConsumerWithContext != null)
             {
-                routemethod.ConsumerWithContext(context.Content, handler, context);
+                routemethod.ConsumerWithContext((TContent)context.Content, handler, context);
             }
             else
             {
-                routemethod.Consumer?.Invoke(context.Content, handler);
+                routemethod.Consumer?.Invoke((TContent)context.Content, handler);
             }
         }
-        public void Execute<TContent, THandler, TData>(MessageContext<TContent> context, RouteMethod<TContent, THandler> routemethod, THandler handler, TData data) where THandler : class
+        public void Execute<TContent, THandler, TData>(MessageContext context, RouteMethod<TContent, THandler> routemethod, THandler handler, TData data) where THandler : class
         {
             if (routemethod.ConsumerWithContext != null)
             {
-                routemethod.ConsumerWithContext(context.Content, handler, context);
+                routemethod.ConsumerWithContext((TContent)context.Content, handler, context);
             }
             else
             {
                 if (routemethod.Consumer != null)
                 {
-                    routemethod.Consumer(context.Content, handler);
+                    routemethod.Consumer((TContent)context.Content, handler);
                 }
                 else
                 {
                     if (routemethod.ConsumerWithDataAndContext != null)
                     {
-                        routemethod.ConsumerWithDataAndContext(context.Content, handler, context, data);
+                        routemethod.ConsumerWithDataAndContext((TContent)context.Content, handler, context, data);
                     }
                     else
                     {
-                        routemethod.ConsumerWithData?.Invoke(context.Content, handler, data);
+                        routemethod.ConsumerWithData?.Invoke((TContent)context.Content, handler, data);
                     }
                 }
             }

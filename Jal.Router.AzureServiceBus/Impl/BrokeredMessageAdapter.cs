@@ -21,7 +21,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         {
         }
 
-        public override MessageContext Create<TMessage>(TMessage message)
+        public override MessageContext Read(object message)
         {
             var brokeredmessage = message as BrokeredMessage;
 
@@ -30,7 +30,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 var context = new MessageContext
                 {
                     Id = brokeredmessage.MessageId,
-                    DateTimeUtc = DateTime.UtcNow
+                    DateTimeUtc = DateTime.UtcNow,
+                    ReplyToRequestId = brokeredmessage.ReplyToSessionId,
+                    RequestId = brokeredmessage.SessionId
                 };
 
                 if (brokeredmessage.Properties.ContainsKey(From))
@@ -68,10 +70,10 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 return context;
             }
-            throw new ApplicationException($"Invalid message type {typeof(TMessage).FullName}");
+            throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        public override string ReadBody<TMessage>(TMessage message)
+        public override string GetBody(object message)
         {
             var brokeredmesage = message as BrokeredMessage;
 
@@ -112,10 +114,10 @@ namespace Jal.Router.AzureServiceBus.Impl
                     }
                 }
             }
-            throw new ApplicationException($"Invalid message type {typeof(TMessage).FullName}");
+            throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        public override TMessage Write<TContent, TMessage>(MessageContext<TContent> context)
+        public override object Write(MessageContext context)
         {
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(context.ContentAsString));
 
@@ -156,9 +158,19 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.MessageId = context.Id;
             }
 
+            if (!string.IsNullOrWhiteSpace(context.ReplyToRequestId))
+            {
+                brokeredmessage.ReplyToSessionId = context.ReplyToRequestId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.RequestId))
+            {
+                brokeredmessage.SessionId = context.RequestId;
+            }
+
             brokeredmessage.Properties.Add(RetryCount, context.RetryCount.ToString());
 
-            return (TMessage)Convert.ChangeType(brokeredmessage, typeof(TMessage));
+            return brokeredmessage;
         }
     }
 }

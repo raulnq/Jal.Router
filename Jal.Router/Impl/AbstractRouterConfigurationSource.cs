@@ -158,7 +158,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(@continue));
             }
 
-            var saga = new Saga<TData>(name);
+            var saga = new Saga(name, typeof(TData));
 
             start(new StartingRouteBuilder<TData>(saga));
 
@@ -174,8 +174,13 @@ namespace Jal.Router.Impl
             _origin.Key = key;
         }
 
-        public INameEndPointBuilder RegisterEndPoint(string name = "")
+        public INameEndPointBuilder RegisterEndPoint(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             var endpoint = new EndPoint(name);
 
             _enpoints.Add(endpoint);
@@ -185,8 +190,13 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterEndPoint<TExtractor, T>(string name = "") where TExtractor : IEndPointSettingFinder<T>
+        public void RegisterEndPoint<TExtractor, T>(string name) where TExtractor : IEndPointSettingFinder<T>
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             var endpoint = new EndPoint(name);
 
             _enpoints.Add(endpoint);

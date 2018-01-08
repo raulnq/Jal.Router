@@ -27,6 +27,8 @@ namespace Jal.Router.AzureServiceBus.Installer
 
             container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<AzureServiceBusTopic>().Named(typeof(AzureServiceBusTopic).FullName).DependsOn(new { maxconcurrentcalls = _maxconcurrentcalls, autorenewtimeout = _autorenewtimeout }).LifestyleSingleton());
 
+            container.Register(Component.For<IRequestReplyChannel>().ImplementedBy<AzureServiceBusSession>().Named(typeof(AzureServiceBusSession).FullName).LifestyleSingleton());
+
             container.Register(Component.For<IChannelManager>().ImplementedBy<AzureServiceBusManager>().Named(typeof(AzureServiceBusManager).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<BrokeredMessageAdapter>().Named(typeof(BrokeredMessageAdapter).FullName).LifestyleSingleton());

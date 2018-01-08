@@ -46,14 +46,14 @@ namespace ConsoleApplication1
             container.Install(new RouterInstaller(assemblies, "/"));
             container.Install(new ServiceLocatorInstaller());
             container.Install(new SettingsInstaller());
-            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
-            container.Register(Component.For(typeof(IMessageHandler<Message1>)).ImplementedBy(typeof(Message1Handler)).Named(typeof(Message1Handler).FullName).LifestyleSingleton());
-            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerHandler)).Named(typeof(TriggerHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend>)).ImplementedBy(typeof(RequestHandler)).Named(typeof(RequestHandler).FullName).LifestyleSingleton());
+            //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
 
 
-            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInput1HandlerMessageHandler)).Named(typeof(SagaInput1HandlerMessageHandler).FullName).LifestyleSingleton());
-            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInputTopicHandlerMessageHandler)).Named(typeof(SagaInputTopicHandlerMessageHandler).FullName).LifestyleSingleton());
-            container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInputTopic2HandlerMessageHandler)).Named(typeof(SagaInputTopic2HandlerMessageHandler).FullName).LifestyleSingleton());
+            //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInput1HandlerMessageHandler)).Named(typeof(SagaInput1HandlerMessageHandler).FullName).LifestyleSingleton());
+            //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInputTopicHandlerMessageHandler)).Named(typeof(SagaInputTopicHandlerMessageHandler).FullName).LifestyleSingleton());
+            //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(SagaInputTopic2HandlerMessageHandler)).Named(typeof(SagaInputTopic2HandlerMessageHandler).FullName).LifestyleSingleton());
 
             container.Install(new AzureServiceBusRouterInstaller(8));
             container.Install(new AzureStorageRouterInstaller("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "sagatests", "messagestests", DateTime.UtcNow.ToString("yyyyMMdd")));

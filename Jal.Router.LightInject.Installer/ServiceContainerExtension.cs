@@ -28,7 +28,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRouteMethodSelector, RouteMethodSelector>(new PerContainerLifetime());
 
-            container.Register<IRouteProvider, RouteProvider>(new PerContainerLifetime());
+            container.Register<IChannelPathBuilder, ChannelPathBuilder>(new PerContainerLifetime());
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
@@ -78,6 +78,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof(NullPublishSubscribeChannel).FullName, new PerContainerLifetime());
 
+            container.Register<IRequestReplyChannel, NullRequestReplyChannel>(typeof(NullRequestReplyChannel).FullName, new PerContainerLifetime());
+
             container.Register<IChannelManager, NullChannelManager>(typeof(NullChannelManager).FullName, new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof(NullBusInterceptor).FullName, new PerContainerLifetime());
@@ -101,6 +103,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof(PointToPointHandler).FullName, new PerContainerLifetime());
 
             container.Register<Interface.Outbound.IMiddleware, PublishSubscribeHandler>(typeof(PublishSubscribeHandler).FullName, new PerContainerLifetime());
+
+            container.Register<Interface.Outbound.IMiddleware, RequestReplyHandler>(typeof(RequestReplyHandler).FullName, new PerContainerLifetime());
 
             container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof(AppSettingValueSettingFinder).FullName ,new PerContainerLifetime());
 

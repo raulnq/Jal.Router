@@ -18,6 +18,7 @@ namespace Jal.Router.Interface.Management
         Type ChannelManagerType { get; }
         Type ShutdownWatcherType { get; }
         Type PointToPointChannelType { get; }
+        Type RequestReplyChannelType { get; }
         Type PublishSubscribeChannelType { get; }
         Type StorageType { get;  }
         Type MessageAdapterType { get; }
@@ -27,6 +28,7 @@ namespace Jal.Router.Interface.Management
         Type MessageBodySerializerType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
+        void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
         void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;

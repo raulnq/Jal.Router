@@ -1,7 +1,6 @@
 using System;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
@@ -10,26 +9,37 @@ namespace Jal.Router.AzureServiceBus.Impl
 {
     public class AzureServiceBusTopic : AbstractPublishSubscribeChannel
     {
-        public override void Send<TContent>(MessageContext<TContent> context, IMessageAdapter adapter)
+        public override string Send(MessageContext context, object message)
         {
             var topicClient = TopicClient.CreateFromConnectionString(context.ToConnectionString, context.ToPath);
 
-            var message = adapter.Write<TContent, BrokeredMessage>(context);
+            var bm = message as BrokeredMessage;
 
-            topicClient.Send(message);
+            topicClient.Send(bm);
 
             topicClient.Close();
+
+            return bm.MessageId;
         }
 
-        public override void Listen(string connectionstring, string path, string subscription, Saga saga, Route route, bool startingroute)
+        public override void Listen(Route route, Action<object> routeaction, string channelpath)
         {
-            var subscriptionclient = SubscriptionClient.CreateFromConnectionString(connectionstring, path, subscription);
+            var client = SubscriptionClient.CreateFromConnectionString(route.ToConnectionString, route.ToPath, route.ToSubscription);
 
-            var entityPath = SubscriptionClient.FormatSubscriptionPath(path, subscription);
+            var path = SubscriptionClient.FormatSubscriptionPath(route.ToPath, route.ToSubscription);
 
-            var messagereceiver = subscriptionclient.MessagingFactory.CreateMessageReceiver(entityPath);
+            var receiver = client.MessagingFactory.CreateMessageReceiver(path);
 
-            var options = new OnMessageOptions() {AutoComplete = false};
+            var options = CreateOptions();
+
+            receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId, () => routeaction(bm), () => client.Complete(bm.LockToken)), options);
+
+            route.ShutdownAction = () => { receiver.Close(); client.Close(); };
+        }
+
+        private OnMessageOptions CreateOptions()
+        {
+            var options = new OnMessageOptions() { AutoComplete = false };
 
             if (_maxconcurrentcalls > 0)
             {
@@ -39,40 +49,15 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 options.AutoRenewTimeout = _autorenewtimeout.Value;
             }
-
-            messagereceiver.OnMessage(brokeredmessage =>
-            {
-                var result = ProcessMessage(path, subscription, saga, route, startingroute, brokeredmessage.MessageId, brokeredmessage, typeof(BrokeredMessage) );
-
-                if (result)
-                {
-                    try
-                    {
-                        subscriptionclient.Complete(brokeredmessage.LockToken);
-                    }
-                    catch (Exception ex)
-                    {
-
-                        if (saga != null)
-                        {
-                            Console.WriteLine($"Message {brokeredmessage.MessageId} failed to publish subscriber channel {saga.Name}/{route.Name}/{path}/{subscription} {ex}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Message {brokeredmessage.MessageId} failed to publish subscriber channel {route.Name}/{path}/{subscription} {ex}");
-                        }
-                    }
-                }
-
-            }, options);
-
-            route.ShutdownAction = () => { messagereceiver.Close(); subscriptionclient.Close(); };
+            return options;
         }
 
         private readonly int _maxconcurrentcalls;
 
         private readonly TimeSpan? _autorenewtimeout;
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, IRouter router, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null) : base(factory, configuration, router)
+
+        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
+            : base(factory, configuration, builder)
         {
             _maxconcurrentcalls = maxconcurrentcalls;
             _autorenewtimeout = autorenewtimeout;

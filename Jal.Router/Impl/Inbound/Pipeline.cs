@@ -6,7 +6,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class Pipeline<TContent> : IPipeline
+    public class Pipeline : IPipeline
     {
         private readonly IComponentFactory _factory;
 
@@ -14,11 +14,11 @@ namespace Jal.Router.Impl.Inbound
 
         private int _current;
 
-        private readonly MessageContext<TContent> _context;
+        private readonly MessageContext _context;
 
         private readonly MiddlewareParameter _parameter;
 
-        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext<TContent> context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext context, MiddlewareParameter parameter)
         {
             _factory = factory;
             _middlewares = middlewares;

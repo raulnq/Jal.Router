@@ -6,9 +6,9 @@ namespace Jal.Router.Fluent.Impl
 {
     public class StartingRouteBuilder<TData> : IStartingRouteBuilder<TData>
     {
-        private readonly Saga<TData> _saga;
+        private readonly Saga _saga;
 
-        public StartingRouteBuilder(Saga<TData> saga)
+        public StartingRouteBuilder(Saga saga)
         {
             _saga = saga;
         }
