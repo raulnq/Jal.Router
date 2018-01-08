@@ -22,6 +22,7 @@ namespace Jal.Router.Model
         public Saga Saga { get; set; }
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
+        public Type ResultType { get; set; }
         public string ContentAsString { get; set; }
         public string ToReplyConnectionString { get; set; }
         public string ToReplyPath { get; set; }

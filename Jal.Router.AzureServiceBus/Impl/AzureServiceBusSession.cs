@@ -10,108 +10,58 @@ namespace Jal.Router.AzureServiceBus.Impl
 {
     public class AzureServiceBusSession : AbstractChannel, IRequestReplyChannel
     {
-        private readonly IComponentFactory _factory;
-
-        private readonly IConfiguration _configuration;
-
         public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder)
             : base("request replay",factory, configuration, builder)
         {
-            _factory = factory;
 
-            _configuration = configuration;
         }
 
-        public object Reply(MessageContext context, Type resulttype)
+        public override MessageContext ReceiveOnQueue(MessageContext inputcontext, IMessageAdapter adapter)
         {
-            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+            var client = QueueClient.CreateFromConnectionString(inputcontext.ToReplyConnectionString, inputcontext.ToReplyPath);
 
-            Send(context);
+            var messagesession = client.AcceptMessageSession(inputcontext.ReplyToRequestId);
 
-            if (string.IsNullOrWhiteSpace(context.ToReplySubscription))
-            {
-                return ReceiveOnQueue(context, resulttype, adapter);
-            }
-            else
-            {
-                return ReceiveOnTopic(context, resulttype, adapter);
-            }
-        }
+            var message = inputcontext.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(inputcontext.ToReplyTimeOut)) : messagesession.Receive();
 
-        private object ReceiveOnTopic(MessageContext context, Type resulttype, IMessageAdapter adapter)
-        {
-            var subscriptionclient = SubscriptionClient.CreateFromConnectionString(context.ToReplyConnectionString, context.ToReplyPath, context.ToReplySubscription);
-
-            var messagesession = subscriptionclient.AcceptMessageSession(context.ReplyToRequestId);
-
-            BrokeredMessage message = null;
-
-            if (context.ToReplyTimeOut != 0)
-            {
-                message = messagesession.Receive(TimeSpan.FromSeconds(context.ToReplyTimeOut));
-            }
-            else
-            {
-                message = messagesession.Receive();
-            }
-
-            object response = null;
+            MessageContext outputcontext = null;
 
             if (message != null)
             {
-                var body = adapter.GetBody(message);
-
-                var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
-
-                response = serializer.Deserialize(body, resulttype);
+                outputcontext = adapter.Read(message, inputcontext.ResultType);
 
                 message.Complete();
             }
 
-
             messagesession.Close();
 
-            subscriptionclient.Close();
+            client.Close();
 
-            return response;
+            return outputcontext;
         }
 
-        private object ReceiveOnQueue(MessageContext context, Type resulttype, IMessageAdapter adapter)
+        public override MessageContext ReceiveOnTopic(MessageContext inputcontext, IMessageAdapter adapter)
         {
-            var queuereceiver = QueueClient.CreateFromConnectionString(context.ToReplyConnectionString, context.ToReplyPath);
+            var client = SubscriptionClient.CreateFromConnectionString(inputcontext.ToReplyConnectionString, inputcontext.ToReplyPath, inputcontext.ToReplySubscription);
 
-            var messagesession = queuereceiver.AcceptMessageSession(context.ReplyToRequestId);
+            var messagesession = client.AcceptMessageSession(inputcontext.ReplyToRequestId);
 
-            BrokeredMessage message = null;
+            var message = inputcontext.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(inputcontext.ToReplyTimeOut)) : messagesession.Receive();
 
-            if (context.ToReplyTimeOut != 0)
-            {
-                message = messagesession.Receive(TimeSpan.FromSeconds(context.ToReplyTimeOut));
-            }
-            else
-            {
-                message = messagesession.Receive();
-            }
-
-            object response = null;
+            MessageContext outputcontext = null;
 
             if (message != null)
             {
-                var body = adapter.GetBody(message);
-
-                var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
-
-                response = serializer.Deserialize(body, resulttype);
+                outputcontext = adapter.Read(message, inputcontext.ResultType);
 
                 message.Complete();
             }
 
-
             messagesession.Close();
 
-            queuereceiver.Close();
+            client.Close();
 
-            return response;
+            return outputcontext;
         }
 
         public override string Send(MessageContext context, object message)
@@ -120,11 +70,16 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             var bm = message as BrokeredMessage;
 
-            queueclient.Send(bm);
+            if (bm != null)
+            {
+                queueclient.Send(bm);
 
-            queueclient.Close();
+                queueclient.Close();
 
-            return bm.MessageId;
+                return bm.MessageId;
+            }
+
+            return string.Empty;
         }
     }
 }

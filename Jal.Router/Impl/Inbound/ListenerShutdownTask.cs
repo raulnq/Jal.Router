@@ -46,7 +46,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    var channelpath = _builder.Build(route);
+                    var channelpath = _builder.BuildFromRoute(route);
 
                     Console.WriteLine($"Shutdown {channelpath} point to point channel");
                 }
@@ -55,7 +55,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    var channelpath = _builder.Build(route);
+                    var channelpath = _builder.BuildFromRoute(route);
 
                     Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
                 }
@@ -70,7 +70,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    var channelpath = _builder.Build(saga, route);
+                    var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                     Console.WriteLine($"Shutdown {channelpath} point to point channel");
                 }
@@ -79,7 +79,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     route.ShutdownAction();
 
-                    var channelpath = _builder.Build(saga, route);
+                    var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                     Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
                 }

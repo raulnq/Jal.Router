@@ -53,8 +53,6 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-
                 interceptor.OnError(message, options, ex);
 
                 throw;
@@ -99,7 +97,8 @@ namespace Jal.Router.Impl.Outbound
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName
+                EndPointName = endpoint.EndPointName,
+                ResultType = typeof(TResult)
             };
 
             return Reply<TResult>(message, options);
@@ -149,8 +148,6 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-
                 interceptor.OnError(message, options, ex);
 
                 throw;
@@ -300,8 +297,6 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-
                 interceptor.OnError(message, options, ex);
 
                 throw;

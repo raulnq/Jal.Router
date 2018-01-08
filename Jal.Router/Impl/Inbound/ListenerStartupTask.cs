@@ -54,7 +54,7 @@ namespace Jal.Router.Impl.Inbound
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        var channelpath = _builder.Build(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                         pointtopointchannel.Listen(route, message => _router.RouteToStartingSaga(message, saga, route), channelpath);
 
@@ -63,7 +63,7 @@ namespace Jal.Router.Impl.Inbound
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        var channelpath = _builder.Build(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                         publishsubscriberchannel.Listen(route, message => _router.RouteToStartingSaga(message, saga, route), channelpath);
 
@@ -75,7 +75,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        var channelpath = _builder.Build(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                         pointtopointchannel.Listen(route, message => _router.RouteToContinueSaga(message, saga, route), channelpath);
 
@@ -84,7 +84,7 @@ namespace Jal.Router.Impl.Inbound
 
                     if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                     {
-                        var channelpath = _builder.Build(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
 
                         publishsubscriberchannel.Listen(route, message => _router.RouteToContinueSaga(message, saga, route), channelpath);
 
@@ -98,7 +98,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
-                    var channelpath = _builder.Build(route);
+                    var channelpath = _builder.BuildFromRoute(route);
 
                     pointtopointchannel.Listen(route, message => _router.Route(message, route), channelpath);
 
@@ -107,7 +107,7 @@ namespace Jal.Router.Impl.Inbound
 
                 if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
                 {
-                    var channelpath = _builder.Build(route);
+                    var channelpath = _builder.BuildFromRoute(route);
 
                     publishsubscriberchannel.Listen(route, message => _router.Route(message, route), channelpath);
 

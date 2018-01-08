@@ -24,16 +24,57 @@ namespace Jal.Router.Impl
             _builder = builder;
         }
 
-        public abstract string Send(MessageContext context, object message);
+        public virtual string Send(MessageContext context, object message)
+        {
+            return string.Empty;
+        }
 
         public virtual void Listen(Route route, Action<object> routeaction,  string channelpath)
         {
-            
+
+        }
+
+        public object Reply(MessageContext context)
+        {
+            var channelpath = _builder.BuildReplyFromContext(context);
+
+            Send(context);
+
+            MessageContext outputcontext = null;
+
+            try
+            {
+                var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+
+                outputcontext = string.IsNullOrWhiteSpace(context.ToReplySubscription) ? ReceiveOnQueue(context, adapter) : ReceiveOnTopic(context, adapter);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Message {outputcontext?.Id} failed to arrived to {_channelname} channel {channelpath} {ex}");
+
+                throw;
+            }
+            finally
+            {
+                Console.WriteLine($"Message {outputcontext?.Id} arrived to {_channelname} channel {channelpath}");
+            }
+
+            return outputcontext?.Content;
+        }
+
+        public virtual MessageContext ReceiveOnQueue(MessageContext inputcontext, IMessageAdapter adapter)
+        {
+            return null;
+        }
+
+        public virtual MessageContext ReceiveOnTopic(MessageContext inputcontext, IMessageAdapter adapter)
+        {
+            return null;
         }
 
         public void Send(MessageContext context)
         {
-            var channelpath = _builder.Build(context);
+            var channelpath = _builder.BuildFromContext(context);
 
             var id = string.Empty;
 

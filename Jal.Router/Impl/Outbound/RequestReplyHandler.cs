@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var channel = _factory.Create<IRequestReplyChannel>(_configuration.RequestReplyChannelType);
 
-            var result = channel.Reply(context, parameter.ResultType);
+            var result = channel.Reply(context);
 
             parameter.Result = result;
         }

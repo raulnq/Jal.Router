@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class NullRequestReplyChannel : IRequestReplyChannel
     {
-        public object Reply(MessageContext context, Type resulttype)
+        public object Reply(MessageContext context)
         {
             return null;
         }

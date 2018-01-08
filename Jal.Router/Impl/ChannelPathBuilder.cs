@@ -5,7 +5,7 @@ namespace Jal.Router.Impl
 {
     public class ChannelPathBuilder : IChannelPathBuilder
     {
-        public string Build(Saga saga, Route route)
+        public string BuildFromSagaAndRoute(Saga saga, Route route)
         {
             var channelpath = string.Empty;
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Impl
             }
             return channelpath;
         }
-        public string Build(Route route)
+        public string BuildFromRoute(Route route)
         {
             var channelpath = string.Empty;
 
@@ -51,7 +51,7 @@ namespace Jal.Router.Impl
 
             return channelpath;
         }
-        public string Build(MessageContext context)
+        public string BuildFromContext(MessageContext context)
         {
             var channelpath = string.Empty;
 
@@ -68,6 +68,28 @@ namespace Jal.Router.Impl
             if (!string.IsNullOrWhiteSpace(context.ToSubscription))
             {
                 channelpath = $"{channelpath}/{context.ToSubscription}";
+            }
+
+            return channelpath;
+        }
+
+        public string BuildReplyFromContext(MessageContext context)
+        {
+            var channelpath = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(context.EndPointName))
+            {
+                channelpath = $"{channelpath}/{context.EndPointName}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.ToReplyPath))
+            {
+                channelpath = $"{channelpath}/{context.ToReplyPath}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.ToReplySubscription))
+            {
+                channelpath = $"{channelpath}/{context.ToReplySubscription}";
             }
 
             return channelpath;

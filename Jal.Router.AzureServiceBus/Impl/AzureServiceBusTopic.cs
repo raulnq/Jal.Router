@@ -15,11 +15,16 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             var bm = message as BrokeredMessage;
 
-            topicClient.Send(bm);
+            if (bm != null)
+            {
+                topicClient.Send(bm);
 
-            topicClient.Close();
+                topicClient.Close();
 
-            return bm.MessageId;
+                return bm.MessageId;
+            }
+
+            return string.Empty;
         }
 
         public override void Listen(Route route, Action<object> routeaction, string channelpath)
