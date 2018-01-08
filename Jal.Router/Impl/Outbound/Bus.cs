@@ -66,7 +66,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public TResult Reply<TContent, TResult>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -105,7 +105,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName,typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -188,7 +188,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void Send<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -198,7 +198,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public void Send<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -216,7 +216,7 @@ namespace Jal.Router.Impl.Outbound
         } 
         public void Publish<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -226,7 +226,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public void Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -336,7 +336,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void FireAndForget<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -345,7 +345,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide<TContent>(options.EndPointName);
+            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
 
             var setting = _provider.Provide(endpoint, content);
 

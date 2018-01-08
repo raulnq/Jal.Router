@@ -119,6 +119,144 @@ namespace Jal.Router.Tests.Impl
                     x.With(((request, handler, context) => handler.Handle(request, context)));
                 });
 
+            RegisterRoute<IRequestResponseHandler<Trigger>>("triggerflowa")
+                .ToListenQueue<IRequestResponseHandler<Trigger>, AppSettingValueSettingFinder>("triggerqueueflowa", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Trigger>().ToBeHandledBy<TriggerFlowAHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appa")
+                .ForMessage<RequestToSend>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appaqueue");
+
+            RegisterRoute<IRequestResponseHandler<RequestToSend>>("appa")
+                .ToListenQueue<IRequestResponseHandler<RequestToSend>, AppSettingValueSettingFinder>("appaqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<RequestToSend>().ToBeHandledBy<RequestToSendAppAHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appb")
+                .ForMessage<ResponseToSend>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appbqueue");
+
+            RegisterRoute<IRequestResponseHandler<ResponseToSend>>("appb")
+                .ToListenQueue<IRequestResponseHandler<ResponseToSend>, AppSettingValueSettingFinder>("appbqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<ResponseToSend>().ToBeHandledBy<ResponseToSendAppBHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+
+            RegisterRoute<IRequestResponseHandler<Trigger>>("triggerflowb")
+                .ToListenQueue<IRequestResponseHandler<Trigger>, AppSettingValueSettingFinder>("triggerqueueflowb", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Trigger>().ToBeHandledBy<TriggerFlowBHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appc")
+                .ForMessage<RequestToSend>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appcqueue");
+
+            RegisterRoute<IRequestResponseHandler<RequestToSend>>("appc")
+                .ToListenQueue<IRequestResponseHandler<RequestToSend>, AppSettingValueSettingFinder>("appcqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<RequestToSend>().ToBeHandledBy<RequestToSendAppCHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appd")
+                .ForMessage<ResponseToSend>()
+                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appdtopic");
+
+            RegisterRoute<IRequestResponseHandler<ResponseToSend>>("appd")
+                .ToListenTopic<IRequestResponseHandler<ResponseToSend>, AppSettingValueSettingFinder>("appdtopic", "subscription", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<ResponseToSend>().ToBeHandledBy<ResponseToSendAppDHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+
+            RegisterRoute<IRequestResponseHandler<Trigger>>("triggerflowc")
+                .ToListenQueue<IRequestResponseHandler<Trigger>, AppSettingValueSettingFinder>("triggerqueueflowc", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Trigger>().ToBeHandledBy<TriggerFlowCHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appe")
+             .ForMessage<RequestToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appequeue");
+
+            RegisterEndPoint("appf")
+             .ForMessage<ResponseToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appfqueue");
+
+            RegisterEndPoint("appx")
+             .ForMessage<ResponseToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appxqueue");
+
+            RegisterRoute<IRequestResponseHandler<ResponseToSend>>("appx")
+                .ToListenQueue<IRequestResponseHandler<ResponseToSend>, AppSettingValueSettingFinder>("appxqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<ResponseToSend>().ToBeHandledBy<RequestToSendAppXHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterSaga<Data>("saga", start =>
+            {
+                start.RegisterRoute<IRequestResponseHandler<RequestToSend, Data>>("appe")
+                .ToListenQueue<IRequestResponseHandler<RequestToSend, Data>, Data, AppSettingValueSettingFinder>("appequeue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<RequestToSend>().ToBeHandledBy<RequestToSendAppEHandler>(x =>
+                {
+                    x.With((request, handler, context, data) => handler.Handle(request, context, data));
+                });
+            }, @continue =>
+            {
+                @continue.RegisterRoute<IRequestResponseHandler<ResponseToSend, Data>>("appf")
+                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("appfqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<ResponseToSend>().ToBeHandledBy<ResponseToSendAppFHandler>(x =>
+                {
+                    x.With(((request, handler, context, data) => handler.Handle(request, context, data)));
+                });
+            });
+
+            RegisterRoute<IRequestResponseHandler<Trigger>>("triggerflowd")
+                .ToListenQueue<IRequestResponseHandler<Trigger>, AppSettingValueSettingFinder>("triggerqueueflowd", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Trigger>().ToBeHandledBy<TriggerFlowDHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                });
+
+            RegisterEndPoint("appg")
+             .ForMessage<RequestToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appgqueue");
+
+            RegisterEndPoint("appgretry")
+             .ForMessage<RequestToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appgqueue");
+
+            RegisterEndPoint("appgretryerror")
+             .ForMessage<RequestToSend>()
+             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appgerrorqueue");
+
+            RegisterRoute<IRequestResponseHandler<RequestToSend>>("appg")
+                .ToListenQueue<IRequestResponseHandler<RequestToSend>, AppSettingValueSettingFinder >("appgqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<RequestToSend>().ToBeHandledBy<ResponseToSendAppGHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                })
+                .OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
+                .Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(3, 3))
+                .OnErrorSendFailedMessageTo("appgretryerror");
+
+
+
+            //.UsingStorage<AzureTableStorage>()
+            //.UsingMessageChannel<AzureServiceBusQueue, AzureServiceBusTopic, AzureServiceBusManager>();
+
             //RegisterEndPoint<EndPointSettingFinder, Message>();
 
             //RegisterSubscriptionToPublishSubscriberChannel<AppSettingValueSettingFinder>("subscripcion12", "testtopic", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");

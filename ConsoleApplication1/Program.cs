@@ -48,6 +48,23 @@ namespace ConsoleApplication1
             container.Install(new SettingsInstaller());
             container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerHandler)).Named(typeof(TriggerHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend>)).ImplementedBy(typeof(RequestHandler)).Named(typeof(RequestHandler).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowAHandler)).Named(typeof(TriggerFlowAHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend>)).ImplementedBy(typeof(RequestToSendAppAHandler)).Named(typeof(RequestToSendAppAHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend>)).ImplementedBy(typeof(ResponseToSendAppBHandler)).Named(typeof(ResponseToSendAppBHandler).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowBHandler)).Named(typeof(TriggerFlowBHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend>)).ImplementedBy(typeof(RequestToSendAppCHandler)).Named(typeof(RequestToSendAppCHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend>)).ImplementedBy(typeof(ResponseToSendAppDHandler)).Named(typeof(ResponseToSendAppDHandler).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowCHandler)).Named(typeof(TriggerFlowCHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend,Data>)).ImplementedBy(typeof(RequestToSendAppEHandler)).Named(typeof(RequestToSendAppEHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppFHandler)).Named(typeof(ResponseToSendAppFHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend>)).ImplementedBy(typeof(RequestToSendAppXHandler)).Named(typeof(RequestToSendAppXHandler).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowDHandler)).Named(typeof(TriggerFlowDHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppGHandler)).Named(typeof(ResponseToSendAppGHandler).FullName).LifestyleSingleton());
+
             //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
 
 

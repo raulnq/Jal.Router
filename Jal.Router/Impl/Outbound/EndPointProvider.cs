@@ -27,9 +27,9 @@ namespace Jal.Router.Impl.Outbound
             _endpoints = routes.ToArray();
         }
 
-        public EndPoint Provide<TContent>(string name)
+        public EndPoint Provide(string name, Type contenttype)
         {
-            return _endpoints.Single(x => x.Name==name && x.MessageType == typeof(TContent));
+            return _endpoints.Single(x => x.Name==name && x.MessageType == contenttype);
         }
 
         public EndPointSetting Provide<TContent>(EndPoint endpoint, TContent content)

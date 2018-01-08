@@ -17,5 +17,29 @@ namespace Jal.Router.AzureServiceBus.Extensions
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
+
+        public static IStartingNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueSettingFinder
+        {
+            return listenerroutebuilder.ToListenPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor);
+        }
+
+        public static IStartingNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueSettingFinder
+        {
+            return listenerroutebuilder.ToListenPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
+        }
+
+        public static INextNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+where TExtractorConectionString : IValueSettingFinder
+        {
+            return listenerroutebuilder.ToListenPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor);
+        }
+
+        public static INextNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueSettingFinder
+        {
+            return listenerroutebuilder.ToListenPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
+        }
     }
 }
