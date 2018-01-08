@@ -49,6 +49,8 @@ namespace Jal.Router.Impl
             catch (Exception ex)
             {
                 Console.WriteLine($"Message {id} failed to sent to {_channelname} channel {channelpath} {ex}");
+
+                throw;
             }
             finally
             {
