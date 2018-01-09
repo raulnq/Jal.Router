@@ -32,7 +32,8 @@ namespace Jal.Router.Impl.Outbound
             try
             {
                 if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath) &&
-                    !string.IsNullOrWhiteSpace(message.ToReplyPath) && !string.IsNullOrWhiteSpace(message.ToReplyConnectionString))
+                    !string.IsNullOrWhiteSpace(message.ToReplyPath) && !string.IsNullOrWhiteSpace(message.ToReplyConnectionString)
+                    && !string.IsNullOrWhiteSpace(message.ReplyToRequestId))
                 {
                     var middlewares = new List<Type>();
 
@@ -50,6 +51,10 @@ namespace Jal.Router.Impl.Outbound
 
                     return (TResult)parameter.Result;
                 }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path and/or reply connection string and/or replypath and/or replytorequestid");
+                }
             }
             catch (Exception ex)
             {
@@ -61,8 +66,6 @@ namespace Jal.Router.Impl.Outbound
             {
                 interceptor.OnExit(message, options);
             }
-
-            return default(TResult);
         }
         public TResult Reply<TContent, TResult>(TContent content, Options options)
         {
@@ -144,6 +147,10 @@ namespace Jal.Router.Impl.Outbound
                     pipeline.Execute();
 
                     interceptor.OnSuccess(message, options);
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path");
                 }
             }
             catch (Exception ex)
@@ -293,6 +300,10 @@ namespace Jal.Router.Impl.Outbound
                     pipeline.Execute();
 
                     interceptor.OnSuccess(message, options);
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path");
                 }
             }
             catch (Exception ex)
