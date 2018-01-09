@@ -18,12 +18,12 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         public string Serialize<TContent>(TContent content)
         {
-            return JsonConvert.SerializeObject(content);
+            return JsonConvert.SerializeObject(content, Formatting.None);
         }
 
         public string Serialize(object content)
         {
-            return JsonConvert.SerializeObject(content);
+            return JsonConvert.SerializeObject(content, Formatting.None);
         }
     }
 }

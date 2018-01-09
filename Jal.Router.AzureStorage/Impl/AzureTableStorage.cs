@@ -88,9 +88,9 @@ namespace Jal.Router.AzureStorage.Impl
                     Version = context.Version,
                     RetryCount = context.RetryCount,
                     LastRetry = context.LastRetry,
-                    Origin = JsonConvert.SerializeObject(context.Origin),
-                    Saga = JsonConvert.SerializeObject(context.SagaInfo),
-                    Headers = JsonConvert.SerializeObject(context.Headers),
+                    Origin = JsonConvert.SerializeObject(context.Origin, Formatting.None),
+                    Saga = JsonConvert.SerializeObject(context.SagaInfo, Formatting.None),
+                    Headers = JsonConvert.SerializeObject(context.Headers, Formatting.None),
                     DateTimeUtc = context.DateTimeUtc,
                     Data = saga.Data,
                     Name = route.Name,
@@ -186,8 +186,8 @@ namespace Jal.Router.AzureStorage.Impl
                     Version = context.Version,
                     RetryCount = context.RetryCount,
                     LastRetry = context.LastRetry,
-                    Origin = JsonConvert.SerializeObject(context.Origin),
-                    Headers = JsonConvert.SerializeObject(context.Headers),
+                    Origin = JsonConvert.SerializeObject(context.Origin, Formatting.None),
+                    Headers = JsonConvert.SerializeObject(context.Headers, Formatting.None),
                     DateTimeUtc = context.DateTimeUtc,
                     Name = context.Route.Name
                 };
