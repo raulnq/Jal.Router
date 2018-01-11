@@ -69,7 +69,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public TResult Reply<TContent, TResult>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -91,7 +91,7 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 SagaInfo = options.SagaInfo,
-                ContentType = typeof(TContent),
+                ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
                 ToReplyConnectionString = endpoint.ToReplyConnectionString,
@@ -108,7 +108,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName,typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -181,7 +181,7 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 SagaInfo = options.SagaInfo,
-                ContentType = typeof(TContent),
+                ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
@@ -223,7 +223,7 @@ namespace Jal.Router.Impl.Outbound
         } 
         public void Publish<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -233,7 +233,7 @@ namespace Jal.Router.Impl.Outbound
         }
         public void Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -265,7 +265,7 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 SagaInfo = options.SagaInfo,
-                ContentType = typeof(TContent),
+                ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
@@ -334,7 +334,7 @@ namespace Jal.Router.Impl.Outbound
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
                 SagaInfo = options.SagaInfo,
-                ContentType = typeof(TContent),
+                ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
                 EndPointName = endpoint.EndPointName
@@ -347,7 +347,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void FireAndForget<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
@@ -356,7 +356,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, typeof(TContent));
+            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             var setting = _provider.Provide(endpoint, content);
 
