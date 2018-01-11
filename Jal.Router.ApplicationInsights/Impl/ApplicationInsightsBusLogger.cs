@@ -24,7 +24,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             var telemetry = new DependencyTelemetry()
             {
-                Name = context.ContentType.Name,
+                Name = context.EndPointName,
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
                 Target = context.ToPath,
@@ -36,6 +36,8 @@ namespace Jal.Router.ApplicationInsights.Impl
                     new KeyValuePair<string, string>("origin", context.Origin.Key),
                     new KeyValuePair<string, string>("saga",context.SagaInfo?.Id),
                     new KeyValuePair<string, string>("version", context.Version),
+                    new KeyValuePair<string, string>("replytorequestid", context.ReplyToRequestId),
+                    new KeyValuePair<string, string>("requestid", context.RequestId),
                 },
                 Metrics =
                 {

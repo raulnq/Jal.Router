@@ -29,7 +29,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
-            var name = parameter.Route.ContentType.Name;
+            var name = parameter.Route.Name;
 
             if (!string.IsNullOrWhiteSpace(parameter.Saga?.Name))
             {
@@ -45,6 +45,9 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Properties.Add("version", context.Version);
                 telemetry.Properties.Add("origin", context.Origin.Key);
                 telemetry.Properties.Add("saga", context.SagaInfo?.Id);
+                telemetry.Properties.Add("replytorequestid", context.ReplyToRequestId);
+                telemetry.Properties.Add("requestid", context.RequestId);
+
                 telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
                 telemetry.Context.Operation.Name = name;
                 telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
