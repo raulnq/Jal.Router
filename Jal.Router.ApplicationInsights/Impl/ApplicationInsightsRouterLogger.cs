@@ -40,7 +40,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             {
                 telemetry.Timestamp = context.DateTimeUtc;
                 telemetry.Id = context.Id;
-                telemetry.Name = context.ContentType.Name;
+                telemetry.Name = name;
                 telemetry.Properties.Add("from", context.Origin.Name);
                 telemetry.Properties.Add("version", context.Version);
                 telemetry.Properties.Add("origin", context.Origin.Key);
