@@ -255,7 +255,6 @@ container.Install(new ServiceLocatorInstaller());
 Install the Jal.Router, Jal.Router.AzureStorage and Jal.Router.AzureServiceBus library.
 ```
 container.Install(new RouterInstaller(assemblies));
-container.Install(new ServiceLocatorInstaller());
 container.Install(new AzureServiceBusRouterInstaller());
 container.Install(new AzureStorageRouterInstaller("StorageConnectionString", "sagatests", "messagestests", DateTime.UtcNow.ToString("yyyyMMdd")));
 ```
