@@ -94,7 +94,7 @@ public class TransferMessageHandler : IMessageHandler<Transfer>
 	//Do something
 	}
 }
-
+```
 ### Publishing the message from "App B" to "App A" (App B)
 Now is time to return a message back to the sender app, to do that we need to modify the handler class.
 ```
