@@ -29,13 +29,13 @@ public class Sender
 ```
 The "Send" method could receive two parameters, the first one is the content of the message and the second one is an instance of the "Options" class that has the following:
 * Id (Optional), The value that will be used to identify the message by the concrete messaging service.
-* EndPointName (Mandatory), Name of the endpoint defined in the configuration.
+* EndPointName (Mandatory), Name of the endpoint defined in the configuration class.
 * Version (Optional), Current version of the message (by default is "1")
 * ScheduledEnqueueDateTimeUtc (Optional), If we want to defer the delivery of the message to some time in the future.
 * Headers (Optional), If some extra properties are needed those can be put here.
 * RequestId (Optional), Only mandatory if you want to use the request - reply pattern (reply part).
 * ReplyToRequestId (Optional), Only mandatory if you want to use the request - reply pattern (request part).
-* SagaInfo (Optional), Only mandatory if we are using sagas. You need to pass the saga information of the comming message context to the next step.
+* SagaInfo (Optional), Only mandatory if we are using sagas. You need to pass the saga information of the coming message context to the next step.
 The interface "IBus" will send the message based on the configuration below.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
@@ -50,7 +50,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	}
 }
 ```
-* RegisterEndPoint, This method starts the registration of a endpoint.
+* RegisterEndPoint, This method starts the registration of the endpoint.
 * ForMessage&lt;TMessage&gt;, The TMessage parameter indicates the type of message that could use this endpoint.
 * To&lt;TConnectionStringValueSettingFinder&gt;, This method allows us get the information about the connection string and path where our message will be sent. 
 The TConnectionStringValueSettingFinder parameter is a concrete implementations of the "IValueSettingFinder" interface. 
@@ -91,7 +91,7 @@ public class TransferMessageHandler : IMessageHandler<Transfer>
 {
 	public void Handle(Transfer transfer, MessageContext context)
 	{
-	//Do something
+		//Do something
 	}
 }
 ```
@@ -102,8 +102,8 @@ public class TransferMessageHandler : IMessageHandler<Transfer>
 {
 	public void Handle(Transfer transfer, InboundMessageContext context)
 	{
-	//Do something
-	_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id, EndPointName = "transferredendpoint"});
+		//Do something
+		_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id, EndPointName = "transferredendpoint"});
 	}
 }
 ```
@@ -140,7 +140,7 @@ public class TransferreCompensableMessageHandler : ICompensableMessageHandler<Tr
 {
 	public void Handle(Transferred message, MessageContext context)
 	{
-	//Do something when the response is successful
+		//Do something when the response is successful
 	}
 
 	public bool IsSuccessful(Transferred message)
@@ -150,7 +150,7 @@ public class TransferreCompensableMessageHandler : ICompensableMessageHandler<Tr
 
 	public void Compensate(Transferred message, MessageContext context)
 	{
-	//Do something when the response is a failure
+		//Do something when the response is a failure
 	}
 }
 ```
@@ -175,7 +175,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	}
 }
 ```
-### Retry
+### Retry and Errors
 What happens if during the processing of the "Transfer" message we got a transient error?, Do we have to return the error message or repeat the message?.
 ```
 public class TransferMessageHandler : IMessageHandler<Transfer>
@@ -221,6 +221,10 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 		RegisterEndPoint("retryendpoint")
 		.ForMessage<Transfer>()
 		.To<ConnectionStringValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), "appbtopic");
+
+		RegisterEndPoint("errorendpoint")
+		.ForMessage<Transfer>()
+		.To<ConnectionStringValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), "appberrorqueue");
 
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
 	}
