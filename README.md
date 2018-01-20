@@ -230,7 +230,7 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 	}
 }
 ```
-### Castle Windsor And Azure Service Bus Integration
+### Castle Windsor, Azure Storage and Azure Service Bus Integration
 
 Note: The Jal.Locator.CastleWindsor and Jal.Finder library are needed
 
@@ -252,18 +252,24 @@ Install the Jal.Locator.CastleWindsor library
 ```
 container.Install(new ServiceLocatorInstaller());
 ```
-Install the Jal.Router and Jal.Router.AzureServiceBus library.
+Install the Jal.Router, Jal.Router.AzureStorage and Jal.Router.AzureServiceBus library.
 ```
+container.Install(new RouterInstaller(assemblies));
+container.Install(new ServiceLocatorInstaller());
 container.Install(new AzureServiceBusRouterInstaller());
-container.Install(new RouterLoggerInstaller());
+container.Install(new AzureStorageRouterInstaller("StorageConnectionString", "sagatests", "messagestests", DateTime.UtcNow.ToString("yyyyMMdd")));
 ```
 Tag the assembly container of the router configuration source classes in order to be read by the library
 ```
 [assembly: AssemblyTag]
 ```	
-Resolve an instance of the interface "IRouter" or "IBus"
+Resolve an instance of the interface "IHost"
 ```
-var router = container.Resolve<IRouter<BrokeredMessage>>();
+var host = container.Resolve<IHost>();
 
-var bus = container.Resolve<IBus>();
+host.Configuration.UsingAzureServiceBus();
+
+host.Configuration.UsingAzureStorage();
+
+host.RunAndBlock();
 ```
