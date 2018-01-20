@@ -23,25 +23,28 @@ public class Sender
 
 	public void Send(Transfer transfer)
 	{
-		_bus.Send(transfer, new Options() {Id = "Some meaningful value"});
+		_bus.Send(transfer, new Options() {Id = "Some meaningful value", EndPointName = "transferendpoint"});
 	}
 }
 ```
 The "Send" method could receive two parameters, the first one is the content of the message and the second one is an instance of the "Options" class that has the following:
 * Id (Optional), The value that will be used to identify the message by the concrete messaging service.
-* EndPointName (Optional), If we have more than one enpoint for the current message type and just one of them needs to be used here is the place to put the name.
+* EndPointName (Mandatory), Name of the endpoint defined in the configuration.
 * Version (Optional), Current version of the message (by default is "1")
 * ScheduledEnqueueDateTimeUtc (Optional), If we want to defer the delivery of the message to some time in the future.
 * Headers (Optional), If some extra properties are needed those can be put here.
+* RequestId (Optional), Only mandatory if you want to use the request - reply pattern (reply part).
+* ReplyToRequestId (Optional), Only mandatory if you want to use the request - reply pattern (request part).
+* SagaInfo (Optional), Only mandatory if we are using sagas. You need to pass the saga information of the comming message context to the next step.
 The interface "IBus" will send the message based on the configuration below.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-		RegisterEndPoint()
-        .ForMessage<Transfer>()
-        .To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbqueue");
+		RegisterEndPoint("transferendpoint")
+		.ForMessage<Transfer>()
+		.To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbqueue");
 
 		RegisterOrigin("App A", "59D3EDDD-F8F4-4895-9A1C-FE7A6F9B71EE");
 	}
@@ -50,33 +53,31 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 * RegisterEndPoint, This method starts the registration of a endpoint.
 * ForMessage&lt;TMessage&gt;, The TMessage parameter indicates the type of message that could use this endpoint.
 * To&lt;TConnectionStringValueSettingFinder&gt;, This method allows us get the information about the connection string and path where our message will be sent. 
-The TConnectionStringValueSettingFinder parameter is the concrete implementations of the "IValueSettingFinder" interface. 
+The TConnectionStringValueSettingFinder parameter is a concrete implementations of the "IValueSettingFinder" interface. 
 Currently there are two implementations of this inteface: "ConnectionStringValueSettingFinder" (to have access to the connection string section of the config file) and "AppSettingValueSettingFinder" (to have access to the app settings section of the config file).
 * RegisterOrigin, This method will register the name of the app and the unique id to identified it.
 ### Routing the message on the "App B" ("App B")
-To receive the message in the "App B"  we need to setup the routing logic in the following class.
+To receive the message in the "App B" we need to setup the routing logic in the following class.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-        RegisterRoute<IMessageHandler<Transfer>>("transfer")
-            .ToListenPointToPointChannel<ConnectionStringValueSettingFinder>("appbqueue", c => c.Find("AzureWebJobsServiceBus"))
-            .ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
-        {
-            x.With(((transfer, step, context) => step.Handle(transfer, context)));
-        })
-        .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint")
-        .Using<AppSettingValueSettingFinder>(y => new ExponentialRetryPolicy(6, 5))
-        .OnErrorSendFailedMessageTo("errorendpoint");
+		RegisterHandler<IMessageHandler<Transfer>>("transferroute")
+		.ToListenPointToPointChannel<ConnectionStringValueSettingFinder>("appbqueue", c => c.Find("AzureWebJobsServiceBus"))
+		.ForMessage<Transfer>().Using<TransferMessageHandler>(x =>
+		{
+			x.With(((transfer, step, context) => step.Handle(transfer, context)));
+		});
 	}
 }
 ```
 Let's see every method used in the class above.
-* RegisterRoute, allows us to start the creation of a new route handled by the interface specified in the generic parameter.
-* ForMessage, indicates the object type inside the message to be routed.
-* ToBeHandledBy, This method will tell us the concrete class on charge to handle the message and how to handle it (you can add as many ways as you want here).
-Coming back to the handler class, apart of the Transfer message, you can have access to the InboundMessageContext class that contains the following properties:
+* RegisterHandler, allows us to start the creation of a new handler of the type specified in the generic parameter.
+* ToListenPointToPointChannel, Indicates what we are listening.
+* ForMessage, indicates the object type inside the message to be handled.
+* Using, This method will tell us the concrete class on charge to handle the message and how to handle it (you can add as many ways as you want here).
+Coming back to the handler class, apart of the Transfer message, you can have access to the MessageContext class that contains the following properties:
 * Id, Id of the message.
 * Origin.Name, Name of the app that send us the message.
 * Origin.Key, Unique id of the app that send us the message.
@@ -84,11 +85,11 @@ Coming back to the handler class, apart of the Transfer message, you can have ac
 * Headers, Non standard properties of the message.
 * RetryCount, How many times the message was retried.
 * LastRetry, It is true if we are in the last retry of the current message.
-When the message arrives the "Route" method dispatch it to the corresponding handler method.
+When the message arrives is dispatched to the corresponding handler method.
 ```
 public class TransferMessageHandler : IMessageHandler<Transfer>
 {
-	public void Handle(Transfer transfer, InboundMessageContext context)
+	public void Handle(Transfer transfer, MessageContext context)
 	{
 	//Do something
 	}
@@ -102,7 +103,7 @@ public class TransferMessageHandler : IMessageHandler<Transfer>
 	public void Handle(Transfer transfer, InboundMessageContext context)
 	{
 	//Do something
-	_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id});
+	_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id, EndPointName = "transferredendpoint"});
 	}
 }
 ```
@@ -116,40 +117,28 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+		RegisterHandler<IMessageHandler<Transfer>>("transferroute")
+		.ToListenPointToPointChannel<ConnectionStringValueSettingFinder>("appbqueue", c => c.Find("AzureWebJobsServiceBus"))
+		.ForMessage<Transfer>().Using<TransferMessageHandler>(x =>
 		{
-			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
+			x.With(((transfer, step, context) => step.Handle(transfer, context)));
 		});
 
-		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
+		RegisterEndPoint("transferredendpoint")
+		.ForMessage<Transferred>()
+		.To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbtopic");
 
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
 	}
 }
 ```
 ### Routing the message from "App B" to "App A" (App A)
-We start adding a "Listener" class to receive the message.
-```
-public class Listener
-{
-	private readonly IRouter<BrokeredMessage> _router;
 
-	public Listener(IRouter<BrokeredMessage> router)
-	{
-		_router = router;
-	}
-
-	public void ListenTransferredFromSource([ServiceBusAccount("AppB")][ServiceBusTrigger("appbtopic", "appasubscription")]BrokeredMessage message)
-	{
-		_router.Route<Transferred>(message);
-	}
-}
-```
-Then is time to create our handler class. Notice that now we need to handle two possible scenarios, one if we got a successful processing and the other if it was a failure.
+First, it is time to create our handler class. Notice that now we need to handle two possible scenarios, one if we got a successful processing and the other if it was a failure.
 ```
 public class TransferreCompensableMessageHandler : ICompensableMessageHandler<Transferred>
 {
-	public void Handle(Transferred message, InboundMessageContext context)
+	public void Handle(Transferred message, MessageContext context)
 	{
 	//Do something when the response is successful
 	}
@@ -159,24 +148,28 @@ public class TransferreCompensableMessageHandler : ICompensableMessageHandler<Tr
 		return message.IsSuccess;
 	}
 
-	public void Compensate(Transferred message, InboundMessageContext context)
+	public void Compensate(Transferred message, MessageContext context)
 	{
 	//Do something when the response is a failure
 	}
 }
 ```
-And then our routing setup.
+And then our handler setup.
 ```
 public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
 	public RouterConfigurationSource()
 	{
-		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+		RegisterHandler<IMessageHandler<Transfer>>("transferredroute")
+		.ToListenPublishSubscribeChannel<ConnectionStringValueSettingFinder>("appbtopic", "subscription", c => c.Find("AzureWebJobsAppB"))
+		.ForMessage<Transfer>().Using<TransferMessageHandler>(x =>
 		{
-			x.With(((transfer, handler, context) => handler.Handle(transfer, context)));
-		});
+			x.With(((transfer, step, context) => step.Handle(transfer, context)));
+		})
 
-		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
+		RegisterEndPoint("appbendpoint")
+		.ForMessage<Transfer>()
+		.To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbqueue");
 
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
 	}
@@ -202,23 +195,35 @@ public class TransferMessageHandler : IMessageHandler<Transfer>
 			throw new ApplicationException();
 		}
 
-		_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id});
+		_bus.Publish(transferred, new Origin{ Key = context.Origin.Key }, new Options {Id = context.Id, EndPointName = "transferredendpoint"});
 	}
 }
 ```
 ```
-public RouterConfigurationSource()
+public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
-		RegisterRoute<IMessageHandler<Transfer>>().ForMessage<Transfer>().ToBeHandledBy<TransferMessageHandler>(x =>
+	public RouterConfigurationSource()
+	{
+		RegisterHandler<IMessageHandler<Transfer>>("transferroute")
+		.ToListenPointToPointChannel<ConnectionStringValueSettingFinder>("appbqueue", c => c.Find("AzureWebJobsServiceBus"))
+		.ForMessage<Transfer>().Using<TransferMessageHandler>(x =>
 		{
-			x.With(((transfer, handler, context) => handler.Handle(transfer, context))).OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint").Using<AppSettingValueSettingFinder>(y => new LinearRetryPolicy(600, 3));
-		});
+			x.With(((transfer, step, context) => step.Handle(transfer, context)));
+		})
+		.OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint")
+		.Using<AppSettingValueSettingFinder>(y => new ExponentialRetryPolicy(6, 5))
+		.OnErrorSendFailedMessageTo("errorendpoint");
 
-		RegisterEndPoint().ForMessage<Transferred>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), x => x.Find("appbtopic"));
+		RegisterEndPoint("transferredendpoint")
+		.ForMessage<Transferred>()
+		.To<ConnectionStringValueSettingFinder>(x => x.Find("AzureWebJobsAppB"), "appbtopic");
 
-		RegisterEndPoint("retryendpoint").ForMessage<Transfer>().To<ConnectionStringValueSettingFinder, AppSettingValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), a => a.Find("appbqueue"));
+		RegisterEndPoint("retryendpoint")
+		.ForMessage<Transfer>()
+		.To<ConnectionStringValueSettingFinder>(c=>c.Find("AzureWebJobsAppB"), "appbtopic");
 
 		RegisterOrigin("App B", "9993E555-Q8F4-1111-0A1C-FE7A6FOO71EE");
+	}
 }
 ```
 ### Castle Windsor And Azure Service Bus Integration
