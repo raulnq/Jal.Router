@@ -62,9 +62,15 @@ namespace ConsoleApplication1
             container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppFHandler)).Named(typeof(ResponseToSendAppFHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend>)).ImplementedBy(typeof(RequestToSendAppXHandler)).Named(typeof(RequestToSendAppXHandler).FullName).LifestyleSingleton());
 
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppHHandler)).Named(typeof(ResponseToSendAppHHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<ResponseToSend>)).ImplementedBy(typeof(RequestToSendAppZHandler)).Named(typeof(RequestToSendAppZHandler).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowDHandler)).Named(typeof(TriggerFlowDHandler).FullName).LifestyleSingleton());
             container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppGHandler)).Named(typeof(ResponseToSendAppGHandler).FullName).LifestyleSingleton());
 
+            container.Register(Component.For(typeof(IRequestResponseHandler<Trigger>)).ImplementedBy(typeof(TriggerFlowEHandler)).Named(typeof(TriggerFlowEHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppJHandler)).Named(typeof(ResponseToSendAppJHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IRequestResponseHandler<RequestToSend, Data>)).ImplementedBy(typeof(ResponseToSendAppIHandler)).Named(typeof(ResponseToSendAppIHandler).FullName).LifestyleSingleton());
             //container.Register(Component.For(typeof(IMessageHandler<Message>)).ImplementedBy(typeof(OtherMessageHandler)).Named(typeof(OtherMessageHandler).FullName).LifestyleSingleton());
 
 

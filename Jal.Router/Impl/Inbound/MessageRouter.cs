@@ -58,18 +58,15 @@ namespace Jal.Router.Impl.Inbound
 
         public void Execute<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
         {
-            if (Can(context, route))
+            if (route.RouteMethods != null)
             {
-                if (route.RouteMethods != null)
-                {
-                    var handler = _factory.Create<THandler>(route.ConsumerType);
+                var handler = _factory.Create<THandler>(route.ConsumerType);
 
-                    foreach (var method in route.RouteMethods)
+                foreach (var method in route.RouteMethods)
+                {
+                    if (_selector.Select(context, method, handler))
                     {
-                        if (_selector.Select(context, method, handler))
-                        {
-                            _executor.Execute(context, method, handler);
-                        }
+                        _executor.Execute(context, method, handler);
                     }
                 }
             }
@@ -78,33 +75,19 @@ namespace Jal.Router.Impl.Inbound
         public void Execute<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
-            if (Can(context, route))
+
+            if (route.RouteMethods != null)
             {
-                if (route.RouteMethods != null)
-                {
-                    var consumer = _factory.Create<THandler>(route.ConsumerType);
+                var consumer = _factory.Create<THandler>(route.ConsumerType);
                     
-                    foreach (var method in route.RouteMethods)
+                foreach (var method in route.RouteMethods)
+                {
+                    if (_selector.Select(context, method, consumer))
                     {
-                        if (_selector.Select(context, method, consumer))
-                        {
-                            _executor.Execute(context, method, consumer, data);
-                        }
+                        _executor.Execute(context, method, consumer, data);
                     }
                 }
             }
-        }
-
-        private bool Can<TContent, THandler>(MessageContext context, Route<TContent, THandler> route)
-            where THandler : class
-        {
-            var when = true;
-
-            if (route.When != null)
-            {
-                when = route.When((TContent)context.Content, context);
-            }
-            return when;
         }
     }
 }

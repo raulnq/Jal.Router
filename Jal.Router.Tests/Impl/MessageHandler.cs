@@ -143,7 +143,7 @@ namespace Jal.Router.Tests.Impl
 
         public void Handle(RequestToSend message, MessageContext context, Data data)
         {
-            data.Status = "Complete";
+            data.Status = "Start";
             _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appx", SagaInfo = context.SagaInfo});
             
         }
@@ -165,11 +165,46 @@ namespace Jal.Router.Tests.Impl
         }
     }
 
+        public class RequestToSendAppZHandler : IRequestResponseHandler<ResponseToSend>
+    {
+        private readonly IBus _bus;
+
+        public RequestToSendAppZHandler(IBus bus)
+        {
+            _bus = bus;
+        }
+
+        public void Handle(ResponseToSend message, MessageContext context)
+        {
+            Thread.Sleep(10000);
+            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "apph", SagaInfo = context.SagaInfo });
+        }
+    }
+
     public class ResponseToSendAppFHandler : IRequestResponseHandler<ResponseToSend, Data>
+    {
+        private readonly IBus _bus;
+
+        public ResponseToSendAppFHandler(IBus bus)
+        {
+            _bus = bus;
+        }
+
+        public void Handle(ResponseToSend message, MessageContext context, Data data)
+        {
+            Console.WriteLine(message.Name + " " + data.Status);
+            data.Status = "Continue";
+            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appz", SagaInfo = context.SagaInfo });
+        }
+    }
+
+    public class ResponseToSendAppHHandler : IRequestResponseHandler<ResponseToSend, Data>
     {
         public void Handle(ResponseToSend message, MessageContext contextM, Data data)
         {
-            Console.WriteLine(message.Name+ " " + data.Status);
+            
+            Console.WriteLine(message.Name + " " + data.Status);
+            data.Status = "end";
         }
     }
 
@@ -203,16 +238,45 @@ namespace Jal.Router.Tests.Impl
         }
     }
 
+    public class TriggerFlowEHandler : IRequestResponseHandler<Trigger>
+    {
+        private readonly IBus _bus;
+
+        public TriggerFlowEHandler(IBus bus)
+        {
+            _bus = bus;
+        }
+
+        public void Handle(Trigger message, MessageContext context)
+        {
+            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() {Headers = context.CopyHeaders(), EndPointName = "appi" });
+        }
+    }
+
 
     public class ResponseToSendAppGHandler : IRequestResponseHandler<RequestToSend>
     {
         public void Handle(RequestToSend message, MessageContext context)
         {
-            Console.WriteLine(message.Name + " " + context.RetryCount.ToString());
-            throw new ApplicationException("Error");
+            Console.WriteLine(message.Name);
         }
     }
 
+    public class ResponseToSendAppIHandler : IRequestResponseHandler<RequestToSend>
+    {
+        public void Handle(RequestToSend message, MessageContext context)
+        {
+            Console.WriteLine(message.Name + " I");
+        }
+    }
+
+    public class ResponseToSendAppJHandler : IRequestResponseHandler<RequestToSend>
+    {
+        public void Handle(RequestToSend message, MessageContext context)
+        {
+            Console.WriteLine(message.Name + " J");
+        }
+    }
 
     public class RequestHandler : IRequestResponseHandler<RequestToSend>
     {

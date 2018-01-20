@@ -6,7 +6,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class HandlerBuilder<TContent, THandler> : IHandlerBuilder<TContent, THandler>, IWhenHandlerBuilder<TContent>, IOnRetryUsingBuilder
+    public class HandlerBuilder<TContent, THandler> : IHandlerBuilder<TContent, THandler>, IWhenHandlerBuilder, IOnRetryUsingBuilder
     {
         private readonly Route<TContent, THandler> _route;
 
@@ -15,7 +15,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IWhenHandlerBuilder<TContent> ToBeHandledBy<TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler>> action) where TConcreteConsumer : THandler
+        public IWhenHandlerBuilder Using<TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler>> action) where TConcreteConsumer : THandler
         {
             if (action == null)
             {
@@ -31,7 +31,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRetryBuilder When(Func<TContent, MessageContext, bool> condition)
+        public IOnRetryBuilder When(Func<MessageContext, bool> condition)
         {
             if (condition == null)
             {
@@ -111,7 +111,7 @@ namespace Jal.Router.Fluent.Impl
         }
     }
 
-    public class HandlerBuilder<TContent, THandler, TData> : IHandlerBuilder<TContent, THandler, TData>, IWhenHandlerBuilder<TContent>, IOnRetryUsingBuilder
+    public class HandlerBuilder<TContent, THandler, TData> : IHandlerBuilder<TContent, THandler, TData>, IWhenHandlerBuilder, IOnRetryUsingBuilder
     {
         private readonly Route<TContent, THandler> _route;
 
@@ -120,7 +120,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IWhenHandlerBuilder<TContent> ToBeHandledBy<TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler, TData>> action) where TConcreteConsumer : THandler
+        public IWhenHandlerBuilder Using<TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler, TData>> action) where TConcreteConsumer : THandler
         {
             if (action == null)
             {
@@ -136,7 +136,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRetryBuilder When(Func<TContent, MessageContext, bool> condition)
+        public IOnRetryBuilder When(Func<MessageContext, bool> condition)
         {
             if (condition == null)
             {

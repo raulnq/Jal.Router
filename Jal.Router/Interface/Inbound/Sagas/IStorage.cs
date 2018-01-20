@@ -6,10 +6,12 @@ namespace Jal.Router.Interface.Inbound.Sagas
     {
         void Create(MessageContext context);
 
-        void Create(MessageContext context, object data);
+        void StartSaga(MessageContext context, object data);
 
-        void Update(MessageContext context, object data);
+        void UpdateSaga(MessageContext context, object data);
 
-        object Find(MessageContext context);
+        void EndSaga(MessageContext context, object data);
+
+        object FindSaga(MessageContext context);
     }
 }

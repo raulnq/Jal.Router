@@ -27,13 +27,23 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
-        public override void Listen(Route route, Action<object> routeaction, string channelpath)
+        public override void Listen(Route route, Action<object>[] routeactions, string channelpath)
         {
             var client = QueueClient.CreateFromConnectionString(route.ToConnectionString, route.ToPath);
 
             var receiver = client.MessagingFactory.CreateMessageReceiver(route.ToPath);
 
             var options = CreateOptions();
+
+            Action<BrokeredMessage> routeaction = message =>
+            {
+                foreach (var action in routeactions)
+                {
+                    var clone = message.Clone();
+                    action(clone);
+                }
+            };
+
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId,()=> routeaction(bm), () => client.Complete(bm.LockToken)), options);
 

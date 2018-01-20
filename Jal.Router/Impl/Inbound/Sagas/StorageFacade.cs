@@ -20,7 +20,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            storage.Update(context, data);
+            storage.UpdateSaga(context, data);
         }
     }
 }

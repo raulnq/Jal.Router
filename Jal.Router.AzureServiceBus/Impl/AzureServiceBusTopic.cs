@@ -27,7 +27,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
-        public override void Listen(Route route, Action<object> routeaction, string channelpath)
+        public override void Listen(Route route, Action<object>[] routeactions, string channelpath)
         {
             var client = SubscriptionClient.CreateFromConnectionString(route.ToConnectionString, route.ToPath, route.ToSubscription);
 
@@ -36,6 +36,15 @@ namespace Jal.Router.AzureServiceBus.Impl
             var receiver = client.MessagingFactory.CreateMessageReceiver(path);
 
             var options = CreateOptions();
+
+            Action<BrokeredMessage> routeaction = message =>
+            {
+                foreach (var action in routeactions)
+                {
+                    var clone = message.Clone();
+                    action(clone);
+                }
+            };
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId, () => routeaction(bm), () => client.Complete(bm.LockToken)), options);
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -8,7 +8,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public class StartingMessageHandler : IMiddleware
+    public class EndingMessageHandler : IMiddleware
     {
         private readonly IComponentFactory _factory;
 
@@ -16,7 +16,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         private readonly IConfiguration _configuration;
 
-        public StartingMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration)
+        public EndingMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration)
         {
             _factory = factory;
             _router = router;
@@ -25,18 +25,22 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
-            var data = Activator.CreateInstance(parameter.Saga.DataType);
-
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            storage.StartSaga(context, data);
+            var data = storage.FindSaga(context);
 
-            _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
-
-            if (!_configuration.Storage.ManualSagaSave)
+            if (data != null)
             {
-                storage.UpdateSaga(context, data);
+                _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
+
+                storage.EndSaga(context, data);
             }
+            else
+            {
+                throw new ApplicationException($"No data {parameter.Saga.DataType.FullName} for {parameter.Route.ContentType.FullName}, saga {parameter.Saga.Name}");
+            }
+
+
         }
     }
 }

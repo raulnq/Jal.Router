@@ -64,7 +64,7 @@ namespace Jal.Router.Impl
         }
 
 
-        public IListenerRouteBuilder<THandler> RegisterRoute<THandler>(string name)
+        public IListenerRouteBuilder<THandler> RegisterHandler<THandler>(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -141,7 +141,7 @@ namespace Jal.Router.Impl
             _publishsubscriberchannels.Add(channel);
         }
 
-        public void RegisterSaga<TData>(string name, Action<IStartingRouteBuilder<TData>> start, Action<INextRouteBuilder<TData>> @continue=null) where TData : class, new()
+        public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IStartingRouteBuilder<TData>> start, Action<INextRouteBuilder<TData>> @continue=null, Action<IEndingRouteBuilder<TData>> end = null) where TData : class, new()
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -153,18 +153,20 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(start));
             }
 
-            if (@continue == null)
-            {
-                throw new ArgumentNullException(nameof(@continue));
-            }
 
             var saga = new Saga(name, typeof(TData));
 
             start(new StartingRouteBuilder<TData>(saga));
 
-            @continue(new NextRouteBuilder<TData>(saga));
+            @continue?.Invoke(new NextRouteBuilder<TData>(saga));
+
+            end?.Invoke(new EndingRouteBuilder<TData>(saga));
 
             _sagas.Add(saga);
+
+            var timeoutbuilder = new TimeoutBuilder(saga);
+
+            return timeoutbuilder;
         }
 
         public void RegisterOrigin(string name, string key="")

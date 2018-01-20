@@ -10,17 +10,22 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         }
 
-        public virtual void Create(MessageContext context, object data)
+        public virtual void StartSaga(MessageContext context, object data)
         {
 
         }
 
-        public virtual void Update(MessageContext context, object data)
+        public virtual void UpdateSaga(MessageContext context, object data)
         {
 
         }
 
-        public virtual object Find(MessageContext context)
+        public virtual void EndSaga(MessageContext context, object data)
+        {
+
+        }
+
+        public virtual object FindSaga(MessageContext context)
         {
             return null;
         }

@@ -27,7 +27,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var data = storage.Find(context);
+            var data = storage.FindSaga(context);
 
             if (data != null)
             {
@@ -35,7 +35,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                 if (!_configuration.Storage.ManualSagaSave)
                 {
-                    storage.Update(context, data);
+                    storage.UpdateSaga(context, data);
                 }
             }
             else

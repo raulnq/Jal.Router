@@ -22,5 +22,7 @@ namespace Jal.Router.Model
         public List<Route> NextRoutes { get; set; }
 
         public Route StartingRoute { get; set; }
+
+        public Route EndingRoute { get; set; }
     }
 }

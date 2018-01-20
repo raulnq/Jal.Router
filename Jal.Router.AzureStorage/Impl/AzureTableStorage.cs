@@ -43,7 +43,7 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        private void CreateSaga<TData>(Saga saga, MessageContext context, TData data)
+        private void StartSaga<TData>(Saga saga, MessageContext context, TData data)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace Jal.Router.AzureStorage.Impl
             return string.Empty;
         }
 
-        public SagaRecord GetSaga(MessageContext context, Saga saga, string tablenamesufix)
+        public SagaRecord FindSaga(MessageContext context, Saga saga, string tablenamesufix)
         {
             try
             {
@@ -150,21 +150,34 @@ namespace Jal.Router.AzureStorage.Impl
             return null;
         }
 
-        public override void Create(MessageContext context, object data)
+        public override void StartSaga(MessageContext context, object data)
         {
-            CreateSaga(context.Saga, context, data);
+            StartSaga(context.Saga, context, data);
         }
 
-
-        public override void Update(MessageContext context, object data)
+        public override void UpdateSaga(MessageContext context, object data)
         {
             var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
-            var record = GetSaga(context, context.Saga, tablenamesufix);
+            var record = FindSaga(context, context.Saga, tablenamesufix);
 
             if (record != null)
             {
                 UpdateSaga(record, data, tablenamesufix, context.DateTimeUtc);
+
+                CreateMessage(record, context, context.Route, tablenamesufix);
+            }
+        }
+
+        public override void EndSaga(MessageContext context, object data)
+        {
+            var tablenamesufix = context.SagaInfo.GetTableNameSufix();
+
+            var record = FindSaga(context, context.Saga, tablenamesufix);
+
+            if (record != null)
+            {
+                EndSaga(record, data, tablenamesufix, context.DateTimeUtc);
 
                 CreateMessage(record, context, context.Route, tablenamesufix);
             }
@@ -231,11 +244,46 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override object Find(MessageContext context)
+        private void EndSaga(SagaRecord record, object data, string tablenamesufix, DateTime datetime)
+        {
+            try
+            {
+                record.Data = JsonConvert.SerializeObject(data);
+
+                record.Ended = datetime;
+
+                record.Status = "ENDED";
+
+                record.ETag = "*";
+
+                record.Duration = (record.Ended.Value - record.Created).TotalMilliseconds;
+
+                var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
+
+                table.Execute(TableOperation.Replace(record));
+            }
+            catch (StorageException ex)
+            {
+                if (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+                {
+                    throw new ApplicationException($"Error during the saga update (Optimistic concurrency violation – entity has changed since it was retrieved) {record.Name}", ex);
+                }
+                else
+                {
+                    throw new ApplicationException($"Error during the saga update ({ex.RequestInformation.HttpStatusCode}) {record.Name}", ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error during the saga update {record.Name}", ex);
+            }
+        }
+
+        public override object FindSaga(MessageContext context)
         {
             var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
-            var record = GetSaga(context, context.Saga, tablenamesufix);
+            var record = FindSaga(context, context.Saga, tablenamesufix);
 
             if (record!=null)
             {

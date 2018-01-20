@@ -37,7 +37,10 @@ namespace Jal.Router.Impl.Management
                     {
                         routes.Add(saga.StartingRoute);
                     }
-                    
+                    if (saga.EndingRoute != null)
+                    {
+                        routes.Add(saga.EndingRoute);
+                    }
                     routes.AddRange(saga.NextRoutes);
                 }
             }
@@ -65,11 +68,13 @@ namespace Jal.Router.Impl.Management
 
             foreach (var @group in groups)
             {
-                if (@group.Count() > 1)
+                var names = @group.GroupBy(y => y.Name);
+
+                if (names.Count() > 1)
                 {
                     var first = @group.First();
 
-                    var error = $"Duplicated route {first.ToConnectionString}/{first.ToPath}/{first.ToSubscription}: {string.Join(",", @group.ToArray().Select(x => x.Name))}";
+                    var error = $"Duplicate route with different name {first.ToConnectionString}/{first.ToPath}/{first.ToSubscription}: {string.Join(",", @group.ToArray().Select(x => x.Name))}";
 
                     errors.AppendLine(error);
 

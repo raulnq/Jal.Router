@@ -24,6 +24,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
 
+            container.Register<ISagaRouter, Impl.Inbound.Sagas.SagaRouter>(new PerContainerLifetime());
+
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
 
             container.Register<IRouteMethodSelector, RouteMethodSelector>(new PerContainerLifetime());
@@ -99,6 +101,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IMiddleware, StartingMessageHandler>(typeof(StartingMessageHandler).FullName, new PerContainerLifetime());
 
             container.Register<IMiddleware, NextMessageHandler>(typeof(NextMessageHandler).FullName, new PerContainerLifetime());
+
+            container.Register<IMiddleware, EndingMessageHandler>(typeof(EndingMessageHandler).FullName, new PerContainerLifetime());
 
             container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof(PointToPointHandler).FullName, new PerContainerLifetime());
 

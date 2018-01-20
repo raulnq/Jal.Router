@@ -34,6 +34,8 @@ namespace Jal.Router.Installer
         {
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
+            container.Register(Component.For<ISagaRouter>().ImplementedBy<Impl.Inbound.Sagas.SagaRouter>().LifestyleSingleton());
+
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
             container.Register(Component.For<IRouteMethodSelector>().ImplementedBy<RouteMethodSelector>().LifestyleSingleton());
@@ -109,6 +111,8 @@ namespace Jal.Router.Installer
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(StartingMessageHandler)).Named(typeof(StartingMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(NextMessageHandler)).Named(typeof(NextMessageHandler).FullName).LifestyleSingleton());
+
+            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(EndingMessageHandler)).Named(typeof(EndingMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
 

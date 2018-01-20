@@ -1,4 +1,5 @@
-﻿using Jal.Router.Fluent.Interface;
+﻿using System;
+using Jal.Router.Fluent.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
@@ -13,8 +14,13 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public INextListenerRouteBuilder<THandler, TData> RegisterRoute<THandler>(string name)
+        public INextListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             var builder = new NextNameRouteBuilder<THandler, TData>(_saga, name);
 
             return builder;

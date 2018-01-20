@@ -51,8 +51,11 @@
     <Compile Include="Fluent\Impl\NextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\NextRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
+    <Compile Include="Fluent\Impl\EndingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingNameRouteBuilder.cs" />
+    <Compile Include="Fluent\Impl\EndingRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\StartingRouteBuilder.cs" />
+    <Compile Include="Fluent\Impl\TimeoutBuilder.cs" />
     <Compile Include="Fluent\Interface\IAndWaitReplyFromEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\INextListenerRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INextNameRouteBuilder.cs" />
@@ -61,11 +64,15 @@
     <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRouteOptionBuilder.cs" />
+    <Compile Include="Fluent\Interface\IEndingListenerRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingListenerRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IEndingNameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingNameRouteBuilder.cs" />
+    <Compile Include="Fluent\Interface\IEndingRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IStartingRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRetryBuilder.cs" />
     <Compile Include="Fluent\Interface\IOnRetryUsingBuilder.cs" />
+    <Compile Include="Fluent\Interface\ITimeoutBuilder.cs" />
     <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenHandlerBuilder.cs" />
     <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
@@ -76,6 +83,9 @@
     <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
     <Compile Include="Impl\ChannelPathBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
+    <Compile Include="Model\Inbound\RouteToListen.cs" />
+    <Compile Include="Impl\Inbound\Sagas\EndingMessageHandler.cs" />
+    <Compile Include="Impl\Inbound\Sagas\SagaRouter.cs" />
     <Compile Include="Impl\Management\Host.cs" />
     <Compile Include="Fluent\Interface\IListenerRouteBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerStartupTask.cs" />
@@ -93,6 +103,7 @@
     <Compile Include="Impl\NullRequestReplyChannel.cs" />
     <Compile Include="Impl\Outbound\RequestReplyHandler.cs" />
     <Compile Include="Interface\IChannelPathBuilder.cs" />
+    <Compile Include="Interface\Inbound\Sagas\ISagaRouter.cs" />
     <Compile Include="Interface\IRequestReplyChannel.cs" />
     <Compile Include="Interface\Management\IShutdownWatcher.cs" />
     <Compile Include="Impl\Management\Monitor.cs" />

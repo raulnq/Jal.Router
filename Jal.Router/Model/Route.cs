@@ -46,13 +46,13 @@ namespace Jal.Router.Model
         public string ForwardEndPoint { get; set; }
 
         public Action ShutdownAction { get; set; }
+
+        public Func<MessageContext, bool> When { get; set; }
     }
 
     public class Route<TContent, TConsumer> : Route
     {
         public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; set; }
-
-        public Func<TContent, MessageContext, bool> When { get; set; }
 
         public Type ConsumerType { get; set; }
 
