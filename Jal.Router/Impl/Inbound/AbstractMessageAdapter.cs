@@ -41,9 +41,16 @@ namespace Jal.Router.Impl.Inbound
 
             var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            var content = serializer.Deserialize(body, contenttype);
+            try
+            {
+                var content = serializer.Deserialize(body, contenttype);
 
-            context.Content = content;
+                context.Content = content;
+            }
+            catch (Exception)
+            {
+                context.Content = null;
+            }
 
             return context;
         }
