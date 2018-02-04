@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ConfigurationExtensions.cs" />
     <Compile Include="Fluent\Impl\MiddlewareBuilder.cs" />
     <Compile Include="Fluent\Impl\NextNameRouteBuilder.cs" />
     <Compile Include="Fluent\Impl\NextRouteBuilder.cs" />
