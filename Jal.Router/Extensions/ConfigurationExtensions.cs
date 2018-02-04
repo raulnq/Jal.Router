@@ -51,7 +51,7 @@ namespace Jal.Router.Extensions
 
         public static void PublishToOriginWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null)
         {
-            context.Publish(content, new Origin() { Key = context.Origin.Key }, context.CreateOptionsForParentSaga(endpointname, id));
+            context.Publish(content, new Origin() { Key = context.Origin.ParentKey }, context.CreateOptionsForParentSaga(endpointname, id));
         }
 
         public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null)
@@ -82,7 +82,7 @@ namespace Jal.Router.Extensions
 
         public static void PublishToOriginWithParentSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null)
         {
-            context.Publish(data, content, new Origin() { Key = context.Origin.Key }, context.CreateOptionsForParentSaga(endpointname, id));
+            context.Publish(data, content, new Origin() { Key = context.Origin.ParentKey }, context.CreateOptionsForParentSaga(endpointname, id));
         }
 
         public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null)

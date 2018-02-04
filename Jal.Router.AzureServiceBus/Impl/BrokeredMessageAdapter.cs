@@ -42,6 +42,11 @@ namespace Jal.Router.AzureServiceBus.Impl
                     context.Origin.Name = brokeredmessage.Properties[From].ToString();
                 }
 
+                if (brokeredmessage.Properties.ContainsKey(ParentOrigin))
+                {
+                    context.Origin.ParentKey = brokeredmessage.Properties[ParentOrigin].ToString();
+                }
+
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
                     context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
@@ -69,7 +74,8 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 if (brokeredmessage.Properties != null)
                 {
-                    foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaId))
+                    foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaId && x.Key != ParentOrigin))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -155,6 +161,10 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(ParentSagaId, context.SagaInfo.ParentId);
             }
 
+            if (!string.IsNullOrWhiteSpace(context.Origin.ParentKey))
+            {
+                brokeredmessage.Properties.Add(ParentOrigin, context.Origin.ParentKey);
+            }
 
             if (context.ScheduledEnqueueDateTimeUtc != null)
             {

@@ -28,6 +28,8 @@ namespace Jal.Router.Impl.Inbound
 
         public const string Origin = "origin";
 
+        public const string ParentOrigin = "parentorigin";
+
         public const string RetryCount = "retrycount";
 
         public const string EnclosedType = "enclosedtype";
