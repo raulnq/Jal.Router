@@ -119,5 +119,29 @@ namespace Jal.Router.Model
 
             _bus.Publish(content, origin, options);
         }
+
+        public TResult Reply<TContent, TResult>(TContent content, Options options)
+        {
+            return _bus.Reply<TContent, TResult>(content, options);
+        }
+
+        public TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options)
+        {
+            return _bus.Reply<TContent, TResult>(content, origin, options);
+        }
+
+        public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Options options)
+        {
+            _facade.Save(this, data);
+
+            return _bus.Reply<TContent, TResult>(content, options);
+        }
+
+        public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
+        {
+            _facade.Save(this, data);
+
+            return _bus.Reply<TContent, TResult>(content, origin, options);
+        }
     }
 }
