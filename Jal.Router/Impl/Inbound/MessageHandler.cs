@@ -28,7 +28,7 @@ namespace Jal.Router.Impl.Inbound
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            if (!_configuration.Storage.ManualMessageSave)
+            if (_configuration.Storage.SaveMessage)
             {
                 storage.Create(context);
             }

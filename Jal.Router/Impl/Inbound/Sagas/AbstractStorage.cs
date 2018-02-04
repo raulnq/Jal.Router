@@ -15,6 +15,11 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         }
 
+        public virtual void ContinueSaga(MessageContext context, object data)
+        {
+
+        }
+
         public virtual void UpdateSaga(MessageContext context, object data)
         {
 

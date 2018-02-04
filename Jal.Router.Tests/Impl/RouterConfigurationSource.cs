@@ -125,12 +125,25 @@ namespace Jal.Router.Tests.Impl
             .ForMessage<ResponseToSend>()
             .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appzqueue");
 
-            RegisterHandler<IRequestResponseHandler<ResponseToSend>>("appx")
-                .ToListenQueue<IRequestResponseHandler<ResponseToSend>, AppSettingValueSettingFinder>("appxqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
-                .ForMessage<ResponseToSend>().Using<RequestToSendAppXHandler>(x =>
-                {
-                    x.With(((request, handler, context) => handler.Handle(request, context)));
-                });
+
+
+            RegisterSaga<Data>("innersaga", @start =>
+            {
+                @start.RegisterHandler<IRequestResponseHandler<ResponseToSend, Data>>("appx")
+                    .ToListenQueue<IRequestResponseHandler<ResponseToSend, Data>, Data, AppSettingValueSettingFinder>("appxqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                    .ForMessage<ResponseToSend>().Using<RequestToSendAppXHandler>(x =>
+                    {
+                        x.With(((request, handler, context, data) => handler.Handle(request, context, data)));
+                    });
+            },
+            @continue =>
+            {
+                    
+            },
+            @end =>
+            {
+
+            });
 
             RegisterHandler<IRequestResponseHandler<ResponseToSend>>("appz")
                 .ToListenQueue<IRequestResponseHandler<ResponseToSend>, AppSettingValueSettingFinder>("appzqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")

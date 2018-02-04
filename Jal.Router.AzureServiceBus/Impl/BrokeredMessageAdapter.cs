@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
+using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Microsoft.ServiceBus.Messaging;
 
@@ -17,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.Impl
     }
     public class BrokeredMessageAdapter : AbstractMessageAdapter
     {
-        public BrokeredMessageAdapter(IComponentFactory factory, IConfiguration configuration) : base(factory, configuration)
+        public BrokeredMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus, IStorageFacade facade) : base(factory, configuration, bus, facade)
         {
         }
 
@@ -27,7 +29,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (brokeredmessage != null)
             {
-                var context = new MessageContext
+                var context = new MessageContext(Bus, Facade)
                 {
                     Id = brokeredmessage.MessageId,
                     DateTimeUtc = DateTime.UtcNow,
@@ -43,6 +45,11 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
                     context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
+                }
+
+                if (brokeredmessage.Properties.ContainsKey(ParentSagaId))
+                {
+                    context.SagaInfo.ParentId = brokeredmessage.Properties[ParentSagaId].ToString();
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(Version))
@@ -62,7 +69,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 if (brokeredmessage.Properties != null)
                 {
-                    foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version && x.Key != RetryCount && x.Key != SagaId))
+                    foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -142,6 +149,12 @@ namespace Jal.Router.AzureServiceBus.Impl
             {
                 brokeredmessage.Properties.Add(SagaId, context.SagaInfo.Id);
             }
+
+            if (!string.IsNullOrWhiteSpace(context.SagaInfo.ParentId))
+            {
+                brokeredmessage.Properties.Add(ParentSagaId, context.SagaInfo.ParentId);
+            }
+
 
             if (context.ScheduledEnqueueDateTimeUtc != null)
             {

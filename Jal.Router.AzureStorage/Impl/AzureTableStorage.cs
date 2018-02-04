@@ -51,6 +51,11 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var row = Guid.NewGuid().ToString();
 
+                if (!string.IsNullOrWhiteSpace(context.SagaInfo.Id))
+                {
+                    context.SagaInfo.ParentId = context.SagaInfo.Id;
+                }
+
                 context.SagaInfo.SetId(partition, row, _currenttablenamesufix);
 
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
@@ -155,7 +160,7 @@ namespace Jal.Router.AzureStorage.Impl
             StartSaga(context.Saga, context, data);
         }
 
-        public override void UpdateSaga(MessageContext context, object data)
+        public override void ContinueSaga(MessageContext context, object data)
         {
             var tablenamesufix = context.SagaInfo.GetTableNameSufix();
 
@@ -166,6 +171,18 @@ namespace Jal.Router.AzureStorage.Impl
                 UpdateSaga(record, data, tablenamesufix, context.DateTimeUtc);
 
                 CreateMessage(record, context, context.Route, tablenamesufix);
+            }
+        }
+
+        public override void UpdateSaga(MessageContext context, object data)
+        {
+            var tablenamesufix = context.SagaInfo.GetTableNameSufix();
+
+            var record = FindSaga(context, context.Saga, tablenamesufix);
+
+            if (record != null)
+            {
+                UpdateSaga(record, data, tablenamesufix, context.DateTimeUtc);
             }
         }
 

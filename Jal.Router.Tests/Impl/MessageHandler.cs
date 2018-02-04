@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Jal.Router.Extensions;
 using Jal.Router.Impl;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
@@ -55,31 +56,17 @@ namespace Jal.Router.Tests.Impl
 
     public class TriggerFlowAHandler : IRequestResponseHandler<Trigger>
     {
-        private readonly IBus _bus;
-
-        public TriggerFlowAHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(Trigger message, MessageContext context)
         {
-            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() {EndPointName = "appa" });
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appa");
         }
     }
 
     public class RequestToSendAppAHandler : IRequestResponseHandler<RequestToSend>
     {
-        private readonly IBus _bus;
-
-        public RequestToSendAppAHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(RequestToSend message, MessageContext context)
         {
-            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() {EndPointName = "appb" });
+            context.Send(new ResponseToSend() { Name = message.Name }, "appb");
         }
     }
 
@@ -93,31 +80,17 @@ namespace Jal.Router.Tests.Impl
 
     public class TriggerFlowBHandler : IRequestResponseHandler<Trigger>
     {
-        private readonly IBus _bus;
-
-        public TriggerFlowBHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(Trigger message, MessageContext context)
         {
-            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() { EndPointName = "appc" });
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appc");
         }
     }
 
     public class RequestToSendAppCHandler : IRequestResponseHandler<RequestToSend>
     {
-        private readonly IBus _bus;
-
-        public RequestToSendAppCHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(RequestToSend message, MessageContext context)
         {
-            _bus.Publish(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appd"});
+            context.Publish(new ResponseToSend() { Name = message.Name }, "appd");
         }
     }
 
@@ -131,70 +104,41 @@ namespace Jal.Router.Tests.Impl
 
     public class RequestToSendAppEHandler : IRequestResponseHandler<RequestToSend, Data>
     {
-        private readonly IBus _bus;
-
-        private readonly IStorageFacade _storage;
-
-        public RequestToSendAppEHandler(IBus bus, IStorageFacade storage)
-        {
-            _bus = bus;
-            _storage = storage;
-        }
-
         public void Handle(RequestToSend message, MessageContext context, Data data)
         {
             data.Status = "Start";
-            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appx", SagaInfo = context.SagaInfo});
+
+            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appx");
             
         }
     }
 
-    public class RequestToSendAppXHandler : IRequestResponseHandler<ResponseToSend>
+    public class RequestToSendAppXHandler : IRequestResponseHandler<ResponseToSend, Data>
     {
-        private readonly IBus _bus;
-
-        public RequestToSendAppXHandler(IBus bus)
+        public void Handle(ResponseToSend message, MessageContext context, Data data)
         {
-            _bus = bus;
-        }
-
-        public void Handle(ResponseToSend message, MessageContext context)
-        {
-            Thread.Sleep(10000);
-            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appf", SagaInfo = context.SagaInfo });
+            context.SendWithParentSagaInfo(new ResponseToSend() { Name = message.Name }, "appf");
         }
     }
 
         public class RequestToSendAppZHandler : IRequestResponseHandler<ResponseToSend>
     {
-        private readonly IBus _bus;
-
-        public RequestToSendAppZHandler(IBus bus)
-        {
-            _bus = bus;
-        }
 
         public void Handle(ResponseToSend message, MessageContext context)
         {
-            Thread.Sleep(10000);
-            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "apph", SagaInfo = context.SagaInfo });
+            context.SendWithSagaInfo(new ResponseToSend() { Name = message.Name }, "apph");
+            
         }
     }
 
     public class ResponseToSendAppFHandler : IRequestResponseHandler<ResponseToSend, Data>
     {
-        private readonly IBus _bus;
-
-        public ResponseToSendAppFHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(ResponseToSend message, MessageContext context, Data data)
         {
             Console.WriteLine(message.Name + " " + data.Status);
             data.Status = "Continue";
-            _bus.Send(new ResponseToSend() { Name = message.Name }, new Options() { EndPointName = "appz", SagaInfo = context.SagaInfo });
+
+            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appz");
         }
     }
 
@@ -210,31 +154,17 @@ namespace Jal.Router.Tests.Impl
 
     public class TriggerFlowCHandler : IRequestResponseHandler<Trigger>
     {
-        private readonly IBus _bus;
-
-        public TriggerFlowCHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(Trigger message, MessageContext context)
         {
-            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() { EndPointName = "appe" });
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appe");
         }
     }
 
     public class TriggerFlowDHandler : IRequestResponseHandler<Trigger>
     {
-        private readonly IBus _bus;
-
-        public TriggerFlowDHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(Trigger message, MessageContext context)
         {
-            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() { EndPointName = "appg" });
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appg");
         }
     }
 
@@ -249,7 +179,7 @@ namespace Jal.Router.Tests.Impl
 
         public void Handle(Trigger message, MessageContext context)
         {
-            _bus.Send(new RequestToSend() { Name = "Hello world!!" }, new Options() {Headers = context.CopyHeaders(), EndPointName = "appi" });
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appi");
         }
     }
 
@@ -280,17 +210,11 @@ namespace Jal.Router.Tests.Impl
 
     public class RequestHandler : IRequestResponseHandler<RequestToSend>
     {
-        private readonly IBus _bus;
-
-        public RequestHandler(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public void Handle(RequestToSend message, MessageContext context)
         {
             Console.WriteLine($"request {message.Name}");
-            _bus.Publish(new ResponseToSend() {Name = message.Name}, new Options() {RequestId = context.ReplyToRequestId, EndPointName = "toresponsetopic" } );
+
+            context.Publish(new ResponseToSend() { Name = message.Name }, new Options() { RequestId = context.ReplyToRequestId, EndPointName = "toresponsetopic" });
         }
     }
 

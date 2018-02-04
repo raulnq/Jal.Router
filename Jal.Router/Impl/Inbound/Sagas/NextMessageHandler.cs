@@ -33,10 +33,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             {
                 _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
 
-                if (!_configuration.Storage.ManualSagaSave)
-                {
-                    storage.UpdateSaga(context, data);
-                }
+                storage.ContinueSaga(context, data);
             }
             else
             {

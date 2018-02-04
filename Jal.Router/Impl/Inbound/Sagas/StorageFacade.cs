@@ -16,7 +16,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _configuration = configuration;
         }
 
-        public void Save<TData>(MessageContext context, TData data) where TData : class, new()
+        public void Save<TData>(MessageContext context, TData data)
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 

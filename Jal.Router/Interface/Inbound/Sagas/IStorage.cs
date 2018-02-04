@@ -8,6 +8,8 @@ namespace Jal.Router.Interface.Inbound.Sagas
 
         void StartSaga(MessageContext context, object data);
 
+        void ContinueSaga(MessageContext context, object data);
+
         void UpdateSaga(MessageContext context, object data);
 
         void EndSaga(MessageContext context, object data);

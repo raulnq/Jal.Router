@@ -1,7 +1,9 @@
 using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
+using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
@@ -12,9 +14,15 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IConfiguration _configuration;
 
+        protected readonly IBus Bus;
+
+        protected readonly IStorageFacade Facade;
+
         public const string From = "from";
 
         public const string SagaId = "sagaid";
+
+        public const string ParentSagaId = "parentsagaid";
 
         public const string Version = "version";
 
@@ -24,10 +32,12 @@ namespace Jal.Router.Impl.Inbound
 
         public const string EnclosedType = "enclosedtype";
 
-        protected AbstractMessageAdapter(IComponentFactory factory, IConfiguration configuration)
+        protected AbstractMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus, IStorageFacade facade)
         {
             _factory = factory;
             _configuration = configuration;
+            Bus = bus;
+            Facade = facade;
         }
         public MessageContext Read(object message, Type contenttype)
         {

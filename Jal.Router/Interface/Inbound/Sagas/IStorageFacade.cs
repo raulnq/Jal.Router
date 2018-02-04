@@ -4,6 +4,6 @@ namespace Jal.Router.Interface.Inbound.Sagas
 {
     public interface IStorageFacade
     {
-        void Save<TData>(MessageContext context, TData data) where TData : class, new();
+        void Save<TData>(MessageContext context, TData data);
     }
 }
