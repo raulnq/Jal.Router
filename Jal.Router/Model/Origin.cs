@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Jal.Router.Model
 {
     public class Origin
@@ -6,6 +8,11 @@ namespace Jal.Router.Model
 
         public string Key { get; set; }//Origin
 
-        public string ParentKey { get; set; }
+        public List<string> ParentKeys { get; set; }//ParentOrigin
+
+        public Origin()
+        {
+            ParentKeys = new List<string>();
+        }
     }
 }

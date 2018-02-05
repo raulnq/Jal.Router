@@ -22,13 +22,13 @@ namespace Jal.Router.Impl.Inbound
 
         public const string SagaId = "sagaid";
 
-        public const string ParentSagaId = "parentsagaid";
+        public const string ParentSagaIds = "parentsagaids";
 
         public const string Version = "version";
 
         public const string Origin = "origin";
 
-        public const string ParentOrigin = "parentorigin";
+        public const string ParentOrigins = "parentorigins";
 
         public const string RetryCount = "retrycount";
 

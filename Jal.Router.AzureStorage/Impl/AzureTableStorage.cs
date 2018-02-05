@@ -53,8 +53,8 @@ namespace Jal.Router.AzureStorage.Impl
 
                 if (!string.IsNullOrWhiteSpace(context.SagaInfo.Id))
                 {
-                    context.SagaInfo.ParentId = context.SagaInfo.Id;
-                    context.Origin.ParentKey = context.Origin.Key;
+                    context.SagaInfo.ParentIds.Add(context.SagaInfo.Id);
+                    context.Origin.ParentKeys.Add(context.Origin.Key);
                 }
 
                 context.SagaInfo.SetId(partition, row, _currenttablenamesufix);
