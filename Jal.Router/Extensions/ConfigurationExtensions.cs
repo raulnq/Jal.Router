@@ -57,7 +57,7 @@ namespace Jal.Router.Extensions
                 Key = context.Origin.ParentKeys.Last(),
                 ParentKeys = context.Origin.ParentKeys.Take(context.Origin.ParentKeys.Count - 1).ToList()
             }
-            : new Origin() { }, context.CreateOptionsForParentSaga(endpointname, id));
+            : new Origin() { Key = context.Origin.Key }, context.CreateOptionsForParentSaga(endpointname, id));
         }
 
         public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null)
@@ -93,7 +93,7 @@ namespace Jal.Router.Extensions
                 Key = context.Origin.ParentKeys.Last(),
                 ParentKeys = context.Origin.ParentKeys.Take(context.Origin.ParentKeys.Count - 1).ToList()
             }
-            : new Origin() {}, context.CreateOptionsForParentSaga(endpointname, id));
+            : new Origin() { Key = context.Origin.Key }, context.CreateOptionsForParentSaga(endpointname, id));
         }
 
         public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null)
@@ -139,7 +139,7 @@ namespace Jal.Router.Extensions
                 {
                     Id = context.SagaInfo.ParentIds.Last() ,
                     ParentIds = context.SagaInfo.ParentIds.Take(context.SagaInfo.ParentIds.Count - 1).ToList()
-                } : new SagaInfo()
+                } : new SagaInfo() { Id = context.SagaInfo.Id }
             };
         }
     }
