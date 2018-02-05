@@ -58,7 +58,7 @@ namespace Jal.Router.AzureStorage.Impl
                 }
 
                 context.SagaInfo.SetId(partition, row, _currenttablenamesufix);
-
+                                                                            
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
 
                 var record = new SagaRecord(partition, row)

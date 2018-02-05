@@ -47,7 +47,7 @@ namespace Jal.Router.Extensions
 
         public static void PublishToOriginWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null)
         {
-            context.Publish(content, new Origin() { Key = context.Origin.Key },  context.CreateOptionsForSaga(endpointname, id));
+            context.Publish(content, new Origin() { Key = context.Origin.Key, ParentKeys = context.Origin.ParentKeys},  context.CreateOptionsForSaga(endpointname, id));
         }
 
         public static void PublishToOriginWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null)
@@ -83,7 +83,7 @@ namespace Jal.Router.Extensions
 
         public static void PublishToOriginWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null)
         {
-            context.Publish(data, content, new Origin() { Key = context.Origin.Key }, context.CreateOptionsForSaga(endpointname, id));
+            context.Publish(data, content, new Origin() { Key = context.Origin.Key, ParentKeys = context.Origin.ParentKeys }, context.CreateOptionsForSaga(endpointname, id));
         }
 
         public static void PublishToOriginWithParentSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null)
@@ -124,7 +124,7 @@ namespace Jal.Router.Extensions
                 EndPointName = endpointname,
                 Headers = context.CopyHeaders(),
                 Id = string.IsNullOrWhiteSpace(id) ? context.Id : id,
-                SagaInfo = new SagaInfo() { Id = context.SagaInfo.Id }
+                SagaInfo = new SagaInfo() { Id = context.SagaInfo.Id, ParentIds = context.SagaInfo.ParentIds}
             };
         }
 
