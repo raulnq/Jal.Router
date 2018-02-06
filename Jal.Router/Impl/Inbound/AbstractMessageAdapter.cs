@@ -41,6 +41,35 @@ namespace Jal.Router.Impl.Inbound
             Bus = bus;
             Facade = facade;
         }
+
+        protected object Deserialize(string content, Type type)
+        {
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+
+            try
+            {
+                return serializer.Deserialize(content, type);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        protected string Serialize(object content)
+        {
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+
+            try
+            {
+                return serializer.Serialize(content);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public MessageContext Read(object message, Type contenttype)
         {
             var context = Read(message);
@@ -51,18 +80,7 @@ namespace Jal.Router.Impl.Inbound
 
             context.ContentAsString = body;
 
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
-
-            try
-            {
-                var content = serializer.Deserialize(body, contenttype);
-
-                context.Content = content;
-            }
-            catch (Exception)
-            {
-                context.Content = null;
-            }
+            context.Content = Deserialize(body, contenttype);
 
             return context;
         }

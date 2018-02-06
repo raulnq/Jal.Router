@@ -51,9 +51,9 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var row = Guid.NewGuid().ToString();
 
-                context.SagaInfo.ParentIds.Add(context.SagaInfo.Id);
+                context.SagaInfo.ParentIds.Add(context.SagaInfo.Id??string.Empty);
 
-                context.Origin.ParentKeys.Add(context.Origin.Key);
+                context.Origin.ParentKeys.Add(context.Origin.Key??string.Empty);
 
                 context.SagaInfo.SetId(partition, row, _currenttablenamesufix);
                                                                             
