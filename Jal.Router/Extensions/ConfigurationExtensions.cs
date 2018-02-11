@@ -42,6 +42,12 @@ namespace Jal.Router.Extensions
         {
             context.Send(content, context.CreateOptions(endpointname, id, headers));
         }
+
+        public static void Send<TContent>(this MessageContext context, TContent content, Origin origin, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        {
+            context.Send(content, origin, context.CreateOptions(endpointname, id, headers));
+        }
+
         public static void Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
             context.Send(data, content, context.CreateOptions(endpointname, id, headers));
@@ -144,7 +150,9 @@ namespace Jal.Router.Extensions
 
         public static Origin CreateOriginToOriginForSaga(this MessageContext context)
         {
-            return new Origin() { Key = context.Origin.Key, ParentKeys = context.Origin.ParentKeys };
+            var newkey = context.Origin.ParentKeys.LastOrDefault();
+
+            return new Origin() { Key = string.IsNullOrWhiteSpace(newkey) ?context.Origin.Key : newkey, ParentKeys = context.Origin.ParentKeys };
         }
 
         public static Origin CreateOriginForParentSaga(this MessageContext context)
@@ -158,7 +166,7 @@ namespace Jal.Router.Extensions
 
             var newparentkey = newparentkeys.LastOrDefault();
 
-            return new Origin() { Key =  newparentkey ,ParentKeys = newparentkeys };
+            return new Origin() { Key = string.IsNullOrWhiteSpace(newparentkey) ? context.Origin.Key : newparentkey, ParentKeys = newparentkeys };
         }
 
 

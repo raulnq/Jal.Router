@@ -149,6 +149,7 @@ namespace Jal.Router.Tests.Impl
             
             Console.WriteLine(message.Name + " " + data.Status);
             data.Status = "end";
+            //contextM.PublishToOriginWithSagaInfo(data, new object(), "");
         }
     }
 
@@ -156,7 +157,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send<RequestToSend>(new RequestToSend() { Name = "Hello world!!" }, "appe", "parent");
+            context.Send<RequestToSend>(new RequestToSend() { Name = "Hello world!!" }, new Origin() {Key = "system"}, "appe", "parent");
         }
     }
 

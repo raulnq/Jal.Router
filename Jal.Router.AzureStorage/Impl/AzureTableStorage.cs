@@ -97,6 +97,7 @@ namespace Jal.Router.AzureStorage.Impl
                     Origin = JsonConvert.SerializeObject(context.Origin, Formatting.None),
                     Saga = JsonConvert.SerializeObject(context.SagaInfo, Formatting.None),
                     Headers = JsonConvert.SerializeObject(context.Headers, Formatting.None),
+                    ParentIds = JsonConvert.SerializeObject(context.ParentIds, Formatting.None),
                     DateTimeUtc = context.DateTimeUtc,
                     Data = saga.Data,
                     Name = route.Name,
