@@ -101,7 +101,8 @@ namespace Jal.Router.Impl.Outbound
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
                 EndPointName = endpoint.EndPointName,
-                ResultType = typeof(TResult)
+                ResultType = typeof(TResult),
+                ParentIds = options.ParentIds
             };
 
             return Reply<TResult>(message, options);
@@ -187,7 +188,8 @@ namespace Jal.Router.Impl.Outbound
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName
+                EndPointName = endpoint.EndPointName,
+                ParentIds = options.ParentIds
             };
 
             Send(message, options);
@@ -271,7 +273,8 @@ namespace Jal.Router.Impl.Outbound
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName
+                EndPointName = endpoint.EndPointName,
+                ParentIds = options.ParentIds
             };
 
             Publish(message, options);
@@ -337,7 +340,8 @@ namespace Jal.Router.Impl.Outbound
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
-                EndPointName = endpoint.EndPointName
+                EndPointName = endpoint.EndPointName,
+                ParentIds = options.ParentIds
             };
 
             message.Origin.Key = string.Empty;

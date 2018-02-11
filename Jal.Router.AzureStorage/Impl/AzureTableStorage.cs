@@ -51,6 +51,8 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var row = Guid.NewGuid().ToString();
 
+                context.ParentIds.Add(context.Id);
+
                 context.SagaInfo.ParentIds.Add(context.SagaInfo.Id??string.Empty);
 
                 context.Origin.ParentKeys.Add(context.Origin.Key??string.Empty);
@@ -111,7 +113,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation saga {saga.Name} with content {context.ContentType.FullName} ", ex);
+                throw new ApplicationException($"Error during the message record creation saga {saga.Name} with content {context.ContentType.FullName}", ex);
             }
         }
 

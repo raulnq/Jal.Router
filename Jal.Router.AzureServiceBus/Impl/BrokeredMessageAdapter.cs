@@ -48,6 +48,11 @@ namespace Jal.Router.AzureServiceBus.Impl
                     context.Origin.ParentKeys = Deserialize(brokeredmessage.Properties[ParentOrigins].ToString(),typeof(List<string>)) as List<string>;
                 }
 
+                if (brokeredmessage.Properties.ContainsKey(ParentIds))
+                {
+                    context.ParentIds = Deserialize(brokeredmessage.Properties[ParentIds].ToString(), typeof(List<string>)) as List<string>;
+                }
+
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
                     context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
@@ -76,7 +81,7 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties != null)
                 {
                     foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaIds && x.Key != ParentOrigins))
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaIds && x.Key != ParentOrigins && x.Key!= ParentIds))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -174,6 +179,17 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (!string.IsNullOrWhiteSpace(keys))
                 {
                     brokeredmessage.Properties.Add(ParentOrigins, keys);
+                }
+            }
+
+
+            if (context.ParentIds.Count > 0)
+            {
+                var keys = Serialize(context.ParentIds);
+
+                if (!string.IsNullOrWhiteSpace(keys))
+                {
+                    brokeredmessage.Properties.Add(ParentIds, keys);
                 }
             }
 

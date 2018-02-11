@@ -108,7 +108,7 @@ namespace Jal.Router.Tests.Impl
         {
             data.Status = "Start";
 
-            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appx");
+            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appx", $"{context.Id}@child-1");
             
         }
     }
@@ -138,7 +138,7 @@ namespace Jal.Router.Tests.Impl
             Console.WriteLine(message.Name + " " + data.Status);
             data.Status = "Continue";
 
-            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appz");
+            context.SendWithSagaInfo(data, new ResponseToSend() { Name = message.Name }, "appz", $"{context.Id}@child-2");
         }
     }
 
@@ -156,7 +156,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appe");
+            context.Send<RequestToSend>(new RequestToSend() { Name = "Hello world!!" }, "appe", "parent");
         }
     }
 

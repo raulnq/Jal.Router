@@ -13,9 +13,10 @@ namespace Jal.Router.Model
             SagaInfo = new SagaInfo();
             RequestId = string.Empty;
             ReplyToRequestId = string.Empty;
+            ParentIds=new List<string>();
         }
         public string Id { get; set; }
-
+        public List<string> ParentIds { get; set; }
         public SagaInfo SagaInfo { get; set; }
 
         public string EndPointName { get; set; }

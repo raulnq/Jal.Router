@@ -24,6 +24,8 @@ namespace Jal.Router.Impl.Inbound
 
         public const string ParentSagaIds = "parentsagaids";
 
+        public const string ParentIds = "parentids";
+
         public const string Version = "version";
 
         public const string Origin = "origin";

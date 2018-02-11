@@ -16,6 +16,7 @@ namespace Jal.Router.Model
         public string ToSubscription { get; set; }
         public string ToPath { get; set; }
         public string Id { get; set; }
+        public List<string> ParentIds { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Version { get; set; }
         public int RetryCount { get; set; }
@@ -45,6 +46,7 @@ namespace Jal.Router.Model
             LastRetry = true;
             Origin = new Origin();
             SagaInfo = new SagaInfo();
+            ParentIds = new List<string>();
         }
 
         public MessageContext()
@@ -54,6 +56,7 @@ namespace Jal.Router.Model
             LastRetry = true;
             Origin = new Origin();
             SagaInfo = new SagaInfo();
+            ParentIds= new List<string>();
         }
 
         public Dictionary<string, string> CopyHeaders()
