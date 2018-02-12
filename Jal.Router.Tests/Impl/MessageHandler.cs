@@ -149,7 +149,7 @@ namespace Jal.Router.Tests.Impl
             
             Console.WriteLine(message.Name + " " + data.Status);
             data.Status = "end";
-            //contextM.PublishToOriginWithSagaInfo(data, new object(), "");
+            contextM.PublishToOriginWithSagaInfo(data, new object(), "");
         }
     }
 

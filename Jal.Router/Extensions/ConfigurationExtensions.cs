@@ -53,6 +53,11 @@ namespace Jal.Router.Extensions
             context.Send(data, content, context.CreateOptions(endpointname, id, headers));
         }
 
+        public static void Send<TContent, TData>(this MessageContext context, TData data, TContent content, Origin origin, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        {
+            context.Send(data, content, origin, context.CreateOptions(endpointname, id, headers));
+        }
+
         public static void PublishWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
             context.Publish(content, context.CreateOriginForSaga(), context.CreateOptionsForSaga(endpointname,  id, headers));
@@ -214,11 +219,12 @@ namespace Jal.Router.Extensions
 
         public static Options CreateOptionsForParentSaga(this MessageContext context, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
-            var sagaparentid = context.SagaInfo.ParentIds.Last();
-
+            
             var newsagaparentids = context.SagaInfo.ParentIds.Take(context.SagaInfo.ParentIds.Count - 1).ToList();
 
             var newparentids = context.ParentIds.Take(context.ParentIds.Count - 1).ToList();
+
+            var sagaparentid = newsagaparentids.LastOrDefault();
 
             var parentid = newparentids.LastOrDefault();
 
@@ -232,6 +238,7 @@ namespace Jal.Router.Extensions
             };
 
             if (headers == null) return options;
+
             foreach (var header in headers)
             {
                 options.Headers.Add(header);
