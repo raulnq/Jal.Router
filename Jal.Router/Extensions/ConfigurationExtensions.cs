@@ -8,18 +8,18 @@ namespace Jal.Router.Extensions
     {
         public static void SendWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id=null, Dictionary<string,string> headers = null)
         {
-            context.Send(content, context.CreateOriginForSaga(), context.CreateOptionsForSaga(endpointname, id, headers));
+            context.Send(content, context.CreateOrigin(), context.CreateOptionsForSaga(endpointname, id, headers));
         }
         public static void SendWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Send(data, content, context.CreateOriginForSaga(), context.CreateOptionsForSaga(endpointname, id, headers));
+            context.Send(data, content, context.CreateOrigin(), context.CreateOptionsForSaga(endpointname, id, headers));
         }
 
         public static void SendWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
             if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count>0)
             {
-                context.Send(content, context.CreateOriginForParentSaga(), context.CreateOptionsForParentSaga(endpointname, id, headers));
+                context.Send(content, context.CreateOriginForParent(), context.CreateOptionsForParentSaga(endpointname, id, headers));
             }
             else
             {
@@ -31,7 +31,7 @@ namespace Jal.Router.Extensions
         {
             if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
             {
-                context.Send(data, content, context.CreateOriginForParentSaga(), context.CreateOptionsForParentSaga(endpointname, id, headers));
+                context.Send(data, content, context.CreateOriginForParent(), context.CreateOptionsForParentSaga(endpointname, id, headers));
             }
             else
             {
@@ -60,11 +60,11 @@ namespace Jal.Router.Extensions
 
         public static void PublishWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(content, context.CreateOriginForSaga(), context.CreateOptionsForSaga(endpointname,  id, headers));
+            context.Publish(content, context.CreateOrigin(), context.CreateOptionsForSaga(endpointname,  id, headers));
         }
         public static void PublishWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(data, content, context.CreateOriginForSaga(), context.CreateOptionsForSaga(endpointname, id, headers));
+            context.Publish(data, content, context.CreateOrigin(), context.CreateOptionsForSaga(endpointname, id, headers));
         }
         public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
@@ -75,28 +75,28 @@ namespace Jal.Router.Extensions
             context.Publish(data, content, context.CreateOptions(endpointname, id, headers));
         }
 
-        public static void PublishToOrigin<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(content, context.CreateOriginToOrigin(), context.CreateOptions(endpointname, id, headers));
+            context.Publish(content, origin, context.CreateOptions(endpointname, id, headers));
         }
-        public static void PublishToOrigin<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(data, content, context.CreateOriginToOrigin(), context.CreateOptions(endpointname, id, headers));
+            context.Publish(data, content, origin, context.CreateOptions(endpointname, id, headers));
         }
-        public static void PublishToOriginWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void PublishWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(content,context.CreateOriginToOriginForSaga(), context.CreateOptionsForSaga(endpointname, id, headers));
+            context.Publish(content, origin, context.CreateOptionsForSaga(endpointname, id, headers));
         }
-        public static void PublishToOriginWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void PublishWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            context.Publish(data, content, context.CreateOriginToOriginForSaga(), context.CreateOptionsForSaga(endpointname, id, headers));
+            context.Publish(data, content, origin, context.CreateOptionsForSaga(endpointname, id, headers));
         }
 
         public static void PublishWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
         {
             if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
             {
-                context.Publish(content, context.CreateOriginForParentSaga() , context.CreateOptionsForParentSaga(endpointname,  id, headers));
+                context.Publish(content, context.CreateOriginForParent() , context.CreateOptionsForParentSaga(endpointname,  id, headers));
             }
             else
             {
@@ -107,7 +107,7 @@ namespace Jal.Router.Extensions
         {
             if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
             {
-                context.Publish(data, content, context.CreateOriginForParentSaga(), context.CreateOptionsForParentSaga(endpointname, id, headers));
+                context.Publish(data, content, context.CreateOriginForParent(), context.CreateOptionsForParentSaga(endpointname, id, headers));
             }
             else
             {
@@ -115,63 +115,37 @@ namespace Jal.Router.Extensions
             }
         }
 
-        public static void PublishToOriginWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void PublishWithParentSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
+            if (context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
             {
-                context.Publish(content, context.CreateOriginToOriginForParentSaga(), context.CreateOptionsForParentSaga(endpointname, id, headers));
+                context.Publish(content, origin, context.CreateOptionsForParentSaga(endpointname, id, headers));
             }
             else
             {
-                context.PublishToOriginWithSagaInfo(content, endpointname, id, headers);
+                context.PublishWithSagaInfo(content, endpointname, origin, id, headers);
             }
         }
-        public static void PublishToOriginWithParentSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id = null, Dictionary<string, string> headers = null)
+        public static void PublishWithParentSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, Origin origin, string id = null, Dictionary<string, string> headers = null)
         {
-            if (context.Origin.ParentKeys.Count > 0 && context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
+            if (context.SagaInfo.ParentIds.Count > 0 && context.ParentIds.Count > 0)
             {
-                context.Publish(data, content, context.CreateOriginToOriginForParentSaga(), context.CreateOptionsForParentSaga(endpointname, id, headers));
+                context.Publish(data, content, origin, context.CreateOptionsForParentSaga(endpointname, id, headers));
             }
             else
             {
-                context.PublishToOriginWithSagaInfo(data, content, endpointname, id, headers);
+                context.PublishWithSagaInfo(data, content, endpointname, origin, id, headers);
             }
         }
 
-        public static Origin CreateOrigin(this MessageContext context)
+        public static Origin CreateOrigin(this MessageContext context, string key = null)
         {
-            return new Origin() { ParentKeys = context.Origin.ParentKeys };
+            return new Origin() { ParentKeys = context.Origin.ParentKeys, Key = key};
         }
 
-        public static Origin CreateOriginToOrigin(this MessageContext context)
+        public static Origin CreateOriginForParent(this MessageContext context, string key = null)
         {
-            return new Origin() { Key = context.Origin.Key, ParentKeys = context.Origin.ParentKeys };
-        }
-
-        public static Origin CreateOriginForSaga(this MessageContext context)
-        {
-            return new Origin() { ParentKeys = context.Origin.ParentKeys };
-        }
-
-        public static Origin CreateOriginToOriginForSaga(this MessageContext context)
-        {
-            var newkey = context.Origin.ParentKeys.LastOrDefault();
-
-            return new Origin() { Key = string.IsNullOrWhiteSpace(newkey) ?context.Origin.Key : newkey, ParentKeys = context.Origin.ParentKeys };
-        }
-
-        public static Origin CreateOriginForParentSaga(this MessageContext context)
-        {
-            return new Origin() { ParentKeys = context.Origin.ParentKeys.Take(context.Origin.ParentKeys.Count - 1).ToList() };
-        }
-
-        public static Origin CreateOriginToOriginForParentSaga(this MessageContext context)
-        {
-            var newparentkeys = context.Origin.ParentKeys.Take(context.Origin.ParentKeys.Count - 1).ToList();
-
-            var newparentkey = newparentkeys.LastOrDefault();
-
-            return new Origin() { Key = string.IsNullOrWhiteSpace(newparentkey) ? context.Origin.Key : newparentkey, ParentKeys = newparentkeys };
+            return new Origin() { ParentKeys = context.Origin.ParentKeys.Take(context.Origin.ParentKeys.Count - 1).ToList(), Key = key};
         }
 
 
