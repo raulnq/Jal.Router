@@ -1,4 +1,6 @@
-﻿using Jal.Router.Model;
+﻿using System;
+using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Interface.Inbound.Sagas
 {
@@ -15,5 +17,11 @@ namespace Jal.Router.Interface.Inbound.Sagas
         void EndSaga(MessageContext context, object data);
 
         object FindSaga(MessageContext context);
+
+        SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "");
+
+        MessageEntity[] GetMessagesBySaga(string sagakey, string messagestoragename = "");
+
+        MessageEntity[] GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "");
     }
 }

@@ -84,6 +84,7 @@
     <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
     <Compile Include="Impl\ChannelPathBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
+    <Compile Include="Model\Inbound\MessageEntity.cs" />
     <Compile Include="Model\Inbound\RouteToListen.cs" />
     <Compile Include="Impl\Inbound\Sagas\EndingMessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\SagaRouter.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Interface\Management\IHost.cs" />
     <Compile Include="Interface\Management\IShutdown.cs" />
     <Compile Include="Interface\Management\IShutdownTask.cs" />
+    <Compile Include="Model\Inbound\SagaEntity.cs" />
     <Compile Include="Model\Management\StartupBeat.cs" />
     <Compile Include="Model\Management\StorageConfiguration.cs" />
     <Compile Include="Impl\Management\SubscriptionToPublishSubscribeChannelMonitor.cs" />

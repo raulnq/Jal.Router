@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
@@ -41,6 +44,155 @@ namespace Jal.Router.AzureStorage.Impl
             var table = tableClient.GetTableReference(tablename);
 
             return table;
+        }
+
+        public override SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        {
+            var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
+
+            if (!string.IsNullOrWhiteSpace(sagastoragename))
+            {
+                table = GetCloudTable(_connectionstring, $"{sagastoragename}");
+            }
+
+            var diff = (end - start).TotalDays;
+
+            var currentdate = new DateTime(start.Year, start.Month, start.Day);
+
+            var list = new List<SagaEntity>();
+
+            for (var i = 0; i <= diff; i++)
+            {
+                var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{saganame}";
+
+                var sagas = GetSagas(table, partitionkey, start, end);
+
+                list.AddRange(sagas);
+
+                currentdate =currentdate.AddDays(1);
+            }
+
+            return list.ToArray();
+        }
+
+        public SagaEntity[] GetSagas(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        {
+            try
+            {
+                var records = table.CreateQuery<SagaRecord>().Where(x => x.PartitionKey == partitionkey && x.Created >= start && x.Created < end);
+
+                return records.Select(x => new SagaEntity()
+                {
+                    Data = x.Data,
+                    DataType = x.DataType,
+                    Name = x.Name,
+                    Created = x.Created,
+                    Updated = x.Updated,
+                    Ended = x.Ended,
+                    Timeout = x.Timeout,
+                    Status = x.Status,
+                    Duration = x.Duration,
+                    Key = x.RowKey
+                }).ToArray();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override MessageEntity[] GetMessagesBySaga(string sagakey, string messagestoragename = "")
+        {
+            var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+
+            if (!string.IsNullOrWhiteSpace(messagestoragename))
+            {
+                table = GetCloudTable(_connectionstring, $"{messagestoragename}");
+            }
+
+            try
+            {
+                var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == sagakey);
+
+                return records.Select(x => new MessageEntity()
+                {
+                    Content = x.Content,
+                    ContentType = x.ContentType,
+                    Id = x.Id,
+                    Version = x.Version,
+                    RetryCount = x.RetryCount,
+                    LastRetry = x.LastRetry,
+                    Origin = JsonConvert.DeserializeObject<Origin>(x.Origin),
+                    Saga = JsonConvert.DeserializeObject<SagaInfo>(x.Saga),
+                    Headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(x.Headers),
+                    ParentIds = JsonConvert.DeserializeObject<List<string>>(x.ParentIds),
+                    DateTimeUtc = x.DateTimeUtc,
+                    Data = x.Data,
+                    Name = x.Name
+                }).ToArray();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override MessageEntity[] GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "")
+        {
+            var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+
+            if (!string.IsNullOrWhiteSpace(messagestoragename))
+            {
+                table = GetCloudTable(_connectionstring, $"{messagestoragename}");
+            }
+
+            var diff = (int)(end - start).TotalDays;
+
+            var currentdate = new DateTime(start.Year, start.Month, start.Day);
+
+            var list = new List<MessageEntity>();
+
+            for (var i = 0; i <= diff; i++)
+            {
+                var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{routename}";
+
+                var messages = GetMessages(table, partitionkey, start, end);
+
+                list.AddRange(messages);
+
+                currentdate = currentdate.AddDays(1);
+            }
+
+            return list.ToArray();
+        }
+
+        public MessageEntity[] GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        {
+            try
+            {
+                var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == partitionkey && x.DateTimeUtc >= start && x.DateTimeUtc < end);
+
+                return records.Select(x => new MessageEntity()
+                {
+                    Content = x.Content,
+                    ContentType = x.ContentType,
+                    Id = x.Id,
+                    Version = x.Version,
+                    RetryCount = x.RetryCount,
+                    LastRetry = x.LastRetry,
+                    Origin = !string.IsNullOrWhiteSpace(x.Origin) ? JsonConvert.DeserializeObject<Origin>(x.Origin) : null,
+                    Saga = !string.IsNullOrWhiteSpace(x.Saga) ? JsonConvert.DeserializeObject<SagaInfo>(x.Saga) : null,
+                    Headers = !string.IsNullOrWhiteSpace(x.Headers) ? JsonConvert.DeserializeObject<Dictionary<string, string>>(x.Headers) : null,
+                    ParentIds = !string.IsNullOrWhiteSpace(x.ParentIds) ? JsonConvert.DeserializeObject<List<string>>(x.ParentIds) : null,
+                    DateTimeUtc = x.DateTimeUtc,
+                    Data = x.Data,
+                    Name = x.Name,
+                }).ToArray();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         private void StartSaga<TData>(Saga saga, MessageContext context, TData data)
