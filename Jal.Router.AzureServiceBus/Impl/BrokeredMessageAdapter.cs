@@ -40,27 +40,17 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 if (brokeredmessage.Properties.ContainsKey(From))
                 {
-                    context.Origin.Name = brokeredmessage.Properties[From].ToString();
+                    context.Origin.From = brokeredmessage.Properties[From].ToString();
                 }
 
-                if (brokeredmessage.Properties.ContainsKey(ParentOrigins))
+                if (brokeredmessage.Properties.ContainsKey(Tracking))
                 {
-                    context.Origin.ParentKeys = Deserialize(brokeredmessage.Properties[ParentOrigins].ToString(),typeof(List<string>)) as List<string>;
-                }
-
-                if (brokeredmessage.Properties.ContainsKey(ParentIds))
-                {
-                    context.ParentIds = Deserialize(brokeredmessage.Properties[ParentIds].ToString(), typeof(List<string>)) as List<string>;
+                    context.Tracks = Deserialize(brokeredmessage.Properties[Tracking].ToString(), typeof(List<Track>)) as List<Track>;
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
                     context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
-                }
-
-                if (brokeredmessage.Properties.ContainsKey(ParentSagaIds))
-                {
-                    context.SagaInfo.ParentIds = Deserialize(brokeredmessage.Properties[ParentSagaIds].ToString(),typeof(List<string>)) as List<string>;
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(Version))
@@ -81,7 +71,7 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties != null)
                 {
                     foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key != ParentSagaIds && x.Key != ParentOrigins && x.Key!= ParentIds))
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracking))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -147,9 +137,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(header.Key, header.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Origin.Name))
+            if (!string.IsNullOrWhiteSpace(context.Origin.From))
             {
-                brokeredmessage.Properties.Add(From, context.Origin.Name);
+                brokeredmessage.Properties.Add(From, context.Origin.From);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Version))
@@ -162,34 +152,13 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(SagaId, context.SagaInfo.Id);
             }
 
-            if (context.SagaInfo.ParentIds.Count>0)
+            if (context.Tracks != null)
             {
-                var ids = Serialize(context.SagaInfo.ParentIds);
+                var root = Serialize(context.Tracks);
 
-                if (!string.IsNullOrWhiteSpace(ids))
+                if (!string.IsNullOrWhiteSpace(root))
                 {
-                    brokeredmessage.Properties.Add(ParentSagaIds, ids);
-                }
-            }
-
-            if (context.Origin.ParentKeys.Count>0)
-            {
-                var keys = Serialize(context.Origin.ParentKeys);
-
-                if (!string.IsNullOrWhiteSpace(keys))
-                {
-                    brokeredmessage.Properties.Add(ParentOrigins, keys);
-                }
-            }
-
-
-            if (context.ParentIds.Count > 0)
-            {
-                var keys = Serialize(context.ParentIds);
-
-                if (!string.IsNullOrWhiteSpace(keys))
-                {
-                    brokeredmessage.Properties.Add(ParentIds, keys);
+                    brokeredmessage.Properties.Add(Tracking, root);
                 }
             }
 

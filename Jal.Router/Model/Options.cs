@@ -13,10 +13,9 @@ namespace Jal.Router.Model
             SagaInfo = new SagaInfo();
             RequestId = string.Empty;
             ReplyToRequestId = string.Empty;
-            ParentIds=new List<string>();
+            Tracks = new List<Track>();
         }
         public string Id { get; set; }
-        public List<string> ParentIds { get; set; }
         public SagaInfo SagaInfo { get; set; }
 
         public string EndPointName { get; set; }
@@ -30,5 +29,7 @@ namespace Jal.Router.Model
         public IDictionary<string,string> Headers { get; set; }
 
         public int RetryCount { get; set; }
+
+        public List<Track> Tracks { get; set; }
     }
 }

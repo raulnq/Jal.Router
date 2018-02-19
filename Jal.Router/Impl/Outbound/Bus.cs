@@ -102,7 +102,7 @@ namespace Jal.Router.Impl.Outbound
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
                 EndPointName = endpoint.EndPointName,
                 ResultType = typeof(TResult),
-                ParentIds = options.ParentIds
+                Tracks = options.Tracks
             };
 
             return Reply<TResult>(message, options);
@@ -113,9 +113,9 @@ namespace Jal.Router.Impl.Outbound
 
             var setting = _provider.Provide(endpoint, content);
 
-            if (string.IsNullOrWhiteSpace(origin.Name))
+            if (string.IsNullOrWhiteSpace(origin.From))
             {
-                origin.Name = endpoint.Origin.Name;
+                origin.From = endpoint.Origin.From;
             }
 
             if (string.IsNullOrWhiteSpace(origin.Key))
@@ -189,7 +189,7 @@ namespace Jal.Router.Impl.Outbound
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
                 EndPointName = endpoint.EndPointName,
-                ParentIds = options.ParentIds
+                Tracks = options.Tracks
             };
 
             Send(message, options);
@@ -211,9 +211,9 @@ namespace Jal.Router.Impl.Outbound
 
             var setting = _provider.Provide(endpoint, content);
 
-            if (string.IsNullOrWhiteSpace(origin.Name))
+            if (string.IsNullOrWhiteSpace(origin.From))
             {
-                origin.Name = endpoint.Origin.Name;
+                origin.From = endpoint.Origin.From;
             }
 
             if (string.IsNullOrWhiteSpace(origin.Key))
@@ -239,9 +239,9 @@ namespace Jal.Router.Impl.Outbound
 
             var setting = _provider.Provide(endpoint, content);
 
-            if (string.IsNullOrWhiteSpace(origin.Name))
+            if (string.IsNullOrWhiteSpace(origin.From))
             {
-                origin.Name = endpoint.Origin.Name;
+                origin.From = endpoint.Origin.From;
             }
 
             if (string.IsNullOrWhiteSpace(origin.Key))
@@ -274,7 +274,7 @@ namespace Jal.Router.Impl.Outbound
                 RequestId = options.RequestId,
                 ToReplyTimeOut = endpoint.ToReplyTimeOut,
                 EndPointName = endpoint.EndPointName,
-                ParentIds = options.ParentIds
+                Tracks = options.Tracks
             };
 
             Publish(message, options);
@@ -341,7 +341,7 @@ namespace Jal.Router.Impl.Outbound
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
                 EndPointName = endpoint.EndPointName,
-                ParentIds = options.ParentIds
+                Tracks = options.Tracks
             };
 
             message.Origin.Key = string.Empty;
@@ -355,7 +355,7 @@ namespace Jal.Router.Impl.Outbound
 
             var setting = _provider.Provide(endpoint, content);
 
-            FireAndForget(content, setting, new Origin() { Key = endpoint.Origin.Key, Name = endpoint.Origin.Name }, options);
+            FireAndForget(content, setting, new Origin() { Key = endpoint.Origin.Key, From = endpoint.Origin.From }, options);
         }
 
         public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
@@ -364,9 +364,9 @@ namespace Jal.Router.Impl.Outbound
 
             var setting = _provider.Provide(endpoint, content);
 
-            if (string.IsNullOrWhiteSpace(origin.Name))
+            if (string.IsNullOrWhiteSpace(origin.From))
             {
-                origin.Name = endpoint.Origin.Name;
+                origin.From = endpoint.Origin.From;
             }
 
             if (string.IsNullOrWhiteSpace(origin.Key))

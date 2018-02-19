@@ -6,7 +6,6 @@ namespace Jal.Router.Model.Inbound
     public class MessageEntity
     {
         public string Data { get; set; }
-        public IList<string> ParentIds { get; set; }
         public DateTime DateTimeUtc { get; set; }
         public string Content { get; set; }
         public string Id { get; set; }
@@ -18,5 +17,6 @@ namespace Jal.Router.Model.Inbound
         public IDictionary<string, string> Headers { get; set; }
         public string Name { get; set; }
         public string ContentType { get; set; }
+        public List<Track> Tracks { get; set; }
     }
 }

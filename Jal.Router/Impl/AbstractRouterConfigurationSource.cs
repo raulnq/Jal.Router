@@ -171,7 +171,7 @@ namespace Jal.Router.Impl
 
         public void RegisterOrigin(string name, string key="")
         {
-            _origin.Name = name;
+            _origin.From = name;
 
             _origin.Key = key;
         }

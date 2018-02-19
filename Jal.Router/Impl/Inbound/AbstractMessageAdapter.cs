@@ -18,19 +18,15 @@ namespace Jal.Router.Impl.Inbound
 
         protected readonly IStorageFacade Facade;
 
+        public const string Tracking = "tracking";
+
         public const string From = "from";
 
         public const string SagaId = "sagaid";
 
-        public const string ParentSagaIds = "parentsagaids";
-
-        public const string ParentIds = "parentids";
-
         public const string Version = "version";
 
         public const string Origin = "origin";
-
-        public const string ParentOrigins = "parentorigins";
 
         public const string RetryCount = "retrycount";
 

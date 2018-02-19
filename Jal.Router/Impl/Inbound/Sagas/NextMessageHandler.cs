@@ -8,7 +8,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public class NextMessageHandler : IMiddleware
+    public class NextMessageHandler : AbstractMiddlewareMessageHandler, IMiddleware
     {
         private readonly IComponentFactory _factory;
 
@@ -27,13 +27,36 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var data = storage.FindSaga(context);
+            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
 
-            if (data != null)
+            var sagaentity = storage.GetSaga(context.SagaInfo.Id);
+
+            if (sagaentity != null)
             {
-                _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
+                context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaInfo.Id, parameter.Saga.Name);
 
-                storage.ContinueSaga(context, data);
+                var data = serializer.Deserialize(sagaentity.Data, parameter.Saga.DataType);
+
+                if (data != null)
+                {
+                    _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
+
+                    sagaentity.Data = serializer.Serialize(data);
+
+                    sagaentity.Updated = context.DateTimeUtc;
+
+                    sagaentity.Status = context.SagaInfo.Status;
+
+                    storage.UpdateSaga(context, context.SagaInfo.Id, sagaentity);
+
+                    var messageentity = CreateMessageEntity(context, parameter, sagaentity);
+
+                    storage.CreateMessage(context, context.SagaInfo.Id, sagaentity, messageentity);
+                }
+                else
+                {
+                    throw new ApplicationException($"Empty/Invalid data {parameter.Saga.DataType.FullName} for {parameter.Route.ContentType.FullName}, saga {parameter.Saga.Name}");
+                }
             }
             else
             {

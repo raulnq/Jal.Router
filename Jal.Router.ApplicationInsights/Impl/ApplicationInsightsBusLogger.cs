@@ -32,9 +32,9 @@ namespace Jal.Router.ApplicationInsights.Impl
                 Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
                 Properties =
                 {
-                    new KeyValuePair<string, string>("from", context.Origin.Name),
+                    new KeyValuePair<string, string>("from", context.Origin.From),
                     new KeyValuePair<string, string>("origin", context.Origin.Key),
-                    new KeyValuePair<string, string>("saga",context.SagaInfo?.Id),
+                    new KeyValuePair<string, string>("sagaid",context.SagaInfo?.Id),
                     new KeyValuePair<string, string>("version", context.Version),
                     new KeyValuePair<string, string>("replytorequestid", context.ReplyToRequestId),
                     new KeyValuePair<string, string>("requestid", context.RequestId),

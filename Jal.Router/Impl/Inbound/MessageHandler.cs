@@ -28,9 +28,26 @@ namespace Jal.Router.Impl.Inbound
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
+            context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name);
+
             if (_configuration.Storage.SaveMessage)
             {
-                storage.Create(context);
+                var message = new MessageEntity()
+                {
+                    Content = context.ContentAsString,
+                    ContentType = context.Route.ContentType.FullName,
+                    Id = context.Id,
+                    Version = context.Version,
+                    RetryCount = context.RetryCount,
+                    LastRetry = context.LastRetry,
+                    Origin = context.Origin,
+                    Headers = context.Headers,
+                    DateTimeUtc = context.DateTimeUtc,
+                    Name = context.Route.Name,
+                    Tracks = context.Tracks
+                };
+
+                storage.CreateMessage(context, message);
             }
             
             _router.Route(context, parameter.Route);

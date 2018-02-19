@@ -41,17 +41,17 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Timestamp = context.DateTimeUtc;
                 telemetry.Id = context.Id;
                 telemetry.Name = name;
-                telemetry.Properties.Add("from", context.Origin.Name);
+                telemetry.Properties.Add("from", context.Origin.From);
                 telemetry.Properties.Add("version", context.Version);
                 telemetry.Properties.Add("origin", context.Origin.Key);
-                telemetry.Properties.Add("saga", context.SagaInfo?.Id);
+                telemetry.Properties.Add("sagaid", context.SagaInfo?.Id);
                 telemetry.Properties.Add("replytorequestid", context.ReplyToRequestId);
                 telemetry.Properties.Add("requestid", context.RequestId);
 
                 telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
                 telemetry.Context.Operation.Name = name;
                 telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
-                telemetry.Source = context.Origin.Name;
+                telemetry.Source = context.Origin.From;
                 if (!string.IsNullOrWhiteSpace(_configuration.ApplicationName))
                 {
                     telemetry.Context.Cloud.RoleName = _configuration.ApplicationName;
