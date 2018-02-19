@@ -87,17 +87,26 @@ namespace Jal.Router.Model
             Tracks.Add(tracking);
         }
 
-        public Track GetStartSaga()
+        public Track[] GetTracksOfTheSaga()
         {
             if (!string.IsNullOrWhiteSpace(SagaInfo.Id))
             {
-                return Tracks.FirstOrDefault(x => x.Id == SagaInfo.Id);
+                return Tracks.Where(x => x.Id == SagaInfo.Id).ToArray();
             }
 
+            return new Track[] {};
+        }
+
+        public Track GetCurrentTrack()
+        {
+            if (Tracks.Count > 0)
+            {
+                return Tracks[Tracks.Count - 1];
+            }
             return null;
         }
 
-        public Track GetInvoker()
+        public Track GetTrackOfTheCaller()
         {
             if (Tracks.Count > 1)
             {
@@ -106,7 +115,7 @@ namespace Jal.Router.Model
             return null;
         }
 
-        public Track GetSagaInvoker()
+        public Track GetTrackOfTheSagaCaller()
         {
             if (!string.IsNullOrWhiteSpace(SagaInfo.Id))
             {

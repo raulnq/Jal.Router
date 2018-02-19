@@ -114,7 +114,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(ResponseToSend message, MessageContext context, Data data)
         {
-            var caller = context.GetSagaInvoker();
+            var caller = context.GetTrackOfTheSagaCaller();
 
             context.Send(new ResponseToSend() { Name = message.Name }, "appf", caller.Id, caller.SagaId);
         }
