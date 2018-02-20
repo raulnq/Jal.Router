@@ -91,7 +91,7 @@ namespace Jal.Router.Model
         {
             if (!string.IsNullOrWhiteSpace(SagaInfo.Id))
             {
-                return Tracks.Where(x => x.Id == SagaInfo.Id).ToArray();
+                return Tracks.Where(x => x.SagaId == SagaInfo.Id).ToArray();
             }
 
             return new Track[] {};

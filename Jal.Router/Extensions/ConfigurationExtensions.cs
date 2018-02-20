@@ -23,11 +23,11 @@ namespace Jal.Router.Extensions
             context.Send(data, content, context.CreateOptions(endpointname, id, headers));
         }
 
-        public static void PublishWithSagaInfo<TContent>(this MessageContext context, TContent content, string endpointname, string id, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id, string sagaid, string key, Dictionary<string, string> headers = null)
         {
             context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname,  id, sagaid, headers));
         }
-        public static void PublishWithSagaInfo<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id, string sagaid, string key, Dictionary<string, string> headers = null)
         {
             context.Publish(data, content, context.CreateOrigin(key), context.CreateOptions(endpointname, id, sagaid, headers));
         }
@@ -81,10 +81,6 @@ namespace Jal.Router.Extensions
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentNullException(id);
-            }
-            if (string.IsNullOrWhiteSpace(sagaid))
-            {
-                throw new ArgumentNullException(sagaid);
             }
 
             var options = new Options()
