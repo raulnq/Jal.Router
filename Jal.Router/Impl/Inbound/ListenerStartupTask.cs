@@ -95,26 +95,51 @@ namespace Jal.Router.Impl.Inbound
 
                 if (group.Any())
                 {
-                    var routeitem = group.First();
-
-                    var route = routeitem.Route;
-
-                    var saga = routeitem.Saga;
-
-                    var channelpath = routeitem.Saga == null ? _builder.BuildFromRoute(route) : _builder.BuildFromSagaAndRoute(saga, route);
-
-                    if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                    if (group.Count() == 1)
                     {
-                        pointtopointchannel.Listen(route, actions.ToArray(), channelpath);
+                        var item = group.First();
 
-                        Console.WriteLine($"Listening {channelpath} point to point channel");
+                        var route = item.Route;
+
+                        var saga = item.Saga;
+
+                        var channelpath = item.Saga == null ? _builder.BuildFromRoute(route): _builder.BuildFromSagaAndRoute(saga, route);
+
+                        if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                        {
+                            pointtopointchannel.Listen(route, actions.ToArray(), channelpath);
+
+                            Console.WriteLine($"Listening {channelpath} point to point channel");
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
+                        {
+                            publishsubscriberchannel.Listen(route, actions.ToArray(), channelpath);
+
+                            Console.WriteLine($"Listening {channelpath} publish subscriber channel");
+                        }
                     }
-
-                    if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
+                    else
                     {
-                        publishsubscriberchannel.Listen(route, actions.ToArray(), channelpath);
+                        var item = group.First();
 
-                        Console.WriteLine($"Listening {channelpath} publish subscriber channel");
+                        var route = item.Route;
+
+                        var channelpath = _builder.BuildFromRoute(route);
+
+                        if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                        {
+                            pointtopointchannel.Listen(route, actions.ToArray(), channelpath);
+
+                            Console.WriteLine($"Listening {channelpath} point to point channel ({actions.Count})");
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
+                        {
+                            publishsubscriberchannel.Listen(route, actions.ToArray(), channelpath);
+
+                            Console.WriteLine($"Listening {channelpath} publish subscriber channel ({actions.Count})");
+                        }
                     }
                 }
             }

@@ -59,7 +59,8 @@ namespace Jal.Router.Extensions
                 EndPointName = endpointname,
                 Headers = context.CopyHeaders(),
                 Id = string.IsNullOrWhiteSpace(id) ? context.Id : id,
-                Tracks = context.Tracks
+                Tracks = context.Tracks,
+                RequestId = context.ReplyToRequestId
             };
 
             if (headers != null)
@@ -89,7 +90,8 @@ namespace Jal.Router.Extensions
                 Headers = context.CopyHeaders(),
                 Id = id,
                 SagaInfo = new SagaInfo() { Id = sagaid },
-                Tracks = context.Tracks
+                Tracks = context.Tracks,
+                RequestId = context.ReplyToRequestId
             };
 
             if (headers != null)
