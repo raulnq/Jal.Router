@@ -33,7 +33,7 @@ namespace Jal.Router.AzureServiceBus.Installer
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<BrokeredMessageAdapter>().Named(typeof(BrokeredMessageAdapter).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMessageBodySerializer>().ImplementedBy<JsonMessageBodySerializer>().Named(typeof(JsonMessageBodySerializer).FullName).LifestyleSingleton());
+            container.Register(Component.For<IMessageSerializer>().ImplementedBy<JsonMessageSerializer>().Named(typeof(JsonMessageSerializer).FullName).LifestyleSingleton());
         }
     }
 }

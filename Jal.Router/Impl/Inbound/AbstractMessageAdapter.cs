@@ -1,7 +1,6 @@
 using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -10,15 +9,13 @@ namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractMessageAdapter : IMessageAdapter
     {
-        private readonly IComponentFactory _factory;
+        protected readonly IComponentFactory Factory;
 
-        private readonly IConfiguration _configuration;
+        protected readonly IConfiguration Configuration;
 
         protected readonly IBus Bus;
 
-        protected readonly IStorageFacade Facade;
-
-        public const string Tracking = "tracking";
+        public const string Tracks = "tracking";
 
         public const string From = "from";
 
@@ -32,17 +29,16 @@ namespace Jal.Router.Impl.Inbound
 
         public const string EnclosedType = "enclosedtype";
 
-        protected AbstractMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus, IStorageFacade facade)
+        protected AbstractMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus)
         {
-            _factory = factory;
-            _configuration = configuration;
+            Factory = factory;
+            Configuration = configuration;
             Bus = bus;
-            Facade = facade;
         }
 
-        protected object Deserialize(string content, Type type)
+        public object Deserialize(string content, Type type)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
             try
             {
@@ -54,9 +50,23 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        protected string Serialize(object content)
+        public TContent Deserialize<TContent>(string content)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
+
+            try
+            {
+                return serializer.Deserialize<TContent>(content);
+            }
+            catch (Exception)
+            {
+                return default(TContent);
+            }
+        }
+
+        public string Serialize(object content)
+        {
+            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
             try
             {
@@ -74,19 +84,16 @@ namespace Jal.Router.Impl.Inbound
 
             context.ContentType = contenttype;
 
-            var body = GetBody(message);
-
-            context.ContentAsString = body;
-
-            context.Content = Deserialize(body, contenttype);
+            context.ContentAsString = GetContent(message);
 
             return context;
         }
 
+
         public abstract object Write(MessageContext context);
 
-        public abstract MessageContext Read(object message);
+        protected abstract MessageContext Read(object message);
 
-        public abstract string GetBody(object message);
+        protected abstract string GetContent(object message);
     }
 }

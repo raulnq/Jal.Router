@@ -110,5 +110,77 @@ namespace Jal.Router.Fluent.Impl
 
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
+
+        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method, string status)
+        {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                throw new ArgumentNullException(nameof(status));
+            }
+            var routemethod = new RouteMethod<TContent, THandler>(method) {Status = status};
+
+            _route.RouteMethods.Add(routemethod);
+
+            return new WhenRouteBuilder<TContent, THandler>(routemethod);
+        }
+
+        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, TData> method, string status)
+        {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                throw new ArgumentNullException(nameof(status));
+            }
+            Action<TContent, THandler, object> wrapper = (b, h, d) => method(b, h, (TData)d);
+
+            var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
+
+            _route.RouteMethods.Add(routemethod);
+
+            return new WhenRouteBuilder<TContent, THandler>(routemethod);
+        }
+
+        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method, string status)
+        {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                throw new ArgumentNullException(nameof(status));
+            }
+            var routemethod = new RouteMethod<TContent, THandler>(method) { Status = status };
+
+            _route.RouteMethods.Add(routemethod);
+
+            return new WhenRouteBuilder<TContent, THandler>(routemethod);
+        }
+
+        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method, string status)
+        {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                throw new ArgumentNullException(nameof(status));
+            }
+            Action<TContent, THandler, MessageContext, object> wrapper = (b, h, i, d) => method(b, h, i, (TData)d);
+
+            var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
+
+            _route.RouteMethods.Add(routemethod);
+
+            return new WhenRouteBuilder<TContent, THandler>(routemethod);
+        }
     }
 }

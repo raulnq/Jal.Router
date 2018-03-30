@@ -15,7 +15,7 @@ namespace Jal.Router.AzureServiceBus.LightInject.Installer
             
             container.Register<IChannelManager, AzureServiceBusManager>(typeof(AzureServiceBusManager).FullName, new PerContainerLifetime());
 
-            container.Register<IMessageBodySerializer, JsonMessageBodySerializer>(typeof(JsonMessageBodySerializer).FullName, new PerContainerLifetime());
+            container.Register<IMessageSerializer, JsonMessageSerializer>(typeof(JsonMessageSerializer).FullName, new PerContainerLifetime());
 
             container.Register<IPointToPointChannel>(x => new AzureServiceBusQueue(x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), x.GetInstance<IChannelPathBuilder>(), maxconcurrentcalls, autorenewtimeout), typeof(AzureServiceBusQueue).FullName, new PerContainerLifetime());
 

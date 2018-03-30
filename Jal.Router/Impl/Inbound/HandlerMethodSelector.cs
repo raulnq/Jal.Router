@@ -3,9 +3,9 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class RouteMethodSelector : IRouteMethodSelector
+    public class HandlerMethodSelector : IHandlerMethodSelector
     {
-        public bool Select<TContent, THandler>(MessageContext context, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
+        public bool Select<TContent, THandler>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
         {
             if (routemethod.EvaluatorWithContext == null)
             {
@@ -15,7 +15,7 @@ namespace Jal.Router.Impl.Inbound
                 }
                 else
                 {
-                    if (routemethod.Evaluator((TContent)context.Content, handler))
+                    if (routemethod.Evaluator(content, handler))
                     {
                         return true;
                     }
@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
             }
             else
             {
-                if (routemethod.EvaluatorWithContext((TContent)context.Content, handler, context))
+                if (routemethod.EvaluatorWithContext(content, handler, context))
                 {
                     return true;
                 }

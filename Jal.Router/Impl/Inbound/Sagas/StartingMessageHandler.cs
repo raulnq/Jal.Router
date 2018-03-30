@@ -16,6 +16,8 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         private readonly IConfiguration _configuration;
 
+        private const string DefaultStatus = "STARTED";
+
         public StartingMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration)
         {
             _factory = factory;
@@ -29,9 +31,9 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            context.SagaInfo.Status = "STARTED";
+            context.SagaContext.Status = DefaultStatus;
 
             var sagaentity = CreateSagaEntity(context, parameter);
 
@@ -39,9 +41,9 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var id = storage.CreateSaga(context, sagaentity);
 
-            context.SagaInfo.Id = id;
+            context.SagaContext.Id = id;
 
-            context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaInfo.Id, parameter.Saga.Name);
+            context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
 
             _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
 
@@ -53,13 +55,17 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                 sagaentity.Updated = context.DateTimeUtc;
 
-                sagaentity.Status = context.SagaInfo.Status;
+                sagaentity.Status = context.SagaContext.Status;
 
                 storage.UpdateSaga(context, id, sagaentity);
 
                 var messageentity = CreateMessageEntity(context, parameter, sagaentity);
 
                 storage.CreateMessage(context, id, sagaentity, messageentity);
+            }
+            else
+            {
+                throw new ApplicationException($"No data {parameter.Saga.DataType.FullName} for {parameter.Route.ContentType.FullName}, saga {parameter.Saga.Name}");
             }
         }
     }

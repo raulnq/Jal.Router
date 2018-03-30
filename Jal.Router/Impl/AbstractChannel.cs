@@ -42,10 +42,10 @@ namespace Jal.Router.Impl
 
             MessageContext outputcontext = null;
 
+            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+
             try
             {
-                var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
-
                 outputcontext = string.IsNullOrWhiteSpace(context.ToReplySubscription) ? ReceiveOnQueue(context, adapter) : ReceiveOnTopic(context, adapter);
             }
             catch (Exception ex)
@@ -59,7 +59,12 @@ namespace Jal.Router.Impl
                 Console.WriteLine($"Message {outputcontext?.Id} arrived to {_channelname} channel {channelpath}");
             }
 
-            return outputcontext?.Content;
+            if (outputcontext != null)
+            {
+                return adapter.Deserialize(context.ContentAsString, context.ContentType);
+            }
+
+            return null;
         }
 
         public virtual MessageContext ReceiveOnQueue(MessageContext inputcontext, IMessageAdapter adapter)

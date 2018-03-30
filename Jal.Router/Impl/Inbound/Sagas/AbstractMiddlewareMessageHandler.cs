@@ -15,7 +15,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
                 Name = parameter.Saga.Name,
                 DataType = parameter.Saga.DataType.FullName,
                 Timeout = parameter.Saga.Timeout,
-                Status = context.SagaInfo.Status,
+                Status = context.SagaContext.Status,
                 Key = Guid.NewGuid().ToString()
             };
         }
@@ -31,7 +31,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
                 RetryCount = context.RetryCount,
                 LastRetry = context.LastRetry,
                 Origin = context.Origin,
-                Saga = context.SagaInfo,
+                Saga = context.SagaContext,
                 Headers = context.Headers,
                 DateTimeUtc = context.DateTimeUtc,
                 Data = sagaentity.Data,

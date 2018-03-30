@@ -24,6 +24,8 @@ namespace Jal.Router.Model
             ConsumerWithDataAndContext = consumer;
         }
 
+        public string Status { get; set; }
+
         public Action<TContent, TConsumer> Consumer { get; set; }
 
         public Func<TContent, TConsumer, bool> Evaluator { get; set; }

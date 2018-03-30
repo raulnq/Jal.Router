@@ -77,12 +77,12 @@ namespace Jal.Router.Impl.Outbound
         }
         public TResult Reply<TContent, TResult>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var message = new MessageContext
             {
                 Id = options.Id,
-                Content = content,
+                //Content = content,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = origin,
@@ -90,7 +90,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                SagaInfo = options.SagaInfo,
+                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
@@ -168,12 +168,12 @@ namespace Jal.Router.Impl.Outbound
 
         public void Send<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var message = new MessageContext
             {
                 Id = options.Id,
-                Content = content,
+                //Content = content,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = origin,
@@ -181,7 +181,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                SagaInfo = options.SagaInfo,
+                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
@@ -253,12 +253,12 @@ namespace Jal.Router.Impl.Outbound
         }
         public void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var message = new MessageContext
             {
                 Id = options.Id,
-                Content = content,
+                //Content = content,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
                 Origin = origin,
@@ -266,7 +266,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                SagaInfo = options.SagaInfo,
+                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
@@ -323,12 +323,12 @@ namespace Jal.Router.Impl.Outbound
 
         public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var message = new MessageContext
             {
                 Id = options.Id,
-                Content = content,
+                //Content = content,
                 Origin = origin,
                 ToConnectionString = endpoint.ToConnectionString,
                 ToPath = endpoint.ToPath,
@@ -336,7 +336,7 @@ namespace Jal.Router.Impl.Outbound
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
                 RetryCount = options.RetryCount,
-                SagaInfo = options.SagaInfo,
+                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),

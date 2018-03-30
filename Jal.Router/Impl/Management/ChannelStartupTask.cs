@@ -46,11 +46,11 @@ namespace Jal.Router.Impl.Management
 
             foreach (var source in _sources)
             {
-                var susbcribers = source.GetSubscriptionsToPublishSubscribeChannel();
+                var subscriptions = source.GetSubscriptionsToPublishSubscribeChannel();
 
-                foreach (var susbcriber in susbcribers)
+                foreach (var subscription in subscriptions)
                 {
-                    CreateSubscriptionToPublishSubscribeChannel(susbcriber, channelmanager);
+                    CreateSubscriptionToPublishSubscribeChannel(subscription, channelmanager);
                 }
             }
         }

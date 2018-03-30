@@ -85,6 +85,7 @@
     <Compile Include="Impl\ChannelPathBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
     <Compile Include="Impl\Inbound\Sagas\AbstractMiddlewareMessageHandler.cs" />
+    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
     <Compile Include="Model\Track.cs" />
     <Compile Include="Model\Inbound\MessageEntity.cs" />
     <Compile Include="Model\Inbound\RouteToListen.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="Impl\Inbound\MessageRouter.cs" />
     <Compile Include="Impl\Inbound\MessageHandler.cs" />
     <Compile Include="Impl\Inbound\Sagas\NextMessageHandler.cs" />
-    <Compile Include="Impl\Inbound\Sagas\StorageFacade.cs" />
+    <Compile Include="Impl\Inbound\Sagas\StorageFinder.cs" />
     <Compile Include="Impl\Management\ConfigurationSanityCheckStartupTask.cs" />
     <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
     <Compile Include="Impl\Management\ShutdownNullWatcher.cs" />
@@ -133,7 +134,7 @@
     <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
     <Compile Include="Impl\Outbound\EndPointProvider.cs" />
     <Compile Include="Impl\Inbound\ExponentialRetryPolicy.cs" />
-    <Compile Include="Impl\Inbound\HandlerExecutor.cs" />
+    <Compile Include="Impl\Inbound\HandlerMethodExecutor.cs" />
     <Compile Include="Impl\Outbound\Pipeline.cs" />
     <Compile Include="Impl\Outbound\PointToPointHandler.cs" />
     <Compile Include="Impl\Outbound\PublishSubscribeHandler.cs" />
@@ -141,9 +142,8 @@
     <Compile Include="Impl\Patterns\AbstractMessageHandlerWithData.cs" />
     <Compile Include="Impl\Patterns\AbstractSplitterMessageHandlerWithData.cs" />
     <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandler.cs" />
-    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
     <Compile Include="Impl\Patterns\AbstractSplitterMessageHandler.cs" />
-    <Compile Include="Interface\IMessageBodySerializer.cs" />
+    <Compile Include="Interface\IMessageSerializer.cs" />
     <Compile Include="Interface\ILogger.cs" />
     <Compile Include="Interface\Inbound\IMessageAdapter.cs" />
     <Compile Include="Interface\Inbound\IMessageRouter.cs" />
@@ -155,7 +155,7 @@
     <Compile Include="Impl\Management\ChannelStartupTask.cs" />
     <Compile Include="Interface\IComponentFactory.cs" />
     <Compile Include="Interface\Inbound\IRouterInterceptor.cs" />
-    <Compile Include="Interface\Inbound\Sagas\IStorageFacade.cs" />
+    <Compile Include="Interface\Inbound\Sagas\IStorageFinder.cs" />
     <Compile Include="Interface\Management\IMonitor.cs" />
     <Compile Include="Interface\Management\IMonitoringTask.cs" />
     <Compile Include="Interface\Outbound\IMiddleware.cs" />
@@ -170,8 +170,8 @@
     <Compile Include="Interface\Inbound\Sagas\IStorage.cs" />
     <Compile Include="Impl\Inbound\Sagas\StartingMessageHandler.cs" />
     <Compile Include="Impl\Inbound\MessageExceptionHandler.cs" />
-    <Compile Include="Impl\Inbound\RouteMethodSelector.cs" />
-    <Compile Include="Interface\Inbound\IHandlerExecutor.cs" />
+    <Compile Include="Impl\Inbound\HandlerMethodSelector.cs" />
+    <Compile Include="Interface\Inbound\IHandlerMethodExecutor.cs" />
     <Compile Include="Impl\Inbound\LinearRetryPolicy.cs" />
     <Compile Include="Impl\Outbound\NullBusInterceptor.cs" />
     <Compile Include="Impl\NullPublishSubscribeChannel.cs" />
@@ -179,7 +179,7 @@
     <Compile Include="Interface\Outbound\IBusInterceptor.cs" />
     <Compile Include="Interface\Outbound\IEndPointProvider.cs" />
     <Compile Include="Interface\Outbound\IEndPointSettingFinder.cs" />
-    <Compile Include="Interface\Inbound\IRouteMethodSelector.cs" />
+    <Compile Include="Interface\Inbound\IHandlerMethodSelector.cs" />
     <Compile Include="Interface\IValueSettingFinder.cs" />
     <Compile Include="Interface\IPublishSubscribeChannel.cs" />
     <Compile Include="Interface\IPointToPointChannel.cs" />
@@ -212,10 +212,10 @@
     <Compile Include="Impl\Inbound\Router.cs" />
     <Compile Include="Interface\Inbound\IRouter.cs" />
     <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
-    <Compile Include="Model\SagaInfo.cs" />
+    <Compile Include="Model\SagaContext.cs" />
     <Compile Include="Model\Management\SubscriptionToPublishSubscribeChannel.cs" />
     <Compile Include="Model\Management\PublishSubscribeChannel.cs" />
-    <Compile Include="Impl\NullMessageBodySerializer.cs" />
+    <Compile Include="Impl\NullMessageSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

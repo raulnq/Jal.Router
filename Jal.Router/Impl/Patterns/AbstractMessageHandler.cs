@@ -50,11 +50,5 @@ namespace Jal.Router.Impl.Patterns
         {
 
         }
-
-        public virtual Options CreateOptions(TMessage message, MessageContext context)
-        {
-            return new Options();
-        }
-
     }
 }

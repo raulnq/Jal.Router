@@ -11,14 +11,24 @@ namespace Jal.Router.Impl
             return new MessageContext();
         }
 
-        public string GetBody(object message)
-        {
-            return string.Empty;
-        }
-
         public object Write(MessageContext context)
         {
             return null;
+        }
+
+        public object Deserialize(string content, Type type)
+        {
+            return null;
+        }
+
+        public TContent Deserialize<TContent>(string content)
+        {
+            return default(TContent);
+        }
+
+        public string Serialize(object content)
+        {
+            return string.Empty;
         }
     }
 }

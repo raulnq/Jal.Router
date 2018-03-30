@@ -17,7 +17,7 @@ namespace Jal.Router.AzureServiceBus.Extensions
 
             configuration.UsingMessageAdapter<BrokeredMessageAdapter>();
 
-            configuration.UsingMessageBodySerializer<JsonMessageBodySerializer>();
+            configuration.UsingMessageSerializer<JsonMessageSerializer>();
         }
 
 

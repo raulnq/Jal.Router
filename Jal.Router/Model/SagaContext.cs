@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.Model
 {
-    public class SagaInfo
+    public class SagaContext
     {
         public string Id { get; set; }
 

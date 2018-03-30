@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class JsonMessageBodySerializer : IMessageBodySerializer
+    public class JsonMessageSerializer : IMessageSerializer
     {
         public TContent Deserialize<TContent>(string content)
         {

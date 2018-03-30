@@ -19,5 +19,13 @@ namespace Jal.Router.Fluent.Interface
         IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method);
 
         IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method);
+
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method, string status);
+
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, TData> method, string status);
+
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method, string status);
+
+        IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method, string status);
     }
 }

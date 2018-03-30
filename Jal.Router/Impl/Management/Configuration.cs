@@ -32,7 +32,7 @@ namespace Jal.Router.Impl.Management
         public Type BusInterceptorType { get; private set; }
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
-        public Type MessageBodySerializerType { get; private set; }
+        public Type MessageSerializerType { get; private set; }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
         {
             PublishSubscribeChannelType = typeof(TPublishSubscribeChannel);
@@ -62,9 +62,9 @@ namespace Jal.Router.Impl.Management
             ShutdownWatcherType = typeof(TShutdownWatcher);
         }
 
-        public void UsingMessageBodySerializer<TMessageBodySerializer>() where TMessageBodySerializer : IMessageBodySerializer
+        public void UsingMessageSerializer<TMessageBodySerializer>() where TMessageBodySerializer : IMessageSerializer
         {
-            MessageBodySerializerType = typeof(TMessageBodySerializer);
+            MessageSerializerType = typeof(TMessageBodySerializer);
         }
 
         public void UsingStorage<TStorage>() where TStorage : IStorage
@@ -127,7 +127,7 @@ namespace Jal.Router.Impl.Management
             UsingPointToPointChannel<NullPointToPointChannel>();
             UsingPublishSubscribeChannel<NullPublishSubscribeChannel>();
             UsingRequestReplyChannel<NullRequestReplyChannel>();
-            UsingMessageBodySerializer<NullMessageBodySerializer>();
+            UsingMessageSerializer<NullMessageSerializer>();
             UsingMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();

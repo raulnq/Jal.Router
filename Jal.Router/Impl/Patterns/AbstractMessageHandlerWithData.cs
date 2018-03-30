@@ -40,10 +40,5 @@ namespace Jal.Router.Impl.Patterns
         {
             OnException(message, context, ex);
         }
-
-        public virtual Options CreateOptions(TMessage message, MessageContext context, TData data)
-        {
-            return CreateOptions(message, context);
-        }
     }
 }

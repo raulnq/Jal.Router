@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class NullMessageBodySerializer : IMessageBodySerializer
+    public class NullMessageSerializer : IMessageSerializer
     {
         public TContent Deserialize<TContent>(string content)
         {

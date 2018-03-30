@@ -16,6 +16,8 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         private readonly IConfiguration _configuration;
 
+        private const string DefaultStatus = "IN PROCESS";
+
         public NextMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration)
         {
             _factory = factory;
@@ -27,13 +29,15 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             var storage = _factory.Create<IStorage>(_configuration.StorageType);
 
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var sagaentity = storage.GetSaga(context.SagaInfo.Id);
+            var sagaentity = storage.GetSaga(context.SagaContext.Id);
+
+            context.SagaContext.Status = DefaultStatus;
 
             if (sagaentity != null)
             {
-                context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaInfo.Id, parameter.Saga.Name);
+                context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
 
                 var data = serializer.Deserialize(sagaentity.Data, parameter.Saga.DataType);
 
@@ -45,13 +49,13 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                     sagaentity.Updated = context.DateTimeUtc;
 
-                    sagaentity.Status = context.SagaInfo.Status;
+                    sagaentity.Status = context.SagaContext.Status;
 
-                    storage.UpdateSaga(context, context.SagaInfo.Id, sagaentity);
+                    storage.UpdateSaga(context, context.SagaContext.Id, sagaentity);
 
                     var messageentity = CreateMessageEntity(context, parameter, sagaentity);
 
-                    storage.CreateMessage(context, context.SagaInfo.Id, sagaentity, messageentity);
+                    storage.CreateMessage(context, context.SagaContext.Id, sagaentity, messageentity);
                 }
                 else
                 {

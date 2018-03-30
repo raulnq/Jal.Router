@@ -25,7 +25,7 @@ namespace Jal.Router.Interface.Management
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; }
         Type BusInterceptorType { get; }
-        Type MessageBodySerializerType { get; }
+        Type MessageSerializerType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
         void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
@@ -39,7 +39,7 @@ namespace Jal.Router.Interface.Management
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        void UsingMessageBodySerializer<TSerializer>() where TSerializer : IMessageBodySerializer;
+        void UsingMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
         void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
         void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;

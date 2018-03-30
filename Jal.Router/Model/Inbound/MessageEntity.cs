@@ -13,7 +13,7 @@ namespace Jal.Router.Model.Inbound
         public int RetryCount { get; set; }
         public bool LastRetry { get; set; }
         public Origin Origin { get; set; }
-        public SagaInfo Saga { get; set; }
+        public SagaContext Saga { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Name { get; set; }
         public string ContentType { get; set; }

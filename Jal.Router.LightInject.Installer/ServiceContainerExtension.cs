@@ -28,13 +28,13 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
 
-            container.Register<IRouteMethodSelector, RouteMethodSelector>(new PerContainerLifetime());
+            container.Register<IHandlerMethodSelector, HandlerMethodSelector>(new PerContainerLifetime());
 
             container.Register<IChannelPathBuilder, ChannelPathBuilder>(new PerContainerLifetime());
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
-            container.Register<IHandlerExecutor, HandlerExecutor>(new PerContainerLifetime());
+            container.Register<IHandlerMethodExecutor, HandlerMethodExecutor>(new PerContainerLifetime());
 
             container.Register<IComponentFactory, ComponentFactory>(new PerContainerLifetime());
 
@@ -62,7 +62,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
-            container.Register<IStorageFacade, StorageFacade>(new PerContainerLifetime());
+            container.Register<IStorageFinder, StorageFinder>(new PerContainerLifetime());
 
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof(PointToPointChannelMonitor).FullName, new PerContainerLifetime());
 
@@ -70,7 +70,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitoringTask, HeartBeatMonitor>(typeof(HeartBeatMonitor).FullName, new PerContainerLifetime());
 
-            container.Register<IMessageBodySerializer, NullMessageBodySerializer>(typeof(NullMessageBodySerializer).FullName, new PerContainerLifetime());
+            container.Register<IMessageSerializer, NullMessageSerializer>(typeof(NullMessageSerializer).FullName, new PerContainerLifetime());
 
             container.Register<IMessageAdapter, NullMessageAdapter>(typeof(NullMessageAdapter).FullName, new PerContainerLifetime());
 
@@ -93,8 +93,6 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IStorage, NullStorage>(typeof(NullStorage).FullName, new PerContainerLifetime());
 
             container.Register<IMiddleware, MessageHandler>(typeof(MessageHandler).FullName,new PerContainerLifetime());
-
-            container.Register<IMiddleware, AppSettingsBasicAuthenticationHandler>(typeof(AppSettingsBasicAuthenticationHandler).FullName, new PerContainerLifetime());
 
             container.Register<IMiddleware, MessageExceptionHandler>(typeof(MessageExceptionHandler).FullName,new PerContainerLifetime());
 

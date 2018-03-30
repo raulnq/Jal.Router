@@ -38,9 +38,9 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
-            container.Register(Component.For<IRouteMethodSelector>().ImplementedBy<RouteMethodSelector>().LifestyleSingleton());
+            container.Register(Component.For<IHandlerMethodSelector>().ImplementedBy<HandlerMethodSelector>().LifestyleSingleton());
 
-            container.Register(Component.For<IHandlerExecutor>().ImplementedBy<HandlerExecutor>().LifestyleSingleton());
+            container.Register(Component.For<IHandlerMethodExecutor>().ImplementedBy<HandlerMethodExecutor>().LifestyleSingleton());
 
             container.Register(Component.For<IChannelPathBuilder>().ImplementedBy<ChannelPathBuilder>().LifestyleSingleton());
 
@@ -70,7 +70,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<IStorageFacade>().ImplementedBy<StorageFacade>().LifestyleSingleton());
+            container.Register(Component.For<IStorageFinder>().ImplementedBy<StorageFinder>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
@@ -78,7 +78,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<HeartBeatMonitor>().LifestyleSingleton().Named(typeof(HeartBeatMonitor).FullName));
 
-            container.Register(Component.For<IMessageBodySerializer>().ImplementedBy<NullMessageBodySerializer>().LifestyleSingleton().Named(typeof(NullMessageBodySerializer).FullName));
+            container.Register(Component.For<IMessageSerializer>().ImplementedBy<NullMessageSerializer>().LifestyleSingleton().Named(typeof(NullMessageSerializer).FullName));
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<NullMessageAdapter>().LifestyleSingleton().Named(typeof(NullMessageAdapter).FullName));
 
@@ -103,8 +103,6 @@ namespace Jal.Router.Installer
             container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(NullStorage)).Named(typeof(NullStorage).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
-
-            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(AppSettingsBasicAuthenticationHandler)).Named(typeof(AppSettingsBasicAuthenticationHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageExceptionHandler)).Named(typeof(MessageExceptionHandler).FullName).LifestyleSingleton());
 

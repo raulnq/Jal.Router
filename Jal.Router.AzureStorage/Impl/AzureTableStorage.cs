@@ -102,9 +102,9 @@ namespace Jal.Router.AzureStorage.Impl
             }).ToArray();
         }
 
-        public override MessageEntity[] GetMessagesBySaga(SagaEntity entity, string messagestoragename = "")
+        public override MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "")
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
 
@@ -113,7 +113,7 @@ namespace Jal.Router.AzureStorage.Impl
                 table = GetCloudTable(_connectionstring, $"{messagestoragename}");
             }
 
-            var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == entity.Key);
+            var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == sagaentity.Key);
 
             return records.Select(x => new MessageEntity()
             {
@@ -124,7 +124,7 @@ namespace Jal.Router.AzureStorage.Impl
                 RetryCount = x.RetryCount,
                 LastRetry = x.LastRetry,
                 Origin = serializer.Deserialize<Origin>(x.Origin),
-                Saga = serializer.Deserialize<SagaInfo>(x.Saga),
+                Saga = serializer.Deserialize<SagaContext>(x.Saga),
                 Headers = serializer.Deserialize<Dictionary<string, string>>(x.Headers),
                 DateTimeUtc = x.DateTimeUtc,
                 Data = x.Data,
@@ -163,7 +163,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private MessageEntity[] GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
         {
-            var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
             var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == partitionkey && x.DateTimeUtc >= start && x.DateTimeUtc < end);
 
@@ -176,7 +176,7 @@ namespace Jal.Router.AzureStorage.Impl
                 RetryCount = x.RetryCount,
                 LastRetry = x.LastRetry,
                 Origin = !string.IsNullOrWhiteSpace(x.Origin) ? serializer.Deserialize<Origin>(x.Origin) : null,
-                Saga = !string.IsNullOrWhiteSpace(x.Saga) ? serializer.Deserialize<SagaInfo>(x.Saga) : null,
+                Saga = !string.IsNullOrWhiteSpace(x.Saga) ? serializer.Deserialize<SagaContext>(x.Saga) : null,
                 Headers = !string.IsNullOrWhiteSpace(x.Headers) ? serializer.Deserialize<Dictionary<string, string>>(x.Headers) : null,
                 Tracks = !string.IsNullOrWhiteSpace(x.Tracks) ? serializer.Deserialize<List<Track>>(x.Tracks) : null,
                 DateTimeUtc = x.DateTimeUtc,
@@ -189,7 +189,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+                var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
                 var tablenamesufix = GetTableNameSufix(id);
 
@@ -300,25 +300,25 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override string CreateSaga(MessageContext context, SagaEntity entity)
+        public override string CreateSaga(MessageContext context, SagaEntity sagaentity)
         {
             try
             {
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Saga.Name}";
 
-                var id = $"{partition}@{entity.Key}@{_currenttablenamesufix}";
+                var id = $"{partition}@{sagaentity.Key}@{_currenttablenamesufix}";
                 
                 var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
 
-                var record = new SagaRecord(partition, entity.Key)
+                var record = new SagaRecord(partition, sagaentity.Key)
                 {
-                    Data = entity.Data,
-                    Created = entity.Created,
-                    Updated = entity.Updated,
-                    Name = entity.Name,
-                    DataType = entity.DataType,
-                    Timeout = entity.Timeout,
-                    Status = entity.Status
+                    Data = sagaentity.Data,
+                    Created = sagaentity.Created,
+                    Updated = sagaentity.Updated,
+                    Name = sagaentity.Name,
+                    DataType = sagaentity.DataType,
+                    Timeout = sagaentity.Timeout,
+                    Status = sagaentity.Status
                 };
 
                 table.Execute(TableOperation.Insert(record));
@@ -331,11 +331,11 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override void CreateMessage(MessageContext context, MessageEntity entity)
+        public override void CreateMessage(MessageContext context, MessageEntity messageentity)
         {
             try
             {
-                var serializer = _factory.Create<IMessageBodySerializer>(_configuration.MessageBodySerializerType);
+                var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Route.Name}";
 
@@ -343,17 +343,17 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
-                    Content = entity.Content,
-                    ContentType = entity.ContentType,
-                    Id = entity.Id,
-                    Version = entity.Version,
-                    RetryCount = entity.RetryCount,
-                    LastRetry = entity.LastRetry,
-                    Origin = serializer.Serialize(entity.Origin),
-                    Headers = serializer.Serialize(entity.Headers),
-                    DateTimeUtc = entity.DateTimeUtc,
-                    Name = entity.Name,
-                    Tracks = serializer.Serialize(entity.Tracks),
+                    Content = messageentity.Content,
+                    ContentType = messageentity.ContentType,
+                    Id = messageentity.Id,
+                    Version = messageentity.Version,
+                    RetryCount = messageentity.RetryCount,
+                    LastRetry = messageentity.LastRetry,
+                    Origin = serializer.Serialize(messageentity.Origin),
+                    Headers = serializer.Serialize(messageentity.Headers),
+                    DateTimeUtc = messageentity.DateTimeUtc,
+                    Name = messageentity.Name,
+                    Tracks = serializer.Serialize(messageentity.Tracks),
                 };
 
                 table.Execute(TableOperation.Insert(record));
@@ -364,7 +364,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override void UpdateSaga(MessageContext context, string id, SagaEntity entity)
+        public override void UpdateSaga(MessageContext context, string id, SagaEntity sagaentity)
         {
             try
             {
@@ -384,20 +384,20 @@ namespace Jal.Router.AzureStorage.Impl
 
                     if (record != null)
                     {
-                        record.Data = entity.Data;
+                        record.Data = sagaentity.Data;
 
-                        record.Updated = entity.Updated;
+                        record.Updated = sagaentity.Updated;
 
-                        if (!string.IsNullOrWhiteSpace(entity.Status))
+                        if (!string.IsNullOrWhiteSpace(sagaentity.Status))
                         {
-                            record.Status = entity.Status;
+                            record.Status = sagaentity.Status;
                         }
 
-                        record.Duration = entity.Duration;
+                        record.Duration = sagaentity.Duration;
 
-                        if (entity.Ended != null)
+                        if (sagaentity.Ended != null)
                         {
-                            record.Ended = entity.Ended;
+                            record.Ended = sagaentity.Ended;
                         }
 
                         record.ETag = "*";
@@ -406,28 +406,28 @@ namespace Jal.Router.AzureStorage.Impl
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga key {entity.Key}");
+                        throw new ApplicationException($"Record not found for saga key {sagaentity.Key}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga key format {entity.Key}");
+                    throw new ApplicationException($"Invalid saga key format {sagaentity.Key}");
                 }
             }
             catch (StorageException ex)
             {
                 if (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
                 {
-                    throw new ApplicationException($"Error during the saga update (Optimistic concurrency violation – entity has changed since it was retrieved) {entity.Name}", ex);
+                    throw new ApplicationException($"Error during the saga update (Optimistic concurrency violation – entity has changed since it was retrieved) {sagaentity.Name}", ex);
                 }
                 else
                 {
-                    throw new ApplicationException($"Error during the saga update ({ex.RequestInformation.HttpStatusCode}) {entity.Name}", ex);
+                    throw new ApplicationException($"Error during the saga update ({ex.RequestInformation.HttpStatusCode}) {sagaentity.Name}", ex);
                 }
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga update {entity.Name}", ex);
+                throw new ApplicationException($"Error during the saga update {sagaentity.Name}", ex);
             }
         }
 

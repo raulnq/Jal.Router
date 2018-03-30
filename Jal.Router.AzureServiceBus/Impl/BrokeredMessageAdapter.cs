@@ -20,17 +20,21 @@ namespace Jal.Router.AzureServiceBus.Impl
     }
     public class BrokeredMessageAdapter : AbstractMessageAdapter
     {
-        public BrokeredMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus, IStorageFacade facade) : base(factory, configuration, bus, facade)
+        public BrokeredMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus) : base(factory, configuration, bus)
         {
         }
 
-        public override MessageContext Read(object message)
+        protected override MessageContext Read(object message)
         {
             var brokeredmessage = message as BrokeredMessage;
 
             if (brokeredmessage != null)
             {
-                var context = new MessageContext(Bus, Facade)
+                var storage = Factory.Create<IStorage>(Configuration.StorageType);
+
+                var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
+
+                var context = new MessageContext(Bus, serializer, storage)
                 {
                     Id = brokeredmessage.MessageId,
                     DateTimeUtc = DateTime.UtcNow,
@@ -43,14 +47,14 @@ namespace Jal.Router.AzureServiceBus.Impl
                     context.Origin.From = brokeredmessage.Properties[From].ToString();
                 }
 
-                if (brokeredmessage.Properties.ContainsKey(Tracking))
+                if (brokeredmessage.Properties.ContainsKey(Tracks))
                 {
-                    context.Tracks = Deserialize(brokeredmessage.Properties[Tracking].ToString(), typeof(List<Track>)) as List<Track>;
+                    context.Tracks = Deserialize(brokeredmessage.Properties[Tracks].ToString(), typeof(List<Track>)) as List<Track>;
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(SagaId))
                 {
-                    context.SagaInfo.Id = brokeredmessage.Properties[SagaId].ToString();
+                    context.SagaContext.Id = brokeredmessage.Properties[SagaId].ToString();
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(Version))
@@ -71,7 +75,7 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties != null)
                 {
                     foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracking))
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -82,7 +86,7 @@ namespace Jal.Router.AzureServiceBus.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        public override string GetBody(object message)
+        protected override string GetContent(object message)
         {
             var brokeredmesage = message as BrokeredMessage;
 
@@ -147,9 +151,9 @@ namespace Jal.Router.AzureServiceBus.Impl
                 brokeredmessage.Properties.Add(Version, context.Version);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.SagaInfo.Id))
+            if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
-                brokeredmessage.Properties.Add(SagaId, context.SagaInfo.Id);
+                brokeredmessage.Properties.Add(SagaId, context.SagaContext.Id);
             }
 
             if (context.Tracks != null)
@@ -158,7 +162,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
                 if (!string.IsNullOrWhiteSpace(root))
                 {
-                    brokeredmessage.Properties.Add(Tracking, root);
+                    brokeredmessage.Properties.Add(Tracks, root);
                 }
             }
 

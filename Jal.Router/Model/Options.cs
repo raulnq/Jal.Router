@@ -10,13 +10,13 @@ namespace Jal.Router.Model
             Headers=new Dictionary<string, string>();
             Version = "1";
             RetryCount = 0;
-            SagaInfo = new SagaInfo();
+            SagaContext = new SagaContext();
             RequestId = string.Empty;
             ReplyToRequestId = string.Empty;
             Tracks = new List<Track>();
         }
         public string Id { get; set; }
-        public SagaInfo SagaInfo { get; set; }
+        public SagaContext SagaContext { get; set; }
 
         public string EndPointName { get; set; }
 

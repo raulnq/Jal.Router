@@ -1,6 +1,7 @@
 using System;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
@@ -14,10 +15,13 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IBus _bus;
 
-        public MessageExceptionHandler(IComponentFactory factory, IBus bus)
+        private readonly IConfiguration _configuration;
+
+        public MessageExceptionHandler(IComponentFactory factory, IBus bus, IConfiguration configuration)
         {
             _factory = factory;
             _bus = bus;
+            _configuration = configuration;
         }
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
@@ -118,12 +122,16 @@ namespace Jal.Router.Impl.Inbound
                 Version = context.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
                 RetryCount = context.RetryCount + 1,
-                SagaInfo = context.SagaInfo,
+                SagaContext = context.SagaContext,
                 ReplyToRequestId = context.ReplyToRequestId,
                 RequestId = context.RequestId,
             };
 
-            _bus.Send(context.Content, context.Origin, options);
+            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+
+            var content = adapter.Deserialize(context.ContentAsString, context.ContentType);
+
+            _bus.Send(content, context.Origin, options);
         }
 
         private void SendError(Route route, MessageContext context, Exception ex)
@@ -134,7 +142,7 @@ namespace Jal.Router.Impl.Inbound
                 Headers = context.Headers,
                 Id = context.Id,
                 Version = context.Version,
-                SagaInfo = context.SagaInfo,
+                SagaContext = context.SagaContext,
                 ReplyToRequestId = context.ReplyToRequestId,
                 RequestId = context.RequestId,
             };
@@ -176,8 +184,12 @@ namespace Jal.Router.Impl.Inbound
                     }
                 }
             }
-                
-            _bus.Send(context.Content, context.Origin, options);
+
+            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+
+            var content = adapter.Deserialize(context.ContentAsString, context.ContentType);
+
+            _bus.Send(content, context.Origin, options);
 
 
         }

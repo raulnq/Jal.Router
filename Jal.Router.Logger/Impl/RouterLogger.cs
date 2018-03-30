@@ -24,11 +24,11 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Router.cs, Route, {context.Id}] Start Call. Message arrived. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
+                _log.Info($"[Router.cs, Route, {context.Id}] Start Call. Message arrived. id: {context.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
 
                 next();
 
-                _log.Info($"[Router.cs, Route, {context.Id}] Message routed. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
+                _log.Info($"[Router.cs, Route, {context.Id}] Message routed. id: {context.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
             }
             catch (Exception exception)
             {
@@ -40,7 +40,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Router.cs, Route, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Id} sagaid: {context.SagaInfo?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
+                _log.Info($"[Router.cs, Route, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {parameter.Route?.Name} saga: {parameter.Saga?.Name}");
             }
         }
     }

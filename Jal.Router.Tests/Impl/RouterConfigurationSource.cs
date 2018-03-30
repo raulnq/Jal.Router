@@ -185,7 +185,7 @@ namespace Jal.Router.Tests.Impl
                 .ToListenQueue<IRequestResponseHandler<RequestToSend, Data>, Data, AppSettingValueSettingFinder>("appequeue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<RequestToSend>().Using<RequestToSendAppEHandler>(x =>
                 {
-                    x.With((request, handler, context, data) => handler.Handle(request, context, data));
+                    x.With((request, handler, context, data) => handler.Handle(request, context, data), "START");
                 });
             }, @continue =>
             {
@@ -193,7 +193,7 @@ namespace Jal.Router.Tests.Impl
                 .ToListenPointToPointChannel<AppSettingValueSettingFinder>("appfqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<ResponseToSend>().Using<ResponseToSendAppFHandler>(x =>
                 {
-                    x.With(((request, handler, context, data) => handler.Handle(request, context, data)));
+                    x.With(((request, handler, context, data) => handler.Handle(request, context, data)), "CONTINUE");
                 });
             }, end =>
             {
@@ -201,7 +201,7 @@ namespace Jal.Router.Tests.Impl
                 .ToListenPointToPointChannel<AppSettingValueSettingFinder>("apphqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<ResponseToSend>().Using<ResponseToSendAppHHandler>(x =>
                 {
-                    x.With(((request, handler, context, data) => handler.Handle(request, context, data)));
+                    x.With(((request, handler, context, data) => handler.Handle(request, context, data)), "END");
                 });
             }).WithTimeout(50);
 

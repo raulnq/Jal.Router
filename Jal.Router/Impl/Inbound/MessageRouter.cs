@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
@@ -11,15 +12,18 @@ namespace Jal.Router.Impl.Inbound
     {
         private readonly IComponentFactory _factory;
 
-        private readonly IRouteMethodSelector _selector;
+        private readonly IHandlerMethodSelector _selector;
 
-        private readonly IHandlerExecutor _executor;
+        private readonly IHandlerMethodExecutor _executor;
 
-        public MessageRouter(IComponentFactory factory, IRouteMethodSelector selector, IHandlerExecutor executor)
+        private readonly IConfiguration _configuration;
+
+        public MessageRouter(IComponentFactory factory, IHandlerMethodSelector selector, IHandlerMethodExecutor executor, IConfiguration configuration)
         {
             _factory = factory;
             _selector = selector;
             _executor = executor;
+            _configuration = configuration;
         }
 
         public void Route(MessageContext context, Route route)
@@ -60,13 +64,17 @@ namespace Jal.Router.Impl.Inbound
         {
             if (route.RouteMethods != null)
             {
+                var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+
                 var handler = _factory.Create<THandler>(route.ConsumerType);
+
+                var content = adapter.Deserialize<TContent>(context.ContentAsString);
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (_selector.Select(context, method, handler))
+                    if (_selector.Select(context, content, method, handler))
                     {
-                        _executor.Execute(context, method, handler);
+                        _executor.Execute(context, content, method, handler);
                     }
                 }
             }
@@ -78,13 +86,22 @@ namespace Jal.Router.Impl.Inbound
 
             if (route.RouteMethods != null)
             {
+                var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+
                 var consumer = _factory.Create<THandler>(route.ConsumerType);
-                    
+
+                var content = adapter.Deserialize<TContent>(context.ContentAsString);
+
                 foreach (var method in route.RouteMethods)
                 {
-                    if (_selector.Select(context, method, consumer))
+                    if (_selector.Select(context, content, method, consumer))
                     {
-                        _executor.Execute(context, method, consumer, data);
+                        if (!string.IsNullOrWhiteSpace(method.Status))
+                        {
+                            context.SagaContext.Status = method.Status;
+                        }
+
+                        _executor.Execute(context, content, method, consumer, data);
                     }
                 }
             }

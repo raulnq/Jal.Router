@@ -7,12 +7,12 @@ namespace Jal.Router.Impl.Inbound.Sagas
 {
     public abstract class AbstractStorage : IStorage
     {
-        public virtual void CreateMessage(MessageContext context, MessageEntity entity)
+        public virtual void CreateMessage(MessageContext context, MessageEntity messageentity)
         {
 
         }
 
-        public virtual string CreateSaga(MessageContext context, SagaEntity entity)
+        public virtual string CreateSaga(MessageContext context, SagaEntity sagaentity)
         {
             return string.Empty;
         }
@@ -22,7 +22,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         }
 
-        public virtual void UpdateSaga(MessageContext context, string id, SagaEntity entity)
+        public virtual void UpdateSaga(MessageContext context, string id, SagaEntity sagaentity)
         {
             
         }
@@ -37,7 +37,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             return null;
         }
 
-        public virtual MessageEntity[] GetMessagesBySaga(SagaEntity entity, string messagestoragename = "")
+        public virtual MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "")
         {
             return null;
         }

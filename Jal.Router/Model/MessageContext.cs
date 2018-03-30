@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
 
@@ -10,7 +11,9 @@ namespace Jal.Router.Model
     {
         private readonly IBus _bus;
 
-        private readonly IStorageFacade _facade;
+        private readonly IMessageSerializer _serializer;
+
+        private readonly IStorage _storage;
         public string EndPointName { get; set; }
         public string ToConnectionString { get; set; }
         public string ToSubscription { get; set; }
@@ -23,7 +26,7 @@ namespace Jal.Router.Model
         public Route Route { get; set; }     
         public Origin Origin { get; set; }
         public DateTime DateTimeUtc { get; set; }
-        public SagaInfo SagaInfo { get; set; }
+        public SagaContext SagaContext { get; set; }
         public Saga Saga { get; set; }
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
@@ -35,17 +38,17 @@ namespace Jal.Router.Model
         public string ToReplySubscription { get; set; }
         public string ReplyToRequestId { get; set; }
         public string RequestId { get; set; }
-        public object Content { get; set; }
         public List<Track> Tracks { get; set; }
-        public MessageContext(IBus bus, IStorageFacade facade)
+        public MessageContext(IBus bus, IMessageSerializer serializer, IStorage storage)
         {
             _bus = bus;
-            _facade = facade;
+            _serializer = serializer;
+            _storage = storage;
             Headers = new Dictionary<string, string>();
             Version = "1";
             LastRetry = true;
             Origin = new Origin();
-            SagaInfo = new SagaInfo();
+            SagaContext = new SagaContext();
             Tracks = new List<Track>();
         }
 
@@ -55,7 +58,7 @@ namespace Jal.Router.Model
             Version = "1";
             LastRetry = true;
             Origin = new Origin();
-            SagaInfo = new SagaInfo();
+            SagaContext = new SagaContext();
             Tracks = new List<Track>();
         }
 
@@ -89,9 +92,9 @@ namespace Jal.Router.Model
 
         public Track[] GetTracksOfTheSaga()
         {
-            if (!string.IsNullOrWhiteSpace(SagaInfo.Id))
+            if (!string.IsNullOrWhiteSpace(SagaContext.Id))
             {
-                return Tracks.Where(x => x.SagaId == SagaInfo.Id).ToArray();
+                return Tracks.Where(x => x.SagaId == SagaContext.Id).ToArray();
             }
 
             return new Track[] {};
@@ -117,13 +120,13 @@ namespace Jal.Router.Model
 
         public Track GetTrackOfTheSagaCaller()
         {
-            if (!string.IsNullOrWhiteSpace(SagaInfo.Id))
+            if (!string.IsNullOrWhiteSpace(SagaContext.Id))
             {
                 var index = -1;
 
                 for (var i = 0; i < Tracks.Count; i++)
                 {
-                    if (Tracks[i].SagaId == SagaInfo.Id)
+                    if (Tracks[i].SagaId == SagaContext.Id)
                     {
                         index = i - 1;
 
@@ -138,6 +141,25 @@ namespace Jal.Router.Model
             }
 
             return null;
+        }
+
+        private void Update(object data)
+        {
+            if (_storage != null && _serializer != null)
+            {
+                var sagaentity = _storage.GetSaga(SagaContext.Id);
+
+                if (sagaentity != null)
+                {
+                    sagaentity.Data = _serializer.Serialize(data);
+
+                    sagaentity.Updated = DateTimeUtc;
+
+                    sagaentity.Status = SagaContext.Status;
+
+                    _storage.UpdateSaga(this, SagaContext.Id, sagaentity);
+                }
+            }
         }
 
         public Dictionary<string, string> CopyHeaders()
@@ -162,7 +184,7 @@ namespace Jal.Router.Model
 
         public void Send<TContent, TData>(TData data, TContent content, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             _bus.Send(content, options);
         }
@@ -172,9 +194,14 @@ namespace Jal.Router.Model
             _bus.Send(content, origin, options);
         }
 
+        public void Send<TContent>(TContent content, EndPointSetting endpointsetting, Origin origin, Options options)
+        {
+            _bus.Send(content, endpointsetting, origin, options);
+        }
+
         public void Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             _bus.Send(content, origin, options);
         }
@@ -186,7 +213,7 @@ namespace Jal.Router.Model
 
         public void Publish<TContent, TData>(TData data, TContent content, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             _bus.Publish(content, options);
         }
@@ -196,10 +223,14 @@ namespace Jal.Router.Model
             _bus.Publish(content, origin, options);
         }
 
+        public void Publish<TContent>(TContent content, EndPointSetting endpointsetting, Origin origin, Options options)
+        {
+            _bus.Publish(content, endpointsetting, origin, options);
+        }
 
         public void Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             _bus.Publish(content, origin, options);
         }
@@ -216,14 +247,14 @@ namespace Jal.Router.Model
 
         public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             return _bus.Reply<TContent, TResult>(content, options);
         }
 
         public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            _facade.UpdateSaga(this, data);
+            Update(data);
 
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }

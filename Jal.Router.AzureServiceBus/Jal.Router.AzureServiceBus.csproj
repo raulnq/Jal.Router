@@ -59,7 +59,7 @@
     <Compile Include="Impl\AzureServiceBusQueue.cs" />
     <Compile Include="Impl\BrokeredMessageAdapter.cs" />
     <Compile Include="Extensions\ConfigurationExtensions.cs" />
-    <Compile Include="Impl\JsonMessageBodySerializer.cs" />
+    <Compile Include="Impl\JsonMessageSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

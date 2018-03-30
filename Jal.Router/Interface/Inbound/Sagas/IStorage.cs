@@ -6,11 +6,11 @@ namespace Jal.Router.Interface.Inbound.Sagas
 {
     public interface IStorage
     {
-        void CreateMessage(MessageContext context, MessageEntity entity);
+        void CreateMessage(MessageContext context, MessageEntity messageentity);
 
-        string CreateSaga(MessageContext context, SagaEntity entity);
+        string CreateSaga(MessageContext context, SagaEntity sagaentity);
 
-        void UpdateSaga(MessageContext context, string id, SagaEntity entity);
+        void UpdateSaga(MessageContext context, string id, SagaEntity sagaentity);
 
         void CreateMessage(MessageContext context, string id, SagaEntity sagaentity, MessageEntity messageentity);
 
@@ -18,7 +18,7 @@ namespace Jal.Router.Interface.Inbound.Sagas
 
         SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "");
 
-        MessageEntity[] GetMessagesBySaga(SagaEntity entity, string messagestoragename = "");
+        MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "");
 
         MessageEntity[] GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "");
     }

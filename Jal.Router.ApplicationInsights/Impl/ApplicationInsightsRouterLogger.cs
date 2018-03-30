@@ -44,7 +44,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Properties.Add("from", context.Origin.From);
                 telemetry.Properties.Add("version", context.Version);
                 telemetry.Properties.Add("origin", context.Origin.Key);
-                telemetry.Properties.Add("sagaid", context.SagaInfo?.Id);
+                telemetry.Properties.Add("sagaid", context.SagaContext?.Id);
                 telemetry.Properties.Add("replytorequestid", context.ReplyToRequestId);
                 telemetry.Properties.Add("requestid", context.RequestId);
 

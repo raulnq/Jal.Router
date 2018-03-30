@@ -7,8 +7,12 @@ namespace Jal.Router.Interface.Inbound
     {
         MessageContext Read(object message, Type contenttype);
 
-        string GetBody(object message);
-
         object Write(MessageContext context);
+
+        object Deserialize(string content, Type type);
+
+        TContent Deserialize<TContent>(string content);
+
+        string Serialize(object content);
     }
 }

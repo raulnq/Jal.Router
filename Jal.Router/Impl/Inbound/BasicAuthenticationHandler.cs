@@ -1,5 +1,4 @@
 using System;
-using System.Configuration;
 using System.Security;
 using System.Text;
 using Jal.Router.Interface.Inbound;
@@ -8,13 +7,22 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class AppSettingsBasicAuthenticationHandler : IMiddleware
+    public class BasicAuthenticationHandler : IMiddleware
     {
+        private readonly string _key;
+
+        private readonly string _secret;
+
+        public BasicAuthenticationHandler(string key, string secret)
+        {
+            _key = key;
+            _secret = secret;
+        }
+
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
             if (!IsValid(context))
             {
-                Console.WriteLine("Unauthorized");
                 throw new SecurityException("Unauthorized");
             }
             next();
@@ -22,22 +30,18 @@ namespace Jal.Router.Impl.Inbound
 
         private bool IsValid(MessageContext context)
         {
-            var key = ConfigurationManager.AppSettings["basicauthentication.key"];
-
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(_key))
                 return false;
 
-            var secret = ConfigurationManager.AppSettings["basicauthentication.secret"];
-
-            if (string.IsNullOrEmpty(secret))
+            if (string.IsNullOrEmpty(_secret))
                 return false;
 
-            if (!context.Headers.ContainsKey("Authorization"))
+            if (!context.Headers.ContainsKey("authorization"))
             {
                 return false;
             }
 
-            var header = context.Headers["Authorization"];
+            var header = context.Headers["authorization"];
 
             if (string.IsNullOrEmpty(header))
                 return false;
@@ -62,7 +66,7 @@ namespace Jal.Router.Impl.Inbound
             if (string.IsNullOrEmpty(keyfromheader) || string.IsNullOrEmpty(secretfromheader))
                 return false;
 
-            return keyfromheader.ToLower() == key.ToLower() && secretfromheader == secret;
+            return keyfromheader.ToLower() == _key.ToLower() && secretfromheader == _secret;
         }
     }
 }
