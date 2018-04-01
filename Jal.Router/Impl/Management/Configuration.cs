@@ -137,14 +137,17 @@ namespace Jal.Router.Impl.Management
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
             AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
-            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();          
+            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();    
+            AddLogger<ConsoleShutdownBeatLogger, ShutdownBeat>();
+            AddStartupTask<StartupTask>();
             AddStartupTask<ConfigurationSanityCheckStartupTask>();
             AddStartupTask<ChannelStartupTask>();
             AddStartupTask<ListenerStartupTask>();
-            AddStartupTask<StartupTask>();
             AddShutdownTask<ListenerShutdownTask>();
+            AddShutdownTask<ShutdownTask>();
             UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();
+            ApplicationName = "[Empty]";
         }
     }
 }

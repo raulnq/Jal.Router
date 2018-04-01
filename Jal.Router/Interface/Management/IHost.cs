@@ -4,6 +4,8 @@
     {
         void RunAndBlock();
 
+        void Run();
+
         IConfiguration Configuration { get; }
     }
 }

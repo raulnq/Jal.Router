@@ -23,9 +23,23 @@ namespace Jal.Router.Installer
 
         private readonly string _shutdownfile;
 
-        public RouterInstaller(Assembly[] sourceassemblies, string shutdownfile="")
+        private readonly IRouterConfigurationSource[] _sources;
+
+        public RouterInstaller(string shutdownfile = "")
+        {
+            _shutdownfile = shutdownfile;
+        }
+
+        public RouterInstaller(Assembly[] sourceassemblies, string shutdownfile = "")
         {
             _sourceassemblies = sourceassemblies;
+
+            _shutdownfile = shutdownfile;
+        }
+
+        public RouterInstaller(IRouterConfigurationSource[] sources, string shutdownfile = "")
+        {
+            _sources = sources;
 
             _shutdownfile = shutdownfile;
         }
@@ -34,7 +48,7 @@ namespace Jal.Router.Installer
         {
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
-            container.Register(Component.For<ISagaRouter>().ImplementedBy<Impl.Inbound.Sagas.SagaRouter>().LifestyleSingleton());
+            container.Register(Component.For<ISagaRouter>().ImplementedBy<SagaRouter>().LifestyleSingleton());
 
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
@@ -59,6 +73,8 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IStartupTask>().ImplementedBy<ChannelStartupTask>().LifestyleSingleton().Named(typeof(ChannelStartupTask).FullName));
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<StartupTask>().LifestyleSingleton().Named(typeof(StartupTask).FullName));
+
+            container.Register(Component.For<IShutdownTask>().ImplementedBy<ShutdownTask>().LifestyleSingleton().Named(typeof(ShutdownTask).FullName));
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<ConfigurationSanityCheckStartupTask>().LifestyleSingleton().Named(typeof(ConfigurationSanityCheckStartupTask).FullName));
 
@@ -98,6 +114,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(ILogger<StartupBeat>)).ImplementedBy(typeof(ConsoleStartupBeatLogger)).Named(typeof(ConsoleStartupBeatLogger).FullName).LifestyleSingleton());
 
+            container.Register(Component.For(typeof(ILogger<ShutdownBeat>)).ImplementedBy(typeof(ConsoleShutdownBeatLogger)).Named(typeof(ConsoleShutdownBeatLogger).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(NullBusInterceptor)).Named(typeof(NullBusInterceptor).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(NullStorage)).Named(typeof(NullStorage).FullName).LifestyleSingleton());
@@ -134,6 +152,15 @@ namespace Jal.Router.Installer
                     container.Register(assemblyDescriptor.BasedOn<AbstractRouterConfigurationSource>().WithServiceAllInterfaces());
                     container.Register(assemblyDescriptor.BasedOn<IValueSettingFinder>().WithServiceAllInterfaces());
                     container.Register(assemblyDescriptor.BasedOn(typeof(IEndPointSettingFinder<>)).WithServiceAllInterfaces());
+                }
+            }
+
+            if (_sources != null)
+            {
+                foreach (var source in _sources)
+                {
+                    container.Register(Component.For(typeof(IRouterConfigurationSource)).Instance(source).Named(source.GetType().FullName).LifestyleSingleton());
+
                 }
             }
         }

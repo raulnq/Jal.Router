@@ -51,11 +51,11 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("Start has already been called");
             }
 
+            Console.WriteLine($"Starting {Configuration.ApplicationName}");
+
             _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
 
             _startup.Start();
-
-            Console.WriteLine("Host Started");
 
             _monitor.Start();
 
@@ -80,6 +80,11 @@ namespace Jal.Router.Impl.Management
             Stop();
         }
 
+        public void Run()
+        {
+            Start();
+        }
+
         public IConfiguration Configuration { get; }
 
         public Task StopAsync()
@@ -91,13 +96,13 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("The host has not yet starteds");
             }
 
+            Console.WriteLine($"Stopping {Configuration.ApplicationName}");
+
             _shutdown.Stop();
 
             _watcher.Stop();
 
             _cancellationtokensource.Dispose();
-
-            Console.WriteLine("Host Stopped");
 
             return Task.FromResult(0);
         }

@@ -81,11 +81,14 @@
     <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
     <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
     <Compile Include="Impl\AbstractChannel.cs" />
+    <Compile Include="Impl\ConsoleShutdownBeatLogger.cs" />
     <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
     <Compile Include="Impl\ChannelPathBuilder.cs" />
     <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
     <Compile Include="Impl\Inbound\Sagas\AbstractMiddlewareMessageHandler.cs" />
+    <Compile Include="Impl\Management\ShutdownTask.cs" />
     <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
+    <Compile Include="Model\Management\ShutdownBeat.cs" />
     <Compile Include="Model\Track.cs" />
     <Compile Include="Model\Inbound\MessageEntity.cs" />
     <Compile Include="Model\Inbound\RouteToListen.cs" />
