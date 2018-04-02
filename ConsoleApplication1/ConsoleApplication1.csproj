@@ -60,12 +60,20 @@
       <HintPath>..\packages\Jal.Locator.CastleWindsor.1.0.4.0\lib\net40\Jal.Locator.CastleWindsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Jal.Locator.LightInject, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jal.Locator.LightInject.1.0.2\lib\net45\Jal.Locator.LightInject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Jal.Settings, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jal.Settings.1.0.5\lib\net40\Jal.Settings.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Jal.Settings.Installer, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jal.Settings.Installer.1.0.3\lib\net40\Jal.Settings.Installer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.4.1.0\lib\net45\LightInject.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -96,6 +104,10 @@
       <Project>{49513199-2f7a-41c1-9f4b-42974bdcdeef}</Project>
       <Name>Jal.Router.AzureServiceBus.Installer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.LightInject.Installer\Jal.Router.AzureServiceBus.LightInject.Installer.csproj">
+      <Project>{E83D6C74-BF40-45BA-848A-EC075CC37ACE}</Project>
+      <Name>Jal.Router.AzureServiceBus.LightInject.Installer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jal.Router.AzureServiceBus\Jal.Router.AzureServiceBus.csproj">
       <Project>{f016307f-797e-4fa0-b671-baea91188be9}</Project>
       <Name>Jal.Router.AzureServiceBus</Name>
@@ -111,6 +123,10 @@
     <ProjectReference Include="..\Jal.Router.Installer\Jal.Router.Installer.csproj">
       <Project>{9c5f53e5-a886-42fd-83d4-5c780786e6c4}</Project>
       <Name>Jal.Router.Installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj">
+      <Project>{6173E97A-E056-4FB7-B4E3-3B5B66FDA2BB}</Project>
+      <Name>Jal.Router.LightInject.Installer</Name>
     </ProjectReference>
     <ProjectReference Include="..\Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj">
       <Project>{3139bebe-cb50-4c86-958e-ac77d2b7211c}</Project>
