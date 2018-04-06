@@ -61,7 +61,7 @@ namespace Jal.Router.Impl
 
             if (outputcontext != null)
             {
-                return adapter.Deserialize(context.ContentAsString, context.ContentType);
+                return adapter.Deserialize(outputcontext.ContentAsString, outputcontext.ContentType);
             }
 
             return null;
