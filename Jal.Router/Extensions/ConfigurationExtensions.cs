@@ -6,6 +6,10 @@ namespace Jal.Router.Extensions
 {
     public static class MessageContextExtensions
     {
+        public static void FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, string id, string sagaid, Dictionary<string, string> headers = null)
+        {
+            context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers));
+        }
         public static void Send<TContent>(this MessageContext context, TContent content, string endpointname, string id, string sagaid, Dictionary<string, string> headers = null)
         {
             context.Send(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers));
