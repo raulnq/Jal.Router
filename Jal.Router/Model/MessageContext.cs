@@ -143,7 +143,7 @@ namespace Jal.Router.Model
             return null;
         }
 
-        private void Update(object data)
+        public void Update(object data)
         {
             if (_storage != null && _serializer != null)
             {
