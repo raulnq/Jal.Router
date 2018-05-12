@@ -2,13 +2,13 @@
 {
     public class StorageConfiguration
     {
-        public bool OptimisticConcurrency { get; set; }
         public bool SaveMessage { get; set; }
+        public bool IgnoreExceptionOnSaveMessage { get; set; }
 
         public StorageConfiguration()
         {
-            OptimisticConcurrency = true;
             SaveMessage = true;
+            IgnoreExceptionOnSaveMessage = false;
         }
     }
 }

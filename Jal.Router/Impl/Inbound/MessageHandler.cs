@@ -47,7 +47,17 @@ namespace Jal.Router.Impl.Inbound
                     Tracks = context.Tracks
                 };
 
-                storage.CreateMessage(context, message);
+                try
+                {
+                    storage.CreateMessage(context, message);
+                }
+                catch (Exception)
+                {
+                    if (!_configuration.Storage.IgnoreExceptionOnSaveMessage)
+                    {
+                        throw;
+                    }
+                }
             }
             
             _router.Route(context, parameter.Route);

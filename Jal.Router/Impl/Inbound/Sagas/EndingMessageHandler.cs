@@ -57,7 +57,17 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                     var message = CreateMessageEntity(context, parameter, sagaentity);
 
-                    storage.CreateMessage(context, context.SagaContext.Id, sagaentity, message);
+                    try
+                    {
+                        storage.CreateMessage(context, context.SagaContext.Id, sagaentity, message);
+                    }
+                    catch (Exception)
+                    {
+                        if (!_configuration.Storage.IgnoreExceptionOnSaveMessage)
+                        {
+                            throw;
+                        }
+                    }
                 }
                 else
                 {
