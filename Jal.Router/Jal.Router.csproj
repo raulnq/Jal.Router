@@ -88,6 +88,9 @@
     <Compile Include="Impl\Inbound\Sagas\AbstractMiddlewareMessageHandler.cs" />
     <Compile Include="Impl\Management\ShutdownTask.cs" />
     <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
+    <Compile Include="Impl\Patterns\DynamicRouter.cs" />
+    <Compile Include="Interface\Patterns\IDynamicRoute.cs" />
+    <Compile Include="Interface\Patterns\IDynamicRouter.cs" />
     <Compile Include="Model\Management\ShutdownBeat.cs" />
     <Compile Include="Model\Track.cs" />
     <Compile Include="Model\Inbound\MessageEntity.cs" />
