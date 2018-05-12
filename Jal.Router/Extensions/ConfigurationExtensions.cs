@@ -14,6 +14,7 @@ namespace Jal.Router.Extensions
         {
             context.Send(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers));
         }
+
         public static void Send<TContent>(this MessageContext context, TContent content, EndPointSetting endpointsetting, string id, string sagaid,  Dictionary<string,string> headers = null)
         {
             context.Send(content, endpointsetting, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers));
@@ -22,6 +23,7 @@ namespace Jal.Router.Extensions
         {
             context.Send(data, content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers));
         }
+
         public static void Send<TContent>(this MessageContext context, TContent content, string endpointname, string id, Dictionary<string, string> headers = null)
         {
             context.Send(content, context.CreateOptions(endpointname, id, headers));

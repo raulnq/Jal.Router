@@ -7,7 +7,12 @@ namespace Jal.Router.Impl.Patterns
     {
         public abstract TSplittedMessage[] CreateSplittedMessages(TMessage message, MessageContext context);
 
-        public abstract void Send(TSplittedMessage message, MessageContext context);
+        public virtual void OnNoSplittedMessages(TMessage message, MessageContext context)
+        {
+            
+        }
+
+        public abstract void Send(TSplittedMessage message, MessageContext context, int messages);
 
         public override void HandleWithContext(TMessage message, MessageContext context)
         {
@@ -18,10 +23,21 @@ namespace Jal.Router.Impl.Patterns
 
                 var messages = CreateSplittedMessages(message, context);
 
-                foreach (var m in messages)
+                if (messages.Length > 0)
                 {
-                    Send(m, context);
+                    var counter = messages.Length;
+
+                    foreach (var m in messages)
+                    {
+                        Send(m, context, counter);
+                    }
                 }
+                else
+                {
+                    OnNoSplittedMessages(message, context);
+                }
+
+                OnSuccess(message, context);
             }
             catch (Exception ex)
             {

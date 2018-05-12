@@ -46,6 +46,11 @@ namespace Jal.Router.Impl.Patterns
 
         }
 
+        public virtual void OnSuccess(TMessage message, MessageContext context)
+        {
+
+        }
+
         public virtual void OnException(TMessage message, MessageContext context, Exception ex)
         {
 

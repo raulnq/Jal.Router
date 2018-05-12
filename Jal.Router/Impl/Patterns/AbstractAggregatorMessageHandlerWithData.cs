@@ -1,18 +1,10 @@
 using System;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Patterns
 {
     public abstract class AbstractAggregatorMessageHandlerWithData<TMessage, TAggregatedMessage, TData> : AbstractMessageHandlerWithData<TMessage, TData>
     {
-        private readonly IBus _bus;
-
-        protected AbstractAggregatorMessageHandlerWithData(IBus bus)
-        {
-            _bus = bus;
-        }
-
         public abstract void Add(TMessage message, MessageContext context, TData data);
 
         public abstract bool IsCompleted(TMessage message, MessageContext context, TData data);
@@ -20,6 +12,11 @@ namespace Jal.Router.Impl.Patterns
         public abstract TAggregatedMessage CreateAggregatedMessage(TMessage message, MessageContext context, TData data);
 
         public abstract void Publish(TAggregatedMessage message, MessageContext context, TData data);
+
+        public virtual void OnNoCompleted(TMessage message, MessageContext context, TData data)
+        {
+            
+        }
 
         public override void HandleWithContextAndData(TMessage message, MessageContext context, TData data)
         {
@@ -35,6 +32,12 @@ namespace Jal.Router.Impl.Patterns
 
                     Publish(m, context, data);
                 }
+                else
+                {
+                    OnNoCompleted(message, context, data);
+                }
+
+                OnSuccess(message, context);
             }
             catch (Exception ex)
             {

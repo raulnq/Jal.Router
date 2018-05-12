@@ -14,6 +14,11 @@ namespace Jal.Router.Impl.Patterns
 
         public abstract TAggregatedMessage CreateAggregatedMessage(TMessage message, MessageContext context);
 
+        public virtual void OnNoCompleted(TMessage message, MessageContext context)
+        {
+
+        }
+
         public override void HandleWithContext(TMessage message, MessageContext context)
         {
             try
@@ -28,6 +33,12 @@ namespace Jal.Router.Impl.Patterns
 
                     Publish(m, context);
                 }
+                else
+                {
+                    OnNoCompleted(message, context);
+                }
+
+                OnSuccess(message, context);
             }
             catch (Exception ex)
             {
