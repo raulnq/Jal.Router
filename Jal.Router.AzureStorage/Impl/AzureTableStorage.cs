@@ -356,6 +356,14 @@ namespace Jal.Router.AzureStorage.Impl
                     Tracks = serializer.Serialize(messageentity.Tracks),
                 };
 
+
+                var size = Encoding.UTF8.GetByteCount(record.Content);
+
+                if (size >= 64000)
+                {
+                    record.Content = LimitByteLength(record.Content, 63000) + "...";
+                }
+
                 table.Execute(TableOperation.Insert(record));
             }
             catch (Exception ex)
