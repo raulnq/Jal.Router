@@ -13,7 +13,7 @@ namespace Jal.Router.Impl.Patterns
             _dynamicroutes = dynamicroutes;
         }
 
-        public void Send(MessageContext context, TData data, string id)
+        public void Send(MessageContext context, TData data, string id="")
         {
             var order = 0;
 
