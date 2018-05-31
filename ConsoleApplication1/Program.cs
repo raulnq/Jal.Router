@@ -32,7 +32,7 @@ using Microsoft.ServiceBus.Messaging;
 using Component = Castle.MicroKernel.Registration.Component;
 
 
-namespace ConsoleApplication1
+namespace Jal.Router.Sample.FullNetFramework
 {
     class Program
     {
@@ -74,7 +74,7 @@ namespace ConsoleApplication1
         }
         static void Main1(string[] args)
         {
-            var container = new LightInject.ServiceContainer();
+            var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSourceSample() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
             container.RegisterAzureServiceBusRouter();
@@ -83,7 +83,7 @@ namespace ConsoleApplication1
 
             var host = container.GetInstance<IHost>();
             host.Configuration.UsingAzureServiceBus();
-            host.Run();         
+            host.Run();
             Console.ReadLine();
         }
 

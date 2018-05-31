@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
     <Version>1.4.0</Version>
     <Company>Raul Naupari</Company>
-    <Description>Castle Windsor installer for the Jal.Router.Logger library</Description>
+    <Description>Jal.Router integration with azure service bus (net standard library)</Description>
     <Copyright />
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
@@ -14,11 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Azure.Management.ServiceBus.Fluent" Version="1.10.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.0.1.16" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jal.Router.Logger\Jal.Router.Logger.csproj" />
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
   </ItemGroup>
 
 </Project>

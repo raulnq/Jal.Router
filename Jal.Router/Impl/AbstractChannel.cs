@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -8,7 +9,7 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractChannel
     {
-        private readonly string _channelname;
+        protected readonly string ChannelName;
 
         protected readonly IComponentFactory Factory;
 
@@ -16,9 +17,9 @@ namespace Jal.Router.Impl
 
         private readonly IChannelPathBuilder _builder;
 
-        protected AbstractChannel(string channelname, IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder)
+        protected AbstractChannel(string channelName, IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder)
         {
-            _channelname = channelname;
+            ChannelName = channelName;
             Factory = factory;
             Configuration = configuration;
             _builder = builder;
@@ -29,7 +30,7 @@ namespace Jal.Router.Impl
             return string.Empty;
         }
 
-        public virtual void Listen(Route route, Action<object>[] routeactions,  string channelpath)
+        public virtual void Listen(Route route, Action<object>[] routingactions,  string channelpath)
         {
 
         }
@@ -50,13 +51,13 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Message {outputcontext?.Id} failed to arrived to {_channelname} channel {channelpath} {ex}");
+                Console.WriteLine($"Message {outputcontext?.Id} failed to arrived to {ChannelName} channel {channelpath} {ex}");
 
                 throw;
             }
             finally
             {
-                Console.WriteLine($"Message {outputcontext?.Id} arrived to {_channelname} channel {channelpath}");
+                Console.WriteLine($"Message {outputcontext?.Id} arrived to {ChannelName} channel {channelpath}");
             }
 
             if (outputcontext != null)
@@ -94,34 +95,54 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Message {id} failed to sent to {_channelname} channel {channelpath} {ex}");
+                Console.WriteLine($"Message {id} failed to sent to {ChannelName} channel {channelpath} {ex}");
 
                 throw;
             }
             finally
             {
-                Console.WriteLine($"Message {id} sent to {_channelname} channel {channelpath}");
+                Console.WriteLine($"Message {id} sent to {ChannelName} channel {channelpath}");
             }
             
         }
 
-        public void OnMessage(string channelpath, string messageid, Action routeaction, Action completeaction)
+        public void OnMessage(string channelpath, string messageid, Action @action, Action completeaction)
         {
-            Console.WriteLine($"Message {messageid} arrived to {_channelname} channel {channelpath}");
+            Console.WriteLine($"Message {messageid} arrived to {ChannelName} channel {channelpath}");
 
             try
             {
-                routeaction();
+                action();
 
                 completeaction();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Message {messageid} failed to {_channelname} channel {channelpath} {ex}");
+                Console.WriteLine($"Message {messageid} failed to {ChannelName} channel {channelpath} {ex}");
             }
             finally
             {
-                Console.WriteLine($"Message {messageid} completed to {_channelname} channel {channelpath}");
+                Console.WriteLine($"Message {messageid} completed to {ChannelName} channel {channelpath}");
+            }
+        }
+
+        public async Task OnMessageAsync(string channelpath, string messageid, Action @action, Func<Task> completeaction)
+        {
+            Console.WriteLine($"Message {messageid} arrived to {ChannelName} channel {channelpath}");
+
+            try
+            {
+                action();
+
+                await completeaction();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Message {messageid} failed to {ChannelName} channel {channelpath} {ex}");
+            }
+            finally
+            {
+                Console.WriteLine($"Message {messageid} completed to {ChannelName} channel {channelpath}");
             }
         }
     }

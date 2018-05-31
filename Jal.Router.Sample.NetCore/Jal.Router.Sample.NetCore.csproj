@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jal.Locator.LightInject" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard.LightInject.Installer\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard\Jal.Router.AzureServiceBus.Standard.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj" />
+    <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
+  </ItemGroup>
+
+</Project>

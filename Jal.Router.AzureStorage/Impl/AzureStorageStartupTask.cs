@@ -41,13 +41,13 @@ namespace Jal.Router.AzureStorage.Impl
         {
             var sagatable = GetCloudTable(_connectionstring, $"{_sagastoragename}{_tablenamesufix}");
 
-            sagatable.CreateIfNotExists();
+            var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
             Console.WriteLine($"Created {sagatable} table");
 
             var messagetable = GetCloudTable(_connectionstring, $"{_messagestorgename}{_tablenamesufix}");
 
-            messagetable.CreateIfNotExists();
+            var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
             Console.WriteLine($"Created {messagetable} table");
         }

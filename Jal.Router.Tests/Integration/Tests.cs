@@ -54,7 +54,7 @@ namespace Jal.Router.Tests.Integration
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-            AssemblyFinder.Current = AssemblyFinder.Builder.UsePath(TestContext.CurrentContext.TestDirectory).Create;
+            AssemblyFinder.Current = AssemblyFinder.Create(TestContext.CurrentContext.TestDirectory);
             IWindsorContainer container = new WindsorContainer();
             var assemblies = AssemblyFinder.Current.GetAssembliesTagged<AssemblyTagAttribute>();
             container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));

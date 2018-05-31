@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using Jal.Router.AzureStorage.Model;
@@ -85,7 +86,18 @@ namespace Jal.Router.AzureStorage.Impl
 
         private SagaEntity[] GetSagas(CloudTable table, string partitionkey, DateTime start, DateTime end)
         {
-            var records = table.CreateQuery<SagaRecord>().Where(x => x.PartitionKey == partitionkey && x.Created >= start && x.Created < end);
+
+            var where = TableQuery.CombineFilters(
+                            TableQuery.CombineFilters(
+                                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionkey),
+                                TableOperators.And,
+                                TableQuery.GenerateFilterConditionForDate("Created", QueryComparisons.GreaterThanOrEqual, start)),
+                        TableOperators.And,
+                        TableQuery.GenerateFilterConditionForDate("Created", QueryComparisons.LessThan, end));
+
+            var query = new TableQuery<SagaRecord>().Where(where);
+
+            var records = ExecuteQueryAsync<SagaRecord>(table, query).GetAwaiter().GetResult();
 
             return records.Select(x => new SagaEntity()
             {
@@ -102,6 +114,20 @@ namespace Jal.Router.AzureStorage.Impl
             }).ToArray();
         }
 
+        public static async System.Threading.Tasks.Task<IEnumerable<T>> ExecuteQueryAsync<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
+        {
+            TableContinuationToken token = null;
+            var retVal = new List<T>();
+            do
+            {
+                var results = await table.ExecuteQuerySegmentedAsync(query, token);
+                retVal.AddRange(results.Results);
+                token = results.ContinuationToken;
+            } while (token != null);
+
+            return retVal;
+        }
+
         public override MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "")
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
@@ -113,7 +139,11 @@ namespace Jal.Router.AzureStorage.Impl
                 table = GetCloudTable(_connectionstring, $"{messagestoragename}");
             }
 
-            var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == sagaentity.Key);
+            var where = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sagaentity.Key);
+
+            var query = new TableQuery<MessageRecord>().Where(where);
+
+            var records = ExecuteQueryAsync<MessageRecord>(table, query).GetAwaiter().GetResult();
 
             return records.Select(x => new MessageEntity()
             {
@@ -165,7 +195,17 @@ namespace Jal.Router.AzureStorage.Impl
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var records = table.CreateQuery<MessageRecord>().Where(x => x.PartitionKey == partitionkey && x.DateTimeUtc >= start && x.DateTimeUtc < end);
+            var where = TableQuery.CombineFilters(
+                TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionkey),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterConditionForDate("DateTimeUtc", QueryComparisons.GreaterThanOrEqual, start)),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForDate("DateTimeUtc", QueryComparisons.LessThan, end));
+
+            var query = new TableQuery<MessageRecord>().Where(where);
+
+            var records = ExecuteQueryAsync<MessageRecord>(table, query).GetAwaiter().GetResult();
 
             return records.Select(x => new MessageEntity()
             {
@@ -219,7 +259,7 @@ namespace Jal.Router.AzureStorage.Impl
                     record.Content = LimitByteLength(record.Content, 63000) + "...";
                 }
 
-                table.Execute(TableOperation.Insert(record));
+                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -256,7 +296,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 
-                    var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
+                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
 
                     var record = result.Result as SagaRecord;
 
@@ -321,7 +361,7 @@ namespace Jal.Router.AzureStorage.Impl
                     Status = sagaentity.Status
                 };
 
-                table.Execute(TableOperation.Insert(record));
+                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
 
                 return id;
             }
@@ -364,7 +404,7 @@ namespace Jal.Router.AzureStorage.Impl
                     record.Content = LimitByteLength(record.Content, 63000) + "...";
                 }
 
-                table.Execute(TableOperation.Insert(record));
+                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -386,7 +426,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 
-                    var result = table.Execute(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
+                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult(); ;
 
                     var record = result.Result as SagaRecord;
 
@@ -410,7 +450,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                         record.ETag = "*";
 
-                        table.Execute(TableOperation.Replace(record));
+                        table.ExecuteAsync(TableOperation.Replace(record)).GetAwaiter().GetResult();
                     }
                     else
                     {

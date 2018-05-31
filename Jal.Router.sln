@@ -1,20 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router", "Jal.Router\Jal.Router.csproj", "{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router", "Jal.Router\Jal.Router.csproj", "{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Installer", "Jal.Router.Installer\Jal.Router.Installer.csproj", "{9C5F53E5-A886-42FD-83D4-5C780786E6C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Installer", "Jal.Router.Installer\Jal.Router.Installer.csproj", "{9C5F53E5-A886-42FD-83D4-5C780786E6C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Tests", "Jal.Router.Tests\Jal.Router.Tests.csproj", "{B4BA67C0-C664-4F4A-B3B3-38D837B46163}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{ACAFB934-7B50-49DC-8BF7-87100CB28387}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.LightInject.Installer", "Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj", "{6173E97A-E056-4FB7-B4E3-3B5B66FDA2BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.LightInject.Installer", "Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj", "{6173E97A-E056-4FB7-B4E3-3B5B66FDA2BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureServiceBus", "Jal.Router.AzureServiceBus\Jal.Router.AzureServiceBus.csproj", "{F016307F-797E-4FA0-B671-BAEA91188BE9}"
 EndProject
@@ -27,25 +22,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger", "Jal.Router.Logger\Jal.Router.Logger.csproj", "{1BB1884D-3CC4-41B8-8055-64460AD09E60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Logger", "Jal.Router.Logger\Jal.Router.Logger.csproj", "{1BB1884D-3CC4-41B8-8055-64460AD09E60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger.Installer", "Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj", "{3139BEBE-CB50-4C86-958E-AC77D2B7211C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Logger.Installer", "Jal.Router.Logger.Installer\Jal.Router.Logger.Installer.csproj", "{3139BEBE-CB50-4C86-958E-AC77D2B7211C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Logger.LightInject.Installer", "Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj", "{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Logger.LightInject.Installer", "Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj", "{DCAF8CD0-F7B1-4A34-AF7D-D8E551448CD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureStorage", "Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj", "{9DDD8C4E-6C9A-4C8F-B558-84F656971990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage", "Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj", "{9DDD8C4E-6C9A-4C8F-B558-84F656971990}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureStorage.Installer", "Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj", "{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.Installer", "Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj", "{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{92950960-1D7E-403C-A5ED-080CC37F9F7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Sample.FullNetFramework", "ConsoleApplication1\Jal.Router.Sample.FullNetFramework.csproj", "{92950960-1D7E-403C-A5ED-080CC37F9F7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureStorage.LightInject.Installer", "Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj", "{30C19278-D519-4C95-BF1F-8BC59EDE44EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.LightInject.Installer", "Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj", "{30C19278-D519-4C95-BF1F-8BC59EDE44EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.ApplicationInsights", "Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj", "{96ABC8C4-06F2-4799-9946-E6C51EA51182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.ApplicationInsights", "Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj", "{96ABC8C4-06F2-4799-9946-E6C51EA51182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.ApplicationInsights.LightInject.Installer", "Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj", "{13116A5A-9E2C-400F-BCA3-75F1855551D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.ApplicationInsights.LightInject.Installer", "Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj", "{13116A5A-9E2C-400F-BCA3-75F1855551D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.ApplicationInsights.Installer", "Jal.Router.ApplicationInsights.Installer\Jal.Router.ApplicationInsights.Installer.csproj", "{7B42DE0B-1436-4EBC-97B5-1202AFFCB9FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.ApplicationInsights.Installer", "Jal.Router.ApplicationInsights.Installer\Jal.Router.ApplicationInsights.Installer.csproj", "{7B42DE0B-1436-4EBC-97B5-1202AFFCB9FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.Standard", "Jal.Router.AzureServiceBus.Standard\Jal.Router.AzureServiceBus.Standard.csproj", "{8C4085FD-2233-492D-84A3-4CE655BA9510}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Sample.NetCore", "Jal.Router.Sample.NetCore\Jal.Router.Sample.NetCore.csproj", "{E16FDBF0-CAB4-4A59-B795-E53C8CC2C873}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.Standard.LightInject.Installer", "Jal.Router.AzureServiceBus.Standard.LightInject.Installer\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.csproj", "{E60683D0-4C84-4BA1-A322-55794D7FF02C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.Standard.Installer", "Jal.Router.AzureServiceBus.Standard.Installer\Jal.Router.AzureServiceBus.Standard.Installer.csproj", "{A8474B47-C697-4EC1-9B9B-B1525BBEF420}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,8 +124,27 @@ Global
 		{7B42DE0B-1436-4EBC-97B5-1202AFFCB9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B42DE0B-1436-4EBC-97B5-1202AFFCB9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B42DE0B-1436-4EBC-97B5-1202AFFCB9FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C4085FD-2233-492D-84A3-4CE655BA9510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C4085FD-2233-492D-84A3-4CE655BA9510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C4085FD-2233-492D-84A3-4CE655BA9510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C4085FD-2233-492D-84A3-4CE655BA9510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E16FDBF0-CAB4-4A59-B795-E53C8CC2C873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E16FDBF0-CAB4-4A59-B795-E53C8CC2C873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E16FDBF0-CAB4-4A59-B795-E53C8CC2C873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E16FDBF0-CAB4-4A59-B795-E53C8CC2C873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E60683D0-4C84-4BA1-A322-55794D7FF02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E60683D0-4C84-4BA1-A322-55794D7FF02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E60683D0-4C84-4BA1-A322-55794D7FF02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E60683D0-4C84-4BA1-A322-55794D7FF02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C86633D0-8595-4062-8E83-44A09131D6BF}
 	EndGlobalSection
 EndGlobal

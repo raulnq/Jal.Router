@@ -1,239 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01C0DBA5-6A4B-49C0-B7BC-75C12B84F191}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Jal.Router</RootNamespace>
-    <AssemblyName>Jal.Router</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <Authors>Raul Naupari</Authors>
+    <Version>1.4.0</Version>
+    <Company>Raul Naupari</Company>
+    <Description>Just another library to route messages</Description>
+    <Copyright />
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageTags />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Jal.Locator, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Jal.Locator.1.0.6.0\lib\net40\Jal.Locator.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
+    <PackageReference Include="Jal.Locator" Version="1.1.1" />
+  </ItemGroup>
+
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Configuration.ConfigurationManager">
+      <Version>4.4.1</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Extensions\ConfigurationExtensions.cs" />
-    <Compile Include="Fluent\Impl\MiddlewareBuilder.cs" />
-    <Compile Include="Fluent\Impl\NextNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\NextRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\EndPointBuilder.cs" />
-    <Compile Include="Fluent\Impl\EndingNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\StartingNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\EndingRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\StartingRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\TimeoutBuilder.cs" />
-    <Compile Include="Fluent\Interface\IAndWaitReplyFromEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\INextListenerRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\INextNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\INextRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IMiddlewareBuilder.cs" />
-    <Compile Include="Fluent\Interface\IHandlerBuilder.cs" />
-    <Compile Include="Fluent\Interface\INameEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IOnRouteOptionBuilder.cs" />
-    <Compile Include="Fluent\Interface\IEndingListenerRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IStartingListenerRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IEndingNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IStartingNameRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IEndingRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IStartingRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\IOnRetryBuilder.cs" />
-    <Compile Include="Fluent\Interface\IOnRetryUsingBuilder.cs" />
-    <Compile Include="Fluent\Interface\ITimeoutBuilder.cs" />
-    <Compile Include="Fluent\Interface\IToEndPointBuilder.cs" />
-    <Compile Include="Fluent\Interface\IWhenHandlerBuilder.cs" />
-    <Compile Include="Fluent\Interface\IWhenMethodBuilder.cs" />
-    <Compile Include="Fluent\Interface\IWithMethodBuilder.cs" />
-    <Compile Include="Fluent\Impl\NameRouteBuilder.cs" />
-    <Compile Include="Fluent\Interface\INameRouteBuilder.cs" />
-    <Compile Include="Impl\AbstractChannel.cs" />
-    <Compile Include="Impl\ConsoleShutdownBeatLogger.cs" />
-    <Compile Include="Impl\ConsoleStartupBeatLogger.cs" />
-    <Compile Include="Impl\ChannelPathBuilder.cs" />
-    <Compile Include="Impl\Inbound\ListenerShutdownTask.cs" />
-    <Compile Include="Impl\Inbound\Sagas\AbstractMiddlewareMessageHandler.cs" />
-    <Compile Include="Impl\Management\ShutdownTask.cs" />
-    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandlerWithData.cs" />
-    <Compile Include="Impl\Patterns\DynamicRouter.cs" />
-    <Compile Include="Interface\Patterns\IDynamicRoute.cs" />
-    <Compile Include="Interface\Patterns\IDynamicRouter.cs" />
-    <Compile Include="Model\Management\ShutdownBeat.cs" />
-    <Compile Include="Model\Track.cs" />
-    <Compile Include="Model\Inbound\MessageEntity.cs" />
-    <Compile Include="Model\Inbound\RouteToListen.cs" />
-    <Compile Include="Impl\Inbound\Sagas\EndingMessageHandler.cs" />
-    <Compile Include="Impl\Inbound\Sagas\SagaRouter.cs" />
-    <Compile Include="Impl\Management\Host.cs" />
-    <Compile Include="Fluent\Interface\IListenerRouteBuilder.cs" />
-    <Compile Include="Impl\Inbound\ListenerStartupTask.cs" />
-    <Compile Include="Impl\Inbound\AbstractMessageAdapter.cs" />
-    <Compile Include="Impl\ConsoleHeartBeatLogger.cs" />
-    <Compile Include="Impl\Inbound\BasicAuthenticationHandler.cs" />
-    <Compile Include="Impl\Inbound\MessageRouter.cs" />
-    <Compile Include="Impl\Inbound\MessageHandler.cs" />
-    <Compile Include="Impl\Inbound\Sagas\NextMessageHandler.cs" />
-    <Compile Include="Impl\Inbound\Sagas\StorageFinder.cs" />
-    <Compile Include="Impl\Management\ConfigurationSanityCheckStartupTask.cs" />
-    <Compile Include="Impl\Management\HeartBeatMonitor.cs" />
-    <Compile Include="Impl\Management\ShutdownNullWatcher.cs" />
-    <Compile Include="Impl\Management\ShutdownFileWatcher.cs" />
-    <Compile Include="Impl\NullRequestReplyChannel.cs" />
-    <Compile Include="Impl\Outbound\RequestReplyHandler.cs" />
-    <Compile Include="Interface\IChannelPathBuilder.cs" />
-    <Compile Include="Interface\Inbound\Sagas\ISagaRouter.cs" />
-    <Compile Include="Interface\IRequestReplyChannel.cs" />
-    <Compile Include="Interface\Management\IShutdownWatcher.cs" />
-    <Compile Include="Impl\Management\Monitor.cs" />
-    <Compile Include="Impl\Management\PointToPointChannelMonitor.cs" />
-    <Compile Include="Impl\Management\Shutdown.cs" />
-    <Compile Include="Impl\Management\StartupTask.cs" />
-    <Compile Include="Interface\Management\IHost.cs" />
-    <Compile Include="Interface\Management\IShutdown.cs" />
-    <Compile Include="Interface\Management\IShutdownTask.cs" />
-    <Compile Include="Model\Inbound\SagaEntity.cs" />
-    <Compile Include="Model\Management\StartupBeat.cs" />
-    <Compile Include="Model\Management\StorageConfiguration.cs" />
-    <Compile Include="Impl\Management\SubscriptionToPublishSubscribeChannelMonitor.cs" />
-    <Compile Include="Impl\NullMessageAdapter.cs" />
-    <Compile Include="Impl\Outbound\AbstractBusInterceptor.cs" />
-    <Compile Include="Impl\Management\AbstractChannelManager.cs" />
-    <Compile Include="Impl\AbstractPublishSubscribeChannel.cs" />
-    <Compile Include="Impl\AbstractPointToPointChannel.cs" />
-    <Compile Include="Impl\Inbound\Sagas\AbstractStorage.cs" />
-    <Compile Include="Impl\AppSettingValueSettingFinder.cs" />
-    <Compile Include="Impl\ComponentFactory.cs" />
-    <Compile Include="Impl\ConnectionStringValueSettingFinder.cs" />
-    <Compile Include="Impl\EmptyRouterConfigurationSource.cs" />
-    <Compile Include="Impl\Outbound\EndPointProvider.cs" />
-    <Compile Include="Impl\Inbound\ExponentialRetryPolicy.cs" />
-    <Compile Include="Impl\Inbound\HandlerMethodExecutor.cs" />
-    <Compile Include="Impl\Outbound\Pipeline.cs" />
-    <Compile Include="Impl\Outbound\PointToPointHandler.cs" />
-    <Compile Include="Impl\Outbound\PublishSubscribeHandler.cs" />
-    <Compile Include="Impl\Patterns\AbstractMessageHandler.cs" />
-    <Compile Include="Impl\Patterns\AbstractMessageHandlerWithData.cs" />
-    <Compile Include="Impl\Patterns\AbstractSplitterMessageHandlerWithData.cs" />
-    <Compile Include="Impl\Patterns\AbstractAggregatorMessageHandler.cs" />
-    <Compile Include="Impl\Patterns\AbstractSplitterMessageHandler.cs" />
-    <Compile Include="Interface\IMessageSerializer.cs" />
-    <Compile Include="Interface\ILogger.cs" />
-    <Compile Include="Interface\Inbound\IMessageAdapter.cs" />
-    <Compile Include="Interface\Inbound\IMessageRouter.cs" />
-    <Compile Include="Interface\Inbound\IMiddleware.cs" />
-    <Compile Include="Impl\Inbound\Pipeline.cs" />
-    <Compile Include="Interface\Inbound\IPipeline.cs" />
-    <Compile Include="Impl\Management\NullChannelManager.cs" />
-    <Compile Include="Impl\Management\Startup.cs" />
-    <Compile Include="Impl\Management\ChannelStartupTask.cs" />
-    <Compile Include="Interface\IComponentFactory.cs" />
-    <Compile Include="Interface\Inbound\IRouterInterceptor.cs" />
-    <Compile Include="Interface\Inbound\Sagas\IStorageFinder.cs" />
-    <Compile Include="Interface\Management\IMonitor.cs" />
-    <Compile Include="Interface\Management\IMonitoringTask.cs" />
-    <Compile Include="Interface\Outbound\IMiddleware.cs" />
-    <Compile Include="Interface\Outbound\IPipeline.cs" />
-    <Compile Include="Interface\Patterns\IMessageHandler.cs" />
-    <Compile Include="Interface\Patterns\IMessageHandlerWithData.cs" />
-    <Compile Include="Interface\Management\IChannelManager.cs" />
-    <Compile Include="Impl\Inbound\Sagas\NullStorage.cs" />
-    <Compile Include="Interface\Management\IConfiguration.cs" />
-    <Compile Include="Interface\Management\IStartup.cs" />
-    <Compile Include="Interface\Management\IStartupTask.cs" />
-    <Compile Include="Interface\Inbound\Sagas\IStorage.cs" />
-    <Compile Include="Impl\Inbound\Sagas\StartingMessageHandler.cs" />
-    <Compile Include="Impl\Inbound\MessageExceptionHandler.cs" />
-    <Compile Include="Impl\Inbound\HandlerMethodSelector.cs" />
-    <Compile Include="Interface\Inbound\IHandlerMethodExecutor.cs" />
-    <Compile Include="Impl\Inbound\LinearRetryPolicy.cs" />
-    <Compile Include="Impl\Outbound\NullBusInterceptor.cs" />
-    <Compile Include="Impl\NullPublishSubscribeChannel.cs" />
-    <Compile Include="Impl\NullPointToPointChannel.cs" />
-    <Compile Include="Interface\Outbound\IBusInterceptor.cs" />
-    <Compile Include="Interface\Outbound\IEndPointProvider.cs" />
-    <Compile Include="Interface\Outbound\IEndPointSettingFinder.cs" />
-    <Compile Include="Interface\Inbound\IHandlerMethodSelector.cs" />
-    <Compile Include="Interface\IValueSettingFinder.cs" />
-    <Compile Include="Interface\IPublishSubscribeChannel.cs" />
-    <Compile Include="Interface\IPointToPointChannel.cs" />
-    <Compile Include="Interface\Inbound\IRetryPolicy.cs" />
-    <Compile Include="Interface\Outbound\IBus.cs" />
-    <Compile Include="Impl\Outbound\Bus.cs" />
-    <Compile Include="Impl\Management\Configuration.cs" />
-    <Compile Include="Model\EndPointSetting.cs" />
-    <Compile Include="Model\EndPoint.cs" />
-    <Compile Include="Model\Management\HeartBeat.cs" />
-    <Compile Include="Model\Management\MonitoringTaskMetadata.cs" />
-    <Compile Include="Model\Management\PointToPointChannelInfo.cs" />
-    <Compile Include="Model\Management\PublishSubscribeChannelInfo.cs" />
-    <Compile Include="Model\Management\SubscriptionToPublishSubscribeChannelInfo.cs" />
-    <Compile Include="Model\MessageContext.cs" />
-    <Compile Include="Model\Inbound\MiddlewareParameter.cs" />
-    <Compile Include="Model\Management\PointToPointChannel.cs" />
-    <Compile Include="Model\Outbound\MiddlewareParameter.cs" />
-    <Compile Include="Model\Saga.cs" />
-    <Compile Include="Model\Options.cs" />
-    <Compile Include="Model\Origin.cs" />
-    <Compile Include="Model\Route.cs" />
-    <Compile Include="Model\RouteMethod.cs" />
-    <Compile Include="Interface\IRouterConfigurationSource.cs" />
-    <Compile Include="Fluent\Impl\HandlerBuilder.cs" />
-    <Compile Include="Fluent\Impl\WhenRouteBuilder.cs" />
-    <Compile Include="Fluent\Impl\WhitRouteBuilder.cs" />
-    <Compile Include="Impl\Inbound\NullRouterInterceptor.cs" />
-    <Compile Include="Impl\Inbound\AbstractRouterInterceptor.cs" />
-    <Compile Include="Impl\Inbound\Router.cs" />
-    <Compile Include="Interface\Inbound\IRouter.cs" />
-    <Compile Include="Impl\AbstractRouterConfigurationSource.cs" />
-    <Compile Include="Model\SagaContext.cs" />
-    <Compile Include="Model\Management\SubscriptionToPublishSubscribeChannel.cs" />
-    <Compile Include="Model\Management\PublishSubscribeChannel.cs" />
-    <Compile Include="Impl\NullMessageSerializer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  
 </Project>
