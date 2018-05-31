@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.Installer", "Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj", "{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Sample.FullNetFramework", "ConsoleApplication1\Jal.Router.Sample.FullNetFramework.csproj", "{92950960-1D7E-403C-A5ED-080CC37F9F7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Sample.FullNetFramework", "Jal.Router.Sample.FullNetFramework\Jal.Router.Sample.FullNetFramework.csproj", "{92950960-1D7E-403C-A5ED-080CC37F9F7D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.LightInject.Installer", "Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj", "{30C19278-D519-4C95-BF1F-8BC59EDE44EB}"
 EndProject
