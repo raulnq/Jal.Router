@@ -4,8 +4,8 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <authors>Raul Naupari</authors>
+    <owners>Raul Naupari</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/raulnq/Jal.Router</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
