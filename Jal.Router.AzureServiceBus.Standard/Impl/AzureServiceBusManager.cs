@@ -6,6 +6,7 @@ using Jal.Router.Model.Management;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ServiceBus.Fluent;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest.Azure;
 using Newtonsoft.Json;
 
@@ -13,6 +14,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusManager : IChannelManager
     {
+        public AzureServiceBusManager()
+        {
+            LoggerCallbackHandler.UseDefaultLogging = false;
+        }
+
         public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin, bool all)
         {
             var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
