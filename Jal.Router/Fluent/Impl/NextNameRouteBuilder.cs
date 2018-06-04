@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -68,6 +69,28 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
+        public INextNameRouteBuilder<THandler, TData> ToListenPointToPointChannel(string path, string connectionstring)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (string.IsNullOrWhiteSpace(connectionstring))
+            {
+                throw new ArgumentNullException(nameof(connectionstring));
+            }
+
+            _topath = path;
+
+            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+
+            _toconnectionstringextractor = extractor;
+
+            _connectionstringextractortype = typeof(NullValueSettingFinder);
+
+            return this;
+        }
+
         public INextNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
             Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
         {
@@ -89,6 +112,34 @@ namespace Jal.Router.Fluent.Impl
             _toconnectionstringextractor = connectionstringextractor;
 
             _connectionstringextractortype = typeof(TExtractorConectionString);
+
+            _tosubscription = subscription;
+
+            return this;
+        }
+
+        public INextNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel(string path, string subscription, string connectionstring)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (string.IsNullOrWhiteSpace(connectionstring))
+            {
+                throw new ArgumentNullException(nameof(connectionstring));
+            }
+            if (subscription == null)
+            {
+                throw new ArgumentNullException(nameof(subscription));
+            }
+
+            _topath = path;
+
+            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+
+            _toconnectionstringextractor = extractor;
+
+            _connectionstringextractortype = typeof(NullValueSettingFinder);
 
             _tosubscription = subscription;
 

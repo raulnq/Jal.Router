@@ -143,6 +143,8 @@ namespace Jal.Router.Installer
 #if NETSTANDARD2_0
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConfigurationValueSettingFinder)).Named(typeof(ConfigurationValueSettingFinder).FullName).LifestyleSingleton());
 #endif
+            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(NullValueSettingFinder)).Named(typeof(NullValueSettingFinder).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IHost)).ImplementedBy(typeof(Host)).Named(typeof(Host).FullName).LifestyleSingleton());

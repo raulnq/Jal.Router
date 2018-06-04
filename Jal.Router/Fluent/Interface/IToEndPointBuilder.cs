@@ -7,5 +7,7 @@ namespace Jal.Router.Fluent.Interface
     {
         IAndWaitReplyFromEndPointBuilder To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path)
             where TExtractorConnectionString : IValueSettingFinder;
+
+        IAndWaitReplyFromEndPointBuilder To(string connectionstring, string path);
     }
 }

@@ -7,5 +7,7 @@ namespace Jal.Router.Fluent.Interface
     public interface IOnRetryUsingBuilder
     {
         IOnRouteOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder;
+
+        IOnRouteOptionBuilder Using(IRetryPolicy policy);
     }
 }

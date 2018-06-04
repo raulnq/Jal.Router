@@ -9,5 +9,8 @@ namespace Jal.Router.Fluent.Interface
             where TExtractorConectionString : IValueSettingFinder;
         INextNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder;
+
+        INextNameRouteBuilder<THandler, TData> ToListenPointToPointChannel(string path, string connectionstring);
+        INextNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel(string path, string subscription, string connectionstring);
     }
 }

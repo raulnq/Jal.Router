@@ -170,6 +170,7 @@ namespace Jal.Router.LightInject.Installer
 #if NETSTANDARD2_0
             container.Register<IValueSettingFinder, ConfigurationValueSettingFinder>(typeof (ConfigurationValueSettingFinder).FullName, new PerContainerLifetime());
 #endif
+            container.Register<IValueSettingFinder, NullValueSettingFinder>(typeof(NullValueSettingFinder).FullName, new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof (EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
         }

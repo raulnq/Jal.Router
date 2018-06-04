@@ -1,5 +1,6 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
@@ -68,6 +69,22 @@ namespace Jal.Router.Fluent.Impl
             }
 
             _route.RetryPolicyExtractor = policycreator;
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder Using(IRetryPolicy policy)
+        {
+            _route.RetryExtractorType = typeof(NullValueSettingFinder);
+
+            if (policy == null)
+            {
+                throw new ArgumentNullException(nameof(policy));
+            }
+
+            Func<IValueSettingFinder, IRetryPolicy> creator = x => policy;
+
+            _route.RetryPolicyExtractor = creator;
 
             return this;
         }
@@ -173,6 +190,22 @@ namespace Jal.Router.Fluent.Impl
             }
 
             _route.RetryPolicyExtractor = policycreator;
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder Using(IRetryPolicy policy)
+        {
+            _route.RetryExtractorType = typeof(NullValueSettingFinder);
+
+            if (policy == null)
+            {
+                throw new ArgumentNullException(nameof(policy));
+            }
+
+            Func<IValueSettingFinder, IRetryPolicy> creator = x => policy;
+
+            _route.RetryPolicyExtractor = creator;
 
             return this;
         }
