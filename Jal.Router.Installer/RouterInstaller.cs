@@ -164,7 +164,7 @@ namespace Jal.Router.Installer
             {
                 foreach (var source in _sources)
                 {
-                    container.Register(Component.For(typeof(IRouterConfigurationSource)).Instance(source).Named(source.GetType().FullName).LifestyleSingleton());
+                    container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(source.GetType()).Named(source.GetType().FullName).LifestyleSingleton());
 
                 }
             }

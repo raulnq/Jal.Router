@@ -27,7 +27,7 @@ namespace Jal.Router.LightInject.Installer
             {
                 foreach (var source in sources)
                 {
-                    container.Register(x => source, source.GetType().FullName, new PerContainerLifetime());
+                    container.Register(typeof(IRouterConfigurationSource) , source.GetType(), source.GetType().FullName, new PerContainerLifetime());
 
                 }
             }
