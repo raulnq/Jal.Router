@@ -28,7 +28,7 @@ namespace Jal.Router.Impl.Management
         public Type StorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; }
-        public Type RouterInterceptorType { get; private set; }
+        public Type RouterInterceptorType { get; set; }
         public Type BusInterceptorType { get; private set; }
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
