@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.Standard.Installer", "Jal.Router.AzureServiceBus.Standard.Installer\Jal.Router.AzureServiceBus.Standard.Installer.csproj", "{A8474B47-C697-4EC1-9B9B-B1525BBEF420}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All", "Jal.Router.LightInject.Installer.All\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All.csproj", "{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +142,10 @@ Global
 		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8474B47-C697-4EC1-9B9B-B1525BBEF420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

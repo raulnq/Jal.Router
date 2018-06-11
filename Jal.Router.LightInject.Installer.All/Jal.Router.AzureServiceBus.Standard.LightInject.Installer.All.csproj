@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.4.2</Version>
+    <Authors>Raul Naupari</Authors>
+    <Company>Raul Naupari</Company>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
+    <Description>LightInject installer for the current stack of the Jal.Router library</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jal.Locator.LightInject" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard.LightInject.Installer\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
+  </ItemGroup>
+
+</Project>
