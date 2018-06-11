@@ -138,6 +138,11 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
                 host.Configuration.UsingApplicationInsights();
             }
 
+            if (_parameter.RouterInterceptorType != null)
+            {
+                host.Configuration.RouterInterceptorType = _parameter.RouterInterceptorType;
+            }
+
             host.Configuration.AddMonitoringTask<HeartBeatMonitor>(_parameter.HeartBeatFrequency);
 
             host.Configuration.UsingShutdownWatcher<ShutdownFileWatcher>();
