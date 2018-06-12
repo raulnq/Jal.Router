@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.4.4</Version>
+    <Version>1.4.6</Version>
     <Authors>Raul Naupari</Authors>
     <Company>Raul Naupari</Company>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
@@ -16,10 +16,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Jal.Router.ApplicationInsights.LightInject.Installer\Jal.Router.ApplicationInsights.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj" />
     <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard.LightInject.Installer\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard\Jal.Router.AzureServiceBus.Standard.csproj" />
     <ProjectReference Include="..\Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj" />
     <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj" />
     <ProjectReference Include="..\Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Logger\Jal.Router.Logger.csproj" />
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
   </ItemGroup>
 

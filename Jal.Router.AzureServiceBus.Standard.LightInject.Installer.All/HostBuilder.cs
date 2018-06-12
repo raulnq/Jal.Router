@@ -53,9 +53,10 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder UsingApplicationInsights(string applicationinsightskey)
+        public IHostBuilder UsingApplicationInsights(string applicationinsightskey="")
         {
             _parameter.ApplicationInsightsKey = applicationinsightskey;
+            _parameter.UseApplicationInsights = true;
             return this;
         }
 
@@ -96,12 +97,15 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
                 _parameter.Container.RegisterRouterLogger();
             }
 
-            if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
+            if (_parameter.UseApplicationInsights)
             {
                 _parameter.Container.Register<TelemetryClient>(new PerContainerLifetime());
 
                 _parameter.Container.RegisterApplicationInsights();
+            }
 
+            if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
+            {
                 TelemetryConfiguration.Active.InstrumentationKey = _parameter.ApplicationInsightsKey;
             }
 
