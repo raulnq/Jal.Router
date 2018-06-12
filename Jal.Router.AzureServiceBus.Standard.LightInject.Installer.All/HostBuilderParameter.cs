@@ -31,6 +31,8 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
 
         public int HeartBeatFrequency { get; set; }
 
+        public bool UseApplicationInsights { get; set; }
+
         public string ApplicationInsightsKey { get; set; }
 
         public HostBuilderParameter()
