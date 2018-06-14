@@ -58,11 +58,11 @@ namespace Jal.Router.Sample.FullNetFramework
             public RouterConfigurationSourceSample()
             {
                 RegisterHandler<IMessageHandler>("handler")
-                    .ToListenChannels(builder =>
+                    .ToListen(builder =>
                     {
-                        builder.Add("testqueue", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
-                        builder.Add("testqueue2", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
-                        builder.Add("testtopic", "subs", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                        builder.AddPointToPointChannel("testqueue", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                        builder.AddPointToPointChannel("testqueue2", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                        builder.AddPublishSubscribeChannel("testtopic", "subs", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
                     })
                     .ForMessage<Message>().Using<MessageHandler>(x =>
                     {

@@ -39,7 +39,7 @@ namespace Jal.Router.Fluent.Impl
             return builder;
         }
 
-        public void Add<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        public void AddPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -61,7 +61,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public void Add(string path, string connectionstring)
+        public void AddPointToPointChannel(string path, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -85,7 +85,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public void Add<TExtractorConectionString>(string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        public void AddPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -112,7 +112,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public void Add(string path, string subscription, string connectionstring)
+        public void AddPublishSubscribeChannel(string path, string subscription, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -141,7 +141,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public INameRouteBuilder<THandler> ToListenChannels(Action<IListenerChannelBuilder> channelbuilder)
+        public INameRouteBuilder<THandler> ToListen(Action<IListenerChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {
