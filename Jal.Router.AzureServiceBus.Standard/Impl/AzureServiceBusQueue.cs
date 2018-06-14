@@ -29,9 +29,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return string.Empty;
         }
 
-        public override void Listen(Route route, Action<object>[] routingactions, string channelpath)
+        public override void Listen(Channel channel, Action<object>[] routingactions, string channelpath)
         {
-            var queueclient = new QueueClient(route.ToConnectionString, route.ToPath);
+            var queueclient = new QueueClient(channel.ToConnectionString, channel.ToPath);
 
             var options = CreateOptions(channelpath);
 
@@ -50,7 +50,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 await OnMessageAsync(channelpath, message.MessageId, () => @action(message), () => queueclient.CompleteAsync(message.SystemProperties.LockToken));
             }, options);
 
-            route.ShutdownAction = () => { queueclient.CloseAsync().GetAwaiter().GetResult(); };
+            channel.ShutdownAction = () => { queueclient.CloseAsync().GetAwaiter().GetResult(); };
         }
 
         private MessageHandlerOptions CreateOptions(string channelpath)

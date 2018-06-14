@@ -38,6 +38,7 @@ namespace Jal.Router.Sample.FullNetFramework
     {
         public class Message
         {
+            public string Name { get; set; }
         }
         public interface IMessageHandler
         {
@@ -57,11 +58,23 @@ namespace Jal.Router.Sample.FullNetFramework
             public RouterConfigurationSourceSample()
             {
                 RegisterHandler<IMessageHandler>("handler")
-                .ToListenQueue<IMessageHandler, AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
-                .ForMessage<Message>().Using<MessageHandler>(x =>
-                {
-                    x.With(((request, handler, context) => handler.Handle(request)));
-                });
+                    .ToListenChannels(builder =>
+                    {
+                        builder.Add("testqueue", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                        builder.Add("testqueue2", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                        builder.Add("testtopic", "subs", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                    })
+                    .ForMessage<Message>().Using<MessageHandler>(x =>
+                    {
+                        x.With(((request, handler, context) => handler.Handle(request)));
+                    });
+
+                //RegisterHandler<IMessageHandler>("handler")
+                //.ToListenQueue<IMessageHandler, AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                //.ForMessage<Message>().Using<MessageHandler>(x =>
+                //{
+                //    x.With(((request, handler, context) => handler.Handle(request)));
+                //});
                 
                 //RegisterOrigin("appflowc", "789");
 
@@ -72,7 +85,7 @@ namespace Jal.Router.Sample.FullNetFramework
 
             }
         }
-        static void Main1(string[] args)
+        static void Main(string[] args)
         {
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSourceSample() });
@@ -87,22 +100,22 @@ namespace Jal.Router.Sample.FullNetFramework
             Console.ReadLine();
         }
 
-        static void Main(string[] args)
-        {
-            var container = new WindsorContainer();
-            container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
+        //static void Main(string[] args)
+        //{
+        //    var container = new WindsorContainer();
+        //    container.Kernel.Resolver.AddSubResolver(new ArrayResolver(container.Kernel));
 
-            container.Install(new RouterInstaller(new IRouterConfigurationSource[] {new RouterConfigurationSourceSample()}));
-            container.Install(new AzureServiceBusRouterInstaller());
-            container.Register(Component.For(typeof(IMessageHandler)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
+        //    container.Install(new RouterInstaller(new IRouterConfigurationSource[] {new RouterConfigurationSourceSample()}));
+        //    container.Install(new AzureServiceBusRouterInstaller());
+        //    container.Register(Component.For(typeof(IMessageHandler)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
 
 
-            container.Install(new ServiceLocatorInstaller());
-            var host = container.Resolve<IHost>();
-            host.Configuration.UsingAzureServiceBus();
-            host.Run();
-            Console.ReadLine();
-        }
+        //    container.Install(new ServiceLocatorInstaller());
+        //    var host = container.Resolve<IHost>();
+        //    host.Configuration.UsingAzureServiceBus();
+        //    host.Run();
+        //    Console.ReadLine();
+        //}
 
         //static void Main(string[] args)
         //{

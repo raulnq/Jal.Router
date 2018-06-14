@@ -48,41 +48,49 @@ namespace Jal.Router.Impl.Management
 
             foreach (var route in routes)
             {
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(route.ConnectionStringExtractorType);
-
-                var toconnectionextractor = route.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                route.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
-
-                if (string.IsNullOrWhiteSpace(route.ToConnectionString))
+                foreach (var routePath in route.Channels)
                 {
-                    var error = $"Empty connection string {route.Name}";
+                    var extractorconnectionstring = _factory.Create<IValueSettingFinder>(routePath.ConnectionStringExtractorType);
 
-                    errors.AppendLine(error);
+                    var toconnectionextractor = routePath.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                    Console.WriteLine(error);
+                    routePath.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
+
+                    if (string.IsNullOrWhiteSpace(routePath.ToConnectionString))
+                    {
+                        var error = $"Empty connection string {route.Name}";
+
+                        errors.AppendLine(error);
+
+                        Console.WriteLine(error);
+                    }
                 }
             }
 
-            var groups = routes.GroupBy(x => x.ToPath + x.ToSubscription + x.ToConnectionString);
+            var counters = new Dictionary<string, List<string>>();
+
+            foreach (var route in routes)
+            {
+                foreach (var routePath in route.Channels)
+                {
+                    if (!counters.ContainsKey($"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}"))
+                        counters.Add($"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}", new List<string> { route.Name });
+                    else
+                        counters[$"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}"].Add(route.Name);
+                }
+            }
+
+            var groups = counters.Where(x => x.Value.Count > 1);
 
             foreach (var @group in groups)
             {
-                var names = @group.GroupBy(y => y.Name);
+                var error = $"Duplicate route with different name {@group.Key}: {string.Join(",", @group.Value.ToArray())}";
 
-                if (names.Count() > 1)
-                {
-                    var first = @group.First();
+                errors.AppendLine(error);
 
-                    var error = $"Duplicate route with different name {first.ToConnectionString}/{first.ToPath}/{first.ToSubscription}: {string.Join(",", @group.ToArray().Select(x => x.Name))}";
-
-                    errors.AppendLine(error);
-
-                    Console.WriteLine(error);               
-                }
+                Console.WriteLine(error);
             }
-
-
+            
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
                 throw new ApplicationException(errors.ToString());
