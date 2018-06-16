@@ -40,7 +40,7 @@ namespace Jal.Router.Sample.NetCore
         public RouterConfigurationSourceSample()
         {
             RegisterHandler<IMessageHandler>("handler")
-                .ToListenQueue<IMessageHandler>("inputqueue123", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ToListen(x=>x.AddQueue("inputqueue123", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
                 .ForMessage<Message>().Using<MessageHandler>(x =>
                 {
                     x.With(((request, handler, context) => handler.Handle(request, context)));

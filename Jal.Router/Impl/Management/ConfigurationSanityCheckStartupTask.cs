@@ -48,15 +48,15 @@ namespace Jal.Router.Impl.Management
 
             foreach (var route in routes)
             {
-                foreach (var routePath in route.Channels)
+                foreach (var channel in route.Channels)
                 {
-                    var extractorconnectionstring = _factory.Create<IValueSettingFinder>(routePath.ConnectionStringExtractorType);
+                    var extractorconnectionstring = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
 
-                    var toconnectionextractor = routePath.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                    var toconnectionextractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                    routePath.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
+                    channel.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
 
-                    if (string.IsNullOrWhiteSpace(routePath.ToConnectionString))
+                    if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
                     {
                         var error = $"Empty connection string {route.Name}";
 
@@ -71,12 +71,12 @@ namespace Jal.Router.Impl.Management
 
             foreach (var route in routes)
             {
-                foreach (var routePath in route.Channels)
+                foreach (var channel in route.Channels)
                 {
-                    if (!counters.ContainsKey($"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}"))
-                        counters.Add($"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}", new List<string> { route.Name });
+                    if (!counters.ContainsKey($"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}"))
+                        counters.Add($"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}", new List<string> { route.Name });
                     else
-                        counters[$"{routePath.ToConnectionString}/{routePath.ToPath}/{routePath.ToSubscription}"].Add(route.Name);
+                        counters[$"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}"].Add(route.Name);
                 }
             }
 
