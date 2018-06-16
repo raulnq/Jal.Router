@@ -29,9 +29,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return string.Empty;
         }
 
-        public override void Listen(Route route, Action<object>[] routingactions, string channelpath)
+        public override void Listen(Channel channel, Action<object>[] routingactions, string channelpath)
         {
-            var client = new SubscriptionClient(route.ToConnectionString, route.ToPath, route.ToSubscription);
+            var client = new SubscriptionClient(channel.ToConnectionString, channel.ToPath, channel.ToSubscription);
 
             var options = CreateOptions(channelpath);
 
@@ -51,7 +51,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 await OnMessageAsync(channelpath, message.MessageId, () => @action(message), () => client.CompleteAsync(message.SystemProperties.LockToken));
             }, options);
 
-            route.ShutdownAction = () => { client.CloseAsync().GetAwaiter().GetResult(); };
+            channel.ShutdownAction = () => { client.CloseAsync().GetAwaiter().GetResult(); };
         }
 
         private MessageHandlerOptions CreateOptions(string channelpath)

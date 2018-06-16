@@ -40,48 +40,55 @@ namespace Jal.Router.Impl.Inbound
 
         private void Shutdown(Route route)
         {
-            if (route.ShutdownAction != null)
+            foreach (var channel in route.Channels)
             {
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                if (channel.ShutdownAction != null)
                 {
-                    route.ShutdownAction();
+                    if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
+                    {
+                        channel.ShutdownAction();
 
-                    var channelpath = _builder.BuildFromRoute(route);
+                        var channelpath = _builder.BuildFromRoute(route.Name, channel);
 
-                    Console.WriteLine($"Shutdown {channelpath} point to point channel");
-                }
+                        Console.WriteLine($"Shutdown {channelpath} point to point channel");
+                    }
 
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
-                {
-                    route.ShutdownAction();
+                    if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
+                    {
+                        channel.ShutdownAction();
 
-                    var channelpath = _builder.BuildFromRoute(route);
+                        var channelpath = _builder.BuildFromRoute(route.Name, channel);
 
-                    Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
+                        Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
+                    }
                 }
             }
+            
         }
 
         private void Shutdown(Saga saga, Route route)
         {
-            if (route.ShutdownAction != null)
+            foreach (var channel in route.Channels)
             {
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                if (channel.ShutdownAction != null)
                 {
-                    route.ShutdownAction();
+                    if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
+                    {
+                        channel.ShutdownAction();
 
-                    var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route.Name, channel);
 
-                    Console.WriteLine($"Shutdown {channelpath} point to point channel");
-                }
+                        Console.WriteLine($"Shutdown {channelpath} point to point channel");
+                    }
 
-                if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
-                {
-                    route.ShutdownAction();
+                    if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
+                    {
+                        channel.ShutdownAction();
 
-                    var channelpath = _builder.BuildFromSagaAndRoute(saga, route);
+                        var channelpath = _builder.BuildFromSagaAndRoute(saga, route.Name, channel);
 
-                    Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
+                        Console.WriteLine($"Shutdown {channelpath} publish subscriber channel");
+                    }
                 }
             }
         }

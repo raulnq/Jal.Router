@@ -44,7 +44,7 @@ namespace Jal.Router.Impl.Inbound
 
             foreach (var source in _sources)
             {
-                routes.AddRange(source.GetRoutes().Select(x=>new RouteToListen() {Route = x}));
+                routes.AddRange(source.GetRoutes().Select(x => new RouteToListen() { Route = x }));
 
                 foreach (var saga in source.GetSagas())
                 {
@@ -56,17 +56,33 @@ namespace Jal.Router.Impl.Inbound
                     {
                         routes.Add(new RouteToListen() { Route = saga.EndingRoute, Saga = saga, IsEnd = true });
                     }
-                    routes.AddRange(saga.NextRoutes.Select(x=>new RouteToListen() {Route = x, Saga = saga, IsNext = true}));
+                    routes.AddRange(saga.NextRoutes.Select(x => new RouteToListen() { Route = x, Saga = saga, IsNext = true }));
                 }
             }
 
-            var groups = routes.GroupBy(x => x.Route.Name + x.Route.ToPath + x.Route.ToSubscription + x.Route.ToConnectionString);
+            var groups = new Dictionary<string, List<RouteToListen>>();
+
+            foreach (var routeToListen in routes)
+            {
+                foreach (var channel in routeToListen.Route.Channels)
+                {
+                    if (!groups.ContainsKey(routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString))
+                    {
+                        groups.Add(routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString, new List<RouteToListen>() { routeToListen });
+                    }
+                    else
+                    {
+                        groups[routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString].Add(routeToListen);
+                    }
+
+                }
+            }
 
             foreach (var @group in groups)
             {
                 var actions = new List<Action<object>>();
 
-                foreach (var item in group)
+                foreach (var item in group.Value)
                 {
                     var route = item.Route;
 
@@ -93,50 +109,54 @@ namespace Jal.Router.Impl.Inbound
                     }
                 }
 
-                if (group.Any())
+                if (group.Value.Any())
                 {
-                    if (group.Count() == 1)
+                    if (group.Value.Count() == 1)
                     {
-                        var item = group.First();
+                        var item = group.Value.First();
 
                         var route = item.Route;
 
                         var saga = item.Saga;
 
-                        var channelpath = item.Saga == null ? _builder.BuildFromRoute(route): _builder.BuildFromSagaAndRoute(saga, route);
+                        var channel = route.Channels.First(x => group.Key.Replace(route.Name, "") == x.ToPath + x.ToSubscription + x.ToConnectionString);
 
-                        if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                        var channelpath = item.Saga == null ? _builder.BuildFromRoute(route.Name, channel) : _builder.BuildFromSagaAndRoute(saga, route.Name, channel);
+
+                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
                         {
-                            pointtopointchannel.Listen(route, actions.ToArray(), channelpath);
+                            pointtopointchannel.Listen(channel, actions.ToArray(), channelpath);
 
                             Console.WriteLine($"Listening {channelpath} point to point channel");
                         }
 
-                        if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
+                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
                         {
-                            publishsubscriberchannel.Listen(route, actions.ToArray(), channelpath);
+                            publishsubscriberchannel.Listen(channel, actions.ToArray(), channelpath);
 
                             Console.WriteLine($"Listening {channelpath} publish subscriber channel");
                         }
                     }
                     else
                     {
-                        var item = group.First();
+                        var item = group.Value.First();
 
                         var route = item.Route;
 
-                        var channelpath = _builder.BuildFromRoute(route);
+                        var channel = route.Channels.First(x => group.Key.Replace(route.Name, "") == x.ToPath + x.ToSubscription + x.ToConnectionString);
 
-                        if (!string.IsNullOrWhiteSpace(route.ToPath) && string.IsNullOrWhiteSpace(route.ToSubscription))
+                        var channelpath = _builder.BuildFromRoute(route.Name, channel);
+
+                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
                         {
-                            pointtopointchannel.Listen(route, actions.ToArray(), channelpath);
+                            pointtopointchannel.Listen(channel, actions.ToArray(), channelpath);
 
                             Console.WriteLine($"Listening {channelpath} point to point channel ({actions.Count})");
                         }
 
-                        if (!string.IsNullOrWhiteSpace(route.ToPath) && !string.IsNullOrWhiteSpace(route.ToSubscription))
+                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
                         {
-                            publishsubscriberchannel.Listen(route, actions.ToArray(), channelpath);
+                            publishsubscriberchannel.Listen(channel, actions.ToArray(), channelpath);
 
                             Console.WriteLine($"Listening {channelpath} publish subscriber channel ({actions.Count})");
                         }

@@ -27,11 +27,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
-        public override void Listen(Route route, Action<object>[] routeactions, string channelpath)
+        public override void Listen(Channel channel, Action<object>[] routeactions, string channelpath)
         {
-            var client = SubscriptionClient.CreateFromConnectionString(route.ToConnectionString, route.ToPath, route.ToSubscription);
+            var client = SubscriptionClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath, channel.ToSubscription);
 
-            var path = SubscriptionClient.FormatSubscriptionPath(route.ToPath, route.ToSubscription);
+            var path = SubscriptionClient.FormatSubscriptionPath(channel.ToPath, channel.ToSubscription);
 
             var receiver = client.MessagingFactory.CreateMessageReceiver(path);
 
@@ -48,7 +48,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId, () => routeaction(bm), () => client.Complete(bm.LockToken)), options);
 
-            route.ShutdownAction = () => { receiver.Close(); client.Close(); };
+            channel.ShutdownAction = () => { receiver.Close(); client.Close(); };
         }
 
         private OnMessageOptions CreateOptions()

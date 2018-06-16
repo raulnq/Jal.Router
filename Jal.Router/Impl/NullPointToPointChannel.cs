@@ -11,7 +11,7 @@ namespace Jal.Router.Impl
             
         }
 
-        public void Listen(Route route, Action<object>[] routeactions, string channelpath)
+        public void Listen(Channel channel, Action<object>[] routeactions, string channelpath)
         {
 
         }

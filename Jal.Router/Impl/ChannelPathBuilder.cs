@@ -5,7 +5,7 @@ namespace Jal.Router.Impl
 {
     public class ChannelPathBuilder : IChannelPathBuilder
     {
-        public string BuildFromSagaAndRoute(Saga saga, Route route)
+        public string BuildFromSagaAndRoute(Saga saga, string routeName, Channel route)
         {
             var channelpath = string.Empty;
 
@@ -14,9 +14,9 @@ namespace Jal.Router.Impl
                 channelpath = $"{channelpath}/{saga.Name}";
             }
 
-            if (!string.IsNullOrWhiteSpace(route.Name))
+            if (!string.IsNullOrWhiteSpace(routeName))
             {
-                channelpath = $"{channelpath}/{route.Name}";
+                channelpath = $"{channelpath}/{routeName}";
             }
 
             if (!string.IsNullOrWhiteSpace(route.ToPath))
@@ -30,23 +30,23 @@ namespace Jal.Router.Impl
             }
             return channelpath;
         }
-        public string BuildFromRoute(Route route)
+        public string BuildFromRoute(string routeName, Channel channel)
         {
             var channelpath = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(route.Name))
+            if (!string.IsNullOrWhiteSpace(routeName))
             {
-                channelpath = $"{channelpath}/{route.Name}";
+                channelpath = $"{channelpath}/{routeName}";
             }
 
-            if (!string.IsNullOrWhiteSpace(route.ToPath))
+            if (!string.IsNullOrWhiteSpace(channel.ToPath))
             {
-                channelpath = $"{channelpath}/{route.ToPath}";
+                channelpath = $"{channelpath}/{channel.ToPath}";
             }
 
-            if (!string.IsNullOrWhiteSpace(route.ToSubscription))
+            if (!string.IsNullOrWhiteSpace(channel.ToSubscription))
             {
-                channelpath = $"{channelpath}/{route.ToSubscription}";
+                channelpath = $"{channelpath}/{channel.ToSubscription}";
             }
 
             return channelpath;
