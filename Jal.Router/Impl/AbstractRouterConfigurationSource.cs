@@ -263,21 +263,5 @@ namespace Jal.Router.Impl
 
             return builder;
         }
-
-        public void RegisterEndPoint<TExtractor, T>(string name) where TExtractor : IEndPointSettingFinder<T>
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            var endpoint = new EndPoint(name);
-
-            _enpoints.Add(endpoint);
-
-            endpoint.ExtractorType = typeof(TExtractor);
-
-            endpoint.MessageType = typeof(T);
-        }
     }
 }

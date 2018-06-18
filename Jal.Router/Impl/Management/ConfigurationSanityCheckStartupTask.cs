@@ -27,9 +27,13 @@ namespace Jal.Router.Impl.Management
 
             var routes = new List<Route>();
 
+            var endpoints = new List<EndPoint>();
+
             foreach (var source in _sources)
             {
                 routes.AddRange(source.GetRoutes());
+
+                endpoints.AddRange(source.GetEndPoints());
 
                 foreach (var saga in source.GetSagas())
                 {
@@ -45,6 +49,53 @@ namespace Jal.Router.Impl.Management
                 }
             }
 
+            foreach (var endpoint in endpoints)
+            {
+                foreach (var channel in endpoint.Channels)
+                {
+                    if (channel.ConnectionStringExtractorType != null)
+                    {
+                        var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+
+                        var extractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+
+                        if (extractor != null)
+                        {
+                            channel.ToConnectionString = extractor(finder);
+                        }
+
+                        if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                        {
+                            var error = $"Empty connection string {endpoint.Name}";
+
+                            errors.AppendLine(error);
+
+                            Console.WriteLine(error);
+                        }
+                    }
+
+                    if (channel.ToReplyConnectionStringExtractor != null)
+                    {
+                        var finder = _factory.Create<IValueSettingFinder>(channel.ReplyConnectionStringExtractorType);
+
+                        var extractor = channel.ToReplyConnectionStringExtractor as Func<IValueSettingFinder, string>;
+
+                        if (extractor != null)
+                        {
+                            channel.ToReplyConnectionString = extractor(finder);
+                        }
+
+                        if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
+                        {
+                            var error = $"Empty reply connection string {endpoint.Name}";
+
+                            errors.AppendLine(error);
+
+                            Console.WriteLine(error);
+                        }
+                    }
+                }
+            }
 
             foreach (var route in routes)
             {

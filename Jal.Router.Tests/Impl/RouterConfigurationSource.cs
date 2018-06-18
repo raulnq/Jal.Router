@@ -87,8 +87,8 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterEndPoint("torequestqueue")
                 .ForMessage<RequestToSend>()
-                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
-                .AndWaitReplyFromPublishSubscribeChannel<AppSettingValueSettingFinder>("responsetopic","subscription",x=> "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=",10);
+                .To(x => x.Add<AppSettingValueSettingFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
+                .AndWaitReplyFromPublishSubscribeChannel<AppSettingValueSettingFinder>("responsetopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", 10));
 
             RegisterEndPoint("toresponsetopic")
                 .ForMessage<ResponseToSend>()

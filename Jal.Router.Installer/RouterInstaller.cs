@@ -130,6 +130,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(EndingMessageHandler)).Named(typeof(EndingMessageHandler).FullName).LifestyleSingleton());
 
+            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
+
             container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
 
             container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
@@ -156,7 +158,6 @@ namespace Jal.Router.Installer
                     var assemblyDescriptor = Classes.FromAssembly(assembly);
                     container.Register(assemblyDescriptor.BasedOn<AbstractRouterConfigurationSource>().WithServiceAllInterfaces());
                     container.Register(assemblyDescriptor.BasedOn<IValueSettingFinder>().WithServiceAllInterfaces());
-                    container.Register(assemblyDescriptor.BasedOn(typeof(IEndPointSettingFinder<>)).WithServiceAllInterfaces());
                 }
             }
 

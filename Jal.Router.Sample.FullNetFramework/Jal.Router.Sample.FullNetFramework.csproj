@@ -48,14 +48,6 @@
     <Reference Include="Jal.Finder, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jal.Finder.1.1.1\lib\net45\Jal.Finder.dll</HintPath>
     </Reference>
-    <Reference Include="Jal.HttpClient, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jal.HttpClient.2.0.2\lib\net45\Jal.HttpClient.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Jal.HttpClient.Installer, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jal.HttpClient.Installer.2.0.0\lib\net45\Jal.HttpClient.Installer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Jal.Locator, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jal.Locator.1.1.1\lib\net45\Jal.Locator.dll</HintPath>
     </Reference>

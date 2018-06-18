@@ -1,8 +1,8 @@
-using Jal.Router.Interface.Inbound;
+﻿using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IMiddlewareBuilder
+    public interface IOutboundMiddlewareBuilder
     {
         void Add<TMiddleware>() where TMiddleware : IMiddleware;
     }

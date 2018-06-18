@@ -16,6 +16,7 @@ using Jal.Router.AzureServiceBus.LightInject.Installer;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Installer;
 using Jal.Router.Impl;
+using Jal.Router.Extensions;
 using Jal.Router.Impl.Management;
 using Jal.Router.Installer;
 using Jal.Router.Interface;

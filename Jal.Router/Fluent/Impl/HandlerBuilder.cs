@@ -101,14 +101,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UsingMiddleware(Action<IMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UsingMiddleware(Action<IInboundMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new MiddlewareBuilder(_route);
+            var builder = new InboundMiddlewareBuilder(_route);
 
             action(builder);
 
@@ -222,14 +222,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UsingMiddleware(Action<IMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UsingMiddleware(Action<IInboundMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new MiddlewareBuilder(_route);
+            var builder = new InboundMiddlewareBuilder(_route);
 
             action(builder);
 

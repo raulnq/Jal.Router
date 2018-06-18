@@ -1,6 +1,7 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
+using Jal.Router.Extensions;
 
 namespace Jal.Router.AzureServiceBus.Extensions
 {

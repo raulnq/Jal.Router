@@ -31,30 +31,27 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath) &&
-                    !string.IsNullOrWhiteSpace(message.ToReplyPath) && !string.IsNullOrWhiteSpace(message.ToReplyConnectionString)
-                    && !string.IsNullOrWhiteSpace(message.ReplyToRequestId))
+                var middlewares = new List<Type>
                 {
-                    var middlewares = new List<Type>();
+                    typeof(DistributionHandler)
+                };
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                    middlewares.Add(typeof(RequestReplyHandler));
+                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult)};
+                middlewares.Add(typeof(RequestReplyHandler));
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult)};
 
-                    pipeline.Execute();
+                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                    interceptor.OnSuccess(message, options);
+                pipeline.Execute();
 
-                    return (TResult)parameter.Result;
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path and/or reply connection string and/or replypath and/or replytorequestid");
-                }
+                interceptor.OnSuccess(message, options);
+
+                return (TResult)parameter.Result;
+                
             }
             catch (Exception ex)
             {
@@ -71,20 +68,15 @@ namespace Jal.Router.Impl.Outbound
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var setting = _provider.Provide(endpoint, content);
-
-            return Reply<TContent, TResult>(content, setting, endpoint.Origin, options);
+            return Reply<TContent, TResult>(content, endpoint, endpoint.Origin, options);
         }
-        public TResult Reply<TContent, TResult>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
+        public TResult Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext
+            var message = new MessageContext(endpoint)
             {
                 Id = options.Id,
-                //Content = content,
-                ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath,
                 Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
@@ -94,13 +86,8 @@ namespace Jal.Router.Impl.Outbound
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
-                ToReplyConnectionString = endpoint.ToReplyConnectionString,
-                ToReplySubscription = endpoint.ToReplySubscription,
-                ToReplyPath = endpoint.ToReplyPath,
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
-                ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName,
                 ResultType = typeof(TResult),
                 Tracks = options.Tracks
             };
@@ -110,8 +97,6 @@ namespace Jal.Router.Impl.Outbound
         public TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
-
-            var setting = _provider.Provide(endpoint, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -123,7 +108,7 @@ namespace Jal.Router.Impl.Outbound
                 origin.Key = endpoint.Origin.Key;
             }
 
-            return Reply<TContent, TResult>(content, setting, origin, options);
+            return Reply<TContent, TResult>(content, endpoint, origin, options);
         }
         private void Send(MessageContext message, Options options)
         {
@@ -133,26 +118,24 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath))
+                var middlewares = new List<Type>
                 {
-                    var middlewares = new List<Type>();
+                    typeof(DistributionHandler)
+                };
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                    middlewares.Add(typeof(PointToPointHandler));
+                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Send"};
+                middlewares.Add(typeof(PointToPointHandler));
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Send"};
 
-                    pipeline.Execute();
+                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                    interceptor.OnSuccess(message, options);
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path");
-                }
+                pipeline.Execute();
+
+                interceptor.OnSuccess(message, options);
             }
             catch (Exception ex)
             {
@@ -166,16 +149,13 @@ namespace Jal.Router.Impl.Outbound
             }
         }
 
-        public void Send<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
+        public void Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext
+            var message = new MessageContext(endpoint)
             {
                 Id = options.Id,
-                //Content = content,
-                ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath,
                 Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
@@ -187,8 +167,6 @@ namespace Jal.Router.Impl.Outbound
                 ContentAsString = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
-                ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName,
                 Tracks = options.Tracks
             };
 
@@ -199,18 +177,14 @@ namespace Jal.Router.Impl.Outbound
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var setting = _provider.Provide(endpoint, content);
-
             var origin = endpoint.Origin;
 
-            Send(content, setting, origin, options);
+            Send(content, endpoint, origin, options);
         }
         public void Send<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var setting = _provider.Provide(endpoint, content);
-
             if (string.IsNullOrWhiteSpace(origin.From))
             {
                 origin.From = endpoint.Origin.From;
@@ -221,23 +195,19 @@ namespace Jal.Router.Impl.Outbound
                 origin.Key = endpoint.Origin.Key;
             }
 
-            Send(content, setting, origin, options);
+            Send(content, endpoint, origin, options);
         } 
         public void Publish<TContent>(TContent content, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var setting = _provider.Provide(endpoint, content);
-
             var origin = endpoint.Origin;
 
-            Publish(content, setting, origin, options);
+            Publish(content, endpoint, origin, options);
         }
         public void Publish<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
-
-            var setting = _provider.Provide(endpoint, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -249,18 +219,15 @@ namespace Jal.Router.Impl.Outbound
                 origin.Key = endpoint.Origin.Key;
             }
 
-            Publish(content, setting, origin, options);
+            Publish(content, endpoint, origin, options);
         }
-        public void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
+        public void Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext
+            var message = new MessageContext(endpoint)
             {
                 Id = options.Id,
-                //Content = content,
-                ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath,
                 Origin = origin,
                 Headers = options.Headers,
                 Version = options.Version,
@@ -272,8 +239,6 @@ namespace Jal.Router.Impl.Outbound
                 ContentAsString = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
-                ToReplyTimeOut = endpoint.ToReplyTimeOut,
-                EndPointName = endpoint.EndPointName,
                 Tracks = options.Tracks
             };
 
@@ -288,26 +253,25 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(message.ToConnectionString) && !string.IsNullOrWhiteSpace(message.ToPath))
+                var middlewares = new List<Type>
                 {
-                    var middlewares = new List<Type>();
+                    typeof(DistributionHandler)
+                };
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                    middlewares.Add(typeof(PublishSubscribeHandler));
+                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
+                middlewares.Add(typeof(PublishSubscribeHandler));
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
 
-                    pipeline.Execute();
+                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                    interceptor.OnSuccess(message, options);
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPointName}, invalid connection string and/or path");
-                }
+                pipeline.Execute();
+
+                interceptor.OnSuccess(message, options);
+
             }
             catch (Exception ex)
             {
@@ -321,17 +285,14 @@ namespace Jal.Router.Impl.Outbound
             }
         }
 
-        public void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options)
+        public void FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext
+            var message = new MessageContext(endpoint)
             {
                 Id = options.Id,
-                //Content = content,
                 Origin = origin,
-                ToConnectionString = endpoint.ToConnectionString,
-                ToPath = endpoint.ToPath,
                 Headers = options.Headers,
                 Version = options.Version,
                 ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
@@ -340,7 +301,6 @@ namespace Jal.Router.Impl.Outbound
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 ContentAsString = serializer.Serialize(content),
-                EndPointName = endpoint.EndPointName,
                 Tracks = options.Tracks
             };
 
@@ -353,16 +313,12 @@ namespace Jal.Router.Impl.Outbound
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var setting = _provider.Provide(endpoint, content);
-
-            FireAndForget(content, setting, new Origin() { Key = endpoint.Origin.Key, From = endpoint.Origin.From }, options);
+            FireAndForget(content, endpoint, new Origin() { Key = endpoint.Origin.Key, From = endpoint.Origin.From }, options);
         }
 
         public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
-
-            var setting = _provider.Provide(endpoint, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -374,7 +330,7 @@ namespace Jal.Router.Impl.Outbound
                 origin.Key = endpoint.Origin.Key;
             }
 
-            FireAndForget(content, setting, origin, options);
+            FireAndForget(content, endpoint, origin, options);
         }
     }
 }

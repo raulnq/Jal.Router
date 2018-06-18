@@ -1,12 +1,11 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, INameEndPointBuilder, IAndWaitReplyFromEndPointBuilder
+    public class EndPointBuilder : IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder
     {
         private readonly EndPoint _endpoint;
 
@@ -15,16 +14,19 @@ namespace Jal.Router.Fluent.Impl
             _endpoint = endpoint;
         }
 
-        public IToEndPointBuilder ForMessage<TMessage>()
+        public IOnEndPointOptionBuilder ForMessage<TMessage>()
         {
             _endpoint.MessageType = typeof (TMessage);
 
             return this;
         }
 
-        public IAndWaitReplyFromEndPointBuilder To<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        public IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
         {
-            _endpoint.ConnectionStringExtractorType = typeof(TExtractorConnectionString);
+            var channel = new Channel
+            {
+                ConnectionStringExtractorType = typeof(TExtractorConnectionString)
+            };
 
             if (connectionstringextractor == null)
             {
@@ -36,130 +38,37 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            _endpoint.ToConnectionStringExtractor = connectionstringextractor;
+            channel.ToConnectionStringExtractor = connectionstringextractor;
 
-            _endpoint.ToPath = path;
+            channel.ToPath = path;
+
+            _endpoint.Channels.Add(channel);
+
+            return new AndWaitReplyFromEndPointBuilder(channel);
+        }
+
+        public void To(Action<IToChannelBuilder> channelbuilder)
+        {
+            if (channelbuilder==null)
+            {
+                throw new ArgumentNullException(nameof(channelbuilder));
+            }
+
+            channelbuilder(this);
+        }
+
+        public IOnEndPointOptionBuilder UsingMiddleware(Action<IOutboundMiddlewareBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OutboundMiddlewareBuilder(_endpoint);
+
+            action(builder);
 
             return this;
-        }
-
-        public IAndWaitReplyFromEndPointBuilder To(string connectionstring, string path)
-        {
-            _endpoint.ConnectionStringExtractorType = typeof(NullValueSettingFinder);
-
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
-
-            _endpoint.ToConnectionStringExtractor = extractor;
-
-            _endpoint.ToPath = path;
-
-            return this;
-        }
-
-
-        public void AndWaitReplyFromPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstringextractor == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
-            }
-            _endpoint.ToReplyPath = path;
-
-            _endpoint.ToReplyConnectionStringExtractor = connectionstringextractor;
-
-            _endpoint.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
-
-            _endpoint.ToReplyTimeOut = timeout;
-        }
-
-        public void AndWaitReplyFromPointToPointChannel(string path, string connectionstring, int timeout = 60)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-            _endpoint.ToReplyPath = path;
-
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
-
-            _endpoint.ToReplyConnectionStringExtractor = extractor;
-
-            _endpoint.ReplyConnectionStringExtractorType = typeof(NullValueSettingFinder);
-
-            _endpoint.ToReplyTimeOut = timeout;
-        }
-
-        public void AndWaitReplyFromPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
-            Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstringextractor == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
-            }
-            if (subscription == null)
-            {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-
-            _endpoint.ToReplyPath = path;
-
-            _endpoint.ToReplyConnectionStringExtractor = connectionstringextractor;
-
-            _endpoint.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
-
-            _endpoint.ToReplySubscription = subscription;
-
-            _endpoint.ToReplyTimeOut = timeout;
-        }
-
-        public void AndWaitReplyFromPublishSubscribeChannel(string path, string subscription, string connectionstring, int timeout = 60) 
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-            if (subscription == null)
-            {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-
-            _endpoint.ToReplyPath = path;
-
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
-
-            _endpoint.ToReplyConnectionStringExtractor = connectionstring;
-
-            _endpoint.ReplyConnectionStringExtractorType = typeof(NullValueSettingFinder);
-
-            _endpoint.ToReplySubscription = subscription;
-
-            _endpoint.ToReplyTimeOut = timeout;
         }
     }
 }

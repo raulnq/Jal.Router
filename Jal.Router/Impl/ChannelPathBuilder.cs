@@ -5,7 +5,7 @@ namespace Jal.Router.Impl
 {
     public class ChannelPathBuilder : IChannelPathBuilder
     {
-        public string BuildFromSagaAndRoute(Saga saga, string routeName, Channel route)
+        public string BuildFromSagaAndRoute(Saga saga, string routeName, Channel channel)
         {
             var channelpath = string.Empty;
 
@@ -13,26 +13,6 @@ namespace Jal.Router.Impl
             {
                 channelpath = $"{channelpath}/{saga.Name}";
             }
-
-            if (!string.IsNullOrWhiteSpace(routeName))
-            {
-                channelpath = $"{channelpath}/{routeName}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(route.ToPath))
-            {
-                channelpath = $"{channelpath}/{route.ToPath}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(route.ToSubscription))
-            {
-                channelpath = $"{channelpath}/{route.ToSubscription}";
-            }
-            return channelpath;
-        }
-        public string BuildFromRoute(string routeName, Channel channel)
-        {
-            var channelpath = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(routeName))
             {
@@ -48,52 +28,70 @@ namespace Jal.Router.Impl
             {
                 channelpath = $"{channelpath}/{channel.ToSubscription}";
             }
-
             return channelpath;
         }
-        public string BuildFromContext(MessageContext context)
+        public string BuildFromRoute(string name, Channel channel)
         {
             var channelpath = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(context.EndPointName))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                channelpath = $"{channelpath}/{context.EndPointName}";
+                channelpath = $"{channelpath}/{name}";
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ToPath))
+            if (!string.IsNullOrWhiteSpace(channel.ToPath))
             {
-                channelpath = $"{channelpath}/{context.ToPath}";
+                channelpath = $"{channelpath}/{channel.ToPath}";
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ToSubscription))
+            if (!string.IsNullOrWhiteSpace(channel.ToSubscription))
             {
-                channelpath = $"{channelpath}/{context.ToSubscription}";
+                channelpath = $"{channelpath}/{channel.ToSubscription}";
             }
 
             return channelpath;
         }
-
-        public string BuildReplyFromContext(MessageContext context)
+        public string BuildFromEndpoint(string name, Channel channel)
         {
             var channelpath = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(context.EndPointName))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                channelpath = $"{channelpath}/{context.EndPointName}";
+                channelpath = $"{channelpath}/{name}";
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ToReplyPath))
+            if (!string.IsNullOrWhiteSpace(channel.ToPath))
             {
-                channelpath = $"{channelpath}/{context.ToReplyPath}";
+                channelpath = $"{channelpath}/{channel.ToPath}";
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ToReplySubscription))
+            if (!string.IsNullOrWhiteSpace(channel.ToSubscription))
             {
-                channelpath = $"{channelpath}/{context.ToReplySubscription}";
+                channelpath = $"{channelpath}/{channel.ToSubscription}";
             }
 
             return channelpath;
         }
+        public string BuildReplyFromEndpoint(string name, Channel channel)
+        {
+            var channelpath = string.Empty;
 
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                channelpath = $"{channelpath}/{name}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(channel.ToReplyPath))
+            {
+                channelpath = $"{channelpath}/{channel.ToReplyPath}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(channel.ToReplySubscription))
+            {
+                channelpath = $"{channelpath}/{channel.ToReplySubscription}";
+            }
+
+            return channelpath;
+        }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -61,30 +60,6 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public void AddPointToPointChannel(string path, string connectionstring)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            if (connectionstring == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
-
-            _channels.Add(new Channel
-            {
-                ToPath = path,
-
-                ToConnectionStringExtractor = extractor,
-
-                ConnectionStringExtractorType = typeof(NullValueSettingFinder)
-            });
-        }
-
         public void AddPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -107,35 +82,6 @@ namespace Jal.Router.Fluent.Impl
                 ToConnectionStringExtractor = connectionstringextractor,
 
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
-
-                ToSubscription = subscription
-            });
-        }
-
-        public void AddPublishSubscribeChannel(string path, string subscription, string connectionstring)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstring == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-            if (subscription == null)
-            {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
-
-            _channels.Add(new Channel
-            {
-                ToPath = path,
-
-                ToConnectionStringExtractor = extractor,
-
-                ConnectionStringExtractorType = typeof(NullValueSettingFinder),
 
                 ToSubscription = subscription
             });

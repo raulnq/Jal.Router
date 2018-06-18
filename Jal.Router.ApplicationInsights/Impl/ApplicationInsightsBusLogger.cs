@@ -24,10 +24,10 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             var telemetry = new DependencyTelemetry()
             {
-                Name = context.EndPointName,
+                Name = context.EndPoint.Name,
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
-                Target = context.ToPath,
+                Target = parameter.Channel.ToPath,
                 Data = context.ContentAsString,
                 Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
                 Properties =

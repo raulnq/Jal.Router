@@ -15,5 +15,17 @@ namespace Jal.Router.Model
         public string ToSubscription { get; set; }
 
         public Action ShutdownAction { get; set; }
+
+        public string ToReplyPath { get; set; }
+
+        public int ToReplyTimeOut { get; set; }
+
+        public string ToReplySubscription { get; set; }
+
+        public Type ReplyConnectionStringExtractorType { get; set; }
+
+        public object ToReplyConnectionStringExtractor { get; set; }
+
+        public string ToReplyConnectionString { get; set; }
     }
 }

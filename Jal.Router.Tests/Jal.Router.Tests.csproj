@@ -110,7 +110,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Impl\EndPointSettingFinder.cs" />
     <Compile Include="Impl\OtherMessageHandler.cs" />
     <Compile Include="Impl\MessageHandler.cs" />
     <Compile Include="Impl\RouterConfigurationSource.cs" />

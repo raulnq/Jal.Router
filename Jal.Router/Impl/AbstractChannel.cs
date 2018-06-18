@@ -15,31 +15,26 @@ namespace Jal.Router.Impl
 
         protected readonly IConfiguration Configuration;
 
-        private readonly IChannelPathBuilder _builder;
-
-        protected AbstractChannel(string channelName, IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder)
+        protected AbstractChannel(string channelName, IComponentFactory factory, IConfiguration configuration)
         {
             ChannelName = channelName;
             Factory = factory;
             Configuration = configuration;
-            _builder = builder;
         }
 
-        public virtual string Send(MessageContext context, object message)
+        public virtual string Send(Channel channel, object message)
         {
             return string.Empty;
         }
 
-        public virtual void Listen(Channel channel, Action<object>[] actions,  string channelpath)
+        public virtual void Listen(Channel channel, Action<object>[] actions, string channelpath)
         {
 
         }
 
-        public object Reply(MessageContext context)
+        public object Reply(Channel channel, MessageContext context, string channelpath)
         {
-            var channelpath = _builder.BuildReplyFromContext(context);
-
-            Send(context);
+            Send(channel, context, channelpath);
 
             MessageContext outputcontext = null;
 
@@ -47,7 +42,7 @@ namespace Jal.Router.Impl
 
             try
             {
-                outputcontext = string.IsNullOrWhiteSpace(context.ToReplySubscription) ? ReceiveOnQueue(context, adapter) : ReceiveOnTopic(context, adapter);
+                outputcontext = string.IsNullOrWhiteSpace(channel.ToReplySubscription) ? ReceiveOnQueue(channel, context, adapter) : ReceiveOnTopic(channel, context, adapter);
             }
             catch (Exception ex)
             {
@@ -68,20 +63,18 @@ namespace Jal.Router.Impl
             return null;
         }
 
-        public virtual MessageContext ReceiveOnQueue(MessageContext inputcontext, IMessageAdapter adapter)
+        public virtual MessageContext ReceiveOnQueue(Channel channel, MessageContext context, IMessageAdapter adapter)
         {
             return null;
         }
 
-        public virtual MessageContext ReceiveOnTopic(MessageContext inputcontext, IMessageAdapter adapter)
+        public virtual MessageContext ReceiveOnTopic(Channel channel, MessageContext context, IMessageAdapter adapter)
         {
             return null;
         }
 
-        public void Send(MessageContext context)
+        public void Send(Channel channel, MessageContext context, string channelpath)
         {
-            var channelpath = _builder.BuildFromContext(context);
-
             var id = string.Empty;
 
             try
@@ -90,7 +83,7 @@ namespace Jal.Router.Impl
 
                 var message = adapter.Write(context);
 
-                id = Send(context, message);
+                id = Send(channel, message);
 
             }
             catch (Exception ex)

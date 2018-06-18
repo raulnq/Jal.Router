@@ -8,6 +8,8 @@ namespace Jal.Router.Model.Outbound
 
         public string OutboundType { get; set; }
 
+        public Channel Channel { get; set; }
+
         public object Result { get; set; }
 
         public Type ResultType { get; set; }

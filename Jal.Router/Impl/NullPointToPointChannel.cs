@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class NullPointToPointChannel : IPointToPointChannel
     {
-        public void Send(MessageContext context)
+        public void Send(Channel channel, MessageContext context, string channelpath)
         {
             
         }

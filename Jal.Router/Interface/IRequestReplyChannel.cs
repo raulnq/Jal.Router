@@ -5,6 +5,6 @@ namespace Jal.Router.Interface
 {
     public interface IRequestReplyChannel
     {
-        object Reply(MessageContext context);
+        object Reply(Channel channel, MessageContext context, string channelpath);
     }
 }

@@ -10,20 +10,15 @@ namespace Jal.Router.Model
     public class MessageContext
     {
         private readonly IBus _bus;
-
         private readonly IMessageSerializer _serializer;
-
         private readonly IStorage _storage;
-        public string EndPointName { get; set; }
-        public string ToConnectionString { get; set; }
-        public string ToSubscription { get; set; }
-        public string ToPath { get; set; }
         public string Id { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Version { get; set; }
         public int RetryCount { get; set; }
         public bool LastRetry { get; set; }
-        public Route Route { get; set; }     
+        public Route Route { get; set; }
+        public EndPoint EndPoint { get; set; }
         public Origin Origin { get; set; }
         public DateTime DateTimeUtc { get; set; }
         public SagaContext SagaContext { get; set; }
@@ -32,10 +27,6 @@ namespace Jal.Router.Model
         public Type ContentType { get; set; }
         public Type ResultType { get; set; }
         public string ContentAsString { get; set; }
-        public string ToReplyConnectionString { get; set; }
-        public string ToReplyPath { get; set; }
-        public int ToReplyTimeOut { get; set; }
-        public string ToReplySubscription { get; set; }
         public string ReplyToRequestId { get; set; }
         public string RequestId { get; set; }
         public List<Track> Tracks { get; set; }
@@ -52,7 +43,7 @@ namespace Jal.Router.Model
             Tracks = new List<Track>();
         }
 
-        public MessageContext()
+        public MessageContext(EndPoint endpoint)
         {
             Headers = new Dictionary<string, string>();
             Version = "1";
@@ -60,6 +51,7 @@ namespace Jal.Router.Model
             Origin = new Origin();
             SagaContext = new SagaContext();
             Tracks = new List<Track>();
+            EndPoint = endpoint;
         }
 
         public void AddTrack(string id, string key, string from, string route)
@@ -194,9 +186,9 @@ namespace Jal.Router.Model
             _bus.Send(content, origin, options);
         }
 
-        public void Send<TContent>(TContent content, EndPointSetting endpointsetting, Origin origin, Options options)
+        public void Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            _bus.Send(content, endpointsetting, origin, options);
+            _bus.Send(content, endpoint, origin, options);
         }
 
         public void Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
@@ -223,9 +215,9 @@ namespace Jal.Router.Model
             _bus.Publish(content, origin, options);
         }
 
-        public void Publish<TContent>(TContent content, EndPointSetting endpointsetting, Origin origin, Options options)
+        public void Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            _bus.Publish(content, endpointsetting, origin, options);
+            _bus.Publish(content, endpoint, origin, options);
         }
 
         public void Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
