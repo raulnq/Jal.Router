@@ -53,17 +53,6 @@ namespace Jal.Router.LightInject.Installer
                         {
                             container.Register(typeof(IValueSettingFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
-
-                        if (exportedType.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)))
-                        {
-                            var argument = exportedType.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEndPointSettingFinder<>)).GetGenericArguments();
-
-                            var type = typeof(IEndPointSettingFinder<>);
-
-                            var genericType = type.MakeGenericType(argument);
-
-                            container.Register(genericType, exportedType, exportedType.FullName, new PerContainerLifetime());
-                        }
                     }
                 }
             }
@@ -162,6 +151,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<Interface.Outbound.IMiddleware, PublishSubscribeHandler>(typeof (PublishSubscribeHandler).FullName, new PerContainerLifetime());
 
             container.Register<Interface.Outbound.IMiddleware, RequestReplyHandler>(typeof (RequestReplyHandler).FullName,new PerContainerLifetime());
+
+            container.Register<Interface.Outbound.IMiddleware, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
 
             container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof (AppSettingValueSettingFinder).FullName, new PerContainerLifetime());
 

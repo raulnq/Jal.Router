@@ -3,7 +3,6 @@ using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Newtonsoft.Json;
-// ReSharper disable ConvertToLocalFunction
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {

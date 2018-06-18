@@ -7,7 +7,7 @@ using Jal.Router.Impl.Inbound;
 using Jal.Router.Model;
 using Jal.Router.Tests.Model;
 using Microsoft.ServiceBus.Messaging;
-
+using Jal.Router.Extensions;
 namespace Jal.Router.Tests.Impl
 {
     public class RouterConfigurationSourceFlowC : AbstractRouterConfigurationSource
@@ -87,8 +87,8 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterEndPoint("torequestqueue")
                 .ForMessage<RequestToSend>()
-                .To<AppSettingValueSettingFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
-                .AndWaitReplyFromPublishSubscribeChannel<AppSettingValueSettingFinder>("responsetopic","subscription",x=> "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=",10);
+                .To(x => x.Add<AppSettingValueSettingFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
+                .AndWaitReplyFromPublishSubscribeChannel<AppSettingValueSettingFinder>("responsetopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", 10));
 
             RegisterEndPoint("toresponsetopic")
                 .ForMessage<ResponseToSend>()
@@ -190,7 +190,7 @@ namespace Jal.Router.Tests.Impl
             }, @continue =>
             {
                 @continue.RegisterHandler<IRequestResponseHandler<ResponseToSend, Data>>("appf")
-                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("appfqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ToListenPointToPointChannel<IRequestResponseHandler<ResponseToSend, Data>, Data, AppSettingValueSettingFinder >("appfqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<ResponseToSend>().Using<ResponseToSendAppFHandler>(x =>
                 {
                     x.With(((request, handler, context, data) => handler.Handle(request, context, data)), "CONTINUE");
@@ -198,7 +198,7 @@ namespace Jal.Router.Tests.Impl
             }, end =>
             {
                 end.RegisterHandler<IRequestResponseHandler<ResponseToSend, Data>>("apph")
-                .ToListenPointToPointChannel<AppSettingValueSettingFinder>("apphqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ToListenPointToPointChannel<IRequestResponseHandler<ResponseToSend, Data>, Data, AppSettingValueSettingFinder>("apphqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
                 .ForMessage<ResponseToSend>().Using<ResponseToSendAppHHandler>(x =>
                 {
                     x.With(((request, handler, context, data) => handler.Handle(request, context, data)), "END");

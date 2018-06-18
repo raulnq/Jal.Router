@@ -9,9 +9,9 @@ namespace Jal.Router.AzureServiceBus.Impl
 {
     public class AzureServiceBusQueue : AbstractPointToPointChannel
     {
-        public override string Send(MessageContext context, object message)
+        public override string Send(Channel channel, object message)
         {
-            var queueclient = QueueClient.CreateFromConnectionString(context.ToConnectionString, context.ToPath);
+            var queueclient = QueueClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath);
 
             var bm = message as BrokeredMessage;
 
@@ -69,8 +69,8 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         private readonly TimeSpan? _autorenewtimeout;
 
-        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null) 
-            : base(factory, configuration, builder)
+        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null) 
+            : base(factory, configuration)
         {
             _maxconcurrentcalls = maxconcurrentcalls;
             _autorenewtimeout = autorenewtimeout;

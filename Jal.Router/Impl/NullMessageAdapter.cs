@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
     {
         public MessageContext Read(object message, Type contenttype)
         {
-            return new MessageContext();
+            return new MessageContext(new EndPoint(string.Empty));
         }
 
         public object Write(MessageContext context)

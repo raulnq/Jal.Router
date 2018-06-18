@@ -16,7 +16,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, Action curent, MiddlewareParameter parameter)
         {
             var stopwatch = new Stopwatch();
 
@@ -24,11 +24,11 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Start Call. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPointName} connectionstring: {context.ToConnectionString} path: {context.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Start Call. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
 
                 next();
 
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Message sent. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPointName} connectionstring: {context.ToConnectionString} path: {context.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Message sent. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
             }
             catch (Exception exception)
             {
@@ -40,7 +40,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPointName} connectionstring: {context.ToConnectionString} path: {context.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
             }
         }
     }

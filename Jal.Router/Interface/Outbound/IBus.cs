@@ -12,11 +12,11 @@ namespace Jal.Router.Interface.Outbound
 
         void Send<TContent>(TContent content, Origin origin, Options options);
 
-        void Send<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options);
+        void Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
 
         void FireAndForget<TContent>(TContent content, Options options);
 
-        void FireAndForget<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options);
+        void FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
 
         void FireAndForget<TContent>(TContent content, Origin origin, Options options);
 
@@ -24,6 +24,6 @@ namespace Jal.Router.Interface.Outbound
 
         void Publish<TContent>(TContent content, Origin origin, Options options);
 
-        void Publish<TContent>(TContent content, EndPointSetting endpoint, Origin origin, Options options);
+        void Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
     }
 }

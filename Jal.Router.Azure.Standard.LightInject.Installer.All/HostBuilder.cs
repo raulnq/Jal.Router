@@ -16,8 +16,9 @@ using Jal.Router.Logger.Extensions;
 using LightInject;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
+using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 
-namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
+namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
     public class HostBuilder : IHostBuilder
     {

@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 
-namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
+namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
     public interface IHostBuilder
     {

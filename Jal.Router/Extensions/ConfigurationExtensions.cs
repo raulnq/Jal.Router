@@ -15,9 +15,9 @@ namespace Jal.Router.Extensions
             context.Send(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers));
         }
 
-        public static void Send<TContent>(this MessageContext context, TContent content, EndPointSetting endpointsetting, string id, string sagaid,  Dictionary<string,string> headers = null)
+        public static void Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id, string sagaid,  Dictionary<string,string> headers = null)
         {
-            context.Send(content, endpointsetting, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers));
+            context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers));
         }
         public static void Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id, string sagaid, Dictionary<string, string> headers = null)
         {
@@ -38,9 +38,9 @@ namespace Jal.Router.Extensions
             context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname,  id, sagaid, headers));
         }
 
-        public static void Publish<TContent>(this MessageContext context, TContent content, EndPointSetting endpointsetting, string id, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static void Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id, string sagaid, string key, Dictionary<string, string> headers = null)
         {
-            context.Publish(content, endpointsetting, context.CreateOrigin(key), context.CreateOptions(string.Empty, id, sagaid, headers));
+            context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, id, sagaid, headers));
         }
 
         public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, string id, string sagaid, string key, Dictionary<string, string> headers = null)

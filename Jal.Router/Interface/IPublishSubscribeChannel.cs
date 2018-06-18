@@ -5,8 +5,8 @@ namespace Jal.Router.Interface
 {
     public interface IPublishSubscribeChannel
     {
-        void Send(MessageContext context);
+        void Send(Channel channel, MessageContext context, string channelpath);
 
-        void Listen(Channel channel, Action<object>[] routeactions, string channelpath);
+        void Listen(Channel channel, Action<object>[] actions, string channelpath);
     }
 }

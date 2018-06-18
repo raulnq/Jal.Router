@@ -4,10 +4,10 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class MiddlewareBuilder : IMiddlewareBuilder
+    public class InboundMiddlewareBuilder : IInboundMiddlewareBuilder
     {
         private readonly Route _route;
-        public MiddlewareBuilder(Route route)
+        public InboundMiddlewareBuilder(Route route)
         {
             _route = route;
         }

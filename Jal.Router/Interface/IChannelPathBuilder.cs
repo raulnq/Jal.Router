@@ -4,12 +4,12 @@ namespace Jal.Router.Interface
 {
     public interface IChannelPathBuilder
     {
-        string BuildFromRoute(string routeName, Channel channel);
+        string BuildFromRoute(string name, Channel channel);
 
-        string BuildFromSagaAndRoute(Saga saga, string routeName, Channel channel);
+        string BuildFromSagaAndRoute(Saga saga, string name, Channel channel);
 
-        string BuildFromContext(MessageContext context);
+        string BuildFromEndpoint(string name, Channel channel);
 
-        string BuildReplyFromContext(MessageContext context);
+        string BuildReplyFromEndpoint(string name, Channel channel);
     }
 }

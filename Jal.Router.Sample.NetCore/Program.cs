@@ -40,19 +40,24 @@ namespace Jal.Router.Sample.NetCore
         public RouterConfigurationSourceSample()
         {
             RegisterHandler<IMessageHandler>("handler")
-                .ToListenQueue<IMessageHandler>("inputqueue123", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ToListen(x=>x.AddQueue("inputqueuenew", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
                 .ForMessage<Message>().Using<MessageHandler>(x =>
                 {
-                    x.With(((request, handler, context) => handler.Handle(request, context)));
+                    x.With((request, handler, context) => handler.Handle(request, context));
                 });
 
             RegisterOrigin("newcoreapp", "123");
 
             RegisterEndPoint("endpoint")
              .ForMessage<Message>()
-             .To("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+             .To(x =>
+                {
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=","outputqueue");
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+                });
 
-            this.RegisterQueue<AppSettingValueSettingFinder>("inputqueue123", x => new ServiceBusConfiguration()
+            this.RegisterQueue<AppSettingValueSettingFinder>("inputqueuenew", x => new ServiceBusConfiguration()
             {
                 ClientId = "e40d9bbb-c50f-436e-8a5f-8494e0f84242",
                 ClientSecret = "OkDfucL/DT9h1FISlh79OfAnmwu9/h/TRx4ryFG+hIc=",
@@ -63,7 +68,7 @@ namespace Jal.Router.Sample.NetCore
                 TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
             });
 
-            this.RegisterTopic<AppSettingValueSettingFinder>("inputtopic123", x => new ServiceBusConfiguration()
+            this.RegisterTopic<AppSettingValueSettingFinder>("inputtopicnew", x => new ServiceBusConfiguration()
             {
                 ClientId = "e40d9bbb-c50f-436e-8a5f-8494e0f84242",
                 ClientSecret = "OkDfucL/DT9h1FISlh79OfAnmwu9/h/TRx4ryFG+hIc=",
@@ -74,8 +79,7 @@ namespace Jal.Router.Sample.NetCore
                 TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
             });
 
-
-            this.RegisterSubscriptionToTopic<AppSettingValueSettingFinder>("subscription1", "inputtopic123", x => new ServiceBusConfiguration()
+            this.RegisterSubscriptionToTopic<AppSettingValueSettingFinder>("subscriptionnew", "inputtopicnew", x => new ServiceBusConfiguration()
             {
                 ClientId = "e40d9bbb-c50f-436e-8a5f-8494e0f84242",
                 ClientSecret = "OkDfucL/DT9h1FISlh79OfAnmwu9/h/TRx4ryFG+hIc=",

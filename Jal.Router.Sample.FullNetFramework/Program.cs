@@ -16,6 +16,7 @@ using Jal.Router.AzureServiceBus.LightInject.Installer;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Installer;
 using Jal.Router.Impl;
+using Jal.Router.Extensions;
 using Jal.Router.Impl.Management;
 using Jal.Router.Installer;
 using Jal.Router.Interface;
@@ -57,25 +58,25 @@ namespace Jal.Router.Sample.FullNetFramework
         {
             public RouterConfigurationSourceSample()
             {
-                RegisterHandler<IMessageHandler>("handler")
-                    .ToListen(builder =>
-                    {
-                        builder.AddPointToPointChannel("testqueue", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
-                        builder.AddPointToPointChannel("testqueue2", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
-                        builder.AddPublishSubscribeChannel("testtopic", "subs", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
-                    })
-                    .ForMessage<Message>().Using<MessageHandler>(x =>
-                    {
-                        x.With(((request, handler, context) => handler.Handle(request)));
-                    });
-
                 //RegisterHandler<IMessageHandler>("handler")
-                //.ToListenQueue<IMessageHandler, AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
-                //.ForMessage<Message>().Using<MessageHandler>(x =>
-                //{
-                //    x.With(((request, handler, context) => handler.Handle(request)));
-                //});
-                
+                //    .ToListen(builder =>
+                //    {
+                //        builder.AddPointToPointChannel("testqueue", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                //        builder.AddPointToPointChannel("testqueue2", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                //        builder.AddPublishSubscribeChannel("testtopic", "subs", "Endpoint=sb://demo-8.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Q2Gz996OsfNkE0IP39AxYDlNVEnHf3IxrNk4IEkGI/Y=");
+                //    })
+                //    .ForMessage<Message>().Using<MessageHandler>(x =>
+                //    {
+                //        x.With(((request, handler, context) => handler.Handle(request)));
+                //    });
+
+                RegisterHandler<IMessageHandler>("handler")
+                .ToListenQueue<IMessageHandler, AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                .ForMessage<Message>().Using<MessageHandler>(x =>
+                {
+                    x.With(((request, handler, context) => handler.Handle(request)));
+                });
+
                 //RegisterOrigin("appflowc", "789");
 
                 //RegisterEndPoint("appe")

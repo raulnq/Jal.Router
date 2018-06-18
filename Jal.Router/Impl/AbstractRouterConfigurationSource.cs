@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Jal.Router.Fluent.Impl;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Management;
 
@@ -262,22 +261,6 @@ namespace Jal.Router.Impl
             var builder = new EndPointBuilder(endpoint);
 
             return builder;
-        }
-
-        public void RegisterEndPoint<TExtractor, T>(string name) where TExtractor : IEndPointSettingFinder<T>
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            var endpoint = new EndPoint(name);
-
-            _enpoints.Add(endpoint);
-
-            endpoint.ExtractorType = typeof(TExtractor);
-
-            endpoint.MessageType = typeof(T);
         }
     }
 }

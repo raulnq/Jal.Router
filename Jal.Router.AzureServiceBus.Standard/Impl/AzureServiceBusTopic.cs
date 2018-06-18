@@ -5,15 +5,14 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
-// ReSharper disable ConvertToLocalFunction
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusTopic : AbstractPublishSubscribeChannel
     {
-        public override string Send(MessageContext context, object message)
+        public override string Send(Channel channel, object message)
         {
-            var topicclient = new TopicClient(context.ToConnectionString, context.ToPath);
+            var topicclient = new TopicClient(channel.ToConnectionString, channel.ToPath);
 
             var sbmessage = message as Message;
 
@@ -79,8 +78,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly TimeSpan? _autorenewtimeout;
 
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
-            : base(factory, configuration, builder)
+        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
+            : base(factory, configuration)
         {
             _maxconcurrentcalls = maxconcurrentcalls;
             _autorenewtimeout = autorenewtimeout;
