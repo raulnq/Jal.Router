@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
@@ -31,27 +32,33 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                var middlewares = new List<Type>
+                if (message.EndPoint.Channels.Any())
                 {
-                    typeof(DistributionHandler)
-                };
+                    var middlewares = new List<Type>
+                    {
+                        typeof(DistributionHandler)
+                    };
 
-                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
+                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                middlewares.Add(typeof(RequestReplyHandler));
+                    middlewares.Add(typeof(RequestReplyHandler));
 
-                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult)};
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult), Channel = message.EndPoint.Channels.First() };
 
-                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                pipeline.Execute();
+                    pipeline.Execute();
 
-                interceptor.OnSuccess(message, options);
+                    interceptor.OnSuccess(message, options);
 
-                return (TResult)parameter.Result;
-                
+                    return (TResult)parameter.Result;
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
+                }
             }
             catch (Exception ex)
             {
@@ -118,22 +125,29 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                var middlewares = new List<Type>
+                if (message.EndPoint.Channels.Any())
                 {
-                    typeof(DistributionHandler)
-                };
+                    var middlewares = new List<Type>
+                    {
+                        typeof(DistributionHandler)
+                    };
 
-                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
+                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                middlewares.Add(typeof(PointToPointHandler));
+                    middlewares.Add(typeof(PointToPointHandler));
 
-                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Send"};
+                    var parameter = new MiddlewareParameter() {Options = options, OutboundType = "Send", Channel = message.EndPoint.Channels.First() };
 
-                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                pipeline.Execute();
+                    pipeline.Execute();
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
+                }
 
                 interceptor.OnSuccess(message, options);
             }
@@ -253,22 +267,29 @@ namespace Jal.Router.Impl.Outbound
 
             try
             {
-                var middlewares = new List<Type>
+                if (message.EndPoint.Channels.Any())
                 {
-                    typeof(DistributionHandler)
-                };
+                    var middlewares = new List<Type>
+                    {
+                        typeof(DistributionHandler)
+                    };
 
-                middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
 
-                middlewares.AddRange(message.EndPoint.MiddlewareTypes);
+                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
 
-                middlewares.Add(typeof(PublishSubscribeHandler));
+                    middlewares.Add(typeof(PublishSubscribeHandler));
 
-                var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish", Channel = message.EndPoint.Channels.First() };
 
-                var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
+                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
-                pipeline.Execute();
+                    pipeline.Execute();
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
+                }
 
                 interceptor.OnSuccess(message, options);
 

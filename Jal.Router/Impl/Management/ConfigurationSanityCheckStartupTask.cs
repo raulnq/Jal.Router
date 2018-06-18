@@ -51,71 +51,90 @@ namespace Jal.Router.Impl.Management
 
             foreach (var endpoint in endpoints)
             {
-                foreach (var channel in endpoint.Channels)
+                if (endpoint.Channels.Any())
                 {
-                    if (channel.ConnectionStringExtractorType != null)
+                    foreach (var channel in endpoint.Channels)
                     {
-                        var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
-
-                        var extractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                        if (extractor != null)
+                        if (channel.ConnectionStringExtractorType != null)
                         {
-                            channel.ToConnectionString = extractor(finder);
+                            var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+
+                            if (channel.ToConnectionStringExtractor is Func<IValueSettingFinder, string> extractor)
+                            {
+                                channel.ToConnectionString = extractor(finder);
+                            }
+
+                            if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                            {
+                                var error = $"Empty connection string, Endpoint {endpoint.Name}";
+
+                                errors.AppendLine(error);
+
+                                Console.WriteLine(error);
+                            }
                         }
 
-                        if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                        if (channel.ToReplyConnectionStringExtractor != null)
                         {
-                            var error = $"Empty connection string {endpoint.Name}";
+                            var finder = _factory.Create<IValueSettingFinder>(channel.ReplyConnectionStringExtractorType);
 
-                            errors.AppendLine(error);
+                            if (channel.ToReplyConnectionStringExtractor is Func<IValueSettingFinder, string> extractor)
+                            {
+                                channel.ToReplyConnectionString = extractor(finder);
+                            }
 
-                            Console.WriteLine(error);
+                            if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
+                            {
+                                var error = $"Empty reply connection string, Endpoint {endpoint.Name}";
+
+                                errors.AppendLine(error);
+
+                                Console.WriteLine(error);
+                            }
                         }
                     }
+                }
+                else
+                {
+                    var error = $"Missing channels, Endpoint {endpoint.Name}";
 
-                    if (channel.ToReplyConnectionStringExtractor != null)
-                    {
-                        var finder = _factory.Create<IValueSettingFinder>(channel.ReplyConnectionStringExtractorType);
+                    errors.AppendLine(error);
 
-                        var extractor = channel.ToReplyConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                        if (extractor != null)
-                        {
-                            channel.ToReplyConnectionString = extractor(finder);
-                        }
-
-                        if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
-                        {
-                            var error = $"Empty reply connection string {endpoint.Name}";
-
-                            errors.AppendLine(error);
-
-                            Console.WriteLine(error);
-                        }
-                    }
+                    Console.WriteLine(error);
                 }
             }
 
             foreach (var route in routes)
             {
-                foreach (var channel in route.Channels)
+                if (route.Channels.Any())
                 {
-                    var extractorconnectionstring = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
-
-                    var toconnectionextractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                    channel.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
-
-                    if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                    foreach (var channel in route.Channels)
                     {
-                        var error = $"Empty connection string {route.Name}";
+                        var extractorconnectionstring = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
 
-                        errors.AppendLine(error);
+                        var toconnectionextractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                        Console.WriteLine(error);
+                        channel.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
+
+                        if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                        {
+                            var error = $"Empty connection string, Router {route.Name}";
+
+                            errors.AppendLine(error);
+
+                            Console.WriteLine(error);
+                        }
                     }
                 }
+                else
+                {
+                    var error = $"Missing channels, Router {route.Name}";
+
+                    errors.AppendLine(error);
+
+                    Console.WriteLine(error);
+                }
+
             }
 
             var counters = new Dictionary<string, List<string>>();

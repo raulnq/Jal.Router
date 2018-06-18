@@ -7,9 +7,7 @@ namespace Jal.Router.Impl
     {
         public string Find(string name)
         {
-            var section = ConfigurationManager.GetSection("connectionStrings") as ConnectionStringsSection;
-
-            if (section != null) return section.ConnectionStrings[name].ConnectionString;
+            if (ConfigurationManager.GetSection("connectionStrings") is ConnectionStringsSection section) return section.ConnectionStrings[name].ConnectionString;
 
             return string.Empty;
         }

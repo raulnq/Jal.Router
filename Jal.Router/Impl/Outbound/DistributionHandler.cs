@@ -7,11 +7,13 @@ namespace Jal.Router.Impl.Outbound
 {
     public class DistributionHandler : IMiddleware
     {
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
             var channels = context.EndPoint.Channels.Count;
 
             var count = 0;
+
+            var @action = next;
 
             foreach (var channel in context.EndPoint.Channels)
             {
@@ -20,17 +22,19 @@ namespace Jal.Router.Impl.Outbound
                 try
                 {
                     count++;
-                    next();
+                    @action();
                     break;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     if(count < channels)
                     {
-                        Console.WriteLine($"Message {context.Id} failed to distribute ({count}), moving to the next channel {ex}");
+                        @action = current;
+                        Console.WriteLine($"Message {context.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
+                        Console.WriteLine($"Message {context.Id} failed to distribute ({count}), no more channels");
                         throw;
                     }
                 }

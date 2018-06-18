@@ -9,13 +9,9 @@ namespace Jal.Router.Impl.Outbound
 {
     public class EndPointProvider : IEndPointProvider
     {
-        private readonly IComponentFactory _factory;
-
         private readonly EndPoint[] _endpoints;
-        public EndPointProvider(IRouterConfigurationSource[] sources, IComponentFactory factory)
+        public EndPointProvider(IRouterConfigurationSource[] sources)
         {
-            _factory = factory;
-
             var routes = new List<EndPoint>();
 
             foreach (var source in sources)

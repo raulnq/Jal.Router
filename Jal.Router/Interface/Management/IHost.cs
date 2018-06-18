@@ -6,6 +6,10 @@
 
         void Run();
 
+        void Startup();
+
+        void Shutdown();
+
         IConfiguration Configuration { get; }
     }
 }

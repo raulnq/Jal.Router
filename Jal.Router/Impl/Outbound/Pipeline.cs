@@ -40,7 +40,20 @@ namespace Jal.Router.Impl.Outbound
                 {
                     var middleware = _factory.Create<IMiddleware>(_middlewares[_current]);
                     _current++;
-                    middleware.Execute(_context, GetNext(), _parameter);
+                    middleware.Execute(_context, GetNext(), GetCurrent(), _parameter);
+                }
+            };
+        }
+
+        private Action GetCurrent()
+        {
+            return () =>
+            {
+                var index = _current - 1;
+                if (index < _middlewares.Length)
+                {
+                    var middleware = _factory.Create<IMiddleware>(_middlewares[index]);
+                    middleware.Execute(_context, GetNext(), GetCurrent(), _parameter);
                 }
             };
         }

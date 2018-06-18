@@ -50,7 +50,12 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("endpoint")
              .ForMessage<Message>()
-             .To(x => x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue"));
+             .To(x =>
+                {
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=","outputqueue");
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueue");
+                });
 
             this.RegisterQueue<AppSettingValueSettingFinder>("inputqueuenew", x => new ServiceBusConfiguration()
             {

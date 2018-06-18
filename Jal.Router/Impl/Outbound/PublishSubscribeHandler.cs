@@ -22,7 +22,7 @@ namespace Jal.Router.Impl.Outbound
             _builder = builder;
         }
 
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
             if (!string.IsNullOrWhiteSpace(parameter.Channel.ToConnectionString) && !string.IsNullOrWhiteSpace(parameter.Channel.ToPath))
             {

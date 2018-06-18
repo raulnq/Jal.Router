@@ -39,12 +39,22 @@ namespace Jal.Router.Impl.Management
             _cancellationtokensource = new CancellationTokenSource();
         }
 
-        public void Start()
+        private void Start()
         {
             Task.Run(() => StartAsync()).GetAwaiter().GetResult();
         }
 
-        public Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public void Startup()
+        {
+            _startup.Start();
+        }
+
+        public void Shutdown()
+        {
+            _shutdown.Stop();
+        }
+
+        private Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (Interlocked.CompareExchange(ref _state, StateStarting, StateNotStarted) != StateNotStarted)
             {
@@ -55,7 +65,7 @@ namespace Jal.Router.Impl.Management
 
             _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
 
-            _startup.Start();
+            Startup();
 
             _monitor.Start();
 
@@ -66,9 +76,9 @@ namespace Jal.Router.Impl.Management
             return Task.FromResult(0);
         }
 
-        public void Stop()
+        private void Stop()
         {
-            Task.Run(() => StopAsync()).GetAwaiter().GetResult();
+            Task.Run(StopAsync).GetAwaiter().GetResult();
         }
 
         public void RunAndBlock()
@@ -87,7 +97,7 @@ namespace Jal.Router.Impl.Management
 
         public IConfiguration Configuration { get; }
 
-        public Task StopAsync()
+        private Task StopAsync()
         {
             Interlocked.CompareExchange(ref _state, StateStoppingOrStopped, StateStarted);
 
@@ -98,7 +108,7 @@ namespace Jal.Router.Impl.Management
 
             Console.WriteLine($"Stopping {Configuration.ApplicationName}");
 
-            _shutdown.Stop();
+            Shutdown();
 
             _watcher.Stop();
 
