@@ -3,7 +3,7 @@ using Common.Logging;
 using Jal.Router.Interface;
 using LightInject;
 
-namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer.All
+namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
     public class HostBuilderParameter
     {

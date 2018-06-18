@@ -7,7 +7,7 @@
     <Company>Raul Naupari</Company>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
-    <Description>LightInject installer for the current stack of the Jal.Router library</Description>
+    <Description>LightInject installer for the Azure stack of the Jal.Router library</Description>
   </PropertyGroup>
 
   <ItemGroup>
