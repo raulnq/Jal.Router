@@ -11,7 +11,7 @@ namespace Jal.Router.Model
     {
         private readonly IBus _bus;
         private readonly IMessageSerializer _serializer;
-        private readonly IStorage _storage;
+        private readonly ISagaStorage _storage;
         public string Id { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Version { get; set; }
@@ -26,11 +26,12 @@ namespace Jal.Router.Model
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
         public Type ResultType { get; set; }
-        public string ContentAsString { get; set; }
+        public string Content { get; set; }
+        public string DataId { get; set; }
         public string ReplyToRequestId { get; set; }
         public string RequestId { get; set; }
         public List<Track> Tracks { get; set; }
-        public MessageContext(IBus bus, IMessageSerializer serializer, IStorage storage)
+        public MessageContext(IBus bus, IMessageSerializer serializer, ISagaStorage storage)
         {
             _bus = bus;
             _serializer = serializer;

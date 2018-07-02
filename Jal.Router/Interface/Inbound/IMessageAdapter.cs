@@ -5,11 +5,11 @@ namespace Jal.Router.Interface.Inbound
 {
     public interface IMessageAdapter
     {
-        MessageContext Read(object message, Type contenttype);
+        MessageContext Read(object message, Type contenttype, bool useclaimcheck);
 
-        object Write(MessageContext context);
+        object Write(MessageContext context, bool useclaimcheck);
 
-        object Deserialize(string content, Type type);
+        object Deserialize(string content, Type contenttype);
 
         TContent Deserialize<TContent>(string content);
 

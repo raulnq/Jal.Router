@@ -24,7 +24,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
         {
             return new MessageEntity
             {
-                Content = context.ContentAsString,
+                Content = context.Content,
                 ContentType = parameter.Route.ContentType.FullName,
                 Id = context.Id,
                 Version = context.Version,
@@ -36,7 +36,8 @@ namespace Jal.Router.Impl.Inbound.Sagas
                 DateTimeUtc = context.DateTimeUtc,
                 Data = sagaentity.Data,
                 Name = parameter.Route.Name,
-                Tracks = context.Tracks
+                Tracks = context.Tracks,
+                DataId = context.DataId
             };
         }
     }

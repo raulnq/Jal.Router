@@ -10,10 +10,13 @@ namespace Jal.Router.Impl.Management
 
         private readonly IConfiguration _configuration;
 
-        public Shutdown(IComponentFactory factory, IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public Shutdown(IComponentFactory factory, IConfiguration configuration, ILogger logger)
         {
             _factory = factory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public void Stop()
@@ -28,7 +31,8 @@ namespace Jal.Router.Impl.Management
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Shutdown exception {ex}");
+                    _logger.Log($"Shutdown exception {ex}");
+
                     throw;
                 }
 

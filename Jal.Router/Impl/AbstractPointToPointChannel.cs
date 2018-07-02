@@ -6,8 +6,8 @@ namespace Jal.Router.Impl
     public abstract class AbstractPointToPointChannel : AbstractChannel, IPointToPointChannel
     {
 
-        protected AbstractPointToPointChannel(IComponentFactory factory, IConfiguration configuration)
-            :base("point to point", factory, configuration)
+        protected AbstractPointToPointChannel(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+            :base("point to point", factory, configuration, logger)
         {
 
         }

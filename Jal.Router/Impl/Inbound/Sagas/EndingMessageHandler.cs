@@ -27,7 +27,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
-            var storage = _factory.Create<IStorage>(_configuration.StorageType);
+            var storage = _factory.Create<ISagaStorage>(_configuration.SagaStorageType);
 
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 

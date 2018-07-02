@@ -12,8 +12,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusSession : AbstractChannel, IRequestReplyChannel
     {
-        public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration)
-            : base("request replay",factory, configuration)
+        public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+            : base("request replay",factory, configuration, logger)
         {
 
         }
@@ -30,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (message != null)
             {
-                outputcontext = adapter.Read(message, context.ResultType);
+                outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
 
                 messagesession.CompleteAsync(message.SystemProperties.LockToken);
             }
@@ -56,7 +56,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (message != null)
             {
-                outputcontext = adapter.Read(message, context.ResultType);
+                outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
 
                 messagesession.CompleteAsync(message.SystemProperties.LockToken);
             }

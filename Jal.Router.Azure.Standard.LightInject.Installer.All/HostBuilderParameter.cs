@@ -25,6 +25,8 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
         public string MessageStorageName { get; set; }
 
+        public string StorageContainer { get; set; }
+
         public string TableNameSufix { get; set; }
 
         public string ApplicationName { get; set; }

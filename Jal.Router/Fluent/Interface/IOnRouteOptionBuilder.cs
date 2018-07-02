@@ -8,5 +8,6 @@ namespace Jal.Router.Fluent.Interface
         IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname);
         IOnRouteOptionBuilder UsingMiddleware(Action<IInboundMiddlewareBuilder> action);
         IOnRouteOptionBuilder ForwardMessageTo(string endpointname);
+        IOnRouteOptionBuilder AsClaimCheck();
     }
 }

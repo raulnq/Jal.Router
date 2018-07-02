@@ -9,6 +9,7 @@ namespace Jal.Router.Model.Inbound
         public DateTime DateTimeUtc { get; set; }
         public string Content { get; set; }
         public string Id { get; set; }
+        public string DataId { get; set; }
         public string Version { get; set; }
         public int RetryCount { get; set; }
         public bool LastRetry { get; set; }

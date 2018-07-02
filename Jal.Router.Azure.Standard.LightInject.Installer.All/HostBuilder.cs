@@ -62,12 +62,13 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         }
 
         public IHostBuilder UsingAzureStorage(string connectionstring, string sagastoragename = "sagas",
-            string messagestoragename = "messages", string tablenamesufix = "")
+            string messagestoragename = "messages", string tablenamesufix = "", string container="")
         {
             _parameter.StorageConnectionString = connectionstring;
             _parameter.SagaStorageName = sagastoragename;
             _parameter.MessageStorageName = messagestoragename;
             _parameter.TableNameSufix = tablenamesufix;
+            _parameter.StorageContainer = container;
             return this;
         }
 
@@ -112,7 +113,12 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (!string.IsNullOrWhiteSpace(_parameter.StorageConnectionString))
             {
-                _parameter.Container.RegisterAzureStorage(_parameter.StorageConnectionString, _parameter.SagaStorageName, _parameter.MessageStorageName, _parameter.TableNameSufix);
+                _parameter.Container.RegisterAzureSagaStorage(_parameter.StorageConnectionString, _parameter.SagaStorageName, _parameter.MessageStorageName, _parameter.TableNameSufix);
+
+                if(!string.IsNullOrWhiteSpace(_parameter.StorageContainer))
+                {
+                    _parameter.Container.RegisterAzureMessageStorage(_parameter.StorageConnectionString, _parameter.StorageContainer);
+                }
             }
 
             if (_parameter.RouterInterceptorType != null)
@@ -133,7 +139,12 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (!string.IsNullOrWhiteSpace(_parameter.StorageConnectionString))
             {
-                host.Configuration.UsingAzureStorage();
+                host.Configuration.UsingAzureSagaStorage();
+
+                if (!string.IsNullOrWhiteSpace(_parameter.StorageContainer))
+                {
+                    host.Configuration.UsingAzureMessageStorage();
+                }
             }
 
             host.Configuration.Storage.IgnoreExceptionOnSaveMessage = true;

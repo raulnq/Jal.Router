@@ -126,6 +126,13 @@ namespace Jal.Router.Fluent.Impl
 
             return this;
         }
+
+        public IOnRouteOptionBuilder AsClaimCheck()
+        {
+            _route.UseClaimCheck = true;
+
+            return this;
+        }
     }
 
     public class HandlerBuilder<TContent, THandler, TData> : IHandlerBuilder<TContent, THandler, TData>, IWhenHandlerBuilder, IOnRetryUsingBuilder
@@ -165,6 +172,12 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
+        public IOnRouteOptionBuilder AsClaimCheck()
+        {
+            _route.UseClaimCheck = true;
+
+            return this;
+        }
 
         public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo<TExeption>(string endpointname) where TExeption : Exception
         {

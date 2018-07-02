@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using Jal.Router.AzureStorage.Model;
@@ -15,7 +14,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Jal.Router.AzureStorage.Impl
 {
-    public class AzureTableStorage : AbstractStorage
+    public class AzureSagaStorage : AbstractSagaStorage
     {
         private readonly string _connectionstring;
 
@@ -29,7 +28,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly IConfiguration _configuration;
 
-        public AzureTableStorage(string connectionstring, IComponentFactory factory, IConfiguration configuration, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
+        public AzureSagaStorage(string connectionstring, IComponentFactory factory, IConfiguration configuration, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
             _connectionstring = connectionstring;
 
@@ -158,7 +157,8 @@ namespace Jal.Router.AzureStorage.Impl
                 Headers = serializer.Deserialize<Dictionary<string, string>>(x.Headers),
                 DateTimeUtc = x.DateTimeUtc,
                 Data = x.Data,
-                Name = x.Name
+                Name = x.Name,
+                DataId = x.DataId
             }).ToArray();
         }
 
@@ -222,6 +222,7 @@ namespace Jal.Router.AzureStorage.Impl
                 DateTimeUtc = x.DateTimeUtc,
                 Data = x.Data,
                 Name = x.Name,
+                DataId = x.DataId,
             }).ToArray();
         }
 
@@ -250,6 +251,7 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Data = messageentity.Data,
                     Name = messageentity.Name,
+                    DataId = messageentity.DataId,
                 };
 
                 var size = Encoding.UTF8.GetByteCount(record.Content);
@@ -394,6 +396,8 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Name = messageentity.Name,
                     Tracks = serializer.Serialize(messageentity.Tracks),
+                    DataId = messageentity.DataId,
+                    Data = messageentity.Data,
                 };
 
 

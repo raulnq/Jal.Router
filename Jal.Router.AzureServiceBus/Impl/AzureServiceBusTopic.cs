@@ -48,7 +48,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId, () => routeaction(bm), () => client.Complete(bm.LockToken)), options);
 
-            channel.ShutdownAction = () => { receiver.Close(); client.Close(); };
+            channel.Shutdown = () => { receiver.Close(); client.Close(); };
         }
 
         private OnMessageOptions CreateOptions()
@@ -70,8 +70,8 @@ namespace Jal.Router.AzureServiceBus.Impl
 
         private readonly TimeSpan? _autorenewtimeout;
 
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
-            : base(factory, configuration)
+        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, ILogger logger, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
+            : base(factory, configuration, logger)
         {
             _maxconcurrentcalls = maxconcurrentcalls;
             _autorenewtimeout = autorenewtimeout;

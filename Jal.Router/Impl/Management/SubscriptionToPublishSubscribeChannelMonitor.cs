@@ -29,7 +29,7 @@ namespace Jal.Router.Impl.Management
 
                 var loggers = loggertypes.Select(x => _factory.Create<ILogger<SubscriptionToPublishSubscribeChannelInfo>>(x)).ToArray();
 
-                var channelmanager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
+                var manager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
 
                 foreach (var source in _sources)
                 {
@@ -37,7 +37,7 @@ namespace Jal.Router.Impl.Management
 
                     foreach (var subscription in subscriptions)
                     {
-                        var info = GetSubscriptionToPublishSubscribeChannel(subscription, channelmanager);
+                        var info = manager.GetSubscriptionToPublishSubscribeChannel(subscription.ConnectionString, subscription.Path, subscription.Subscription);
 
                         if (info != null)
                         {
@@ -46,23 +46,6 @@ namespace Jal.Router.Impl.Management
                     }
                 }
             }
-        }
-
-        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(SubscriptionToPublishSubscribeChannel subscriptionToPublishSubscribeChannel, IChannelManager channelmanager)
-        {
-            if (subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType != null)
-            {
-
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType);
-
-                var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path))
-                {
-                    return channelmanager.GetSubscriptionToPublishSubscribeChannel(toconnectionextractor(extractorconnectionstring), subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription);
-                }
-            }
-            return null;
         }
     }
 }

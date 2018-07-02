@@ -2,6 +2,7 @@ using System;
 
 namespace Jal.Router.Interface
 {
+
     public interface IMessageSerializer
     {
         TContent Deserialize<TContent>(string content);

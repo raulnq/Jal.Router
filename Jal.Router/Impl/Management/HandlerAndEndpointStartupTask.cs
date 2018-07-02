@@ -8,17 +8,21 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Management
 {
-    public class ConfigurationSanityCheckStartupTask : IStartupTask
+    public class HandlerAndEndpointStartupTask : IStartupTask
     {
         private readonly IRouterConfigurationSource[] _sources;
 
         private readonly IComponentFactory _factory;
 
-        public ConfigurationSanityCheckStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory)
+        private readonly ILogger _logger;
+
+        public HandlerAndEndpointStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory, ILogger logger)
         {
             _sources = sources;
 
             _factory = factory;
+
+            _logger = logger;
         }
 
         public void Run()
@@ -70,7 +74,16 @@ namespace Jal.Router.Impl.Management
 
                                 errors.AppendLine(error);
 
-                                Console.WriteLine(error);
+                                _logger.Log(error);
+                            }
+
+                            if (string.IsNullOrWhiteSpace(channel.ToPath))
+                            {
+                                var error = $"Empty path, Endpoint {endpoint.Name}";
+
+                                errors.AppendLine(error);
+
+                                _logger.Log(error);
                             }
                         }
 
@@ -89,7 +102,16 @@ namespace Jal.Router.Impl.Management
 
                                 errors.AppendLine(error);
 
-                                Console.WriteLine(error);
+                                _logger.Log(error);
+                            }
+
+                            if (string.IsNullOrWhiteSpace(channel.ToReplyPath))
+                            {
+                                var error = $"Empty reply path, Endpoint {endpoint.Name}";
+
+                                errors.AppendLine(error);
+
+                                _logger.Log(error);
                             }
                         }
                     }
@@ -100,7 +122,7 @@ namespace Jal.Router.Impl.Management
 
                     errors.AppendLine(error);
 
-                    Console.WriteLine(error);
+                    _logger.Log(error);
                 }
             }
 
@@ -110,57 +132,43 @@ namespace Jal.Router.Impl.Management
                 {
                     foreach (var channel in route.Channels)
                     {
-                        var extractorconnectionstring = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+                        var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
 
-                        var toconnectionextractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                        var extractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                        channel.ToConnectionString = toconnectionextractor?.Invoke(extractorconnectionstring);
+                        channel.ToConnectionString = extractor?.Invoke(finder);
 
                         if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
                         {
-                            var error = $"Empty connection string, Router {route.Name}";
+                            var error = $"Empty connection string, Handler {route.Name}";
 
                             errors.AppendLine(error);
 
-                            Console.WriteLine(error);
+                            _logger.Log(error);
+                        }
+
+
+                        if (string.IsNullOrWhiteSpace(channel.ToPath))
+                        {
+                            var error = $"Empty path, Handler {route.Name}";
+
+                            errors.AppendLine(error);
+
+                            _logger.Log(error);
                         }
                     }
                 }
                 else
                 {
-                    var error = $"Missing channels, Router {route.Name}";
+                    var error = $"Missing channels, Handler {route.Name}";
 
-                    errors.AppendLine(error);
+                    _logger.Log(error);
 
-                    Console.WriteLine(error);
+                    _logger.Log(error);
                 }
 
             }
 
-            var counters = new Dictionary<string, List<string>>();
-
-            foreach (var route in routes)
-            {
-                foreach (var channel in route.Channels)
-                {
-                    if (!counters.ContainsKey($"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}"))
-                        counters.Add($"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}", new List<string> { route.Name });
-                    else
-                        counters[$"{channel.ToConnectionString}/{channel.ToPath}/{channel.ToSubscription}"].Add(route.Name);
-                }
-            }
-
-            var groups = counters.Where(x => x.Value.Count > 1);
-
-            foreach (var @group in groups)
-            {
-                var error = $"Duplicate route with different name {@group.Key}: {string.Join(",", @group.Value.ToArray())}";
-
-                errors.AppendLine(error);
-
-                Console.WriteLine(error);
-            }
-            
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
                 throw new ApplicationException(errors.ToString());

@@ -15,6 +15,8 @@ namespace Jal.Router.Impl.Inbound
 
         protected readonly IBus Bus;
 
+        public const string DataId = "dataid";
+
         public const string Tracks = "tracking";
 
         public const string From = "from";
@@ -78,19 +80,49 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public MessageContext Read(object message, Type contenttype)
+        public MessageContext Read(object message, Type contenttype, bool useclaimcheck)
         {
             var context = Read(message);
 
             context.ContentType = contenttype;
 
-            context.ContentAsString = GetContent(message);
+            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.DataId))
+            {
+                var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
+
+                context.Content = storage.Read(context.DataId);
+            }
+            else
+            {
+                context.Content = GetContent(message);
+            }
 
             return context;
         }
 
+        public object Write(MessageContext context, bool useclaimcheck)
+        {
+            var content = context.Content;
 
-        public abstract object Write(MessageContext context);
+            if(useclaimcheck)
+            {
+                var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
+
+                context.DataId = Guid.NewGuid().ToString();
+
+                storage.Write(context.DataId, context.Content);
+
+                context.Content = string.Empty;
+            }
+
+            var message = Write(context);
+
+            context.Content = content;
+
+            return message;
+        }
+
+        protected abstract object Write(MessageContext context);
 
         protected abstract MessageContext Read(object message);
 

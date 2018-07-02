@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
 
             interceptor.OnEntry(context);
 

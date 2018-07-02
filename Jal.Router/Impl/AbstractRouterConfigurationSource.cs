@@ -47,7 +47,10 @@ namespace Jal.Router.Impl
         {
             foreach (var subscription in _subscriptions)
             {
-                subscription.Origin = _origin;
+                if(subscription.Rules.Count==0)
+                {
+                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelRule() { Name = "$Default", Filter = $"origin='{_origin.Key}'", IsDefault = true });
+                }
             }
             return _subscriptions.ToArray();
         }
@@ -75,7 +78,7 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor, bool all=false)
+        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule = null)
             where TExtractorConectionString : IValueSettingFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
@@ -93,14 +96,18 @@ namespace Jal.Router.Impl
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
-                ToConnectionStringExtractor = connectionstringextractor,
-                All = all
+                ConnectionStringExtractor = connectionstringextractor
             };
+
+            if(rule!=null)
+            {
+                channel.Rules.Add(rule);
+            }
 
             _subscriptions.Add(channel);
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel(string subscription, string path, string connectionstring, bool all = false)
+        public void RegisterSubscriptionToPublishSubscriberChannel(string subscription, string path, string connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -120,9 +127,14 @@ namespace Jal.Router.Impl
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
                 ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ToConnectionStringExtractor = extractor,
-                All = all
+                ConnectionStringExtractor = extractor,
             };
+
+
+            if (rule != null)
+            {
+                channel.Rules.Add(rule);
+            }
 
             _subscriptions.Add(channel);
         }
@@ -142,7 +154,7 @@ namespace Jal.Router.Impl
             var channel = new PointToPointChannel(path)
             {
                 ConnectionStringExtractorType = typeof (TExtractorConectionString),
-                ToConnectionStringExtractor = connectionstringextractor
+                ConnectionStringExtractor = connectionstringextractor
             };
 
             _pointtopointchannels.Add(channel);
@@ -164,7 +176,7 @@ namespace Jal.Router.Impl
             var channel = new PointToPointChannel(path)
             {
                 ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ToConnectionStringExtractor = extractor
+                ConnectionStringExtractor = extractor
             };
 
             _pointtopointchannels.Add(channel);
@@ -184,7 +196,7 @@ namespace Jal.Router.Impl
             var channel = new PublishSubscribeChannel(path)
             {
                 ConnectionStringExtractorType = typeof(TExtractorConectionString),
-                ToConnectionStringExtractor = connectionstringextractor
+                ConnectionStringExtractor = connectionstringextractor
             };
 
             _publishsubscriberchannels.Add(channel);
@@ -206,7 +218,7 @@ namespace Jal.Router.Impl
             var channel = new PublishSubscribeChannel(path)
             {
                 ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ToConnectionStringExtractor = extractor
+                ConnectionStringExtractor = extractor
             };
 
             _publishsubscriberchannels.Add(channel);

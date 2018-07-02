@@ -19,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             LoggerCallbackHandler.UseDefaultLogging = false;
         }
 
-        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, string origin, bool all)
+        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, SubscriptionToPublishSubscribeChannelRule rule)
         {
             var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
 
@@ -48,11 +48,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                             var subs = new Microsoft.Azure.ServiceBus.SubscriptionClient(configuration.ConnectionString, path, subscription);
 
-                            if (!all)
+                            if (rule!=null)
                             {
                                 subs.RemoveRuleAsync("$Default").GetAwaiter().GetResult();
 
-                                var ruledescriptor = new RuleDescription("$Default", new SqlFilter($"origin='{origin}'"));
+                                var ruledescriptor = new RuleDescription(rule.Name, new SqlFilter(rule.Filter));
 
                                 subs.AddRuleAsync(ruledescriptor).GetAwaiter().GetResult();
                             }

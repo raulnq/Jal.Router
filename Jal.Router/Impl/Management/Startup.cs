@@ -10,10 +10,12 @@ namespace Jal.Router.Impl.Management
 
         private readonly IConfiguration _configuration;
 
-        public Startup(IComponentFactory factory, IConfiguration configuration)
+        private readonly ILogger _logger;
+        public Startup(IComponentFactory factory, IConfiguration configuration, ILogger logger)
         {
             _factory = factory;
             _configuration = configuration;
+            _logger = logger;
         }
 
 
@@ -29,7 +31,7 @@ namespace Jal.Router.Impl.Management
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Startup exception {ex}");
+                    _logger.Log($"Startup exception {ex}");
 
                     throw;
                 }

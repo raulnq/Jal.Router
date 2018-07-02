@@ -50,14 +50,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 await OnMessageAsync(channelpath, message.MessageId, () => @action(message), () => client.CompleteAsync(message.SystemProperties.LockToken));
             }, options);
 
-            channel.ShutdownAction = () => { client.CloseAsync().GetAwaiter().GetResult(); };
+            channel.Shutdown = () => { client.CloseAsync().GetAwaiter().GetResult(); };
         }
 
         private MessageHandlerOptions CreateOptions(string channelpath)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Console.WriteLine($"Message failed to {ChannelName} channel {channelpath} {args.Exception}");
+                Console.WriteLine($"Message failed to {Name} channel {channelpath} {args.Exception}");
                 return Task.CompletedTask;
             };
 
@@ -78,8 +78,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly TimeSpan? _autorenewtimeout;
 
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
-            : base(factory, configuration)
+        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, ILogger logger, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
+            : base(factory, configuration, logger)
         {
             _maxconcurrentcalls = maxconcurrentcalls;
             _autorenewtimeout = autorenewtimeout;

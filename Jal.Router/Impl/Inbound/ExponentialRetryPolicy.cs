@@ -3,6 +3,7 @@ using Jal.Router.Interface.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
+
     public class ExponentialRetryPolicy : IRetryPolicy
     {
         private readonly int _seconds;

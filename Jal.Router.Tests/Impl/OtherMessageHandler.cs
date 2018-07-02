@@ -38,7 +38,7 @@ namespace Jal.Router.Tests.Impl
         {
             Console.WriteLine($"SagaInput1HandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInput1HandlerMessageHandler";
-            throw new Exception("error");
+            //throw new Exception("error");
             _bus.Publish(message, new Options() {EndPointName = "SagaInputTopicHandlerMessageHandler", SagaContext = context.SagaContext});
         }
     }

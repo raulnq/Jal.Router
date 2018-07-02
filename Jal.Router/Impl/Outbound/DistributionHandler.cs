@@ -1,4 +1,5 @@
 ﻿using System;
+using Jal.Router.Interface;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
@@ -7,6 +8,11 @@ namespace Jal.Router.Impl.Outbound
 {
     public class DistributionHandler : IMiddleware
     {
+        private readonly ILogger _logger;
+        public DistributionHandler(ILogger logger)
+        {
+            _logger = logger;
+        }
         public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
             var channels = context.EndPoint.Channels.Count;
@@ -30,11 +36,11 @@ namespace Jal.Router.Impl.Outbound
                     if(count < channels)
                     {
                         @action = current;
-                        Console.WriteLine($"Message {context.Id} failed to distribute ({count}), moving to the next channel");
+                        _logger.Log($"Message {context.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
-                        Console.WriteLine($"Message {context.Id} failed to distribute ({count}), no more channels");
+                        _logger.Log($"Message {context.Id} failed to distribute ({count}), no more channels");
                         throw;
                     }
                 }
