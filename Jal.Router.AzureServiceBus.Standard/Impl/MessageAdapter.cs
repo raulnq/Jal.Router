@@ -31,7 +31,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (sbmessage != null)
             {
-                var storage = Factory.Create<IStorage>(Configuration.StorageType);
+                var storage = Factory.Create<ISagaStorage>(Configuration.SagaStorageType);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
@@ -46,6 +46,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 if (sbmessage.UserProperties.ContainsKey(From))
                 {
                     context.Origin.From = sbmessage.UserProperties[From].ToString();
+                }
+
+                if (sbmessage.UserProperties.ContainsKey(DataId))
+                {
+                    context.DataId = sbmessage.UserProperties[DataId].ToString();
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(Tracks))
@@ -76,7 +81,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 if (sbmessage.UserProperties != null)
                 {
                     foreach (var property in sbmessage.UserProperties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks))
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks && x.Key!=DataId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -132,9 +137,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        public override object Write(MessageContext context)
+        protected override object Write(MessageContext context)
         {
-            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.ContentAsString)) { ContentType = "application/json" };
+            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.Content)) { ContentType = "application/json" };
 
             foreach (var header in context.Headers)
             {
@@ -154,6 +159,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
                 brokeredmessage.UserProperties.Add(SagaId, context.SagaContext.Id);
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.DataId))
+            {
+                brokeredmessage.UserProperties.Add(DataId, context.DataId);
             }
 
             if (context.Tracks != null)

@@ -68,7 +68,7 @@ namespace Jal.Router.Impl.Inbound
 
                 var handler = _factory.Create<THandler>(route.ConsumerType);
 
-                var content = adapter.Deserialize<TContent>(context.ContentAsString);
+                var content = adapter.Deserialize<TContent>(context.Content);
 
                 foreach (var method in route.RouteMethods)
                 {
@@ -90,7 +90,7 @@ namespace Jal.Router.Impl.Inbound
 
                 var consumer = _factory.Create<THandler>(route.ConsumerType);
 
-                var content = adapter.Deserialize<TContent>(context.ContentAsString);
+                var content = adapter.Deserialize<TContent>(context.Content);
 
                 foreach (var method in route.RouteMethods)
                 {

@@ -28,7 +28,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 Id = context.Id,
                 Timestamp = context.DateTimeUtc,
                 Target = parameter.Channel.ToPath,
-                Data = context.ContentAsString,
+                Data = context.Content,
                 Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
                 Properties =
                 {
@@ -36,12 +36,13 @@ namespace Jal.Router.ApplicationInsights.Impl
                     new KeyValuePair<string, string>("origin", context.Origin.Key),
                     new KeyValuePair<string, string>("sagaid",context.SagaContext?.Id),
                     new KeyValuePair<string, string>("version", context.Version),
+                    new KeyValuePair<string, string>("dataid", context.DataId),
                     new KeyValuePair<string, string>("replytorequestid", context.ReplyToRequestId),
                     new KeyValuePair<string, string>("requestid", context.RequestId),
                 },
                 Metrics =
                 {
-                    new KeyValuePair<string, double>("retry", context.RetryCount)
+                    new KeyValuePair<string, double>("retrycount", context.RetryCount)
                 }
             };
             

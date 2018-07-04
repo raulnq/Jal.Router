@@ -39,6 +39,8 @@ namespace Jal.Router.Model
         public string ForwardEndPoint { get; set; }
 
         public Func<MessageContext, bool> When { get; set; }
+
+        public bool UseClaimCheck { get; set; }
     }
 
     public class Route<TContent, TConsumer> : Route

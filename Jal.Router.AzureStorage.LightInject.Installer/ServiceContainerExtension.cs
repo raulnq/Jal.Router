@@ -8,11 +8,18 @@ namespace Jal.Router.AzureStorage.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterAzureStorage(this IServiceContainer container, string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
+        public static void RegisterAzureSagaStorage(this IServiceContainer container, string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
-            container.Register<IStorage>(x=> new AzureTableStorage(connectionstring, x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), sagastoragename, messagestorgename, tablenamesufix), typeof(AzureTableStorage).FullName, new PerContainerLifetime());
+            container.Register<ISagaStorage>(x=> new AzureSagaStorage(connectionstring, x.GetInstance<IComponentFactory>(), x.GetInstance<IConfiguration>(), sagastoragename, messagestorgename, tablenamesufix), typeof(AzureSagaStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask>(x=> new AzureStorageStartupTask(connectionstring, sagastoragename, messagestorgename, tablenamesufix) , typeof(AzureStorageStartupTask).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask>(x=> new AzureSagaStorageStartupTask(x.GetInstance<ILogger>(), connectionstring, sagastoragename, messagestorgename, tablenamesufix) , typeof(AzureSagaStorageStartupTask).FullName, new PerContainerLifetime());
+        }
+
+        public static void RegisterAzureMessageStorage(this IServiceContainer container, string connectionstring, string containername)
+        {
+            container.Register<IMessageStorage>(x => new AzureMessageStorage(connectionstring, containername), typeof(AzureMessageStorage).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask>(x => new AzureMessageStorageStartupTask(x.GetInstance<ILogger>(), connectionstring, containername), typeof(AzureMessageStorageStartupTask).FullName, new PerContainerLifetime());
         }
     }
 }

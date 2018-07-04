@@ -14,18 +14,19 @@ namespace Jal.Router.Interface.Management
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
-        IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; }
+        IList<TaskMetadata> MonitoringTaskTypes { get; }
         Type ChannelManagerType { get; }
         Type ShutdownWatcherType { get; }
         Type PointToPointChannelType { get; }
         Type RequestReplyChannelType { get; }
         Type PublishSubscribeChannelType { get; }
-        Type StorageType { get;  }
+        Type SagaStorageType { get;  }
         Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; set; }
         Type BusInterceptorType { get; }
         Type MessageSerializerType { get; }
+        Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
         void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
@@ -33,7 +34,8 @@ namespace Jal.Router.Interface.Management
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
         void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
-        void UsingStorage<TStorage>() where TStorage : IStorage;
+        void UsingMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
+        void UsingSagaStorage<TStorage>() where TStorage : ISagaStorage;
         void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         void AddInboundMiddleware<TMiddleware>() where TMiddleware : Inbound.IMiddleware;
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;

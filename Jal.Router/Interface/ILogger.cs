@@ -6,4 +6,9 @@ namespace Jal.Router.Interface
     {
         void Log(TInfo info, DateTime datetime);
     }
+
+    public interface ILogger
+    {
+        void Log(string message);
+    }
 }

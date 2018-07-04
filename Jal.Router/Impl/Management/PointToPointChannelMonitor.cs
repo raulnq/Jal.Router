@@ -29,15 +29,15 @@ namespace Jal.Router.Impl.Management
 
                 var loggers = loggertypes.Select(x => _factory.Create<ILogger<PointToPointChannelInfo>>(x)).ToArray();
 
-                var channelmanager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
+                var manager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
 
                 foreach (var source in _sources)
                 {
-                    var queues = source.GetPointToPointChannels();
+                    var channels = source.GetPointToPointChannels();
 
-                    foreach (var queue in queues)
+                    foreach (var channel in channels)
                     {
-                        var info = GetPointToPointChannel(queue, channelmanager);
+                        var info = manager.GetPointToPointChannel(channel.ConnectionString, channel.Path);
 
                         if (info != null)
                         {
@@ -46,23 +46,6 @@ namespace Jal.Router.Impl.Management
                     }
                 }
             }
-        }
-
-        public PointToPointChannelInfo GetPointToPointChannel(PointToPointChannel pointToPointChannel, IChannelManager channelmanager)
-        {
-            if (pointToPointChannel.ConnectionStringExtractorType != null)
-            {
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(pointToPointChannel.ConnectionStringExtractorType);
-
-                var toconnectionextractor = pointToPointChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                if (toconnectionextractor != null)
-                {
-                    return channelmanager.GetPointToPointChannel(toconnectionextractor(extractorconnectionstring), pointToPointChannel.Path);
-                }
-            }
-
-            return null;
         }
     }
 }

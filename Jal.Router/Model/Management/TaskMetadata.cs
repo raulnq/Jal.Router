@@ -2,7 +2,7 @@ using System;
 
 namespace Jal.Router.Model.Management
 {
-    public class MonitoringTaskMetadata
+    public class TaskMetadata
     {
         public Type Type { get; set; }
 

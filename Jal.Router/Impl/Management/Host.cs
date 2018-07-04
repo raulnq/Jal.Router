@@ -26,10 +26,12 @@ namespace Jal.Router.Impl.Management
 
         private readonly IComponentFactory _factory;
 
+        private readonly ILogger _logger;
+
         private int _state;
 
         private readonly CancellationTokenSource _cancellationtokensource;
-        public Host(IStartup startup, IMonitor monitor, IConfiguration configuration, IShutdown shutdown, IComponentFactory factory)
+        public Host(IStartup startup, IMonitor monitor, IConfiguration configuration, IShutdown shutdown, IComponentFactory factory, ILogger logger)
         {
             _startup = startup;
             _monitor = monitor;
@@ -37,6 +39,7 @@ namespace Jal.Router.Impl.Management
             _shutdown = shutdown;
             _factory = factory;
             _cancellationtokensource = new CancellationTokenSource();
+            _logger = logger;
         }
 
         private void Start()
@@ -61,7 +64,7 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("Start has already been called");
             }
 
-            Console.WriteLine($"Starting {Configuration.ApplicationName}");
+            _logger.Log($"Starting {Configuration.ApplicationName}");
 
             _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
 
@@ -106,7 +109,7 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("The host has not yet starteds");
             }
 
-            Console.WriteLine($"Stopping {Configuration.ApplicationName}");
+            _logger.Log($"Stopping {Configuration.ApplicationName}");
 
             Shutdown();
 

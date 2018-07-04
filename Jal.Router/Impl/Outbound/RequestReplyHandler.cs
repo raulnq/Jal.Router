@@ -13,26 +13,19 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IConfiguration _configuration;
 
-        private readonly IChannelPathBuilder _builder;
-
-        public RequestReplyHandler(IComponentFactory factory, IConfiguration configuration, IChannelPathBuilder builder)
+        public RequestReplyHandler(IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
             _configuration = configuration;
-            _builder = builder;
         }
 
         public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
-            if (!string.IsNullOrWhiteSpace(parameter.Channel.ToConnectionString) && !string.IsNullOrWhiteSpace(parameter.Channel.ToPath) &&
-                !string.IsNullOrWhiteSpace(parameter.Channel.ToReplyPath) && !string.IsNullOrWhiteSpace(parameter.Channel.ToReplyConnectionString)
-                && !string.IsNullOrWhiteSpace(context.ReplyToRequestId))
+            if (parameter.Channel.IsValidReplyEndpoint() && !string.IsNullOrWhiteSpace(context.ReplyToRequestId))
             {
-                var channelpath = _builder.BuildReplyFromEndpoint(context.EndPoint.Name, parameter.Channel);
-
                 var channel = _factory.Create<IRequestReplyChannel>(_configuration.RequestReplyChannelType);
 
-                var result = channel.Reply(parameter.Channel, context, channelpath);
+                var result = channel.Reply(parameter.Channel, context, parameter.Channel.GetPath(context.EndPoint.Name));
 
                 parameter.Result = result;
             }

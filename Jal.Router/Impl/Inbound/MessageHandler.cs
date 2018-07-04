@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
-            var storage = _factory.Create<IStorage>(_configuration.StorageType);
+            var storage = _factory.Create<ISagaStorage>(_configuration.SagaStorageType);
 
             context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name);
 
@@ -34,7 +34,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 var message = new MessageEntity()
                 {
-                    Content = context.ContentAsString,
+                    Content = context.Content,
                     ContentType = context.Route.ContentType.FullName,
                     Id = context.Id,
                     Version = context.Version,
@@ -44,7 +44,9 @@ namespace Jal.Router.Impl.Inbound
                     Headers = context.Headers,
                     DateTimeUtc = context.DateTimeUtc,
                     Name = context.Route.Name,
-                    Tracks = context.Tracks
+                    Tracks = context.Tracks,
+                    DataId = context.DataId,
+                    Data = string.Empty
                 };
 
                 try

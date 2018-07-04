@@ -92,7 +92,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
-                ContentAsString = serializer.Serialize(content),
+                Content = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 ResultType = typeof(TResult),
@@ -178,7 +178,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
-                ContentAsString = serializer.Serialize(content),
+                Content = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 Tracks = options.Tracks
@@ -250,7 +250,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
-                ContentAsString = serializer.Serialize(content),
+                Content = serializer.Serialize(content),
                 ReplyToRequestId = options.ReplyToRequestId,
                 RequestId = options.RequestId,
                 Tracks = options.Tracks
@@ -321,7 +321,7 @@ namespace Jal.Router.Impl.Outbound
                 SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
-                ContentAsString = serializer.Serialize(content),
+                Content = serializer.Serialize(content),
                 Tracks = options.Tracks
             };
 

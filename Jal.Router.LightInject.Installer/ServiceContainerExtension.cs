@@ -60,6 +60,8 @@ namespace Jal.Router.LightInject.Installer
 
         public static void RegisterRouter(this IServiceContainer container, string shutdownfile = "")
         {
+            container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
+
             container.Register<IHost, Host>(new PerContainerLifetime());
 
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
@@ -69,8 +71,6 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
 
             container.Register<IHandlerMethodSelector, HandlerMethodSelector>(new PerContainerLifetime());
-
-            container.Register<IChannelPathBuilder, ChannelPathBuilder>(new PerContainerLifetime());
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
@@ -92,7 +92,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdownTask, ShutdownTask>(typeof (ShutdownTask).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, ConfigurationSanityCheckStartupTask>(typeof (ConfigurationSanityCheckStartupTask).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, HandlerAndEndpointStartupTask>(typeof (HandlerAndEndpointStartupTask).FullName, new PerContainerLifetime());
 
             container.Register<IStartupTask, ListenerStartupTask>(typeof (ListenerStartupTask).FullName,new PerContainerLifetime());
 
@@ -104,7 +104,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
-            container.Register<IStorageFinder, StorageFinder>(new PerContainerLifetime());
+            container.Register<ISagaStorageFinder, SagaStorageFinder>(new PerContainerLifetime());
 
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof (PointToPointChannelMonitor).FullName,new PerContainerLifetime());
 
@@ -115,6 +115,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IMessageSerializer, NullMessageSerializer>(typeof (NullMessageSerializer).FullName,new PerContainerLifetime());
 
             container.Register<IMessageAdapter, NullMessageAdapter>(typeof (NullMessageAdapter).FullName,new PerContainerLifetime());
+
+            container.Register<IMessageStorage, NullMessageStorage>(typeof(NullMessageStorage).FullName, new PerContainerLifetime());
 
             container.Register<IRouterInterceptor, NullRouterInterceptor>(typeof (NullRouterInterceptor).FullName,new PerContainerLifetime());
 
@@ -128,13 +130,13 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 
-            container.Register<ILogger<HeartBeat>, ConsoleHeartBeatLogger>(typeof (ConsoleHeartBeatLogger).FullName,new PerContainerLifetime());
+            container.Register<ILogger<HeartBeat>, HeartBeatLogger>(typeof (HeartBeatLogger).FullName,new PerContainerLifetime());
 
-            container.Register<ILogger<StartupBeat>, ConsoleStartupBeatLogger>(typeof (ConsoleStartupBeatLogger).FullName,new PerContainerLifetime());
+            container.Register<ILogger<StartupBeat>, StartupBeatLogger>(typeof (StartupBeatLogger).FullName,new PerContainerLifetime());
 
-            container.Register<ILogger<ShutdownBeat>, ConsoleShutdownBeatLogger>(typeof (ConsoleShutdownBeatLogger).FullName,new PerContainerLifetime());
+            container.Register<ILogger<ShutdownBeat>, ShutdownBeatLogger>(typeof (ShutdownBeatLogger).FullName,new PerContainerLifetime());
 
-            container.Register<IStorage, NullStorage>(typeof (NullStorage).FullName, new PerContainerLifetime());
+            container.Register<ISagaStorage, NullSagaStorage>(typeof (NullSagaStorage).FullName, new PerContainerLifetime());
 
             container.Register<IMiddleware, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
 

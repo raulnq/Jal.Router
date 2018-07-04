@@ -21,15 +21,15 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly ISagaRouter _sagarouter;
 
-        private readonly IChannelPathBuilder _builder;
+        private readonly ILogger _logger;
 
-        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, IChannelPathBuilder builder, ISagaRouter sagarouter)
+        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger, ISagaRouter sagarouter)
         {
             _factory = factory;
             _configuration = configuration;
             _sources = sources;
             _router = router;
-            _builder = builder;
+            _logger = logger;
             _sagarouter = sagarouter;
         }
 
@@ -40,126 +40,69 @@ namespace Jal.Router.Impl.Inbound
 
             var publishsubscriberchannel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 
-            var routes = new List<RouteToListen>();
+            var listeners = new List<Listener>();
 
             foreach (var source in _sources)
             {
-                routes.AddRange(source.GetRoutes().Select(x => new RouteToListen() { Route = x }));
+                listeners.AddRange(source.GetRoutes().Select(route => new Listener() { Route = route, Action = message => _router.Route(message, route), Prefix = route.Name }));
 
                 foreach (var saga in source.GetSagas())
                 {
                     if (saga.StartingRoute != null)
                     {
-                        routes.Add(new RouteToListen() { Route = saga.StartingRoute, Saga = saga, IsStart = true });
+                        listeners.Add(new Listener() { Route = saga.StartingRoute, Action = message => _sagarouter.Start(message, saga, saga.StartingRoute), Prefix = $"{saga.Name}/{saga.StartingRoute.Name}" });
                     }
                     if (saga.EndingRoute != null)
                     {
-                        routes.Add(new RouteToListen() { Route = saga.EndingRoute, Saga = saga, IsEnd = true });
+                        listeners.Add(new Listener() { Route = saga.EndingRoute, Action = message => _sagarouter.End(message, saga, saga.EndingRoute), Prefix = $"{saga.Name}/{saga.EndingRoute.Name}" });
                     }
-                    routes.AddRange(saga.NextRoutes.Select(x => new RouteToListen() { Route = x, Saga = saga, IsNext = true }));
+                    listeners.AddRange(saga.NextRoutes.Select(route => new Listener() { Route = route, Action = message => _sagarouter.Continue(message, saga, route), Prefix = $"{saga.Name}/{route.Name}" }));
                 }
             }
 
-            var groups = new Dictionary<string, List<RouteToListen>>();
+            var groupsbychannel = new Dictionary<string, List<Listener>>();
 
-            foreach (var routeToListen in routes)
+            foreach (var listener in listeners)
             {
-                foreach (var channel in routeToListen.Route.Channels)
+                foreach (var channel in listener.Route.Channels)
                 {
-                    if (!groups.ContainsKey(routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString))
+                    if (!groupsbychannel.ContainsKey(channel.GetId()))
                     {
-                        groups.Add(routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString, new List<RouteToListen>() { routeToListen });
+                        groupsbychannel.Add(channel.GetId(), new List<Listener>() { listener });
                     }
                     else
                     {
-                        groups[routeToListen.Route.Name + channel.ToPath + channel.ToSubscription + channel.ToConnectionString].Add(routeToListen);
+                        groupsbychannel[channel.GetId()].Add(listener);
                     }
-
                 }
             }
 
-            foreach (var @group in groups)
+            foreach (var groupbychannel in groupsbychannel)
             {
-                var actions = new List<Action<object>>();
-
-                foreach (var item in group.Value)
+                if (groupbychannel.Value.Any())
                 {
-                    var route = item.Route;
+                    var listener = groupbychannel.Value.First();
 
-                    if (item.Saga == null)
+                    var channel = listener.Route.Channels.First(x => groupbychannel.Key == x.GetId());
+
+                    var channelpath = channel.GetPath();
+
+                    var prefixes = string.Join(",", groupbychannel.Value.Select(x => x.Prefix));
+
+                    var actions = groupbychannel.Value.Select(x => x.Action).ToArray();
+
+                    if (channel.IsPointToPoint())
                     {
-                        actions.Add(message => _router.Route(message, route));
+                        pointtopointchannel.Listen(channel, actions, channelpath);
+
+                        _logger.Log($"Listening {channelpath} {channel.ToString()} channel ({actions.Length}): {prefixes}");
                     }
-                    else
+
+                    if (channel.IsPublishSubscriber())
                     {
-                        var saga = item.Saga;
+                        publishsubscriberchannel.Listen(channel, actions, channelpath);
 
-                        if (item.IsStart)
-                        {
-                            actions.Add(message => _sagarouter.Start(message, saga, route));
-                        }
-                        if (item.IsEnd)
-                        {
-                            actions.Add(message => _sagarouter.End(message, saga, route));
-                        }
-                        if (item.IsNext)
-                        {
-                            actions.Add(message => _sagarouter.Continue(message, saga, route));
-                        }
-                    }
-                }
-
-                if (group.Value.Any())
-                {
-                    if (group.Value.Count() == 1)
-                    {
-                        var item = group.Value.First();
-
-                        var route = item.Route;
-
-                        var saga = item.Saga;
-
-                        var channel = route.Channels.First(x => group.Key.Replace(route.Name, "") == x.ToPath + x.ToSubscription + x.ToConnectionString);
-
-                        var channelpath = item.Saga == null ? _builder.BuildFromRoute(route.Name, channel) : _builder.BuildFromSagaAndRoute(saga, route.Name, channel);
-
-                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
-                        {
-                            pointtopointchannel.Listen(channel, actions.ToArray(), channelpath);
-
-                            Console.WriteLine($"Listening {channelpath} point to point channel");
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
-                        {
-                            publishsubscriberchannel.Listen(channel, actions.ToArray(), channelpath);
-
-                            Console.WriteLine($"Listening {channelpath} publish subscriber channel");
-                        }
-                    }
-                    else
-                    {
-                        var item = group.Value.First();
-
-                        var route = item.Route;
-
-                        var channel = route.Channels.First(x => group.Key.Replace(route.Name, "") == x.ToPath + x.ToSubscription + x.ToConnectionString);
-
-                        var channelpath = _builder.BuildFromRoute(route.Name, channel);
-
-                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && string.IsNullOrWhiteSpace(channel.ToSubscription))
-                        {
-                            pointtopointchannel.Listen(channel, actions.ToArray(), channelpath);
-
-                            Console.WriteLine($"Listening {channelpath} point to point channel ({actions.Count})");
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(channel.ToPath) && !string.IsNullOrWhiteSpace(channel.ToSubscription))
-                        {
-                            publishsubscriberchannel.Listen(channel, actions.ToArray(), channelpath);
-
-                            Console.WriteLine($"Listening {channelpath} publish subscriber channel ({actions.Count})");
-                        }
+                        _logger.Log($"Listening {channelpath} {channel.ToString()} channel ({actions.Length}): {prefixes}");
                     }
                 }
             }

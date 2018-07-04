@@ -2,6 +2,7 @@ using System;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
+using Jal.Router.Model.Management;
 using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
@@ -47,7 +48,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
-            Func<IValueSettingFinder, ServiceBusConfiguration> connectionstringextractor, bool all = false)
+            Func<IValueSettingFinder, ServiceBusConfiguration> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule=null)
             where TExtractorConectionString : IValueSettingFinder
         {
             Func<IValueSettingFinder, string> extractor = finder =>
@@ -57,12 +58,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
 
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(subscription, topic, extractor, all);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(subscription, topic, extractor, rule);
         }
 
-        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, bool all = false)
+        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, SubscriptionToPublishSubscribeChannelRule rule=null)
         {
-            configuration.RegisterSubscriptionToPublishSubscriberChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), all);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), rule);
         }
     }
 }

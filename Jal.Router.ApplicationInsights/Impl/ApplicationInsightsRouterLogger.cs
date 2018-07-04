@@ -47,6 +47,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Properties.Add("sagaid", context.SagaContext?.Id);
                 telemetry.Properties.Add("replytorequestid", context.ReplyToRequestId);
                 telemetry.Properties.Add("requestid", context.RequestId);
+                telemetry.Properties.Add("dataid", context.DataId);
 
                 telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
                 telemetry.Context.Operation.Name = name;
@@ -62,7 +63,7 @@ namespace Jal.Router.ApplicationInsights.Impl
                     telemetry.Properties.Add(h.Key, h.Value);
                 }
 
-                telemetry.Metrics.Add("retry", context.RetryCount);
+                telemetry.Metrics.Add("retrycount", context.RetryCount);
 
                 next();
 

@@ -19,5 +19,6 @@ namespace Jal.Router.Model
 
         public IList<Channel> Channels { get; set; }
         public IList<Type> MiddlewareTypes { get; set; }
+        public bool UseClaimCheck { get; set; }
     }
 }

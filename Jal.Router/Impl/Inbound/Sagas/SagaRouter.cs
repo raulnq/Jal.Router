@@ -28,7 +28,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
 
             var when = true;
 
@@ -85,7 +85,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
 
             var when = true;
 
@@ -141,7 +141,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
 
             var when = true;
 

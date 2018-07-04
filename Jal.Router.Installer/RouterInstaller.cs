@@ -46,6 +46,8 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<ILogger>().ImplementedBy<Impl.ConsoleLogger>().LifestyleSingleton());
+
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
             container.Register(Component.For<ISagaRouter>().ImplementedBy<SagaRouter>().LifestyleSingleton());
@@ -55,8 +57,6 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IHandlerMethodSelector>().ImplementedBy<HandlerMethodSelector>().LifestyleSingleton());
 
             container.Register(Component.For<IHandlerMethodExecutor>().ImplementedBy<HandlerMethodExecutor>().LifestyleSingleton());
-
-            container.Register(Component.For<IChannelPathBuilder>().ImplementedBy<ChannelPathBuilder>().LifestyleSingleton());
 
             container.Register(Component.For<IEndPointProvider>().ImplementedBy<EndPointProvider>().LifestyleSingleton());
 
@@ -76,7 +76,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IShutdownTask>().ImplementedBy<ShutdownTask>().LifestyleSingleton().Named(typeof(ShutdownTask).FullName));
 
-            container.Register(Component.For<IStartupTask>().ImplementedBy<ConfigurationSanityCheckStartupTask>().LifestyleSingleton().Named(typeof(ConfigurationSanityCheckStartupTask).FullName));
+            container.Register(Component.For<IStartupTask>().ImplementedBy<HandlerAndEndpointStartupTask>().LifestyleSingleton().Named(typeof(HandlerAndEndpointStartupTask).FullName));
 
             container.Register(Component.For<IShutdownWatcher>().ImplementedBy<ShutdownNullWatcher>().LifestyleSingleton().Named(typeof(ShutdownNullWatcher).FullName));
 
@@ -86,7 +86,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<IStorageFinder>().ImplementedBy<StorageFinder>().LifestyleSingleton());
+            container.Register(Component.For<ISagaStorageFinder>().ImplementedBy<SagaStorageFinder>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
@@ -97,6 +97,8 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IMessageSerializer>().ImplementedBy<NullMessageSerializer>().LifestyleSingleton().Named(typeof(NullMessageSerializer).FullName));
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<NullMessageAdapter>().LifestyleSingleton().Named(typeof(NullMessageAdapter).FullName));
+
+            container.Register(Component.For<IMessageStorage>().ImplementedBy<NullMessageStorage>().LifestyleSingleton().Named(typeof(NullMessageStorage).FullName));
 
             container.Register(Component.For<IShutdownWatcher>().Instance(new ShutdownFileWatcher(_shutdownfile)).LifestyleSingleton().Named(typeof(ShutdownFileWatcher).FullName));
 
@@ -110,15 +112,15 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IChannelManager>().ImplementedBy<NullChannelManager>().LifestyleSingleton().Named(typeof(NullChannelManager).FullName));
 
-            container.Register(Component.For(typeof(ILogger<HeartBeat>)).ImplementedBy(typeof(ConsoleHeartBeatLogger)).Named(typeof(ConsoleHeartBeatLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ILogger<HeartBeat>)).ImplementedBy(typeof(HeartBeatLogger)).Named(typeof(HeartBeatLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(ILogger<StartupBeat>)).ImplementedBy(typeof(ConsoleStartupBeatLogger)).Named(typeof(ConsoleStartupBeatLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ILogger<StartupBeat>)).ImplementedBy(typeof(StartupBeatLogger)).Named(typeof(StartupBeatLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(ILogger<ShutdownBeat>)).ImplementedBy(typeof(ConsoleShutdownBeatLogger)).Named(typeof(ConsoleShutdownBeatLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ILogger<ShutdownBeat>)).ImplementedBy(typeof(ShutdownBeatLogger)).Named(typeof(ShutdownBeatLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(NullBusInterceptor)).Named(typeof(NullBusInterceptor).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IStorage)).ImplementedBy(typeof(NullStorage)).Named(typeof(NullStorage).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(ISagaStorage)).ImplementedBy(typeof(NullSagaStorage)).Named(typeof(NullSagaStorage).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
 

@@ -42,8 +42,6 @@ namespace Jal.Router.Impl.Inbound
                     }
                     else
                     {
-                        Console.WriteLine("The retry policy cannot be null");
-
                         throw new ApplicationException("The retry policy cannot be null");
                     }
                 }
@@ -129,7 +127,7 @@ namespace Jal.Router.Impl.Inbound
 
             var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
-            var content = adapter.Deserialize(context.ContentAsString, context.ContentType);
+            var content = adapter.Deserialize(context.Content, context.ContentType);
 
             _bus.Send(content, context.Origin, options);
         }
@@ -187,7 +185,7 @@ namespace Jal.Router.Impl.Inbound
 
             var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
 
-            var content = adapter.Deserialize(context.ContentAsString, context.ContentType);
+            var content = adapter.Deserialize(context.Content, context.ContentType);
 
             _bus.Send(content, context.Origin, options);
 

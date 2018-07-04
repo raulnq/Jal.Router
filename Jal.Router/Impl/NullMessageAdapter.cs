@@ -4,14 +4,15 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
+
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext Read(object message, Type contenttype)
+        public MessageContext Read(object message, Type type, bool useclaimcheck)
         {
             return new MessageContext(new EndPoint(string.Empty));
         }
 
-        public object Write(MessageContext context)
+        public object Write(MessageContext context, bool useclaimcheck)
         {
             return null;
         }
@@ -29,6 +30,11 @@ namespace Jal.Router.Impl
         public string Serialize(object content)
         {
             return string.Empty;
+        }
+
+        public MessageContext Read(object message, Type contenttype)
+        {
+            return new MessageContext(new EndPoint(string.Empty));
         }
     }
 }

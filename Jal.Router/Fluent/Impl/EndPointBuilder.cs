@@ -70,5 +70,12 @@ namespace Jal.Router.Fluent.Impl
 
             return this;
         }
+
+        public IOnEndPointOptionBuilder AsClaimCheck()
+        {
+            _endpoint.UseClaimCheck = true;
+
+            return this;
+        }
     }
 }

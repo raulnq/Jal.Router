@@ -5,7 +5,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public abstract class AbstractStorage : IStorage
+    public abstract class AbstractSagaStorage : ISagaStorage
     {
         public virtual void CreateMessage(MessageContext context, MessageEntity messageentity)
         {

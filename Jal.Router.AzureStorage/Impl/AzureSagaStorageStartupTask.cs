@@ -1,11 +1,12 @@
 using System;
+using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Jal.Router.AzureStorage.Impl
 {
-    public class AzureStorageStartupTask : IStartupTask
+    public class AzureSagaStorageStartupTask : IStartupTask
     {
         private readonly string _connectionstring;
 
@@ -15,7 +16,9 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly string _tablenamesufix;
 
-        public AzureStorageStartupTask(string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
+        private readonly ILogger _logger;
+
+        public AzureSagaStorageStartupTask(ILogger logger, string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
         {
             _connectionstring = connectionstring;
 
@@ -24,6 +27,8 @@ namespace Jal.Router.AzureStorage.Impl
             _sagastoragename = sagastoragename;
 
             _messagestorgename = messagestorgename;
+
+            _logger = logger;
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -43,13 +48,13 @@ namespace Jal.Router.AzureStorage.Impl
 
             var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            Console.WriteLine($"Created {sagatable} table");
+            _logger.Log($"Created {sagatable} table");
 
             var messagetable = GetCloudTable(_connectionstring, $"{_messagestorgename}{_tablenamesufix}");
 
             var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            Console.WriteLine($"Created {messagetable} table");
+            _logger.Log($"Created {messagetable} table");
         }
     }
 }

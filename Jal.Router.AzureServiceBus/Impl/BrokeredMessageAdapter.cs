@@ -30,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             if (brokeredmessage != null)
             {
-                var storage = Factory.Create<IStorage>(Configuration.StorageType);
+                var storage = Factory.Create<ISagaStorage>(Configuration.SagaStorageType);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
@@ -45,6 +45,11 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties.ContainsKey(From))
                 {
                     context.Origin.From = brokeredmessage.Properties[From].ToString();
+                }
+
+                if (brokeredmessage.Properties.ContainsKey(DataId))
+                {
+                    context.DataId = brokeredmessage.Properties[DataId].ToString();
                 }
 
                 if (brokeredmessage.Properties.ContainsKey(Tracks))
@@ -75,7 +80,7 @@ namespace Jal.Router.AzureServiceBus.Impl
                 if (brokeredmessage.Properties != null)
                 {
                     foreach (var property in brokeredmessage.Properties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks))
+                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks && x.Key!=DataId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -130,9 +135,9 @@ namespace Jal.Router.AzureServiceBus.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        public override object Write(MessageContext context)
+        protected override object Write(MessageContext context)
         {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(context.ContentAsString));
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(context.Content));
 
             var brokeredmessage = new BrokeredMessage(stream, true) { ContentType = "application/json" };
 
@@ -154,6 +159,11 @@ namespace Jal.Router.AzureServiceBus.Impl
             if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
                 brokeredmessage.Properties.Add(SagaId, context.SagaContext.Id);
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.DataId))
+            {
+                brokeredmessage.Properties.Add(DataId, context.DataId);
             }
 
             if (context.Tracks != null)

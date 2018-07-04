@@ -1,6 +1,7 @@
 using System;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.AzureServiceBus.Extensions
 {
@@ -30,16 +31,16 @@ namespace Jal.Router.AzureServiceBus.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name, string path,
-            Func<IValueSettingFinder, string> connectionstring, bool all = false)
+            Func<IValueSettingFinder, string> connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
             where TExtractorConectionString : IValueSettingFinder
         {
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(name, path, connectionstring, all);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(name, path, connectionstring, rule);
         }
 
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string name, string path,
-            string connectionstring, bool all = false)
+            string connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
         {
-            configuration.RegisterSubscriptionToPublishSubscriberChannel(name, path, connectionstring, all);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel(name, path, connectionstring, rule);
         }
     }
 }

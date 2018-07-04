@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Text;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
@@ -13,15 +15,20 @@ namespace Jal.Router.Impl.Management
 
         private readonly IConfiguration _configuration;
 
-        public ChannelStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory, IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public ChannelStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory, IConfiguration configuration, ILogger logger)
         {
             _sources = sources;
             _factory = factory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public void Run()
         {
+            var errors = new StringBuilder();
+
             var channelmanager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
 
             foreach (var source in _sources)
@@ -30,7 +37,7 @@ namespace Jal.Router.Impl.Management
 
                 foreach (var queue in queues)
                 {
-                    CreatePointToPointChannel(queue, channelmanager);
+                    CreatePointToPointChannel(queue, channelmanager, errors);
                 }
             }
 
@@ -40,7 +47,7 @@ namespace Jal.Router.Impl.Management
 
                 foreach (var topic in topics)
                 {
-                    CreatePublishSubscriberChannel(topic, channelmanager);
+                    CreatePublishSubscriberChannel(topic, channelmanager, errors);
                 }
             }
 
@@ -50,109 +57,202 @@ namespace Jal.Router.Impl.Management
 
                 foreach (var subscription in subscriptions)
                 {
-                    CreateSubscriptionToPublishSubscribeChannel(subscription, channelmanager);
+                    CreateSubscriptionToPublishSubscribeChannel(subscription, channelmanager, errors);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(errors.ToString()))
+            {
+                throw new ApplicationException(errors.ToString());
+            }
+        }
+
+        public void CreateSubscriptionToPublishSubscribeChannel(SubscriptionToPublishSubscribeChannel subscription, IChannelManager manager, StringBuilder errors)
+        {
+            if (subscription.ConnectionStringExtractorType != null)
+            {
+                var finder = _factory.Create<IValueSettingFinder>(subscription.ConnectionStringExtractorType);
+
+                var extractor = subscription.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
+
+                subscription.ConnectionString = extractor?.Invoke(finder);
+
+                if (string.IsNullOrWhiteSpace(subscription.ConnectionString))
+                {
+                    var error = $"Empty connection string, subscription to publish subscriber channel {subscription.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(subscription.Path))
+                {
+                    var error = $"Empty path, subscription to publish subscriber channel {subscription.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(subscription.Subscription))
+                {
+                    var error = $"Empty subscription, subscription to publish subscriber channel {subscription.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                if (subscription.Rules.Count==0)
+                {
+                    var error = $"Missing rules, subscription to publish subscriber channel {subscription.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                try
+                {
+                    var created = manager.CreateIfNotExistSubscriptionToPublishSubscribeChannel(subscription.ConnectionString, subscription.Path, subscription.Subscription, subscription.Rules.FirstOrDefault());
+
+                    if (created)
+                    {
+                        _logger.Log($"Created subscription to {subscription.Path}/{subscription.Subscription} publish subscriber channel");
+                    }
+                    else
+                    {
+                        _logger.Log($"Subscription to publish subscriber channel {subscription.Path}/{subscription.Subscription} already exists");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = $"Exception {subscription.Path}/{subscription.Subscription} subscription to publish subscriber channel: {ex}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
                 }
             }
         }
 
-        public void CreateSubscriptionToPublishSubscribeChannel(SubscriptionToPublishSubscribeChannel subscriptionToPublishSubscribeChannel, IChannelManager channelmanager)
+        public void CreatePointToPointChannel(PointToPointChannel channel, IChannelManager manager, StringBuilder errors)
         {
-            if (subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType != null)
+            if (channel.ConnectionStringExtractorType != null)
             {
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(subscriptionToPublishSubscribeChannel.ConnectionStringExtractorType);
+                var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
 
-                var toconnectionextractor = subscriptionToPublishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                var extractor = channel.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                if (toconnectionextractor != null && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Path) && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Subscription) && ((subscriptionToPublishSubscribeChannel.All==false && !string.IsNullOrWhiteSpace(subscriptionToPublishSubscribeChannel.Origin.Key)) || subscriptionToPublishSubscribeChannel.All))
+                channel.ConnectionString = extractor?.Invoke(finder);
+
+                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                 {
-                    try
+                    var error = $"Empty connection string, point to point channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(channel.Path))
+                {
+                    var error = $"Empty path, point to point channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                try
+                {
+                    var created = manager.CreateIfNotExistPointToPointChannel(channel.ConnectionString, channel.Path);
+
+                    if (created)
                     {
-                        var connectionstring = toconnectionextractor(extractorconnectionstring);
-
-                        var created = channelmanager.CreateIfNotExistSubscriptionToPublishSubscribeChannel(connectionstring, subscriptionToPublishSubscribeChannel.Path, subscriptionToPublishSubscribeChannel.Subscription, subscriptionToPublishSubscribeChannel.Origin.Key, subscriptionToPublishSubscribeChannel.All);
-
-                        if (created)
-                        {
-                            Console.WriteLine($"Created subscription to {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} publish subscriber channel");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Subscription to publish subscriber channel {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} already exists");
-                        }
+                        _logger.Log($"Created {channel.Path} point to point channel");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Console.WriteLine($"Exception {subscriptionToPublishSubscribeChannel.Path}/{subscriptionToPublishSubscribeChannel.Subscription} subscription to publish subscriber channel: {ex}");
+                        _logger.Log($"Point to point channel {channel.Path} already exists");
                     }
                 }
-            }
-
-        }
-
-        public void CreatePointToPointChannel(PointToPointChannel pointToPointChannel, IChannelManager channelmanager)
-        {
-            if (pointToPointChannel.ConnectionStringExtractorType != null)
-            {
-
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(pointToPointChannel.ConnectionStringExtractorType);
-
-                var toconnectionextractor = pointToPointChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
-
-                if (toconnectionextractor != null)
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        var connectionstring = toconnectionextractor(extractorconnectionstring);
+                    var error = $"Exception {channel.Path} point to point channel: {ex}";
 
-                        var created = channelmanager.CreateIfNotExistPointToPointChannel(connectionstring, pointToPointChannel.Path);
+                    errors.AppendLine(error);
 
-                        if (created)
-                        {
-                            Console.WriteLine($"Created {pointToPointChannel.Path} point to point channel");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Point to point channel {pointToPointChannel.Path} already exists");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Exception {pointToPointChannel.Path} point to point channel: {ex}");
-                    }
-
+                    _logger.Log(error);
                 }
             }
         }
 
-        public void CreatePublishSubscriberChannel(PublishSubscribeChannel publishSubscribeChannel, IChannelManager channelmanager)
+        public void CreatePublishSubscriberChannel(PublishSubscribeChannel channel, IChannelManager manager, StringBuilder errors)
         {
-            if (publishSubscribeChannel.ConnectionStringExtractorType != null)
+            if (channel.ConnectionStringExtractorType != null)
             {
-                var extractorconnectionstring = _factory.Create<IValueSettingFinder>(publishSubscribeChannel.ConnectionStringExtractorType);
+                var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
 
-                var toconnectionextractor = publishSubscribeChannel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                var extractor = channel.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
 
-                if (toconnectionextractor != null)
+                channel.ConnectionString = extractor?.Invoke(finder);
+
+                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                 {
-                    try
-                    {
-                        var connectionstring = toconnectionextractor(extractorconnectionstring);
+                    var error = $"Empty connection string, publish subscriber channel {channel.Path}";
 
-                        var created = channelmanager.CreateIfNotExistPublishSubscribeChannel(connectionstring, publishSubscribeChannel.Path);
+                    errors.AppendLine(error);
 
-                        if (created)
-                        {
-                            Console.WriteLine($"Created {publishSubscribeChannel.Path} publish subscriber channel");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Publish subscriber channel {publishSubscribeChannel.Path} already exists");
-                        }
-                    }
-                    catch (Exception ex)
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(channel.Path))
+                {
+                    var error = $"Empty path, publish subscriber channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
+
+                    return;
+                }
+
+                try
+                {
+                    var created = manager.CreateIfNotExistPublishSubscribeChannel(channel.ConnectionString, channel.Path);
+
+                    if (created)
                     {
-                        Console.WriteLine($"Exception {publishSubscribeChannel.Path} publish subscriber channel: {ex}");
+                        _logger.Log($"Created {channel.Path} publish subscriber channel");
                     }
+                    else
+                    {
+                        _logger.Log($"Publish subscriber channel {channel.Path} already exists");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = $"Exception {channel.Path} publish subscriber channel: {ex}";
+
+                    errors.AppendLine(error);
+
+                    _logger.Log(error);
                 }
             }
         }

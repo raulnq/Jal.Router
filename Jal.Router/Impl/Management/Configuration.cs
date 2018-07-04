@@ -19,14 +19,16 @@ namespace Jal.Router.Impl.Management
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
-        public IList<MonitoringTaskMetadata> MonitoringTaskTypes { get; }
+        public IList<TaskMetadata> MonitoringTaskTypes { get; }
         public Type ChannelManagerType { get; private set; }
         public Type ShutdownWatcherType { get; private set; }
         public Type RequestReplyChannelType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
-        public Type StorageType { get; private set; }
+        public Type SagaStorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
+
+        public Type MessageStorageType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; }
         public Type RouterInterceptorType { get; set; }
         public Type BusInterceptorType { get; private set; }
@@ -40,6 +42,11 @@ namespace Jal.Router.Impl.Management
         public void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter
         {
             MessageAdapterType = typeof(TMessageAdapter);
+        }
+
+        public void UsingMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage
+        {
+            MessageStorageType = typeof(TMessageStorage);
         }
 
         public void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
@@ -67,9 +74,9 @@ namespace Jal.Router.Impl.Management
             MessageSerializerType = typeof(TMessageBodySerializer);
         }
 
-        public void UsingStorage<TStorage>() where TStorage : IStorage
+        public void UsingSagaStorage<TSagaStorage>() where TSagaStorage : ISagaStorage
         {
-            StorageType = typeof(TStorage);
+            SagaStorageType = typeof(TSagaStorage);
         }
 
         public void AddInboundMiddleware<TMiddleware>() where TMiddleware : Interface.Inbound.IMiddleware
@@ -106,7 +113,7 @@ namespace Jal.Router.Impl.Management
 
         public void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask
         {
-            MonitoringTaskTypes.Add(new MonitoringTaskMetadata() {Type = typeof(TMonitoringTask), Interval = interval });
+            MonitoringTaskTypes.Add(new TaskMetadata() {Type = typeof(TMonitoringTask), Interval = interval });
         }
         public void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
         {
@@ -122,7 +129,8 @@ namespace Jal.Router.Impl.Management
         {
             UsingRouterInterceptor<NullRouterInterceptor>();
             UsingBusInterceptor<NullBusInterceptor>();
-            UsingStorage<NullStorage>();
+            UsingSagaStorage<NullSagaStorage>();
+            UsingMessageStorage<NullMessageStorage>();
             UsingChannelManager<NullChannelManager>();
             UsingPointToPointChannel<NullPointToPointChannel>();
             UsingPublishSubscribeChannel<NullPublishSubscribeChannel>();
@@ -131,16 +139,16 @@ namespace Jal.Router.Impl.Management
             UsingMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
-            MonitoringTaskTypes = new List<MonitoringTaskMetadata>();
+            MonitoringTaskTypes = new List<TaskMetadata>();
             StartupTaskTypes = new List<Type>();
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
-            AddLogger<ConsoleHeartBeatLogger, HeartBeat>();
-            AddLogger<ConsoleStartupBeatLogger, StartupBeat>();    
-            AddLogger<ConsoleShutdownBeatLogger, ShutdownBeat>();
+            AddLogger<HeartBeatLogger, HeartBeat>();
+            AddLogger<StartupBeatLogger, StartupBeat>();    
+            AddLogger<ShutdownBeatLogger, ShutdownBeat>();
             AddStartupTask<StartupTask>();
-            AddStartupTask<ConfigurationSanityCheckStartupTask>();
+            AddStartupTask<HandlerAndEndpointStartupTask>();
             AddStartupTask<ChannelStartupTask>();
             AddStartupTask<ListenerStartupTask>();
             AddShutdownTask<ListenerShutdownTask>();
