@@ -18,6 +18,8 @@ namespace Jal.Router.AzureServiceBus.Extensions
             configuration.UsingMessageAdapter<BrokeredMessageAdapter>();
 
             configuration.UsingMessageSerializer<JsonMessageSerializer>();
+
+            configuration.ChannelProviderName = "Azure Service Bus";
         }
 
 

@@ -39,7 +39,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             {
                 var data = serializer.Deserialize(sagaentity.Data, parameter.Saga.DataType);
 
-                context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
+                context.AddTrack(context.Identity.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
 
                 if (data != null)
                 {

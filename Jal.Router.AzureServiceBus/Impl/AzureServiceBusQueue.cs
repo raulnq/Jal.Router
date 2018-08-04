@@ -30,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         public override void Listen(Channel channel, Action<object>[] routeactions, string channelpath)
         {
             var client = QueueClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath);
-
+            
             var receiver = client.MessagingFactory.CreateMessageReceiver(channel.ToPath);
 
             var options = CreateOptions();

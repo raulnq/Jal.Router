@@ -14,6 +14,7 @@ namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
+        public string ChannelProviderName { get; set; }
         public StorageConfiguration Storage { get; set; }
         public string ApplicationName { get; set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
@@ -161,6 +162,7 @@ namespace Jal.Router.Impl.Management
             UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();
             ApplicationName = "[Empty]";
+            ChannelProviderName = "[Empty]";
         }
     }
 }

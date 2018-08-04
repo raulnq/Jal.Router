@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.4.5</Version>
+    <Version>1.4.6</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with azure service bus (net standard library)</Description>
     <Copyright />

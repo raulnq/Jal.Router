@@ -18,12 +18,12 @@ namespace Jal.Router.AzureStorage.Model
 
         public string Tracks { get; set; }
         public string Data { get; set; }
-        public string DataId { get; set; }
+        public string ContentId { get; set; }
         public DateTime DateTimeUtc { get; set; }
 
         public string Content { get; set; }
 
-        public string Id { get; set; }
+        public string Identity { get; set; }
 
         public string Version { get; set; }
 

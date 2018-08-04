@@ -15,7 +15,11 @@ namespace Jal.Router.Impl.Inbound
 
         protected readonly IBus Bus;
 
-        public const string DataId = "dataid";
+        public const string ContentId = "contentid";
+
+        public const string OperationId = "operationid";
+
+        public const string ParentId = "parentid";
 
         public const string Tracks = "tracking";
 
@@ -86,11 +90,11 @@ namespace Jal.Router.Impl.Inbound
 
             context.ContentType = contenttype;
 
-            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.DataId))
+            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
             {
                 var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
 
-                context.Content = storage.Read(context.DataId);
+                context.Content = storage.Read(context.ContentId);
             }
             else
             {
@@ -108,9 +112,9 @@ namespace Jal.Router.Impl.Inbound
             {
                 var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
 
-                context.DataId = Guid.NewGuid().ToString();
+                context.ContentId = Guid.NewGuid().ToString();
 
-                storage.Write(context.DataId, context.Content);
+                storage.Write(context.ContentId, context.Content);
 
                 context.Content = string.Empty;
             }

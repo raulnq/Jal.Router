@@ -81,20 +81,12 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext(endpoint)
+            var message = new MessageContext(endpoint, options)
             {
-                Id = options.Id,
                 Origin = origin,
-                Headers = options.Headers,
-                Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
-                RetryCount = options.RetryCount,
-                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                ReplyToRequestId = options.ReplyToRequestId,
-                RequestId = options.RequestId,
                 ResultType = typeof(TResult),
                 Tracks = options.Tracks
             };
@@ -167,20 +159,12 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext(endpoint)
+            var message = new MessageContext(endpoint, options)
             {
-                Id = options.Id,
                 Origin = origin,
-                Headers = options.Headers,
-                Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
-                RetryCount = options.RetryCount,
-                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                ReplyToRequestId = options.ReplyToRequestId,
-                RequestId = options.RequestId,
                 Tracks = options.Tracks
             };
 
@@ -239,20 +223,12 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext(endpoint)
+            var message = new MessageContext(endpoint, options)
             {
-                Id = options.Id,
                 Origin = origin,
-                Headers = options.Headers,
-                Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
-                RetryCount = options.RetryCount,
-                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                ReplyToRequestId = options.ReplyToRequestId,
-                RequestId = options.RequestId,
                 Tracks = options.Tracks
             };
 
@@ -310,15 +286,9 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var message = new MessageContext(endpoint)
+            var message = new MessageContext(endpoint, options)
             {
-                Id = options.Id,
                 Origin = origin,
-                Headers = options.Headers,
-                Version = options.Version,
-                ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc,
-                RetryCount = options.RetryCount,
-                SagaContext = options.SagaContext,
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),

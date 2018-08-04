@@ -21,7 +21,7 @@ namespace Jal.Router.Impl.Outbound
 
         public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
-            if (parameter.Channel.IsValidReplyEndpoint() && !string.IsNullOrWhiteSpace(context.ReplyToRequestId))
+            if (parameter.Channel.IsValidReplyEndpoint() && !string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
             {
                 var channel = _factory.Create<IRequestReplyChannel>(_configuration.RequestReplyChannelType);
 

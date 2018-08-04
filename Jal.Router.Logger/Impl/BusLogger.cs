@@ -24,15 +24,15 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Start Call. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Identity.Id}] Start Call. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} path: {parameter.Channel.GetPath()} from: {context.Origin.From} origin: {context.Origin.Key} operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
 
                 next();
 
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Message sent. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Identity.Id}] Message sent. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} path: {parameter.Channel.GetPath()} from: {context.Origin.From} origin: {context.Origin.Key}  operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
             }
             catch (Exception exception)
             {
-                _log.Error($"[Bus.cs, {parameter.OutboundType}, {context.Id}] Exception.", exception);
+                _log.Error($"[Bus.cs, {parameter.OutboundType}, {context.Identity.Id}] Exception.  id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} path: {parameter.Channel.GetPath()} from: {context.Origin.From} origin: {context.Origin.Key}  operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}", exception);
 
                 throw;
             }
@@ -40,7 +40,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} connectionstring: {parameter.Channel.ToConnectionString} path: {parameter.Channel.ToPath} from: {context.Origin.From} origin: {context.Origin.Key}");
+                _log.Info($"[Bus.cs, {parameter.OutboundType}, {context.Identity.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} endpoint: {context.EndPoint.Name} path: {parameter.Channel.GetPath()} from: {context.Origin.From} origin: {context.Origin.Key}  operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
             }
         }
     }

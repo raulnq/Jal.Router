@@ -11,6 +11,7 @@ namespace Jal.Router.Interface.Management
     {
         StorageConfiguration Storage { get; set; }
         string ApplicationName { get; set; }
+        string ChannelProviderName { get; set; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }

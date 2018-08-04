@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     {
         public MessageContext Read(object message, Type type, bool useclaimcheck)
         {
-            return new MessageContext(new EndPoint(string.Empty));
+            return new MessageContext(new EndPoint(string.Empty), new Options());
         }
 
         public object Write(MessageContext context, bool useclaimcheck)
@@ -34,7 +34,7 @@ namespace Jal.Router.Impl
 
         public MessageContext Read(object message, Type contenttype)
         {
-            return new MessageContext(new EndPoint(string.Empty));
+            return new MessageContext(new EndPoint(string.Empty), new Options());
         }
     }
 }
