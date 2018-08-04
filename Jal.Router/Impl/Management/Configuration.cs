@@ -27,7 +27,7 @@ namespace Jal.Router.Impl.Management
         public Type PublishSubscribeChannelType { get; private set; }
         public Type SagaStorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
-
+        public Type ChannelShufflerType { get; private set; }
         public Type MessageStorageType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; }
         public Type RouterInterceptorType { get; set; }
@@ -35,6 +35,10 @@ namespace Jal.Router.Impl.Management
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
+        public void UsingChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler
+        {
+            ChannelShufflerType = typeof(TChannelShuffler);
+        }
         public void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
         {
             PublishSubscribeChannelType = typeof(TPublishSubscribeChannel);
@@ -127,6 +131,7 @@ namespace Jal.Router.Impl.Management
 
         public Configuration()
         {
+            UsingChannelShuffler<DefaultChannelShuffler>();
             UsingRouterInterceptor<NullRouterInterceptor>();
             UsingBusInterceptor<NullBusInterceptor>();
             UsingSagaStorage<NullSagaStorage>();

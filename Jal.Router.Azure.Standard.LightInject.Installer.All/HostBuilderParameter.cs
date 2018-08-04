@@ -1,6 +1,7 @@
 ﻿using System;
 using Common.Logging;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Management;
 using LightInject;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
@@ -8,6 +9,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
     public class HostBuilderParameter
     {
         public Type RouterInterceptorType { get; set; }
+        public Action<IConfiguration> Setup { get; set; }
         public ServiceContainer Container { get; set; }
         public IRouterConfigurationSource[] Sources { get; set; }
 

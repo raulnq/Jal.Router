@@ -60,6 +60,10 @@ namespace Jal.Router.LightInject.Installer
 
         public static void RegisterRouter(this IServiceContainer container, string shutdownfile = "")
         {
+            container.Register<IChannelShuffler, DefaultChannelShuffler>(typeof(DefaultChannelShuffler).FullName, new PerContainerLifetime());
+
+            container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());
+
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
             container.Register<IHost, Host>(new PerContainerLifetime());

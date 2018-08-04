@@ -76,8 +76,33 @@ namespace Jal.Router.ApplicationInsights.Impl
                 telemetry.Success = false;
 
                 var telemetryexception = new ExceptionTelemetry(exception);
+
+                telemetryexception.Timestamp = context.DateTimeUtc;
+
+                telemetryexception.Properties.Add("from", context.Origin.From);
+                telemetryexception.Properties.Add("version", context.Version);
+                telemetryexception.Properties.Add("origin", context.Origin.Key);
+                telemetryexception.Properties.Add("sagaid", context.SagaContext?.Id);
+                telemetryexception.Properties.Add("replytorequestid", context.ReplyToRequestId);
+                telemetryexception.Properties.Add("requestid", context.RequestId);
+                telemetryexception.Properties.Add("dataid", context.DataId);
+
+                telemetryexception.Context.Operation.Name = name;
                 telemetryexception.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
                 telemetryexception.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
+                
+                if (!string.IsNullOrWhiteSpace(_configuration.ApplicationName))
+                {
+                    telemetryexception.Context.Cloud.RoleName = _configuration.ApplicationName;
+                }
+
+                foreach (var h in context.Headers)
+                {
+                    telemetryexception.Properties.Add(h.Key, h.Value);
+                }
+
+                telemetryexception.Metrics.Add("retrycount", context.RetryCount);
+
                 _client.TrackException(telemetryexception);
                 throw;
             }
