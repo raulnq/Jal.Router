@@ -37,7 +37,11 @@ namespace Jal.Router.Tests.Impl
 
         public void Handle(Trigger message, MessageContext context)
         {
-            var result = _bus.Reply<RequestToSend, ResponseToSend>(new RequestToSend() {Name = "Hi Raul"}, new Options() {ReplyToRequestId = Guid.NewGuid().ToString(), EndPointName = "torequestqueue" } );
+            var options = new Options() { EndPointName = "torequestqueue" };
+
+            options.Identity.ReplyToRequestId = Guid.NewGuid().ToString();
+
+            var result = _bus.Reply<RequestToSend, ResponseToSend>(new RequestToSend() {Name = "Hi Raul"}, options);
 
             if (result == null)
             {
@@ -55,7 +59,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appa", context.Id);
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appa", context.Identity.Id);
         }
     }
 
@@ -63,7 +67,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(RequestToSend message, MessageContext context)
         {
-            context.Send(new ResponseToSend() { Name = message.Name }, "appb", context.Id);
+            context.Send(new ResponseToSend() { Name = message.Name }, "appb", context.Identity.Id);
         }
     }
 
@@ -79,7 +83,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appc", context.Id);
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appc", context.Identity.Id);
         }
     }
 
@@ -87,7 +91,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(RequestToSend message, MessageContext context)
         {
-            context.Publish(new ResponseToSend() { Name = message.Name }, "appd", context.Id, context.Origin.Key);
+            context.Publish(new ResponseToSend() { Name = message.Name }, "appd", context.Identity.Id, context.Origin.Key);
         }
     }
 
@@ -105,7 +109,7 @@ namespace Jal.Router.Tests.Impl
         {
             data.Status = "Start";
 
-            context.Send(data, new ResponseToSend() { Name = message.Name }, "appx", $"{context.Id}@child-1", context.SagaContext.Id);
+            context.Send(data, new ResponseToSend() { Name = message.Name }, "appx", $"{context.Identity.Id}@child-1", context.Identity.Id, context.SagaContext.Id);
             
         }
     }
@@ -125,7 +129,7 @@ namespace Jal.Router.Tests.Impl
 
         public void Handle(ResponseToSend message, MessageContext context)
         {
-            context.Send(new ResponseToSend() { Name = message.Name }, "apph", context.Id, context.SagaContext.Id);
+            context.Send(new ResponseToSend() { Name = message.Name }, "apph", context.Identity.Id, context.Identity.Id, context.SagaContext.Id);
             
         }
     }
@@ -137,7 +141,7 @@ namespace Jal.Router.Tests.Impl
             Console.WriteLine(message.Name + " " + data.Status);
             data.Status = "Continue";
 
-            context.Send(data, new ResponseToSend() { Name = message.Name }, "appz", $"{context.Id}@child-2", context.SagaContext.Id);
+            context.Send(data, new ResponseToSend() { Name = message.Name }, "appz", $"{context.Identity.Id}@child-2", context.Identity.Id, context.SagaContext.Id);
         }
     }
 
@@ -163,7 +167,7 @@ namespace Jal.Router.Tests.Impl
     {
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appg", context.Id);
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appg", context.Identity.Id);
         }
     }
 
@@ -178,7 +182,7 @@ namespace Jal.Router.Tests.Impl
 
         public void Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appi", context.Id);
+            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appi", context.Identity.Id);
         }
     }
 
@@ -213,7 +217,11 @@ namespace Jal.Router.Tests.Impl
         {
             Console.WriteLine($"request {message.Name}");
 
-            context.Publish(new ResponseToSend() { Name = message.Name }, new Options() { RequestId = context.ReplyToRequestId, EndPointName = "toresponsetopic" });
+            var options = new Options() { EndPointName = "toresponsetopic" };
+
+            options.Identity.RequestId = context.Identity.ReplyToRequestId;
+
+            context.Publish(new ResponseToSend() { Name = message.Name }, options);
         }
     }
 

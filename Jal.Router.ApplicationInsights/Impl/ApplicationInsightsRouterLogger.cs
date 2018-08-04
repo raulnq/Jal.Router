@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -9,17 +10,16 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsRouterLogger : IMiddleware
+
+    public class ApplicationInsightsRouterLogger : AbstractApplicationInsightsLogger, IMiddleware
     {
-        private readonly TelemetryClient _client;
 
-        private readonly IConfiguration _configuration;
-
-        public ApplicationInsightsRouterLogger(TelemetryClient client, IConfiguration configuration)
+        public ApplicationInsightsRouterLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
         {
-            _client = client;
-            _configuration = configuration;
+
         }
+
+
 
         public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
         {
@@ -39,77 +39,48 @@ namespace Jal.Router.ApplicationInsights.Impl
             try
             {
                 telemetry.Timestamp = context.DateTimeUtc;
-                telemetry.Id = context.Id;
+
+                telemetry.Id = $"{context.Identity.Id}";
+
                 telemetry.Name = name;
-                telemetry.Properties.Add("from", context.Origin.From);
-                telemetry.Properties.Add("version", context.Version);
-                telemetry.Properties.Add("origin", context.Origin.Key);
-                telemetry.Properties.Add("sagaid", context.SagaContext?.Id);
-                telemetry.Properties.Add("replytorequestid", context.ReplyToRequestId);
-                telemetry.Properties.Add("requestid", context.RequestId);
-                telemetry.Properties.Add("dataid", context.DataId);
 
-                telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-                telemetry.Context.Operation.Name = name;
-                telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
                 telemetry.Source = context.Origin.From;
-                if (!string.IsNullOrWhiteSpace(_configuration.ApplicationName))
-                {
-                    telemetry.Context.Cloud.RoleName = _configuration.ApplicationName;
-                }
 
-                foreach (var h in context.Headers)
-                {
-                    telemetry.Properties.Add(h.Key, h.Value);
-                }
+                PopulateProperties(telemetry.Properties, context);
 
-                telemetry.Metrics.Add("retrycount", context.RetryCount);
+                PopulateMetrics(telemetry.Metrics, context);
+
+                PopulateContext(telemetry.Context, context);
 
                 next();
 
                 telemetry.ResponseCode = "200";
+
                 telemetry.Success = true;
             }
             catch (Exception exception)
             {
                 telemetry.ResponseCode = "500";
+
                 telemetry.Success = false;
 
                 var telemetryexception = new ExceptionTelemetry(exception);
 
-                telemetryexception.Timestamp = context.DateTimeUtc;
+                PopulateProperties(telemetryexception.Properties, context);
 
-                telemetryexception.Properties.Add("from", context.Origin.From);
-                telemetryexception.Properties.Add("version", context.Version);
-                telemetryexception.Properties.Add("origin", context.Origin.Key);
-                telemetryexception.Properties.Add("sagaid", context.SagaContext?.Id);
-                telemetryexception.Properties.Add("replytorequestid", context.ReplyToRequestId);
-                telemetryexception.Properties.Add("requestid", context.RequestId);
-                telemetryexception.Properties.Add("dataid", context.DataId);
+                PopulateMetrics(telemetryexception.Metrics, context);
 
-                telemetryexception.Context.Operation.Name = name;
-                telemetryexception.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-                telemetryexception.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
-                
-                if (!string.IsNullOrWhiteSpace(_configuration.ApplicationName))
-                {
-                    telemetryexception.Context.Cloud.RoleName = _configuration.ApplicationName;
-                }
+                PopulateContext(telemetryexception.Context, context);
 
-                foreach (var h in context.Headers)
-                {
-                    telemetryexception.Properties.Add(h.Key, h.Value);
-                }
+                Client.TrackException(telemetryexception);
 
-                telemetryexception.Metrics.Add("retrycount", context.RetryCount);
-
-                _client.TrackException(telemetryexception);
                 throw;
             }
             finally
             {
                 telemetry.Duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
-                _client.TrackRequest(telemetry);
+
+                Client.TrackRequest(telemetry);
             }
         }
     }

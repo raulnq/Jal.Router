@@ -113,7 +113,6 @@
     <Compile Include="Impl\OtherMessageHandler.cs" />
     <Compile Include="Impl\MessageHandler.cs" />
     <Compile Include="Impl\RouterConfigurationSource.cs" />
-    <Compile Include="Integration\Tests.cs" />
     <Compile Include="Model\Data.cs" />
     <Compile Include="Model\Response.cs" />
     <Compile Include="Model\Message.cs" />

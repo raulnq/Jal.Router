@@ -148,7 +148,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 Content = x.Content,
                 ContentType = x.ContentType,
-                Id = x.Id,
+                Identity = serializer.Deserialize<Identity>(x.Identity),
                 Version = x.Version,
                 RetryCount = x.RetryCount,
                 LastRetry = x.LastRetry,
@@ -158,7 +158,7 @@ namespace Jal.Router.AzureStorage.Impl
                 DateTimeUtc = x.DateTimeUtc,
                 Data = x.Data,
                 Name = x.Name,
-                DataId = x.DataId
+                ContentId = x.ContentId
             }).ToArray();
         }
 
@@ -211,7 +211,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 Content = x.Content,
                 ContentType = x.ContentType,
-                Id = x.Id,
+                Identity = !string.IsNullOrWhiteSpace(x.Identity) ? serializer.Deserialize<Identity>(x.Identity) : null,
                 Version = x.Version,
                 RetryCount = x.RetryCount,
                 LastRetry = x.LastRetry,
@@ -222,7 +222,7 @@ namespace Jal.Router.AzureStorage.Impl
                 DateTimeUtc = x.DateTimeUtc,
                 Data = x.Data,
                 Name = x.Name,
-                DataId = x.DataId,
+                ContentId = x.ContentId,
             }).ToArray();
         }
 
@@ -240,7 +240,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     Content = messageentity.Content,
                     ContentType = messageentity.ContentType,
-                    Id = messageentity.Id,
+                    Identity = serializer.Serialize(messageentity.Identity),
                     Version = messageentity.Version,
                     RetryCount = messageentity.RetryCount,
                     LastRetry = messageentity.LastRetry,
@@ -251,7 +251,7 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Data = messageentity.Data,
                     Name = messageentity.Name,
-                    DataId = messageentity.DataId,
+                    ContentId = messageentity.ContentId,
                 };
 
                 var size = Encoding.UTF8.GetByteCount(record.Content);
@@ -387,7 +387,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     Content = messageentity.Content,
                     ContentType = messageentity.ContentType,
-                    Id = messageentity.Id,
+                    Identity = serializer.Serialize(messageentity.Identity),
                     Version = messageentity.Version,
                     RetryCount = messageentity.RetryCount,
                     LastRetry = messageentity.LastRetry,
@@ -396,7 +396,7 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Name = messageentity.Name,
                     Tracks = serializer.Serialize(messageentity.Tracks),
-                    DataId = messageentity.DataId,
+                    ContentId = messageentity.ContentId,
                     Data = messageentity.Data,
                 };
 

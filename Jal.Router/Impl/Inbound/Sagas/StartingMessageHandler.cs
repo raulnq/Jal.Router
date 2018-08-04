@@ -43,7 +43,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             context.SagaContext.Id = id;
 
-            context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
+            context.AddTrack(context.Identity.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name, context.SagaContext.Id, parameter.Saga.Name);
 
             _router.Route(context, parameter.Route, data, parameter.Saga.DataType);
 

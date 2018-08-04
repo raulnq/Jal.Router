@@ -49,7 +49,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error to read the message with dataid {id}", ex); ;
+                throw new ApplicationException($"Error to read the message with contentid {id}", ex); ;
             }
         }
 
@@ -68,7 +68,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error to write the message with dataid {id}", ex); ;
+                throw new ApplicationException($"Error to write the message with contentid {id}", ex); ;
             }
         }
     }

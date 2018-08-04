@@ -116,13 +116,11 @@ namespace Jal.Router.Impl.Inbound
             {
                 EndPointName = route.OnRetryEndPoint,
                 Headers = context.Headers,
-                Id = context.Id,
+                Identity = context.Identity,
                 Version = context.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
                 RetryCount = context.RetryCount + 1,
                 SagaContext = context.SagaContext,
-                ReplyToRequestId = context.ReplyToRequestId,
-                RequestId = context.RequestId,
             };
 
             var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
@@ -138,11 +136,9 @@ namespace Jal.Router.Impl.Inbound
             {
                 EndPointName = route.OnErrorEndPoint,
                 Headers = context.Headers,
-                Id = context.Id,
+                Identity = context.Identity,
                 Version = context.Version,
                 SagaContext = context.SagaContext,
-                ReplyToRequestId = context.ReplyToRequestId,
-                RequestId = context.RequestId,
             };
             if (ex != null)
             {

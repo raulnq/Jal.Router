@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         {
             var client = QueueClient.CreateFromConnectionString(channel.ToReplyConnectionString, channel.ToReplyPath);
 
-            var messagesession = client.AcceptMessageSession(context.ReplyToRequestId);
+            var messagesession = client.AcceptMessageSession(context.Identity.ReplyToRequestId);
 
             var message = channel.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(channel.ToReplyTimeOut)) : messagesession.Receive();
 
@@ -44,7 +44,7 @@ namespace Jal.Router.AzureServiceBus.Impl
         {
             var client = SubscriptionClient.CreateFromConnectionString(channel.ToReplyConnectionString, channel.ToReplyPath, channel.ToReplySubscription);
 
-            var messagesession = client.AcceptMessageSession(inputcontext.ReplyToRequestId);
+            var messagesession = client.AcceptMessageSession(inputcontext.Identity.ReplyToRequestId);
 
             var message = channel.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(channel.ToReplyTimeOut)) : messagesession.Receive();
 

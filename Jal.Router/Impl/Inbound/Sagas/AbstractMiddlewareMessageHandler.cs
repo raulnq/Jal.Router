@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
             {
                 Content = context.Content,
                 ContentType = parameter.Route.ContentType.FullName,
-                Id = context.Id,
+                Identity = context.Identity,
                 Version = context.Version,
                 RetryCount = context.RetryCount,
                 LastRetry = context.LastRetry,
@@ -37,7 +37,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
                 Data = sagaentity.Data,
                 Name = parameter.Route.Name,
                 Tracks = context.Tracks,
-                DataId = context.DataId
+                ContentId = context.ContentId
             };
         }
     }

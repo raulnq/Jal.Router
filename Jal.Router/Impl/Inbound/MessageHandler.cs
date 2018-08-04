@@ -28,7 +28,7 @@ namespace Jal.Router.Impl.Inbound
         {
             var storage = _factory.Create<ISagaStorage>(_configuration.SagaStorageType);
 
-            context.AddTrack(context.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name);
+            context.AddTrack(context.Identity.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name);
 
             if (_configuration.Storage.SaveMessage)
             {
@@ -36,7 +36,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     Content = context.Content,
                     ContentType = context.Route.ContentType.FullName,
-                    Id = context.Id,
+                    Identity = context.Identity,
                     Version = context.Version,
                     RetryCount = context.RetryCount,
                     LastRetry = context.LastRetry,
@@ -45,7 +45,7 @@ namespace Jal.Router.Impl.Inbound
                     DateTimeUtc = context.DateTimeUtc,
                     Name = context.Route.Name,
                     Tracks = context.Tracks,
-                    DataId = context.DataId,
+                    ContentId = context.ContentId,
                     Data = string.Empty
                 };
 

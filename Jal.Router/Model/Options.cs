@@ -11,18 +11,16 @@ namespace Jal.Router.Model
             Version = "1";
             RetryCount = 0;
             SagaContext = new SagaContext();
-            RequestId = string.Empty;
-            ReplyToRequestId = string.Empty;
             Tracks = new List<Track>();
+            Identity = new Identity();
         }
-        public string Id { get; set; }
+        public Identity Identity { get; set; }
+
         public SagaContext SagaContext { get; set; }
 
         public string EndPointName { get; set; }
 
         public string Version { get; set; }
-        public string RequestId { get; set; }
-        public string ReplyToRequestId { get; set; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
 

@@ -49,11 +49,11 @@ namespace Jal.Router.Impl.Outbound
                     if(count < numberofchannels)
                     {
                         @action = current;
-                        _logger.Log($"Message {context.Id} failed to distribute ({count}), moving to the next channel");
+                        _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
-                        _logger.Log($"Message {context.Id} failed to distribute ({count}), no more channels");
+                        _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), no more channels");
                         throw;
                     }
                 }

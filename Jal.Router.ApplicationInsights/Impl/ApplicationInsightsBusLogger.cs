@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
@@ -9,12 +10,12 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsBusLogger : IMiddleware
+    public class ApplicationInsightsBusLogger : AbstractApplicationInsightsLogger, IMiddleware
     {
-        private readonly TelemetryClient _client;
-        public ApplicationInsightsBusLogger(TelemetryClient client)
+
+        public ApplicationInsightsBusLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
         {
-            _client = client;
+
         }
         public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
         {
@@ -25,55 +26,56 @@ namespace Jal.Router.ApplicationInsights.Impl
             var telemetry = new DependencyTelemetry()
             {
                 Name = context.EndPoint.Name,
-                Id = context.Id,
+
+                Id = context.Identity.Id,
+
                 Timestamp = context.DateTimeUtc,
-                Target = parameter.Channel.ToPath,
+
+                Target = parameter.Channel.GetPath(),
+
                 Data = context.Content,
-                Type = parameter.OutboundType == "Send" ? "Queue" : "Topic" ,
-                Properties =
-                {
-                    new KeyValuePair<string, string>("from", context.Origin.From),
-                    new KeyValuePair<string, string>("origin", context.Origin.Key),
-                    new KeyValuePair<string, string>("sagaid",context.SagaContext?.Id),
-                    new KeyValuePair<string, string>("version", context.Version),
-                    new KeyValuePair<string, string>("dataid", context.DataId),
-                    new KeyValuePair<string, string>("replytorequestid", context.ReplyToRequestId),
-                    new KeyValuePair<string, string>("requestid", context.RequestId),
-                },
-                Metrics =
-                {
-                    new KeyValuePair<string, double>("retrycount", context.RetryCount)
-                }
+
+                Type = Configuration.ChannelProviderName,
             };
-            
-            telemetry.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-            telemetry.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
-            foreach (var h in context.Headers)
-            {
-                telemetry.Properties.Add(h.Key, h.Value);
-            }
+
+            PopulateContext(telemetry.Context, context);
+
+            PopulateProperties(telemetry.Properties, context);
+
+            PopulateMetrics(telemetry.Metrics, context);
+
+
             try
             {
                 next();
+
                 telemetry.Success = true;
+
                 telemetry.ResultCode = "200";
             }
             catch (Exception exception)
             {
                 telemetry.Success = false;
+
                 telemetry.ResultCode = "500";
 
                 var telemetryexception = new ExceptionTelemetry(exception);
-                telemetryexception.Context.Operation.Id = $"{context.Id}{context.RetryCount}";
-                telemetryexception.Context.Operation.ParentId = $"{context.Id}{context.RetryCount}";
-                _client.TrackException(telemetryexception);
+
+                PopulateContext(telemetryexception.Context, context);
+
+                PopulateProperties(telemetryexception.Properties, context);
+
+                PopulateMetrics(telemetryexception.Metrics, context);
+
+                Client.TrackException(telemetryexception);
 
                 throw;
             }
             finally
             {
                 telemetry.Duration = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds);
-                _client.TrackDependency(telemetry);
+
+                Client.TrackDependency(telemetry);
             }
         }
     }
