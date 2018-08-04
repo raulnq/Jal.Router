@@ -45,7 +45,7 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(RequestReplyHandler));
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult), Channel = message.EndPoint.Channels.First() };
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult) };
 
                     var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
@@ -138,7 +138,7 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(PointToPointHandler));
 
-                    var parameter = new MiddlewareParameter() {Options = options, OutboundType = "Send", Channel = message.EndPoint.Channels.First() };
+                    var parameter = new MiddlewareParameter() {Options = options, OutboundType = "Send" };
 
                     var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 
@@ -280,7 +280,7 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(PublishSubscribeHandler));
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish", Channel = message.EndPoint.Channels.First() };
+                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
 
                     var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
 

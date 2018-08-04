@@ -84,6 +84,12 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
+        public IHostBuilder Using(Action<IConfiguration> setup)
+        {
+            _parameter.Setup = setup;
+            return this;
+        }
+
         public IHost Build()
         {
             _parameter.Container.RegisterFrom<ServiceLocatorCompositionRoot>();
@@ -159,9 +165,15 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 host.Configuration.RouterInterceptorType = _parameter.RouterInterceptorType;
             }
 
+
             host.Configuration.AddMonitoringTask<HeartBeatMonitor>(_parameter.HeartBeatFrequency);
 
             host.Configuration.UsingShutdownWatcher<ShutdownFileWatcher>();
+
+            if (_parameter.Setup != null)
+            {
+                _parameter.Setup(host.Configuration);
+            }
 
             return host;
         }

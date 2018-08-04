@@ -17,6 +17,7 @@ namespace Jal.Router.Interface.Management
         IList<TaskMetadata> MonitoringTaskTypes { get; }
         Type ChannelManagerType { get; }
         Type ShutdownWatcherType { get; }
+        Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
         Type RequestReplyChannelType { get; }
         Type PublishSubscribeChannelType { get; }
@@ -29,6 +30,7 @@ namespace Jal.Router.Interface.Management
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
+        void UsingChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
         void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
         void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
