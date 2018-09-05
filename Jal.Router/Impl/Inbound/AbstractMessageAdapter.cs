@@ -88,6 +88,19 @@ namespace Jal.Router.Impl.Inbound
         {
             var context = Read(message);
 
+            if(Configuration.Identity.OperationIdBuilder!=null)
+            {
+                context.Identity.OperationId = Configuration.Identity.OperationIdBuilder(context);
+            }
+            if (Configuration.Identity.ParentIdBuilder != null)
+            {
+                context.Identity.ParentId = Configuration.Identity.ParentIdBuilder(context);
+            }
+            if (Configuration.Identity.IdBuilder != null)
+            {
+                context.Identity.Id = Configuration.Identity.IdBuilder(context);
+            }
+
             context.ContentType = contenttype;
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))

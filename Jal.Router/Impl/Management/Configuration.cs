@@ -14,6 +14,7 @@ namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
+        public IdentityConfiguration Identity { get; }
         public string ChannelProviderName { get; set; }
         public StorageConfiguration Storage { get; set; }
         public string ApplicationName { get; set; }
@@ -161,6 +162,7 @@ namespace Jal.Router.Impl.Management
             AddShutdownTask<ShutdownTask>();
             UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();
+            Identity = new IdentityConfiguration();
             ApplicationName = "[Empty]";
             ChannelProviderName = "[Empty]";
         }

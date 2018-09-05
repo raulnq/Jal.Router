@@ -96,7 +96,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<SagaRecord>().Where(where);
 
-            var records = ExecuteQueryAsync<SagaRecord>(table, query).GetAwaiter().GetResult();
+            var records = ExecuteQuery<SagaRecord>(table, query);
 
             return records.Select(x => new SagaEntity()
             {
@@ -113,13 +113,13 @@ namespace Jal.Router.AzureStorage.Impl
             }).ToArray();
         }
 
-        public static async System.Threading.Tasks.Task<IEnumerable<T>> ExecuteQueryAsync<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
+        public static IEnumerable<T> ExecuteQuery<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
         {
             TableContinuationToken token = null;
             var retVal = new List<T>();
             do
             {
-                var results = await table.ExecuteQuerySegmentedAsync(query, token);
+                var results = table.ExecuteQuerySegmentedAsync(query, token).GetAwaiter().GetResult();
                 retVal.AddRange(results.Results);
                 token = results.ContinuationToken;
             } while (token != null);
@@ -142,7 +142,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQueryAsync<MessageRecord>(table, query).GetAwaiter().GetResult();
+            var records = ExecuteQuery<MessageRecord>(table, query);
 
             return records.Select(x => new MessageEntity()
             {
@@ -205,7 +205,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQueryAsync<MessageRecord>(table, query).GetAwaiter().GetResult();
+            var records = ExecuteQuery<MessageRecord>(table, query);
 
             return records.Select(x => new MessageEntity()
             {
