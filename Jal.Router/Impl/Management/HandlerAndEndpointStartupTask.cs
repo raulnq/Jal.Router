@@ -41,15 +41,15 @@ namespace Jal.Router.Impl.Management
 
                 foreach (var saga in source.GetSagas())
                 {
-                    if (saga.StartingRoute != null)
+                    if (saga.FirstRoute != null)
                     {
-                        routes.Add(saga.StartingRoute);
+                        routes.Add(saga.FirstRoute);
                     }
-                    if (saga.EndingRoute != null)
+                    if (saga.LastRoute != null)
                     {
-                        routes.Add(saga.EndingRoute);
+                        routes.Add(saga.LastRoute);
                     }
-                    routes.AddRange(saga.NextRoutes);
+                    routes.AddRange(saga.Routes);
                 }
             }
 

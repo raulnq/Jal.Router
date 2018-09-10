@@ -62,29 +62,16 @@ namespace Jal.Router.Model
 
         }
 
-        public void AddTrack(string id, string key, string from, string route)
+        public void AddTrack(Identity identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
         {
             var tracking = new Track()
             {
-                Id = id,
-                Key = key,
-                From = from,
-                Route = route
-            };
-
-            Tracks.Add(tracking);
-        }
-
-        public void AddTrack(string id, string key, string from, string route, string sagaid, string saga)
-        {
-            var tracking = new Track()
-            {
-                Id = id,
-                Key = key,
-                From = from,
-                SagaId = sagaid,
-                Route = route,
-                Saga = saga
+                Id = identity?.Id,
+                Key = origin?.Key,
+                From = origin?.From,
+                SagaId = sagacontext?.Id,
+                Route = route?.Name,
+                Saga = saga?.Name
             };
 
             Tracks.Add(tracking);

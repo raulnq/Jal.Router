@@ -101,7 +101,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UsingMiddleware(Action<IInboundMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UseMiddleware(Action<IInboundMiddlewareBuilder> action)
         {
             if (action == null)
             {
@@ -130,6 +130,20 @@ namespace Jal.Router.Fluent.Impl
         public IOnRouteOptionBuilder AsClaimCheck()
         {
             _route.UseClaimCheck = true;
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder OnEntry(Action<IOnRouteEntryBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnRouteEntryBuilder(_route);
+
+            action(builder);
 
             return this;
         }
@@ -235,7 +249,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UsingMiddleware(Action<IInboundMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UseMiddleware(Action<IInboundMiddlewareBuilder> action)
         {
             if (action == null)
             {
@@ -257,6 +271,20 @@ namespace Jal.Router.Fluent.Impl
             }
 
             _route.ForwardEndPoint = endpointname;
+
+            return this;
+        }
+
+        public IOnRouteOptionBuilder OnEntry(Action<IOnRouteEntryBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnRouteEntryBuilder(_route);
+
+            action(builder);
 
             return this;
         }

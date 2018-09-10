@@ -57,7 +57,7 @@ namespace Jal.Router.Fluent.Impl
             channelbuilder(this);
         }
 
-        public IOnEndPointOptionBuilder UsingMiddleware(Action<IOutboundMiddlewareBuilder> action)
+        public IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action)
         {
             if (action == null)
             {

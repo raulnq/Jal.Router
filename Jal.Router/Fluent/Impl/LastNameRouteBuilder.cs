@@ -7,7 +7,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndingNameRouteBuilder<THandler, TData> : IEndingNameRouteBuilder<THandler, TData>, IEndingListenerRouteBuilder<THandler, TData>, IListenerChannelBuilder
+    public class LastNameRouteBuilder<THandler, TData> : ILastNameRouteBuilder<THandler, TData>, ILastListenerRouteBuilder<THandler, TData>, IListenerChannelBuilder
     {
         private readonly string _name;
 
@@ -19,7 +19,7 @@ namespace Jal.Router.Fluent.Impl
 
         private Action<IListenerChannelBuilder> _channelbuilder;
 
-        public EndingNameRouteBuilder(Saga saga, string name)
+        public LastNameRouteBuilder(Saga saga, string name)
         {
             _saga = saga;
 
@@ -36,7 +36,7 @@ namespace Jal.Router.Fluent.Impl
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 
-            _saga.EndingRoute = value;
+            _saga.LastRoute = value;
 
             return builder;
         }
@@ -90,7 +90,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public IEndingNameRouteBuilder<THandler, TData> ToListen(Action<IListenerChannelBuilder> channelbuilder)
+        public ILastNameRouteBuilder<THandler, TData> ToListen(Action<IListenerChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {

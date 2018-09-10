@@ -4,8 +4,6 @@ using Castle.Windsor;
 using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
 
 namespace Jal.Router.ApplicationInsights.Installer

@@ -224,7 +224,7 @@ namespace Jal.Router.Impl
             _publishsubscriberchannels.Add(channel);
         }
 
-        public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IStartingRouteBuilder<TData>> start, Action<INextRouteBuilder<TData>> @continue=null, Action<IEndingRouteBuilder<TData>> end = null) where TData : class, new()
+        public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IFirstRouteBuilder<TData>> start, Action<IMiddleRouteBuilder<TData>> @continue=null, Action<ILastRouteBuilder<TData>> end = null) where TData : class, new()
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -239,11 +239,11 @@ namespace Jal.Router.Impl
 
             var saga = new Saga(name, typeof(TData));
 
-            start(new StartingRouteBuilder<TData>(saga));
+            start(new FirstRouteBuilder<TData>(saga));
 
-            @continue?.Invoke(new NextRouteBuilder<TData>(saga));
+            @continue?.Invoke(new MiddleRouteBuilder<TData>(saga));
 
-            end?.Invoke(new EndingRouteBuilder<TData>(saga));
+            end?.Invoke(new LastRouteBuilder<TData>(saga));
 
             _sagas.Add(saga);
 

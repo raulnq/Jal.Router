@@ -19,20 +19,19 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IRouter _router;
 
-        private readonly ISagaRouter _sagarouter;
+        private readonly ISagaExecutionCoordinator _sec;
 
         private readonly ILogger _logger;
 
-        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger, ISagaRouter sagarouter)
+        public ListenerStartupTask(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger, ISagaExecutionCoordinator sec)
         {
             _factory = factory;
             _configuration = configuration;
             _sources = sources;
             _router = router;
             _logger = logger;
-            _sagarouter = sagarouter;
+            _sec = sec;
         }
-
 
         public void Run()
         {
@@ -48,15 +47,15 @@ namespace Jal.Router.Impl.Inbound
 
                 foreach (var saga in source.GetSagas())
                 {
-                    if (saga.StartingRoute != null)
+                    if (saga.FirstRoute != null)
                     {
-                        listeners.Add(new Listener() { Route = saga.StartingRoute, Action = message => _sagarouter.Start(message, saga, saga.StartingRoute), Prefix = $"{saga.Name}/{saga.StartingRoute.Name}" });
+                        listeners.Add(new Listener() { Route = saga.FirstRoute, Action = message => _sec.Start(message, saga, saga.FirstRoute), Prefix = $"{saga.Name}/{saga.FirstRoute.Name}" });
                     }
-                    if (saga.EndingRoute != null)
+                    if (saga.LastRoute != null)
                     {
-                        listeners.Add(new Listener() { Route = saga.EndingRoute, Action = message => _sagarouter.End(message, saga, saga.EndingRoute), Prefix = $"{saga.Name}/{saga.EndingRoute.Name}" });
+                        listeners.Add(new Listener() { Route = saga.LastRoute, Action = message => _sec.End(message, saga, saga.LastRoute), Prefix = $"{saga.Name}/{saga.LastRoute.Name}" });
                     }
-                    listeners.AddRange(saga.NextRoutes.Select(route => new Listener() { Route = route, Action = message => _sagarouter.Continue(message, saga, route), Prefix = $"{saga.Name}/{route.Name}" }));
+                    listeners.AddRange(saga.Routes.Select(route => new Listener() { Route = route, Action = message => _sec.Continue(message, saga, route), Prefix = $"{saga.Name}/{route.Name}" }));
                 }
             }
 

@@ -21,7 +21,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
 
 
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
         {
             var telemetry = new RequestTelemetry();
 
@@ -29,11 +29,11 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
-            var name = parameter.Route.Name;
+            var name = context.Route.Name;
 
-            if (!string.IsNullOrWhiteSpace(parameter.Saga?.Name))
+            if (!string.IsNullOrWhiteSpace(context.Saga?.Name))
             {
-                name = $"{parameter.Saga?.Name}_{name}";
+                name = $"{context.Saga?.Name}_{name}";
             }
 
             try
@@ -52,7 +52,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 PopulateContext(telemetry.Context, context);
 
-                next();
+                next(context, middlewarecontext);
 
                 telemetry.ResponseCode = "200";
 

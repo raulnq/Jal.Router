@@ -64,13 +64,17 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());
 
+            container.Register<Interface.Inbound.IPipeline, Impl.Inbound.Pipeline>(new PerContainerLifetime());
+
+            container.Register<Interface.Outbound.IPipeline, Impl.Outbound.Pipeline>(new PerContainerLifetime());
+
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
             container.Register<IHost, Host>(new PerContainerLifetime());
 
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
 
-            container.Register<ISagaRouter, SagaRouter>(new PerContainerLifetime());
+            container.Register<ISagaExecutionCoordinator, SagaExecutionCoordinator>(new PerContainerLifetime());
 
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
 
@@ -108,7 +112,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
-            container.Register<ISagaStorageFinder, SagaStorageFinder>(new PerContainerLifetime());
+            container.Register<ISagaStorageSearcher, SagaStorageSearcher>(new PerContainerLifetime());
 
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof (PointToPointChannelMonitor).FullName,new PerContainerLifetime());
 
@@ -146,11 +150,11 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddleware, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware, StartingMessageHandler>(typeof (StartingMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware, FirstMessageHandler>(typeof (FirstMessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware, NextMessageHandler>(typeof (NextMessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware, EndingMessageHandler>(typeof (EndingMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware, LastMessageHandler>(typeof (LastMessageHandler).FullName,new PerContainerLifetime());
 
             container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
 

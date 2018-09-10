@@ -17,7 +17,7 @@ namespace Jal.Router.ApplicationInsights.Impl
         {
 
         }
-        public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
+        public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
         {
             var stopwatch = new Stopwatch();
 
@@ -31,7 +31,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 Timestamp = context.DateTimeUtc,
 
-                Target = parameter.Channel.GetPath(),
+                Target = middlewarecontext.Channel.GetPath(),
 
                 Data = context.Content,
 
@@ -47,11 +47,13 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             try
             {
-                next();
+                var result = next(context, middlewarecontext);
 
                 telemetry.Success = true;
 
                 telemetry.ResultCode = "200";
+
+                return result;
             }
             catch (Exception exception)
             {

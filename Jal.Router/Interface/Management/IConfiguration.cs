@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
-using Jal.Router.Model;
 using Jal.Router.Model.Management;
 
 namespace Jal.Router.Interface.Management

@@ -23,35 +23,34 @@ namespace Jal.Router.Impl.Inbound
             _configuration = configuration;
         }
 
-
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext messagecontext, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
         {
-            var storage = _factory.Create<ISagaStorage>(_configuration.SagaStorageType);
-
-            context.AddTrack(context.Identity.Id, context.Origin.Key, context.Origin.From, parameter.Route.Name);
+            messagecontext.AddTrack(messagecontext.Identity, messagecontext.Origin, messagecontext.Route);
 
             if (_configuration.Storage.SaveMessage)
             {
-                var message = new MessageEntity()
+                var storage = _factory.Create<ISagaStorage>(_configuration.SagaStorageType);
+
+                var messageentity = new MessageEntity()
                 {
-                    Content = context.Content,
-                    ContentType = context.Route.ContentType.FullName,
-                    Identity = context.Identity,
-                    Version = context.Version,
-                    RetryCount = context.RetryCount,
-                    LastRetry = context.LastRetry,
-                    Origin = context.Origin,
-                    Headers = context.Headers,
-                    DateTimeUtc = context.DateTimeUtc,
-                    Name = context.Route.Name,
-                    Tracks = context.Tracks,
-                    ContentId = context.ContentId,
+                    Content = messagecontext.Content,
+                    ContentType = messagecontext.Route.ContentType.FullName,
+                    Identity = messagecontext.Identity,
+                    Version = messagecontext.Version,
+                    RetryCount = messagecontext.RetryCount,
+                    LastRetry = messagecontext.LastRetry,
+                    Origin = messagecontext.Origin,
+                    Headers = messagecontext.Headers,
+                    DateTimeUtc = messagecontext.DateTimeUtc,
+                    Name = messagecontext.Route.Name,
+                    Tracks = messagecontext.Tracks,
+                    ContentId = messagecontext.ContentId,
                     Data = string.Empty
                 };
 
                 try
                 {
-                    storage.CreateMessage(context, message);
+                    storage.CreateMessage(messagecontext, messageentity);
                 }
                 catch (Exception)
                 {
@@ -62,9 +61,7 @@ namespace Jal.Router.Impl.Inbound
                 }
             }
             
-            _router.Route(context, parameter.Route);
-
-            next();
+            _router.Route(messagecontext);
         }
     }
 }

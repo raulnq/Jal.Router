@@ -19,13 +19,13 @@ namespace Jal.Router.Impl.Inbound
             _secret = secret;
         }
 
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext context, Action<MessageContext, MiddlewareContext> next, MiddlewareContext parameter)
         {
             if (!IsValid(context))
             {
                 throw new SecurityException("Unauthorized");
             }
-            next();
+            next(context, parameter);
         }
 
         private bool IsValid(MessageContext context)

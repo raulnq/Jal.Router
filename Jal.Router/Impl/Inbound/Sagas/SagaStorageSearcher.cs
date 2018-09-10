@@ -6,12 +6,12 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public class SagaStorageFinder : ISagaStorageFinder
+    public class SagaStorageSearcher : ISagaStorageSearcher
     {
         private readonly IComponentFactory _factory;
 
         private readonly IConfiguration _configuration;
-        public SagaStorageFinder(IComponentFactory factory, IConfiguration configuration)
+        public SagaStorageSearcher(IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
             _configuration = configuration;

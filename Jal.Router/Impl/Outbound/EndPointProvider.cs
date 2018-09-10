@@ -24,7 +24,15 @@ namespace Jal.Router.Impl.Outbound
 
         public EndPoint Provide(string name, Type contenttype)
         {
-            return _endpoints.Single(x => x.Name==name && x.MessageType == contenttype);
+            try
+            {
+                return _endpoints.Single(x => x.Name == name && x.MessageType == contenttype);
+            }
+            catch (Exception)
+            {
+                throw new ApplicationException($"Missing endpoint {name} for type {contenttype.FullName}");
+            }
+            
         }
     }
 }

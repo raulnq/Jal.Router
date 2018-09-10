@@ -29,68 +29,68 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static IStartingNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
     where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
 
-        public static IStartingNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
         {
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static IStartingNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
     where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
 
-        public static IStartingNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this IStartingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static INextNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
 where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
 
-        public static INextNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
         {
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static INextNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
     where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
 
-        public static INextNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this INextListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static IEndingNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IEndingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static ILastNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
 
-        public static IEndingNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this IEndingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
+        public static ILastNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string connectionstring)
         {
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static IEndingNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IEndingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
+        public static ILastNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
             where TExtractorConectionString : IValueSettingFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
 
-        public static IEndingNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this IEndingListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
+        public static ILastNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, string connectionstring)
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }

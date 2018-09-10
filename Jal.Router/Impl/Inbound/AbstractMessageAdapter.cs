@@ -4,6 +4,7 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -84,24 +85,24 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public MessageContext Read(object message, Type contenttype, bool useclaimcheck)
+        public MessageContext Read(object message, Type contenttype, bool useclaimcheck, IdentityConfiguration identityconfiguration=null)
         {
             var context = Read(message);
 
-            if(Configuration.Identity.OperationIdBuilder!=null)
-            {
-                context.Identity.OperationId = Configuration.Identity.OperationIdBuilder(context);
-            }
-            if (Configuration.Identity.ParentIdBuilder != null)
-            {
-                context.Identity.ParentId = Configuration.Identity.ParentIdBuilder(context);
-            }
-            if (Configuration.Identity.IdBuilder != null)
-            {
-                context.Identity.Id = Configuration.Identity.IdBuilder(context);
-            }
-
             context.ContentType = contenttype;
+
+            if (identityconfiguration?.OperationIdBuilder != null)
+            {
+                context.Identity.OperationId = identityconfiguration?.OperationIdBuilder(context);
+            }
+            if (identityconfiguration?.ParentIdBuilder != null)
+            {
+                context.Identity.ParentId = identityconfiguration?.ParentIdBuilder(context);
+            }
+            if (identityconfiguration?.IdBuilder != null)
+            {
+                context.Identity.Id = identityconfiguration?.IdBuilder(context);
+            }
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
             {

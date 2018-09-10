@@ -5,21 +5,24 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public class SagaRouter : ISagaRouter
+    public class SagaExecutionCoordinator : ISagaExecutionCoordinator
     {
         private readonly IComponentFactory _factory;
 
         private readonly IConfiguration _configuration;
 
-        public SagaRouter(IComponentFactory factory, IConfiguration configuration)
+        private readonly IPipeline _pipeline;
+
+        public SagaExecutionCoordinator(IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
         {
             _factory = factory;
 
             _configuration = configuration;
+
+            _pipeline = pipeline;
         }
 
         public void Start(object message, Saga saga, Route route)
@@ -28,7 +31,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
             var when = true;
 
@@ -48,19 +51,15 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                     middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
-                    middlewares.AddRange(saga.StartingRoute.MiddlewareTypes);
+                    middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
 
-                    middlewares.Add(typeof(StartingMessageHandler));
+                    middlewares.Add(typeof(FirstMessageHandler));
 
-                    var parameter = new MiddlewareParameter() { Route = route, Saga = saga };
-
-                    context.Route = parameter.Route;
+                    context.Route = route;
 
                     context.Saga = saga;
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), context, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 
@@ -85,7 +84,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
             var when = true;
 
@@ -107,17 +106,13 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                     middlewares.AddRange(route.MiddlewareTypes);
 
-                    middlewares.Add(typeof(NextMessageHandler));
-
-                    var parameter = new MiddlewareParameter() { Route = route, Saga = saga };
+                    middlewares.Add(typeof(MiddleMessageHandler));
 
                     context.Route = route;
 
                     context.Saga = saga;
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), context, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 
@@ -141,7 +136,7 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
             var when = true;
 
@@ -161,19 +156,15 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                     middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
-                    middlewares.AddRange(saga.StartingRoute.MiddlewareTypes);
+                    middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
 
-                    middlewares.Add(typeof(EndingMessageHandler));
+                    middlewares.Add(typeof(LastMessageHandler));
 
-                    var parameter = new MiddlewareParameter() { Route = route, Saga = saga };
-
-                    context.Route = parameter.Route;
+                    context.Route = route;
 
                     context.Saga = saga;
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), context, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 

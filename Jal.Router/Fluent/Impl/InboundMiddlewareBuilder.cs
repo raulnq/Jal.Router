@@ -1,4 +1,5 @@
-﻿using Jal.Router.Fluent.Interface;
+﻿using System;
+using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 

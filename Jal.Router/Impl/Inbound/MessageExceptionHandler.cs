@@ -24,21 +24,21 @@ namespace Jal.Router.Impl.Inbound
             _configuration = configuration;
         }
 
-        public void Execute(MessageContext context, Action next, MiddlewareParameter parameter)
+        public void Execute(MessageContext messagecontext, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
         {
             IRetryPolicy policy = null;
 
             try
             {
-                if (HasRetry(parameter.Route))
+                if (HasRetry(messagecontext.Route))
                 {
-                    policy = GetRetryPolicy(parameter.Route);
+                    policy = GetRetryPolicy(messagecontext.Route);
 
                     if (policy != null)
                     {
-                        var interval = policy.NextRetryInterval(context.RetryCount + 1);
+                        var interval = policy.NextRetryInterval(messagecontext.RetryCount + 1);
 
-                        context.LastRetry = !policy.CanRetry(context.RetryCount + 1, interval);
+                        messagecontext.LastRetry = !policy.CanRetry(messagecontext.RetryCount + 1, interval);
                     }
                     else
                     {
@@ -46,25 +46,25 @@ namespace Jal.Router.Impl.Inbound
                     }
                 }
 
-                next();
+                next(messagecontext, middlewarecontext);
             }
             catch (Exception ex)
             {
                 if (policy != null)
                 {
-                    if (parameter.Route.RetryExceptionType == ex.GetType())
+                    if (messagecontext.Route.RetryExceptionType == ex.GetType())
                     {
-                        if (!context.LastRetry)
+                        if (!messagecontext.LastRetry)
                         {
-                            if (!string.IsNullOrWhiteSpace(parameter.Route.OnRetryEndPoint))
+                            if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnRetryEndPoint))
                             {
-                                SendRetry(parameter.Route, context, policy);
+                                SendRetry(messagecontext.Route, messagecontext, policy);
                             }
                             else
                             {
-                                if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
+                                if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                                 {
-                                    SendError(parameter.Route, context, ex);
+                                    SendError(messagecontext.Route, messagecontext, ex);
                                 }
                                 else
                                 {
@@ -74,9 +74,9 @@ namespace Jal.Router.Impl.Inbound
                         }
                         else
                         {
-                            if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
+                            if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                             {
-                                SendError(parameter.Route, context, ex);
+                                SendError(messagecontext.Route, messagecontext, ex);
                             }
                             else
                             {
@@ -86,9 +86,9 @@ namespace Jal.Router.Impl.Inbound
                     }
                     else
                     {
-                        if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
+                        if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                         {
-                            SendError(parameter.Route, context, ex);
+                            SendError(messagecontext.Route, messagecontext, ex);
                         }
                         else
                         {
@@ -98,9 +98,9 @@ namespace Jal.Router.Impl.Inbound
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(parameter.Route.OnErrorEndPoint))
+                    if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                     {
-                        SendError(parameter.Route, context, ex);
+                        SendError(messagecontext.Route, messagecontext, ex);
                     }
                     else
                     {

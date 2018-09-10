@@ -45,14 +45,15 @@ namespace Jal.Router.Sample.NetCore
         public RouterConfigurationSourceSample()
         {
             RegisterHandler<IMessageHandler>("handler")
-                .ToListen(x=> {
+                .ToListen(x =>
+                {
                     x.AddPublishSubscribeChannel("inputtopicnewrelease2", "subs", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
                     x.AddPointToPointChannel("inputqueuenewrelease2", "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=");
                 })
                 .ForMessage<Message>().Using<MessageHandler>(x =>
                 {
-                    x.With((request, handler, context) => handler.Handle(request, context)).When((request, handler, context)=>true);
-                });
+                    x.With((request, handler, context) => handler.Handle(request, context)).When((request, handler, context) => true);
+                }).OnEntry(x => x.BuildOperationIdWith(y => "operationid"));
 
             RegisterHandler<IMessageHandler>("handler")
                 .ToListen(x => {
@@ -112,6 +113,7 @@ namespace Jal.Router.Sample.NetCore
     {
         public void Handle(Message message, MessageContext context)
         {
+            //throw new Exception("Errorr");
             context.Send(new Message() { Name = "Hi" }, "endpoint", Guid.NewGuid().ToString(), context.Identity.Id);
         }
 

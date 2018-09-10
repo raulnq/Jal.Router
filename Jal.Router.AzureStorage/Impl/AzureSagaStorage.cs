@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl.Inbound.Sagas;
@@ -226,13 +225,13 @@ namespace Jal.Router.AzureStorage.Impl
             }).ToArray();
         }
 
-        public override void CreateMessage(MessageContext context, string id, SagaEntity sagaentity, MessageEntity messageentity)
+        public override void CreateMessage(MessageContext context, string sagaid, SagaEntity sagaentity, MessageEntity messageentity)
         {
             try
             {
                 var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-                var tablenamesufix = GetTableNameSufix(id);
+                var tablenamesufix = GetTableNameSufix(sagaid);
 
                 var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{tablenamesufix}");
 
@@ -263,9 +262,13 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
             }
+            catch (StorageException s)
+            {
+                throw new ApplicationException($"Error during the message record creation for saga {context.Saga.Name} with content {context.ContentType.FullName} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+            }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation saga {context.Saga.Name} with content {context.ContentType.FullName}", ex);
+                throw new ApplicationException($"Error during the message record creation for saga {context.Saga.Name} with content {context.ContentType.FullName} and route {context.Route.Name}", ex);
             }
         }
 
@@ -282,17 +285,17 @@ namespace Jal.Router.AzureStorage.Impl
             return string.Empty;
         }
 
-        public override SagaEntity GetSaga(string id)
+        public override SagaEntity GetSaga(string sagaid)
         {
             try
             {
-                var entity = new SagaEntity() { Key = id };
+                var entity = new SagaEntity();
 
-                var tablenamesufix = GetTableNameSufix(id);
+                var tablenamesufix = GetTableNameSufix(sagaid);
 
-                var partitionkey = GetPartitionKey(id);
+                var partitionkey = GetPartitionKey(sagaid);
 
-                var rowkey = GetRowKey(id);
+                var rowkey = GetRowKey(sagaid);
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
@@ -328,17 +331,21 @@ namespace Jal.Router.AzureStorage.Impl
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga key {id}");
+                        throw new ApplicationException($"Record not found for saga key {sagaid}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga key format {id}");
+                    throw new ApplicationException($"Invalid saga key format {sagaid}");
                 }
+            }
+            catch (StorageException s)
+            {
+                throw new ApplicationException($"Error during the saga record query for saga key {sagaid}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record lookup saga key {id}", ex);
+                throw new ApplicationException($"Error during the saga record query for saga key {sagaid}", ex);
             }
         }
 
@@ -367,9 +374,13 @@ namespace Jal.Router.AzureStorage.Impl
 
                 return id;
             }
+            catch (StorageException s)
+            {
+                throw new ApplicationException($"Error during the saga record creation for saga {context.Saga.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+            }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record creation saga {context.Saga.Name}", ex);
+                throw new ApplicationException($"Error during the saga record creation for saga {context.Saga.Name} and route {context.Route.Name}", ex);
             }
         }
 
@@ -410,27 +421,31 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
             }
+            catch(StorageException s)
+            {
+                throw new ApplicationException($"Error during the message record creation with content {context.ContentType.FullName} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+            }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation with content {context.ContentType.FullName}", ex);
+                throw new ApplicationException($"Error during the message record creation with content {context.ContentType.FullName} and route {context.Route.Name}", ex);
             }
         }
 
-        public override void UpdateSaga(MessageContext context, string id, SagaEntity sagaentity)
+        public override void UpdateSaga(MessageContext context, string sagaid, SagaEntity sagaentity)
         {
             try
             {
-                var tablenamesufix = GetTableNameSufix(id);
+                var tablenamesufix = GetTableNameSufix(sagaid);
 
-                var partitionkey = GetPartitionKey(id);
+                var partitionkey = GetPartitionKey(sagaid);
 
-                var rowkey = GetRowKey(id);
+                var rowkey = GetRowKey(sagaid);
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
                     var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
 
-                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult(); ;
+                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
 
                     var record = result.Result as SagaRecord;
 
@@ -458,28 +473,21 @@ namespace Jal.Router.AzureStorage.Impl
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga key {sagaentity.Key}");
+                        throw new ApplicationException($"Record not found for saga id {sagaid}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga key format {sagaentity.Key}");
+                    throw new ApplicationException($"Invalid saga id format {sagaid}");
                 }
             }
-            catch (StorageException ex)
+            catch (StorageException s)
             {
-                if (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
-                {
-                    throw new ApplicationException($"Error during the saga update (Optimistic concurrency violation – entity has changed since it was retrieved) {sagaentity.Name}", ex);
-                }
-                else
-                {
-                    throw new ApplicationException($"Error during the saga update ({ex.RequestInformation.HttpStatusCode}) {sagaentity.Name}", ex);
-                }
+                throw new ApplicationException($"Error during the saga update for saga {context.Route.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga update {sagaentity.Name}", ex);
+                throw new ApplicationException($"Error during the saga update for saga {context.Route.Name} and route {context.Route.Name}", ex);
             }
         }
 
