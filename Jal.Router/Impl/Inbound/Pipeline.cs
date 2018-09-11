@@ -10,37 +10,25 @@ namespace Jal.Router.Impl.Inbound
     {
         private readonly IComponentFactory _factory;
 
-        private readonly Type[] _middlewares;  
-
-        private int _current;
-
-        private readonly MessageContext _context;
-
-        private readonly MiddlewareParameter _parameter;
-
-        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory)
         {
             _factory = factory;
-            _middlewares = middlewares;
-            _current = 0;
-            _parameter = parameter;
-            _context = context;
         }
 
-        public void Execute()
+        public void Execute(Type[] middlewares, MessageContext context)
         {
-            GetNext().Invoke();
+            GetNext().Invoke(context, new MiddlewareContext() { MiddlewareTypes = middlewares, Index  = 0 });
         }
 
-        private Action GetNext()
+        private Action<MessageContext, MiddlewareContext> GetNext()
         {
-            return () =>
+            return (c,p) =>
             {
-                if (_current < _middlewares.Length)
+                if (p.Index < p.MiddlewareTypes.Length)
                 {
-                    var middleware = _factory.Create<IMiddleware>(_middlewares[_current]);
-                    _current++;
-                    middleware.Execute(_context, GetNext(), _parameter);
+                    var middleware = _factory.Create<IMiddleware>(p.MiddlewareTypes[p.Index]);
+                    p.Index++;
+                    middleware.Execute(c, GetNext(), p);
                 }
             };
         }

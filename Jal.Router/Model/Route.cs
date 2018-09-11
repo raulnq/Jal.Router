@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Model
 {
@@ -14,7 +15,13 @@ namespace Jal.Router.Model
             MiddlewareTypes = new List<Type>();
             Name = name;
             Channels = new List<Channel>();
+            IdentityConfiguration = new IdentityConfiguration();
+            StorageConfiguration = new StorageConfiguration();
         }
+
+        public IdentityConfiguration IdentityConfiguration { get; set; }
+
+        public StorageConfiguration StorageConfiguration { get; set; }
 
         public IList<Channel> Channels { get; set; }
 

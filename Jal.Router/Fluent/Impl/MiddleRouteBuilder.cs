@@ -4,24 +4,24 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndingRouteBuilder<TData> : IEndingRouteBuilder<TData>
+    public class MiddleRouteBuilder<TData> : IMiddleRouteBuilder<TData>
     {
         private readonly Saga _saga;
 
-        public EndingRouteBuilder(Saga saga)
+        public MiddleRouteBuilder(Saga saga)
         {
             _saga = saga;
         }
 
 
-        public IEndingListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>(string name)
+        public IMiddleListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var builder = new EndingNameRouteBuilder<THandler, TData>(_saga, name);
+            var builder = new MiddleNameRouteBuilder<THandler, TData>(_saga, name);
 
             return builder;
         }

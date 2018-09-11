@@ -26,36 +26,36 @@ namespace Jal.Router.Impl.Inbound
             _configuration = configuration;
         }
 
-        public void Route(MessageContext context, Route route)
+        public void Route(MessageContext context)
         {
             try
             {
                 var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 2);
 
-                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType);
+                var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType);
 
-                genericroutemethod?.Invoke(this, new object[] { context, route });
+                genericroutemethod?.Invoke(this, new object[] { context, context.Route });
             }
             catch (TargetInvocationException ex)
             {
-                if (ex.InnerException != null) throw ex.InnerException;
+                if (ex.InnerException != null) throw new Exception($"Exception during the handler execution {context.Route.ConsumerInterfaceType.FullName} route {context.Route.Name}",ex.InnerException);
                 throw;
             }
         }
 
-        public void Route(MessageContext context, Route route, object data, Type datatype)
+        public void Route(MessageContext context, object data)
         {
             try
             {
                 var routemethod = typeof(MessageRouter).GetMethods().First(x => x.Name == nameof(MessageRouter.Execute) && x.GetParameters().Count() == 3);
 
-                var genericroutemethod = routemethod?.MakeGenericMethod(route.ContentType, route.ConsumerInterfaceType, datatype);
+                var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType, context.Saga.DataType);
 
-                genericroutemethod?.Invoke(this, new [] { context, route, data });
+                genericroutemethod?.Invoke(this, new [] { context, context.Route, data });
             }
             catch (TargetInvocationException ex)
             {
-                if (ex.InnerException != null) throw ex.InnerException;
+                if (ex.InnerException != null) throw new Exception($"Exception during the handler execution {context.Route.ConsumerInterfaceType.FullName} route {context.Route.Name} saga {context.Saga.Name}", ex.InnerException);
                 throw;
             }
         }

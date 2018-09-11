@@ -19,10 +19,12 @@ namespace Jal.Router.Impl.Outbound
         public DistributionHandler(ILogger logger, IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
+
             _configuration = configuration;
+
             _logger = logger;
         }
-        public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
+        public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
         {
             var shuffler = _factory.Create<IChannelShuffler>(_configuration.ChannelShufflerType);
 
@@ -32,32 +34,36 @@ namespace Jal.Router.Impl.Outbound
 
             var count = 0;
 
-            var @action = next;
+            var index = middlewarecontext.Index;
 
             foreach (var channel in channels)
             {
-                parameter.Channel = channel;
+                middlewarecontext.Channel = channel;
 
                 try
                 {
                     count++;
-                    @action();
-                    break;
+
+                    return next(context, middlewarecontext);
                 }
                 catch (Exception)
                 {
                     if(count < numberofchannels)
                     {
-                        @action = current;
+                        middlewarecontext.Index = index;
+
                         _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
                         _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), no more channels");
+
                         throw;
                     }
                 }
             }
+
+            return null;
         }
     }
 }

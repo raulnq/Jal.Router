@@ -19,14 +19,16 @@ namespace Jal.Router.Impl.Outbound
             _configuration = configuration;
         }
 
-        public void Execute(MessageContext context, Action next, Action current, MiddlewareParameter parameter)
+        public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
         {
-            if (parameter.Channel.IsValidEndpoint())
+            if (middlewarecontext.Channel.IsValidEndpoint())
             {
                 var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 
-                channel.Send(parameter.Channel, context, parameter.Channel.GetPath(context.EndPoint.Name));
+                channel.Send(middlewarecontext.Channel, context, middlewarecontext.Channel.GetPath(context.EndPoint.Name));
             }
+
+            return null;
         }
     }
 }

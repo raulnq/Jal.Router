@@ -10,51 +10,27 @@ namespace Jal.Router.Impl.Outbound
     {
         private readonly IComponentFactory _factory;
 
-        private readonly Type[] _middlewares;  
-
-        private int _current;
-
-        private readonly MessageContext _context;
-
-        private readonly MiddlewareParameter _parameter;
-
-        public Pipeline(IComponentFactory factory, Type[] middlewares, MessageContext context, MiddlewareParameter parameter)
+        public Pipeline(IComponentFactory factory)
         {
             _factory = factory;
-            _middlewares = middlewares;
-            _current = 0;
-            _parameter = parameter;
-            _context = context;
         }
 
-        public void Execute()
+        public object Execute(Type[] middlewares, MessageContext message, Options options, string outboundtype, Type resulttype=null)
         {
-            GetNext().Invoke();
+            return GetNext().Invoke(message, new MiddlewareContext() {MiddlewareTypes= middlewares, Index=0,  Options = options, OutboundType = outboundtype, ResultType = resulttype });
         }
 
-        private Action GetNext()
+        private Func<MessageContext, MiddlewareContext, object> GetNext()
         {
-            return () =>
+            return (c,p) =>
             {
-                if (_current < _middlewares.Length)
+                if (p.Index < p.MiddlewareTypes.Length)
                 {
-                    var middleware = _factory.Create<IMiddleware>(_middlewares[_current]);
-                    _current++;
-                    middleware.Execute(_context, GetNext(), GetCurrent(), _parameter);
+                    var middleware = _factory.Create<IMiddleware>(p.MiddlewareTypes[p.Index]);
+                    p.Index++;
+                    return middleware.Execute(c, GetNext(), p);
                 }
-            };
-        }
-
-        private Action GetCurrent()
-        {
-            return () =>
-            {
-                var index = _current - 1;
-                if (index < _middlewares.Length)
-                {
-                    var middleware = _factory.Create<IMiddleware>(_middlewares[index]);
-                    middleware.Execute(_context, GetNext(), GetCurrent(), _parameter);
-                }
+                return null;
             };
         }
     }

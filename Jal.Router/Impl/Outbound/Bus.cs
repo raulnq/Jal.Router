@@ -5,7 +5,6 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
@@ -17,11 +16,14 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IConfiguration _configuration;
 
-        public Bus(IEndPointProvider provider, IComponentFactory factory, IConfiguration configuration)
+        private readonly IPipeline _pipeline;
+
+        public Bus(IEndPointProvider provider, IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
         {
             _provider = provider;
             _factory = factory;
             _configuration = configuration;
+            _pipeline = pipeline;
         }
 
         private TResult Reply<TResult>(MessageContext message, Options options)
@@ -45,15 +47,11 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(RequestReplyHandler));
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Reply", ResultType = typeof(TResult) };
-
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
-
-                    pipeline.Execute();
+                    var result = _pipeline.Execute(middlewares.ToArray(), message, options, "Reply", typeof(TResult));
 
                     interceptor.OnSuccess(message, options);
 
-                    return (TResult)parameter.Result;
+                    return (TResult)result;
                 }
                 else
                 {
@@ -130,11 +128,7 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(PointToPointHandler));
 
-                    var parameter = new MiddlewareParameter() {Options = options, OutboundType = "Send" };
-
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), message, options, "Send");
                 }
                 else
                 {
@@ -256,11 +250,7 @@ namespace Jal.Router.Impl.Outbound
 
                     middlewares.Add(typeof(PublishSubscribeHandler));
 
-                    var parameter = new MiddlewareParameter() { Options = options, OutboundType = "Publish" };
-
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), message, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), message, options, "Publish");
                 }
                 else
                 {

@@ -11,7 +11,7 @@ namespace Jal.Router.Model
 
             DataType = datatype;
 
-            NextRoutes = new List<Route>();
+            Routes = new List<Route>();
         }
         public string Name { get; set; }
 
@@ -19,10 +19,10 @@ namespace Jal.Router.Model
 
         public int Timeout { get; set; }
 
-        public List<Route> NextRoutes { get; set; }
+        public List<Route> Routes { get; set; }
 
-        public Route StartingRoute { get; set; }
+        public Route FirstRoute { get; set; }
 
-        public Route EndingRoute { get; set; }
+        public Route LastRoute { get; set; }
     }
 }

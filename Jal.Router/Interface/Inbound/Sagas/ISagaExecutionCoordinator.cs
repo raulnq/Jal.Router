@@ -2,7 +2,7 @@
 
 namespace Jal.Router.Interface.Inbound.Sagas
 {
-    public interface ISagaRouter
+    public interface ISagaExecutionCoordinator
     {
         void Start(object message, Saga saga, Route route);
 

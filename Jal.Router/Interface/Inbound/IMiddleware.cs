@@ -6,6 +6,6 @@ namespace Jal.Router.Interface.Inbound
 {
     public interface IMiddleware
     {
-        void Execute(MessageContext context, Action next, MiddlewareParameter parameter);
+        void Execute(MessageContext context, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext);
     }
 }

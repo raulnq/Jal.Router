@@ -27,14 +27,14 @@ namespace Jal.Router.Impl.Inbound
 
                 foreach (var saga in source.GetSagas())
                 {
-                    Shutdown(saga.StartingRoute);
+                    Shutdown(saga.FirstRoute);
 
-                    foreach (var nextroute in saga.NextRoutes)
+                    foreach (var routes in saga.Routes)
                     {
-                        Shutdown(nextroute);
+                        Shutdown(routes);
                     }
 
-                    Shutdown(saga.EndingRoute);
+                    Shutdown(saga.LastRoute);
                 }
             }
         }

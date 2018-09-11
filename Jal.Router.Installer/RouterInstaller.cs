@@ -52,9 +52,13 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<ILogger>().ImplementedBy<Impl.ConsoleLogger>().LifestyleSingleton());
 
+            container.Register(Component.For<Interface.Inbound.IPipeline>().ImplementedBy<Impl.Inbound.Pipeline>().LifestyleSingleton());
+
+            container.Register(Component.For<Interface.Outbound.IPipeline>().ImplementedBy<Impl.Outbound.Pipeline>().LifestyleSingleton());
+
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
-            container.Register(Component.For<ISagaRouter>().ImplementedBy<SagaRouter>().LifestyleSingleton());
+            container.Register(Component.For<ISagaExecutionCoordinator>().ImplementedBy<SagaExecutionCoordinator>().LifestyleSingleton());
 
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
@@ -90,7 +94,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<ISagaStorageFinder>().ImplementedBy<SagaStorageFinder>().LifestyleSingleton());
+            container.Register(Component.For<ISagaStorageSearcher>().ImplementedBy<SagaStorageSearcher>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
@@ -130,11 +134,11 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MessageExceptionHandler)).Named(typeof(MessageExceptionHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(StartingMessageHandler)).Named(typeof(StartingMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(FirstMessageHandler)).Named(typeof(FirstMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(NextMessageHandler)).Named(typeof(NextMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(MiddleMessageHandler)).Named(typeof(MiddleMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(EndingMessageHandler)).Named(typeof(EndingMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddleware)).ImplementedBy(typeof(LastMessageHandler)).Named(typeof(LastMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
 

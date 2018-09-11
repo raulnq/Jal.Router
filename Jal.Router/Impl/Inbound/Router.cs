@@ -4,7 +4,6 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -14,11 +13,15 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IConfiguration _configuration;
 
-        public Router(IComponentFactory factory, IConfiguration configuration)
+        private readonly IPipeline _pipeline;
+
+        public Router(IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
         {
             _factory = factory;
 
             _configuration = configuration;
+
+            _pipeline = pipeline;
         }
         public void Route(object message, Route route)
         {
@@ -26,7 +29,7 @@ namespace Jal.Router.Impl.Inbound
 
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
-            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck);
+            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
             interceptor.OnEntry(context);
 
@@ -50,13 +53,9 @@ namespace Jal.Router.Impl.Inbound
 
                     middlewares.Add(typeof(MessageHandler));
 
-                    var parameter = new MiddlewareParameter() { Route = route };
-
                     context.Route = route;
 
-                    var pipeline = new Pipeline(_factory, middlewares.ToArray(), context, parameter);
-
-                    pipeline.Execute();
+                    _pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
                 }

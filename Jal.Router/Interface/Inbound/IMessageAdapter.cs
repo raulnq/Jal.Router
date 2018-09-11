@@ -1,11 +1,12 @@
 using System;
 using Jal.Router.Model;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Interface.Inbound
 {
     public interface IMessageAdapter
     {
-        MessageContext Read(object message, Type contenttype, bool useclaimcheck);
+        MessageContext Read(object message, Type contenttype, bool useclaimcheck, IdentityConfiguration identityconfiguration=null);
 
         object Write(MessageContext context, bool useclaimcheck);
 

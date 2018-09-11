@@ -2,7 +2,7 @@
 
 namespace Jal.Router.Model.Outbound
 {
-    public class MiddlewareParameter
+    public class MiddlewareContext
     {
         public Options Options { get; set; }
 
@@ -10,8 +10,10 @@ namespace Jal.Router.Model.Outbound
 
         public Channel Channel { get; set; }
 
-        public object Result { get; set; }
-
         public Type ResultType { get; set; }
+
+        public int Index { get; set; }
+
+        public Type[] MiddlewareTypes { get; set; }
     }
 }

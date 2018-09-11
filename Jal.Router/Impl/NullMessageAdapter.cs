@@ -1,13 +1,14 @@
 using System;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
+using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl
 {
 
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext Read(object message, Type type, bool useclaimcheck)
+        public MessageContext Read(object message, Type type, bool useclaimcheck, IdentityConfiguration identityconfiguration)
         {
             return new MessageContext(new EndPoint(string.Empty), new Options());
         }
