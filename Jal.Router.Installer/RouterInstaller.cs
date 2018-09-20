@@ -157,6 +157,8 @@ namespace Jal.Router.Installer
 #endif
             container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(NullValueSettingFinder)).Named(typeof(NullValueSettingFinder).FullName).LifestyleSingleton());
 
+            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(EnvironmentSettingFinder)).Named(typeof(EnvironmentSettingFinder).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IHost)).ImplementedBy(typeof(Host)).Named(typeof(Host).FullName).LifestyleSingleton());
