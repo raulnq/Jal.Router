@@ -36,12 +36,25 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
+            properties.Add("identity_id", context.Identity?.Id);
+            properties.Add("identity_replytorequestid", context.Identity?.ReplyToRequestId);
+            properties.Add("identity_requestid", context.Identity?.RequestId);
+            properties.Add("identity_operationid", context.Identity?.OperationId);
+            properties.Add("identity_parentid", context.Identity?.ParentId);
+
+            properties.Add("origin_key", context.Origin?.Key);
+            properties.Add("origin_from", context.Origin?.From);
+
+            properties.Add("saga_id", context.SagaContext?.Id);
+            properties.Add("saga_status", context.SagaContext?.Status);
+            properties.Add("saga_name", context.Saga?.Name);
+
             properties.Add("version", context.Version);
-            properties.Add("origin", context.Origin.Key);
-            properties.Add("sagaid", context.SagaContext?.Id);
-            properties.Add("replytorequestid", context.Identity.ReplyToRequestId);
-            properties.Add("requestid", context.Identity.RequestId);
             properties.Add("contentid", context.ContentId);
+            properties.Add("lastretry", context.LastRetry.ToString());
+
+            properties.Add("route_name", context.Route?.Name);
+
             foreach (var h in context.Headers)
             {
                 properties.Add(h.Key, h.Value);
