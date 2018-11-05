@@ -28,9 +28,9 @@ namespace Jal.Router.Impl.Outbound
             {
                 return _endpoints.Single(x => x.Name == name && x.MessageType == contenttype);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new ApplicationException($"Missing endpoint {name} for type {contenttype.FullName}");
+                throw new ApplicationException($"Missing or duplicate endpoint {name} for type {contenttype.FullName}, {ex.Message}");
             }
             
         }

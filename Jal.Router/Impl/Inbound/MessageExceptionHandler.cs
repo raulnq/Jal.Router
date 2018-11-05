@@ -52,7 +52,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 if (policy != null)
                 {
-                    if (messagecontext.Route.RetryExceptionType == ex.GetType())
+                    if (messagecontext.Route.RetryExceptionType == ex.GetType() || (ex.InnerException != null && messagecontext.Route.RetryExceptionType == ex.InnerException.GetType()))
                     {
                         if (!messagecontext.LastRetry)
                         {
