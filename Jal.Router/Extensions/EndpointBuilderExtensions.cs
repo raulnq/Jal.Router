@@ -7,7 +7,7 @@ namespace Jal.Router.Extensions
 {
     public static class EndpointBuilderExtensions
     {
-        public static void To<TExtractorConnectionString>(this IToEndPointBuilder builder, Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        public static void To<TExtractorConnectionString>(this IToEndPointBuilder builder, Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
         {
             builder.To(x=>x.Add<TExtractorConnectionString>(connectionstringextractor, path));
         }
@@ -24,7 +24,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             builder.To<NullValueSettingFinder>(extractor, path);
         }
@@ -41,7 +41,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.Add<NullValueSettingFinder>(extractor, path);
         }
@@ -58,7 +58,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             builder.AndWaitReplyFromPointToPointChannel<NullValueSettingFinder>(path, extractor);
 
@@ -80,7 +80,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             builder.AndWaitReplyFromPublishSubscribeChannel<NullValueSettingFinder>(path, subscription, extractor);
         }

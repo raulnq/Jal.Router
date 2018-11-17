@@ -31,34 +31,19 @@ namespace Jal.Router.Impl.Management
 
             var channelmanager = _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
 
-            foreach (var source in _sources)
+            foreach (var channel in _configuration.RuntimeInfo.PointToPointChannels)
             {
-                var queues = source.GetPointToPointChannels();
-
-                foreach (var queue in queues)
-                {
-                    CreatePointToPointChannel(queue, channelmanager, errors);
-                }
+                CreatePointToPointChannel(channel, channelmanager, errors);
             }
 
-            foreach (var source in _sources)
+            foreach (var channel in _configuration.RuntimeInfo.PublishSubscribeChannels)
             {
-                var topics = source.GetPublishSubscribeChannels();
-
-                foreach (var topic in topics)
-                {
-                    CreatePublishSubscriberChannel(topic, channelmanager, errors);
-                }
+                CreatePublishSubscriberChannel(channel, channelmanager, errors);
             }
 
-            foreach (var source in _sources)
+            foreach (var channel in _configuration.RuntimeInfo.SubscriptionToPublishSubscribeChannels)
             {
-                var subscriptions = source.GetSubscriptionsToPublishSubscribeChannel();
-
-                foreach (var subscription in subscriptions)
-                {
-                    CreateSubscriptionToPublishSubscribeChannel(subscription, channelmanager, errors);
-                }
+                CreateSubscriptionToPublishSubscribeChannel(channel, channelmanager, errors);
             }
 
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
@@ -71,9 +56,9 @@ namespace Jal.Router.Impl.Management
         {
             if (subscription.ConnectionStringExtractorType != null)
             {
-                var finder = _factory.Create<IValueSettingFinder>(subscription.ConnectionStringExtractorType);
+                var finder = _factory.Create<IValueFinder>(subscription.ConnectionStringExtractorType);
 
-                var extractor = subscription.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                var extractor = subscription.ConnectionStringExtractor as Func<IValueFinder, string>;
 
                 subscription.ConnectionString = extractor?.Invoke(finder);
 
@@ -149,9 +134,9 @@ namespace Jal.Router.Impl.Management
         {
             if (channel.ConnectionStringExtractorType != null)
             {
-                var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+                var finder = _factory.Create<IValueFinder>(channel.ConnectionStringExtractorType);
 
-                var extractor = channel.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                var extractor = channel.ConnectionStringExtractor as Func<IValueFinder, string>;
 
                 channel.ConnectionString = extractor?.Invoke(finder);
 
@@ -205,9 +190,9 @@ namespace Jal.Router.Impl.Management
         {
             if (channel.ConnectionStringExtractorType != null)
             {
-                var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+                var finder = _factory.Create<IValueFinder>(channel.ConnectionStringExtractorType);
 
-                var extractor = channel.ConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                var extractor = channel.ConnectionStringExtractor as Func<IValueFinder, string>;
 
                 channel.ConnectionString = extractor?.Invoke(finder);
 

@@ -9,6 +9,7 @@ namespace Jal.Router.Interface.Management
 {
     public interface IConfiguration
     {
+        RuntimeInfo RuntimeInfo { get; }
         IdentityConfiguration Identity { get; }
         StorageConfiguration Storage { get; set; }
         string ApplicationName { get; set; }

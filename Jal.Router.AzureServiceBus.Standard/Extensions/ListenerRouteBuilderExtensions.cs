@@ -7,8 +7,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class ListenerRouteBuilderExtensions
     {
-        public static INameRouteBuilder<THandler> ToListenQueue<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static INameRouteBuilder<THandler> ToListenQueue<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> listenerroutebuilder, string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TExtractorConectionString>(path, connectionstringextractor);
         }
@@ -18,8 +18,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static INameRouteBuilder<THandler> ToListenTopic<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static INameRouteBuilder<THandler> ToListenTopic<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> listenerroutebuilder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
@@ -29,8 +29,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static IFirstNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-    where TExtractorConectionString : IValueSettingFinder
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
@@ -40,8 +40,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static IFirstNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-    where TExtractorConectionString : IValueSettingFinder
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
@@ -51,8 +51,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static IMiddleNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-where TExtractorConectionString : IValueSettingFinder
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueFinder, string> connectionstringextractor)
+where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
@@ -62,8 +62,8 @@ where TExtractorConectionString : IValueSettingFinder
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static IMiddleNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-    where TExtractorConectionString : IValueSettingFinder
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
@@ -73,8 +73,8 @@ where TExtractorConectionString : IValueSettingFinder
             return listenerroutebuilder.ToListenPublishSubscribeChannel(path, subscription, connectionstring);
         }
 
-        public static ILastNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static ILastNameRouteBuilder<THandler, TData> ToListenQueue<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(path, connectionstringextractor);
         }
@@ -84,8 +84,8 @@ where TExtractorConectionString : IValueSettingFinder
             return listenerroutebuilder.ToListenPointToPointChannel(path, connectionstring);
         }
 
-        public static ILastNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static ILastNameRouteBuilder<THandler, TData> ToListenTopic<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> listenerroutebuilder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return listenerroutebuilder.ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(path, subscription, connectionstringextractor);
         }

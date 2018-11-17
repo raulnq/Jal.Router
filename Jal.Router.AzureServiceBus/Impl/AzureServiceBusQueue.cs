@@ -3,6 +3,7 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
@@ -27,17 +28,19 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
-        public override void Listen(Channel channel, Action<object>[] routeactions, string channelpath)
+        public override void Listen(ListenerMetadata metadata)
         {
-            var client = QueueClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath);
+            var client = QueueClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath);
             
-            var receiver = client.MessagingFactory.CreateMessageReceiver(channel.ToPath);
+            var receiver = client.MessagingFactory.CreateMessageReceiver(metadata.ToPath);
+
+            var channelpath = metadata.GetPath();
 
             var options = CreateOptions();
 
             Action<BrokeredMessage> routeaction = message =>
             {
-                foreach (var action in routeactions)
+                foreach (var action in metadata.Handlers)
                 {
                     var clone = message.Clone();
                     action(clone);
@@ -47,7 +50,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId,()=> routeaction(bm), () => client.Complete(bm.LockToken)), options);
 
-            channel.Shutdown = () => { receiver.Close(); client.Close(); };
+            metadata.Shutdown = () => { receiver.Close(); client.Close(); };
         }
 
         private OnMessageOptions CreateOptions()

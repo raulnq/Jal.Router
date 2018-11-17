@@ -1,6 +1,6 @@
 namespace Jal.Router.Interface
 {
-    public interface IValueSettingFinder
+    public interface IValueFinder
     {
         string Find(string name);
     }

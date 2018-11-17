@@ -190,7 +190,7 @@ namespace Jal.Router.Impl.Inbound
 
         private IRetryPolicy GetRetryPolicy(Route route)
         {
-            var extractor = _factory.Create<IValueSettingFinder>(route.RetryExtractorType);
+            var extractor = _factory.Create<IValueFinder>(route.RetryExtractorType);
 
             return route.RetryPolicyExtractor(extractor);
         }

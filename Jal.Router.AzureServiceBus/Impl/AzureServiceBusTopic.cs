@@ -3,6 +3,7 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
@@ -27,11 +28,13 @@ namespace Jal.Router.AzureServiceBus.Impl
             return string.Empty;
         }
 
-        public override void Listen(Channel channel, Action<object>[] routeactions, string channelpath)
+        public override void Listen(ListenerMetadata metadata)
         {
-            var client = SubscriptionClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath, channel.ToSubscription);
+            var client = SubscriptionClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath, metadata.ToSubscription);
 
-            var path = SubscriptionClient.FormatSubscriptionPath(channel.ToPath, channel.ToSubscription);
+            var channelpath = metadata.GetPath();
+
+            var path = SubscriptionClient.FormatSubscriptionPath(metadata.ToPath, metadata.ToSubscription);
 
             var receiver = client.MessagingFactory.CreateMessageReceiver(path);
 
@@ -39,7 +42,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             Action<BrokeredMessage> routeaction = message =>
             {
-                foreach (var action in routeactions)
+                foreach (var action in metadata.Handlers)
                 {
                     var clone = message.Clone();
                     action(clone);
@@ -48,7 +51,7 @@ namespace Jal.Router.AzureServiceBus.Impl
 
             receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId, () => routeaction(bm), () => client.Complete(bm.LockToken)), options);
 
-            channel.Shutdown = () => { receiver.Close(); client.Close(); };
+            metadata.Shutdown = () => { receiver.Close(); client.Close(); };
         }
 
         private OnMessageOptions CreateOptions()

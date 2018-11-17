@@ -49,9 +49,9 @@ namespace Jal.Router.LightInject.Installer
                             container.Register(typeof(AbstractRouterConfigurationSource), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
 
-                        if (typeof(IValueSettingFinder).IsAssignableFrom(exportedType))
+                        if (typeof(IValueFinder).IsAssignableFrom(exportedType))
                         {
-                            container.Register(typeof(IValueSettingFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
+                            container.Register(typeof(IValueFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
                     }
                 }
@@ -164,16 +164,16 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<Interface.Outbound.IMiddleware, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IValueSettingFinder, AppSettingValueSettingFinder>(typeof (AppSettingValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, AppSettingValueSettingFinder>(typeof (AppSettingValueSettingFinder).FullName, new PerContainerLifetime());
 
-            container.Register<IValueSettingFinder, ConnectionStringValueSettingFinder>(typeof (ConnectionStringValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, ConnectionStringValueSettingFinder>(typeof (ConnectionStringValueSettingFinder).FullName, new PerContainerLifetime());
 
 #if NETSTANDARD2_0
-            container.Register<IValueSettingFinder, ConfigurationValueSettingFinder>(typeof (ConfigurationValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, ConfigurationValueSettingFinder>(typeof (ConfigurationValueSettingFinder).FullName, new PerContainerLifetime());
 #endif
-            container.Register<IValueSettingFinder, NullValueSettingFinder>(typeof(NullValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, NullValueSettingFinder>(typeof(NullValueSettingFinder).FullName, new PerContainerLifetime());
 
-            container.Register<IValueSettingFinder, EnvironmentSettingFinder>(typeof(EnvironmentSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, EnvironmentSettingFinder>(typeof(EnvironmentSettingFinder).FullName, new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof (EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
         }

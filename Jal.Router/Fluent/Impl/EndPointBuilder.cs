@@ -21,11 +21,11 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        public IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
         {
             var channel = new Channel
             {
-                ConnectionStringExtractorType = typeof(TExtractorConnectionString)
+                ConnectionStringValueFinderType = typeof(TExtractorConnectionString)
             };
 
             if (connectionstringextractor == null)
@@ -38,7 +38,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            channel.ToConnectionStringExtractor = connectionstringextractor;
+            channel.ToConnectionStringProvider = connectionstringextractor;
 
             channel.ToPath = path;
 

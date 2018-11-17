@@ -4,6 +4,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl
 {
@@ -30,7 +31,7 @@ namespace Jal.Router.Impl
             return string.Empty;
         }
 
-        public virtual void Listen(Channel channel, Action<object>[] actions, string channelpath)
+        public virtual void Listen(ListenerMetadata metadata)
         {
 
         }

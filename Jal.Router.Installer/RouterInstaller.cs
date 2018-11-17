@@ -148,16 +148,16 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<RequestReplyHandler>().LifestyleSingleton().Named(typeof(RequestReplyHandler).FullName));
 
-            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(AppSettingValueSettingFinder)).Named(typeof(AppSettingValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(AppSettingValueSettingFinder)).Named(typeof(AppSettingValueSettingFinder).FullName).LifestyleSingleton());
 
 #if NETSTANDARD2_0
-            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(ConfigurationValueSettingFinder)).Named(typeof(ConfigurationValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConfigurationValueSettingFinder)).Named(typeof(ConfigurationValueSettingFinder).FullName).LifestyleSingleton());
 #endif
-            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(NullValueSettingFinder)).Named(typeof(NullValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(NullValueSettingFinder)).Named(typeof(NullValueSettingFinder).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IValueSettingFinder)).ImplementedBy(typeof(EnvironmentSettingFinder)).Named(typeof(EnvironmentSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(EnvironmentSettingFinder)).Named(typeof(EnvironmentSettingFinder).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 
@@ -169,7 +169,7 @@ namespace Jal.Router.Installer
                 {
                     var assemblyDescriptor = Classes.FromAssembly(assembly);
                     container.Register(assemblyDescriptor.BasedOn<AbstractRouterConfigurationSource>().WithServiceAllInterfaces());
-                    container.Register(assemblyDescriptor.BasedOn<IValueSettingFinder>().WithServiceAllInterfaces());
+                    container.Register(assemblyDescriptor.BasedOn<IValueFinder>().WithServiceAllInterfaces());
                 }
             }
 

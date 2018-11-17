@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _channel = channel;
         }
 
-        public void AndWaitReplyFromPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+        public void AndWaitReplyFromPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -25,15 +25,15 @@ namespace Jal.Router.Fluent.Impl
             }
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringExtractor = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
 
-            _channel.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+            _channel.ReplyConnectionStringValueFinderType = typeof(TExtractorConectionString);
 
             _channel.ToReplyTimeOut = timeout;
         }
 
         public void AndWaitReplyFromPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
-            Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+            Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -50,9 +50,9 @@ namespace Jal.Router.Fluent.Impl
 
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringExtractor = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
 
-            _channel.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+            _channel.ReplyConnectionStringValueFinderType = typeof(TExtractorConectionString);
 
             _channel.ToReplySubscription = subscription;
 

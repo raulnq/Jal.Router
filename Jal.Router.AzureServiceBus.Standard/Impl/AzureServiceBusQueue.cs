@@ -4,6 +4,7 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
@@ -28,15 +29,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return string.Empty;
         }
 
-        public override void Listen(Channel channel, Action<object>[] routingactions, string channelpath)
+        public override void Listen(ListenerMetadata metadata)
         {
-            var queueclient = new QueueClient(channel.ToConnectionString, channel.ToPath);
+            var queueclient = new QueueClient(metadata.ToConnectionString, metadata.ToPath);
 
-            var options = CreateOptions(channelpath);
+            var path = metadata.GetPath();
+
+            var options = CreateOptions(path);
 
             Action<Message> @action = message =>
             {
-                foreach (var routingaction in routingactions)
+                foreach (var routingaction in metadata.Handlers)
                 {
                     var clone = message.Clone();
 
@@ -46,10 +49,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             queueclient.RegisterMessageHandler(async (message, token) =>
             {
-                await OnMessageAsync(channelpath, message.MessageId, () => @action(message), () => queueclient.CompleteAsync(message.SystemProperties.LockToken));
+                await OnMessageAsync(path, message.MessageId, () => @action(message), () => queueclient.CompleteAsync(message.SystemProperties.LockToken));
             }, options);
 
-            channel.Shutdown = () => { queueclient.CloseAsync().GetAwaiter().GetResult(); };
+            metadata.Shutdown = () => { queueclient.CloseAsync().GetAwaiter().GetResult(); };
         }
 
         private MessageHandlerOptions CreateOptions(string channelpath)

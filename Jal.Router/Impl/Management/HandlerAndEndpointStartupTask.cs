@@ -1,71 +1,57 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Management
 {
     public class HandlerAndEndpointStartupTask : IStartupTask
     {
-        private readonly IRouterConfigurationSource[] _sources;
-
         private readonly IComponentFactory _factory;
 
         private readonly ILogger _logger;
 
-        public HandlerAndEndpointStartupTask(IRouterConfigurationSource[] sources, IComponentFactory factory, ILogger logger)
-        {
-            _sources = sources;
+        private readonly IConfiguration _configuration;
 
+        public HandlerAndEndpointStartupTask(IComponentFactory factory, ILogger logger, IConfiguration configuration)
+        {
             _factory = factory;
 
             _logger = logger;
+
+            _configuration = configuration;
         }
 
         public void Run()
         {
             var errors = new StringBuilder();
 
-            var routes = new List<Route>();
+            EvaluateEndpoints(errors);
 
-            var endpoints = new List<EndPoint>();
+            EvaluateRoutes(errors);
 
-            foreach (var source in _sources)
+            if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
-                routes.AddRange(source.GetRoutes());
-
-                endpoints.AddRange(source.GetEndPoints());
-
-                foreach (var saga in source.GetSagas())
-                {
-                    if (saga.FirstRoute != null)
-                    {
-                        routes.Add(saga.FirstRoute);
-                    }
-                    if (saga.LastRoute != null)
-                    {
-                        routes.Add(saga.LastRoute);
-                    }
-                    routes.AddRange(saga.Routes);
-                }
+                throw new ApplicationException(errors.ToString());
             }
+        }
 
-            foreach (var endpoint in endpoints)
+        private void EvaluateEndpoints(StringBuilder errors)
+        {
+            foreach (var endpoint in _configuration.RuntimeInfo.EndPoints)
             {
                 if (endpoint.Channels.Any())
                 {
                     foreach (var channel in endpoint.Channels)
                     {
-                        if (channel.ConnectionStringExtractorType != null)
+                        if (channel.ConnectionStringValueFinderType != null)
                         {
-                            var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+                            var finder = _factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                            if (channel.ToConnectionStringExtractor is Func<IValueSettingFinder, string> extractor)
+                            if (channel.ToConnectionStringProvider is Func<IValueFinder, string> provider)
                             {
-                                channel.ToConnectionString = extractor(finder);
+                                channel.ToConnectionString = provider(finder);
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
@@ -87,13 +73,13 @@ namespace Jal.Router.Impl.Management
                             }
                         }
 
-                        if (channel.ToReplyConnectionStringExtractor != null)
+                        if (channel.ToReplyConnectionStringProvider != null)
                         {
-                            var finder = _factory.Create<IValueSettingFinder>(channel.ReplyConnectionStringExtractorType);
+                            var finder = _factory.Create<IValueFinder>(channel.ReplyConnectionStringValueFinderType);
 
-                            if (channel.ToReplyConnectionStringExtractor is Func<IValueSettingFinder, string> extractor)
+                            if (channel.ToReplyConnectionStringProvider is Func<IValueFinder, string> provider)
                             {
-                                channel.ToReplyConnectionString = extractor(finder);
+                                channel.ToReplyConnectionString = provider(finder);
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
@@ -125,18 +111,21 @@ namespace Jal.Router.Impl.Management
                     _logger.Log(error);
                 }
             }
+        }
 
-            foreach (var route in routes)
+        private void EvaluateRoutes(StringBuilder errors)
+        {
+            foreach (var route in _configuration.RuntimeInfo.RoutesMetadata)
             {
-                if (route.Channels.Any())
+                if (route.Route.Channels.Any())
                 {
-                    foreach (var channel in route.Channels)
+                    foreach (var channel in route.Route.Channels)
                     {
-                        var finder = _factory.Create<IValueSettingFinder>(channel.ConnectionStringExtractorType);
+                        var finder = _factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                        var extractor = channel.ToConnectionStringExtractor as Func<IValueSettingFinder, string>;
+                        var provider = channel.ToConnectionStringProvider as Func<IValueFinder, string>;
 
-                        channel.ToConnectionString = extractor?.Invoke(finder);
+                        channel.ToConnectionString = provider?.Invoke(finder);
 
                         if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
                         {
@@ -162,16 +151,11 @@ namespace Jal.Router.Impl.Management
                 {
                     var error = $"Missing channels, Handler {route.Name}";
 
-                    _logger.Log(error);
+                    errors.AppendLine(error);
 
                     _logger.Log(error);
                 }
 
-            }
-
-            if (!string.IsNullOrWhiteSpace(errors.ToString()))
-            {
-                throw new ApplicationException(errors.ToString());
             }
         }
     }

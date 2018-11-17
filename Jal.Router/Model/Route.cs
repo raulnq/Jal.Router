@@ -39,7 +39,7 @@ namespace Jal.Router.Model
 
         public string OnErrorEndPoint { get; set; }
 
-        public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
+        public Func<IValueFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
 
         public IList<Type> MiddlewareTypes { get; set; }
 

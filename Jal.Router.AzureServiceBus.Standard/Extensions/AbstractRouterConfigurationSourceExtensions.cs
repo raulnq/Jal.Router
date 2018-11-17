@@ -9,11 +9,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class AbstractRouterConfigurationSourceExtensions
     {
-        public static void RegisterQueue<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueSettingFinder, ServiceBusConfiguration> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static void RegisterQueue<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
 
-            Func<IValueSettingFinder, string> extractor = finder =>
+            Func<IValueFinder, string> extractor = finder =>
             {
                 var servicebusconfiguration = connectionstringextractor(finder);
 
@@ -29,10 +29,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string topic,
-            Func<IValueSettingFinder, ServiceBusConfiguration> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
-            Func<IValueSettingFinder, string> extractor = finder =>
+            Func<IValueFinder, string> extractor = finder =>
             {
                 var servicebusconfiguration = connectionstringextractor(finder);
 
@@ -48,10 +48,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
-            Func<IValueSettingFinder, ServiceBusConfiguration> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule=null)
-            where TExtractorConectionString : IValueSettingFinder
+            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule=null)
+            where TExtractorConectionString : IValueFinder
         {
-            Func<IValueSettingFinder, string> extractor = finder =>
+            Func<IValueFinder, string> extractor = finder =>
             {
                 var servicebusconfiguration = connectionstringextractor(finder);
 

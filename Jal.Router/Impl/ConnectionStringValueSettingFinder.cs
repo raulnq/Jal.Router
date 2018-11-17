@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class ConnectionStringValueSettingFinder : IValueSettingFinder
+    public class ConnectionStringValueSettingFinder : IValueFinder
     {
         public string Find(string name)
         {

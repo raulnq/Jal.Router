@@ -4,6 +4,7 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Inbound;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
@@ -28,15 +29,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return string.Empty;
         }
 
-        public override void Listen(Channel channel, Action<object>[] routingactions, string channelpath)
+        public override void Listen(ListenerMetadata metadata)
         {
-            var client = new SubscriptionClient(channel.ToConnectionString, channel.ToPath, channel.ToSubscription);
+            var client = new SubscriptionClient(metadata.ToConnectionString, metadata.ToPath, metadata.ToSubscription);
+
+            var channelpath = metadata.GetPath();
 
             var options = CreateOptions(channelpath);
 
             Action<Message> @action = message =>
             {
-                foreach (var routingaction in routingactions)
+                foreach (var routingaction in metadata.Handlers)
                 {
                     var clone = message.Clone();
 
@@ -50,7 +53,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 await OnMessageAsync(channelpath, message.MessageId, () => @action(message), () => client.CompleteAsync(message.SystemProperties.LockToken));
             }, options);
 
-            channel.Shutdown = () => { client.CloseAsync().GetAwaiter().GetResult(); };
+            metadata.Shutdown = () => { client.CloseAsync().GetAwaiter().GetResult(); };
         }
 
         private MessageHandlerOptions CreateOptions(string channelpath)

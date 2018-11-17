@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
@@ -9,6 +8,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound
 {
+
     public class ListenerStartupTask : IStartupTask
     {
         private readonly IComponentFactory _factory;
@@ -39,70 +39,20 @@ namespace Jal.Router.Impl.Inbound
 
             var publishsubscriberchannel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 
-            var listeners = new List<Listener>();
-
-            foreach (var source in _sources)
+            foreach (var listenermetadata in _configuration.RuntimeInfo.ListenersMetadata)
             {
-                listeners.AddRange(source.GetRoutes().Select(route => new Listener() { Route = route, Action = message => _router.Route(message, route), Prefix = route.Name }));
-
-                foreach (var saga in source.GetSagas())
+                if (listenermetadata.IsPointToPoint())
                 {
-                    if (saga.FirstRoute != null)
-                    {
-                        listeners.Add(new Listener() { Route = saga.FirstRoute, Action = message => _sec.Start(message, saga, saga.FirstRoute), Prefix = $"{saga.Name}/{saga.FirstRoute.Name}" });
-                    }
-                    if (saga.LastRoute != null)
-                    {
-                        listeners.Add(new Listener() { Route = saga.LastRoute, Action = message => _sec.End(message, saga, saga.LastRoute), Prefix = $"{saga.Name}/{saga.LastRoute.Name}" });
-                    }
-                    listeners.AddRange(saga.Routes.Select(route => new Listener() { Route = route, Action = message => _sec.Continue(message, saga, route), Prefix = $"{saga.Name}/{route.Name}" }));
+                    pointtopointchannel.Listen(listenermetadata);
+
+                    _logger.Log($"Listening {listenermetadata.GetPath()} {listenermetadata.ToString()} channel ({listenermetadata.Handlers.Count}): {string.Join(",", listenermetadata.Names)}");
                 }
-            }
 
-            var groupsbychannel = new Dictionary<string, List<Listener>>();
-
-            foreach (var listener in listeners)
-            {
-                foreach (var channel in listener.Route.Channels)
+                if (listenermetadata.IsPublishSubscriber())
                 {
-                    if (!groupsbychannel.ContainsKey(channel.GetId()))
-                    {
-                        groupsbychannel.Add(channel.GetId(), new List<Listener>() { listener });
-                    }
-                    else
-                    {
-                        groupsbychannel[channel.GetId()].Add(listener);
-                    }
-                }
-            }
+                    publishsubscriberchannel.Listen(listenermetadata);
 
-            foreach (var groupbychannel in groupsbychannel)
-            {
-                if (groupbychannel.Value.Any())
-                {
-                    var listener = groupbychannel.Value.First();
-
-                    var channel = listener.Route.Channels.First(x => groupbychannel.Key == x.GetId());
-
-                    var channelpath = channel.GetPath();
-
-                    var prefixes = string.Join(",", groupbychannel.Value.Select(x => x.Prefix));
-
-                    var actions = groupbychannel.Value.Select(x => x.Action).ToArray();
-
-                    if (channel.IsPointToPoint())
-                    {
-                        pointtopointchannel.Listen(channel, actions, channelpath);
-
-                        _logger.Log($"Listening {channelpath} {channel.ToString()} channel ({actions.Length}): {prefixes}");
-                    }
-
-                    if (channel.IsPublishSubscriber())
-                    {
-                        publishsubscriberchannel.Listen(channel, actions, channelpath);
-
-                        _logger.Log($"Listening {channelpath} {channel.ToString()} channel ({actions.Length}): {prefixes}");
-                    }
+                    _logger.Log($"Listening {listenermetadata.GetPath()} {listenermetadata.ToString()} channel ({listenermetadata.Handlers.Count}): {string.Join(",", listenermetadata.Names)}");
                 }
             }
         }

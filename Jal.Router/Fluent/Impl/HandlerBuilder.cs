@@ -59,7 +59,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueFinder, IRetryPolicy> policycreator) where TExtractor : IValueFinder
         {
             _route.RetryExtractorType = typeof(TExtractor);
 
@@ -82,7 +82,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(policy));
             }
 
-            Func<IValueSettingFinder, IRetryPolicy> creator = x => policy;
+            Func<IValueFinder, IRetryPolicy> creator = x => policy;
 
             _route.RetryPolicyExtractor = creator;
 
@@ -207,7 +207,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueSettingFinder, IRetryPolicy> policycreator) where TExtractor : IValueSettingFinder
+        public IOnRouteOptionBuilder Using<TExtractor>(Func<IValueFinder, IRetryPolicy> policycreator) where TExtractor : IValueFinder
         {
             _route.RetryExtractorType = typeof(TExtractor);
 
@@ -230,7 +230,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(policy));
             }
 
-            Func<IValueSettingFinder, IRetryPolicy> creator = x => policy;
+            Func<IValueFinder, IRetryPolicy> creator = x => policy;
 
             _route.RetryPolicyExtractor = creator;
 

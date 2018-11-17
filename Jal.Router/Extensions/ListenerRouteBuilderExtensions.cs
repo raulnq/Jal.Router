@@ -19,7 +19,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             builder.AddPointToPointChannel<NullValueSettingFinder>(path, extractor);
         }
@@ -39,19 +39,19 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             builder.AddPublishSubscribeChannel<NullValueSettingFinder>(path, subscription, extractor);
         }
 
-        public static INameRouteBuilder<THandler> ToListenPointToPointChannel<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> builder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static INameRouteBuilder<THandler> ToListenPointToPointChannel<THandler, TExtractorConectionString>(this IListenerRouteBuilder<THandler> builder, string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor));
         }
 
-        public static INameRouteBuilder<THandler> ToListenPublishSubscribeChannel<THandler,TExtractorConectionString>(this IListenerRouteBuilder<THandler> builder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static INameRouteBuilder<THandler> ToListenPublishSubscribeChannel<THandler,TExtractorConectionString>(this IListenerRouteBuilder<THandler> builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor));
         }
@@ -67,7 +67,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPointToPointChannel<THandler, NullValueSettingFinder>(path, extractor);
         }
@@ -87,19 +87,19 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPublishSubscribeChannel<THandler, NullValueSettingFinder>(path, subscription, extractor);
         }
 
-        public static IMiddleNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-where TExtractorConectionString : IValueSettingFinder
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueFinder, string> connectionstringextractor)
+where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor));
         }
 
-        public static IMiddleNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static IMiddleNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this IMiddleListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor));
         }
@@ -115,7 +115,7 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPointToPointChannel<THandler, TData, NullValueSettingFinder>(path, extractor);
         }
@@ -135,18 +135,18 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPublishSubscribeChannel<THandler, TData, NullValueSettingFinder>(path, subscription, extractor);
         }
-        public static IFirstNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-    where TExtractorConectionString : IValueSettingFinder
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueFinder, string> connectionstringextractor)
+    where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor));
         }
 
-        public static IFirstNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static IFirstNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this IFirstListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor));
         }
@@ -162,7 +162,7 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPointToPointChannel<THandler, TData, NullValueSettingFinder>(path, extractor);
         }
@@ -182,18 +182,18 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPublishSubscribeChannel<THandler, TData, NullValueSettingFinder>(path, subscription, extractor);
         }
-        public static ILastNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static ILastNameRouteBuilder<THandler, TData> ToListenPointToPointChannel<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> builder, string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor));
         }
 
-        public static ILastNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static ILastNameRouteBuilder<THandler, TData> ToListenPublishSubscribeChannel<THandler, TData, TExtractorConectionString>(this ILastListenerRouteBuilder<THandler, TData> builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             return builder.ToListen(x => x.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor));
         }
@@ -209,7 +209,7 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPointToPointChannel<THandler, TData, NullValueSettingFinder>(path, extractor);
         }
@@ -229,7 +229,7 @@ where TExtractorConectionString : IValueSettingFinder
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             return builder.ToListenPublishSubscribeChannel<THandler, TData, NullValueSettingFinder>(path, subscription, extractor);
         }

@@ -78,8 +78,8 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueSettingFinder, string> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule = null)
-            where TExtractorConectionString : IValueSettingFinder
+        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueFinder, string> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule = null)
+            where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -122,7 +122,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
@@ -140,8 +140,8 @@ namespace Jal.Router.Impl
         }
 
 
-        public void RegisterPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public void RegisterPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -171,7 +171,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             var channel = new PointToPointChannel(path)
             {
@@ -182,8 +182,8 @@ namespace Jal.Router.Impl
             _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         { 
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -213,7 +213,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueSettingFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> extractor = x => connectionstring;
 
             var channel = new PublishSubscribeChannel(path)
             {

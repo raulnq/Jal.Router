@@ -4,7 +4,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class ConfigurationValueSettingFinder : IValueSettingFinder
+    public class ConfigurationValueSettingFinder : IValueFinder
     {
         private readonly IConfiguration _configuration;
 

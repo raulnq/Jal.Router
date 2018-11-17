@@ -4,16 +4,6 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
-        public bool IsPointToPoint()
-        {
-            return !string.IsNullOrWhiteSpace(ToPath) && string.IsNullOrWhiteSpace(ToSubscription);
-        }
-
-        public bool IsPublishSubscriber()
-        {
-            return !string.IsNullOrWhiteSpace(ToPath) && !string.IsNullOrWhiteSpace(ToSubscription);
-        }
-
         public string GetId()
         {
             return ToPath + ToSubscription + ToConnectionString;
@@ -27,24 +17,6 @@ namespace Jal.Router.Model
         public bool IsValidReplyEndpoint()
         {
             return IsValidEndpoint() && !string.IsNullOrWhiteSpace(ToReplyConnectionString) && !string.IsNullOrWhiteSpace(ToReplyPath);
-        }
-
-        public bool IsActive()
-        {
-            return Shutdown != null;
-        }
-
-        public override string ToString()
-        {
-            if(IsPointToPoint())
-            {
-                return "point to point";
-            }
-            if(IsPublishSubscriber())
-            {
-                return "publish subscriber";
-            }
-            return string.Empty;
         }
 
         public string GetPath(string prefix="")
@@ -79,9 +51,9 @@ namespace Jal.Router.Model
             return description;
         }
 
-        public Type ConnectionStringExtractorType { get; set; }
+        public Type ConnectionStringValueFinderType { get; set; }
 
-        public object ToConnectionStringExtractor { get; set; }
+        public object ToConnectionStringProvider { get; set; }
 
         public string ToConnectionString { get; set; }
 
@@ -89,17 +61,15 @@ namespace Jal.Router.Model
 
         public string ToSubscription { get; set; }
 
-        public Action Shutdown { get; set; }
-
         public string ToReplyPath { get; set; }
 
         public int ToReplyTimeOut { get; set; }
 
         public string ToReplySubscription { get; set; }
 
-        public Type ReplyConnectionStringExtractorType { get; set; }
+        public Type ReplyConnectionStringValueFinderType { get; set; }
 
-        public object ToReplyConnectionStringExtractor { get; set; }
+        public object ToReplyConnectionStringProvider { get; set; }
 
         public string ToReplyConnectionString { get; set; }
     }
