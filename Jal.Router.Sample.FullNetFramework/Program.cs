@@ -9,10 +9,10 @@ using Jal.Finder.Atrribute;
 using Jal.Finder.Impl;
 using Jal.Locator.CastleWindsor.Installer;
 using Jal.Locator.LightInject.Installer;
-using Jal.Router.AzureServiceBus.Extensions;
-using Jal.Router.AzureServiceBus.Impl;
-using Jal.Router.AzureServiceBus.Installer;
-using Jal.Router.AzureServiceBus.LightInject.Installer;
+using Jal.Router.AzureServiceBus.Standard.Extensions;
+using Jal.Router.AzureServiceBus.Standard.Impl;
+using Jal.Router.AzureServiceBus.Standard;
+using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.Installer;
 using Jal.Router.Impl;
@@ -71,7 +71,7 @@ namespace Jal.Router.Sample.FullNetFramework
                 //    });
 
                 RegisterHandler<IMessageHandler>("handler")
-                .ToListenQueue<IMessageHandler, AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=")
+                    .ToListen(y=>y.AddQueue<AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
                 .ForMessage<Message>().Using<MessageHandler>(x =>
                 {
                     x.With(((request, handler, context) => handler.Handle(request)));

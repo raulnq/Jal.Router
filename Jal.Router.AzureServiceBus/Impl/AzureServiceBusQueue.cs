@@ -4,53 +4,101 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Outbound;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
 {
-    public class AzureServiceBusQueue : AbstractPointToPointChannel
+    public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
     {
-        public override string Send(Channel channel, object message)
+        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            var queueclient = QueueClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath);
-
-            var bm = message as BrokeredMessage;
-
-            if (bm != null)
-            {
-                queueclient.Send(bm);
-
-                queueclient.Close();
-
-                return bm.MessageId;
-            }
-
-            return string.Empty;
+            return () => new object[] { QueueClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath) };
         }
 
-        public override void Listen(ListenerMetadata metadata)
+        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
         {
-            var client = QueueClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath);
-            
-            var receiver = client.MessagingFactory.CreateMessageReceiver(metadata.ToPath);
+            return sender =>
+            {
+                var client = sender[0] as QueueClient;
 
-            var channelpath = metadata.GetPath();
+                client.Close();
+            };
+        }
 
+        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        {
+            return (sender, message) =>
+            {
+                var client = sender[0] as QueueClient;
+
+                var bm = message as BrokeredMessage;
+
+                if (bm != null)
+                {
+                    client.Send(bm);
+
+                    return bm.MessageId;
+                }
+
+                return string.Empty;
+            };
+        }
+
+        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        {
+            return () =>
+            {
+                var client = QueueClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath);
+
+                var channelpath = metadata.GetPath();
+
+                var path = SubscriptionClient.FormatSubscriptionPath(metadata.ToPath, metadata.ToSubscription);
+
+                var receiver = client.MessagingFactory.CreateMessageReceiver(path);
+
+                return new object[] { client, receiver };
+            };
+        }
+
+        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        {
+            return listener =>
+            {
+                var client = listener[0] as QueueClient;
+
+                var receiver = listener[1] as MessageReceiver;
+
+                receiver.Close();
+
+                client.Close();
+            };
+        }
+
+        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        {
             var options = CreateOptions();
 
-            Action<BrokeredMessage> routeaction = message =>
+            Action<BrokeredMessage> handler = message =>
             {
                 foreach (var action in metadata.Handlers)
                 {
                     var clone = message.Clone();
+
                     action(clone);
                 }
             };
 
+            var channelpath = metadata.GetPath();
 
-            receiver.OnMessage(bm => OnMessage(channelpath, bm.MessageId,()=> routeaction(bm), () => client.Complete(bm.LockToken)), options);
+            return (listener) =>
+            {
+                var client = listener[0] as QueueClient;
 
-            metadata.Shutdown = () => { receiver.Close(); client.Close(); };
+                var receiver = listener[1] as MessageReceiver;
+
+                receiver.OnMessage(bm => OnMessage(metadata, bm.MessageId, () => handler(bm), () => client.Complete(bm.LockToken)), options);
+            };
         }
 
         private OnMessageOptions CreateOptions()

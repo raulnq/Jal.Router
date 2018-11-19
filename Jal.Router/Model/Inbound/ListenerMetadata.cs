@@ -9,6 +9,8 @@ namespace Jal.Router.Model.Inbound
 
         public List<string> Names { get; set; }
 
+        public ChannelType Type { get; set; }
+
         public string ToConnectionString { get; set; }
 
         public string ToPath { get; set; }
@@ -20,37 +22,22 @@ namespace Jal.Router.Model.Inbound
             return ToPath + ToSubscription + ToConnectionString;
         }
 
-        public bool IsPointToPoint()
-        {
-            return !string.IsNullOrWhiteSpace(ToPath) && string.IsNullOrWhiteSpace(ToSubscription);
-        }
-
-        public bool IsPublishSubscriber()
-        {
-            return !string.IsNullOrWhiteSpace(ToPath) && !string.IsNullOrWhiteSpace(ToSubscription);
-        }
-
         public override string ToString()
         {
-            if (IsPointToPoint())
+            if (Type == ChannelType.PointToPoint)
             {
                 return "point to point";
             }
-            if (IsPublishSubscriber())
+            if (Type == ChannelType.PublishSubscriber)
             {
                 return "publish subscriber";
             }
             return string.Empty;
         }
 
-        public string GetPath(string prefix = "")
+        public string GetPath()
         {
             var description = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(prefix))
-            {
-                description = $"{description}/{prefix}";
-            }
 
             if (!string.IsNullOrWhiteSpace(ToPath))
             {
@@ -62,32 +49,28 @@ namespace Jal.Router.Model.Inbound
                 description = $"{description}/{ToSubscription}";
             }
 
-            //if (!string.IsNullOrWhiteSpace(ToReplyPath))
-            //{
-            //    description = $"{description}/{ToReplyPath}";
-            //}
-
-            //if (!string.IsNullOrWhiteSpace(ToReplySubscription))
-            //{
-            //    description = $"{description}/{ToReplySubscription}";
-            //}
-
             return description;
         }
 
-        public Action Shutdown { get; set; }
+        public Func<object[]> CreateListenerMethod { get; set; }
 
-        public bool CanShutdown()
-        {
-            return Shutdown != null;
-        }
-        public ListenerMetadata(string topath, string toconnectionstring, string tosubscription)
+        public Action<object[]> DestroyListenerMethod { get; set; }
+
+        public Action<object[]> ListenMethod { get; set; }
+
+        public List<Route> Routes { get; set; }
+
+        public object[] Listener { get; set; }
+
+        public ListenerMetadata(string topath, string toconnectionstring, string tosubscription, ChannelType channeltype)
         {
             ToPath = topath;
             ToConnectionString = toconnectionstring;
             ToSubscription = tosubscription;
             Handlers = new List<Action<object>>();
             Names = new List<string>();
+            Type = channeltype;
+            Routes = new List<Route>();
         }
     }
 }

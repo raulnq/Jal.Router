@@ -75,7 +75,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IOnRouteOptionBuilder Using(IRetryPolicy policy)
         {
-            _route.RetryExtractorType = typeof(NullValueSettingFinder);
+            _route.RetryExtractorType = typeof(NullValueFinder);
 
             if (policy == null)
             {
@@ -223,7 +223,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IOnRouteOptionBuilder Using(IRetryPolicy policy)
         {
-            _route.RetryExtractorType = typeof(NullValueSettingFinder);
+            _route.RetryExtractorType = typeof(NullValueFinder);
 
             if (policy == null)
             {

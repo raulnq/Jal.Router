@@ -15,6 +15,8 @@ using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.LightInject.Installer;
 using Jal.Router.Model.Management;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.MonitoringTask;
+using Jal.ChainOfResponsability.LightInject.Installer;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -26,6 +28,7 @@ namespace Jal.Router.Sample.NetCore
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSourceSample() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
             container.RegisterAzureServiceBusRouter();
+            container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
             container.RegisterAzureSagaStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "sagacore", "messagescore", DateTime.UtcNow.ToString("yyyyMMdd"));
             container.RegisterAzureMessageStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "messages");
             container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
@@ -36,6 +39,7 @@ namespace Jal.Router.Sample.NetCore
             host.Configuration.UsingAzureSagaStorage();
             host.Configuration.UsingAzureMessageStorage();
             host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
+            host.Configuration.AddMonitoringTask<HeartBeatLogger>(10);
             host.RunAndBlock();
         }
     }
@@ -74,9 +78,9 @@ namespace Jal.Router.Sample.NetCore
              //.AsClaimCheck()
              .To(x =>
                 {
-                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease1");
-                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease2");
-                    x.Add("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease3");
+                    x.AddPointToPointChannel("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease1");
+                    x.AddPointToPointChannel("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease2");
+                    x.AddPointToPointChannel("Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "outputqueuenewrelease3");
                 });
 
             var config = new ServiceBusConfiguration()

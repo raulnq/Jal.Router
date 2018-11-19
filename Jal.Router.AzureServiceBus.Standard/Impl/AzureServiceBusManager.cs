@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Interface.Management;
@@ -19,9 +20,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             LoggerCallbackHandler.UseDefaultLogging = false;
         }
 
-        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, SubscriptionToPublishSubscribeChannelRule rule)
+        public bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -29,11 +30,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(path);
+                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
 
                     try
                     {
-                       topic.Subscriptions.GetByName(subscription);
+                       topic.Subscriptions.GetByName(channel.Subscription);
 
                        return false;
                     }
@@ -41,12 +42,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                         {
-                            topic.Subscriptions.Define(subscription)
+                            topic.Subscriptions.Define(channel.Subscription)
                                 .WithDefaultMessageTTL(TimeSpan.FromDays(14))
                                 .WithMessageLockDurationInSeconds(300)
                                 .Create();
 
-                            var subs = new Microsoft.Azure.ServiceBus.SubscriptionClient(configuration.ConnectionString, path, subscription);
+                            var subs = new Microsoft.Azure.ServiceBus.SubscriptionClient(configuration.ConnectionString, channel.Path, channel.Subscription);
+
+                            var rule = channel.Rules.FirstOrDefault();
 
                             if (rule!=null)
                             {
@@ -70,9 +73,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path)
+        public bool CreateIfNotExist(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -80,7 +83,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    serviceBusNamespace.Topics.GetByName(path);
+                    serviceBusNamespace.Topics.GetByName(channel.Path);
 
                     return false;
                 }
@@ -88,7 +91,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        serviceBusNamespace.Topics.Define(path)
+                        serviceBusNamespace.Topics.Define(channel.Path)
                             .WithDefaultMessageTTL(TimeSpan.FromDays(14))
                             .Create();
 
@@ -101,9 +104,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string path)
+        public PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -111,9 +114,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(path);
+                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
                     
-                    var info = new PublishSubscribeChannelInfo(path)
+                    var info = new PublishSubscribeChannelInfo(channel.Path)
                     {
                         MessageCount = topic.ActiveMessageCount,
                         DeadLetterMessageCount = topic.DeadLetterMessageCount,
@@ -133,9 +136,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         }
 
-        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription)
+        public SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -143,11 +146,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(path);
+                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
 
-                    var subs = topic.Subscriptions.GetByName(subscription);
+                    var subs = topic.Subscriptions.GetByName(channel.Subscription);
                     
-                    var info = new SubscriptionToPublishSubscribeChannelInfo(subscription, path)
+                    var info = new SubscriptionToPublishSubscribeChannelInfo(channel.Subscription, channel.Path)
                     {
                         DeadLetterMessageCount = subs.DeadLetterMessageCount,
                         MessageCount = subs.ActiveMessageCount,
@@ -165,9 +168,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string path)
+        public PointToPointChannelInfo GetInfo(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -175,9 +178,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    var queue = serviceBusNamespace.Queues.GetByName(path);
+                    var queue = serviceBusNamespace.Queues.GetByName(channel.Path);
 
-                    var info = new PointToPointChannelInfo(path)
+                    var info = new PointToPointChannelInfo(channel.Path)
                     {
                         DeadLetterMessageCount = queue.DeadLetterMessageCount,
                         MessageCount = queue.ActiveMessageCount,
@@ -196,9 +199,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public bool CreateIfNotExistPointToPointChannel(string connectionstring, string path)
+        public bool CreateIfNotExist(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(connectionstring);
+            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -206,7 +209,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    serviceBusNamespace.Queues.GetByName(path);
+                    serviceBusNamespace.Queues.GetByName(channel.Path);
                     
                     return false;
                 }
@@ -214,7 +217,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        serviceBusNamespace.Queues.Define(path)
+                        serviceBusNamespace.Queues.Define(channel.Path)
                             .WithDefaultMessageTTL(TimeSpan.FromDays(14))
                             .WithMessageLockDurationInSeconds(300)
                             .Create();

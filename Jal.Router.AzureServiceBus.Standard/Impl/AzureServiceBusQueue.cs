@@ -5,39 +5,75 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusQueue : AbstractPointToPointChannel
+    public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
     {
-        public override string Send(Channel channel, object message)
+
+        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            var queueclient = new QueueClient(channel.ToConnectionString, channel.ToPath);
-
-            var sbmessage = message as Message;
-
-            if (sbmessage != null)
-            {
-                queueclient.SendAsync(sbmessage).GetAwaiter().GetResult();
-
-                queueclient.CloseAsync().GetAwaiter().GetResult();
-
-                return sbmessage.MessageId;
-            }
-
-            return string.Empty;
+            return () => new object[] { new QueueClient(metadata.ToConnectionString, metadata.ToPath) };
         }
 
-        public override void Listen(ListenerMetadata metadata)
+        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
         {
-            var queueclient = new QueueClient(metadata.ToConnectionString, metadata.ToPath);
+            return sender =>
+            {
+                var client = sender[0] as QueueClient;
 
-            var path = metadata.GetPath();
+                client.CloseAsync().GetAwaiter().GetResult();
+            };
+        }
 
-            var options = CreateOptions(path);
+        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        {
+            return (sender, message) =>
+            {
+                var client = sender[0] as QueueClient;
 
-            Action<Message> @action = message =>
+                var sbmessage = message as Message;
+
+                if (sbmessage != null)
+                {
+                    client.SendAsync(sbmessage).GetAwaiter().GetResult();
+
+                    return sbmessage.MessageId;
+                }
+
+                return string.Empty;
+            };
+        }
+
+     
+
+        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        {
+            return () =>
+            {
+                var client = new QueueClient(metadata.ToConnectionString, metadata.ToPath);
+
+                return new object[] { client };
+            };
+        }
+
+        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        {
+            return listener =>
+            {
+                var client = listener[0] as QueueClient;
+
+                client.CloseAsync().GetAwaiter().GetResult();
+            };
+        }
+
+        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        {
+            var options = CreateOptions(metadata);
+
+            Action<Message> handler = message =>
             {
                 foreach (var routingaction in metadata.Handlers)
                 {
@@ -47,19 +83,23 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 }
             };
 
-            queueclient.RegisterMessageHandler(async (message, token) =>
+            return (listener) =>
             {
-                await OnMessageAsync(path, message.MessageId, () => @action(message), () => queueclient.CompleteAsync(message.SystemProperties.LockToken));
-            }, options);
+                var client = listener[0] as QueueClient;
 
-            metadata.Shutdown = () => { queueclient.CloseAsync().GetAwaiter().GetResult(); };
+                client.RegisterMessageHandler(async (message, token) =>
+                {
+                    await OnMessageAsync(metadata, message.MessageId, () => handler(message), () => client.CompleteAsync(message.SystemProperties.LockToken));
+                }, options);
+
+            };
         }
 
-        private MessageHandlerOptions CreateOptions(string channelpath)
+        private MessageHandlerOptions CreateOptions(ListenerMetadata metadata)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Logger.Log($"Message failed to {Name} channel {channelpath} {args.Exception}");
+                Logger.Log($"Message failed to {metadata.ToString()} channel {metadata.GetPath()} {args.Exception}");
                 return Task.CompletedTask;
             } ;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability.Fluent.Interfaces;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -14,9 +15,9 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
         private readonly IConfiguration _configuration;
 
-        private readonly IPipeline _pipeline;
+        private readonly IPipelineBuilder _pipeline;
 
-        public SagaExecutionCoordinator(IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
+        public SagaExecutionCoordinator(IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline)
         {
             _factory = factory;
 
@@ -47,19 +48,34 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                 try
                 {
-                    var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
+                    //var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
-                    middlewares.AddRange(_configuration.InboundMiddlewareTypes);
+                    //middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
-                    middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
+                    //middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
 
-                    middlewares.Add(typeof(FirstMessageHandler));
+                    //middlewares.Add(typeof(FirstMessageHandler));
 
                     context.Route = route;
 
                     context.Saga = saga;
 
-                    _pipeline.Execute(middlewares.ToArray(), context);
+                    var chain = _pipeline.For<MessageContext>()
+                        .Use<MessageExceptionHandler>();
+
+                    foreach (var type in _configuration.InboundMiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    foreach (var type in saga.FirstRoute.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    chain.Use<FirstMessageHandler>().Run(context);
+
+                    //_pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 
@@ -100,19 +116,34 @@ namespace Jal.Router.Impl.Inbound.Sagas
                 try
                 {
 
-                    var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
+                    //var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
-                    middlewares.AddRange(_configuration.InboundMiddlewareTypes);
+                    //middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
-                    middlewares.AddRange(route.MiddlewareTypes);
+                    //middlewares.AddRange(route.MiddlewareTypes);
 
-                    middlewares.Add(typeof(MiddleMessageHandler));
+                    //middlewares.Add(typeof(MiddleMessageHandler));
 
                     context.Route = route;
 
                     context.Saga = saga;
 
-                    _pipeline.Execute(middlewares.ToArray(), context);
+                    var chain = _pipeline.For<MessageContext>()
+                        .Use<MessageExceptionHandler>();
+
+                    foreach (var type in _configuration.InboundMiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    foreach (var type in route.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    chain.Use<MiddleMessageHandler>().Run(context);
+
+                    //_pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 
@@ -152,19 +183,34 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
                 try
                 {
-                    var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
+                    //var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
 
-                    middlewares.AddRange(_configuration.InboundMiddlewareTypes);
+                    //middlewares.AddRange(_configuration.InboundMiddlewareTypes);
 
-                    middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
+                    //middlewares.AddRange(saga.FirstRoute.MiddlewareTypes);
 
-                    middlewares.Add(typeof(LastMessageHandler));
+                    //middlewares.Add(typeof(LastMessageHandler));
 
                     context.Route = route;
 
                     context.Saga = saga;
 
-                    _pipeline.Execute(middlewares.ToArray(), context);
+                    var chain = _pipeline.For<MessageContext>()
+                        .Use<MessageExceptionHandler>();
+
+                    foreach (var type in _configuration.InboundMiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    foreach (var type in saga.LastRoute.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    chain.Use<LastMessageHandler>().Run(context);
+
+                    //_pipeline.Execute(middlewares.ToArray(), context);
 
                     interceptor.OnSuccess(context);
 

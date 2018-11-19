@@ -21,9 +21,35 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
+        public IAndWaitReplyFromEndPointBuilder AddPointToPointChannel<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
         {
-            var channel = new Channel
+            var channel = new Channel(ChannelType.PointToPoint)
+            {
+                ConnectionStringValueFinderType = typeof(TExtractorConnectionString)
+            };
+
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            channel.ToConnectionStringProvider = connectionstringextractor;
+
+            channel.ToPath = path;
+
+            _endpoint.Channels.Add(channel);
+
+            return new AndWaitReplyFromEndPointBuilder(channel);
+        }
+
+        public IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
+        {
+            var channel = new Channel(ChannelType.PublishSubscriber)
             {
                 ConnectionStringValueFinderType = typeof(TExtractorConnectionString)
             };

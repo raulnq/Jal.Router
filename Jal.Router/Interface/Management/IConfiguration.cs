@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Management;
 
 namespace Jal.Router.Interface.Management
 {
     public interface IConfiguration
     {
-        RuntimeInfo RuntimeInfo { get; }
+        Runtime Runtime { get; }
         IdentityConfiguration Identity { get; }
         StorageConfiguration Storage { get; set; }
         string ApplicationName { get; set; }
@@ -42,12 +44,12 @@ namespace Jal.Router.Interface.Management
         void UsingMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         void UsingSagaStorage<TStorage>() where TStorage : ISagaStorage;
         void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
-        void AddInboundMiddleware<TMiddleware>() where TMiddleware : Inbound.IMiddleware;
+        void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         void UsingMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
-        void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
+        void AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask;
         void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;
         void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;

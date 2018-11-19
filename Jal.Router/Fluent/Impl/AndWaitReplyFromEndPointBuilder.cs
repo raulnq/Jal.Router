@@ -29,6 +29,8 @@ namespace Jal.Router.Fluent.Impl
 
             _channel.ReplyConnectionStringValueFinderType = typeof(TExtractorConectionString);
 
+            _channel.Type = ChannelType.RequestReplyPointToPoint;
+
             _channel.ToReplyTimeOut = timeout;
         }
 
@@ -55,6 +57,8 @@ namespace Jal.Router.Fluent.Impl
             _channel.ReplyConnectionStringValueFinderType = typeof(TExtractorConectionString);
 
             _channel.ToReplySubscription = subscription;
+
+            _channel.Type = ChannelType.RequestReplyPublishSubscriber;
 
             _channel.ToReplyTimeOut = timeout;
         }

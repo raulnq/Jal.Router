@@ -53,7 +53,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
 
-            _channels.Add(new Channel
+            _channels.Add(new Channel(ChannelType.PointToPoint)
             {
                 ToPath = path,
 
@@ -78,7 +78,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel
+            _channels.Add(new Channel(ChannelType.PublishSubscriber)
             {
                 ToPath = path,
 

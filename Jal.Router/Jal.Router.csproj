@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
     <Version>1.5.2</Version>
     <Company>Raul Naupari</Company>
@@ -19,6 +19,9 @@
 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Jal.ChainOfResponsability">
+      <Version>1.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration">
       <Version>2.1.0</Version>
     </PackageReference>

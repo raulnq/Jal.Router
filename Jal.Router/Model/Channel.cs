@@ -4,19 +4,38 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
+        public Channel(ChannelType channeltype)
+        {
+            Type = channeltype;
+        }
+
+        public ChannelType Type { get; set; }
+
         public string GetId()
         {
             return ToPath + ToSubscription + ToConnectionString;
         }
 
-        public bool IsValidEndpoint()
+        public override string ToString()
         {
-            return !string.IsNullOrWhiteSpace(ToConnectionString) && !string.IsNullOrWhiteSpace(ToPath);
-        }
+            if (Type == ChannelType.PointToPoint)
+            {
+                return "point to point";
+            }
+            if (Type == ChannelType.RequestReplyPointToPoint)
+            {
+                return "request reply to point to point";
+            }
+            if (Type == ChannelType.RequestReplyPublishSubscriber)
+            {
+                return "request reply to publish subscriber";
+            }
+            if (Type == ChannelType.PublishSubscriber)
+            {
+                return "publish subscriber";
+            }
 
-        public bool IsValidReplyEndpoint()
-        {
-            return IsValidEndpoint() && !string.IsNullOrWhiteSpace(ToReplyConnectionString) && !string.IsNullOrWhiteSpace(ToReplyPath);
+            return string.Empty;
         }
 
         public string GetPath(string prefix="")
@@ -40,7 +59,7 @@ namespace Jal.Router.Model
 
             if (!string.IsNullOrWhiteSpace(ToReplyPath))
             {
-                description = $"{description}/{ToReplyPath}";
+                description = $"- {description}/{ToReplyPath}";
             }
 
             if (!string.IsNullOrWhiteSpace(ToReplySubscription))

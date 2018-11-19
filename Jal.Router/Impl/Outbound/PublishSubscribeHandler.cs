@@ -13,22 +13,25 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IConfiguration _configuration;
 
-        public PublishSubscribeHandler(IComponentFactory factory, IConfiguration configuration)
+        private readonly ISender _sender;
+
+        public PublishSubscribeHandler(IComponentFactory factory, IConfiguration configuration, ISender sender)
         {
             _factory = factory;
             _configuration = configuration;
+            _sender = sender;
         }
 
         public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
         {
-            if (middlewarecontext.Channel.IsValidEndpoint())
-            {
-                var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
+            //if (middlewarecontext.Channel.IsValidEndpoint())
+            //{
+            //    var channel = _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
 
-                channel.Send(middlewarecontext.Channel, context, middlewarecontext.Channel.GetPath(context.EndPoint.Name));
-            }
+            //    channel.Send(middlewarecontext.Channel, context, middlewarecontext.Channel.GetPath(context.EndPoint.Name));
+            //}
 
-            return null;
+            return _sender.Send(middlewarecontext.Channel, context);
         }
     }
 }

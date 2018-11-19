@@ -5,107 +5,29 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl
 {
+
     public abstract class AbstractChannel
     {
-        protected readonly string Name;
-
         protected readonly IComponentFactory Factory;
 
         protected readonly IConfiguration Configuration;
 
         protected readonly ILogger Logger;
 
-        protected AbstractChannel(string name, IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        protected AbstractChannel( IComponentFactory factory, IConfiguration configuration, ILogger logger)
         {
-            Name = name;
             Factory = factory;
             Configuration = configuration;
             Logger = logger;
         }
 
-        public virtual string Send(Channel channel, object message)
+        public void OnMessage(ListenerMetadata metadata, string messageid, Action @action, Action completeaction)
         {
-            return string.Empty;
-        }
-
-        public virtual void Listen(ListenerMetadata metadata)
-        {
-
-        }
-
-        public object Reply(Channel channel, MessageContext context, string channelpath)
-        {
-            Send(channel, context, channelpath);
-
-            MessageContext outputcontext = null;
-
-            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
-
-            try
-            {
-                outputcontext = string.IsNullOrWhiteSpace(channel.ToReplySubscription) ? ReceiveOnQueue(channel, context, adapter) : ReceiveOnTopic(channel, context, adapter);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Message {outputcontext?.Identity.Id} failed to arrived to {Name} channel {channelpath} {ex}");
-
-                throw;
-            }
-            finally
-            {
-                Logger.Log($"Message {outputcontext?.Identity.Id} arrived to {Name} channel {channelpath}");
-            }
-
-            if (outputcontext != null)
-            {
-                return adapter.Deserialize(outputcontext.Content, outputcontext.ContentType);
-            }
-
-            return null;
-        }
-
-        public virtual MessageContext ReceiveOnQueue(Channel channel, MessageContext context, IMessageAdapter adapter)
-        {
-            return null;
-        }
-
-        public virtual MessageContext ReceiveOnTopic(Channel channel, MessageContext context, IMessageAdapter adapter)
-        {
-            return null;
-        }
-
-        public void Send(Channel channel, MessageContext context, string channelpath)
-        {
-            var id = string.Empty;
-
-            try
-            {
-                var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
-
-                var message = adapter.Write(context, context.EndPoint.UseClaimCheck);
-
-                id = Send(channel, message);
-
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Message {id} failed to sent to {Name} channel {channelpath} {ex}");
-
-                throw;
-            }
-            finally
-            {
-                Logger.Log($"Message {id} sent to {Name} channel {channelpath}");
-            }
-            
-        }
-
-        public void OnMessage(string channelpath, string messageid, Action @action, Action completeaction)
-        {
-            Logger.Log($"Message {messageid} arrived to {Name} channel {channelpath}");
+            Logger.Log($"Message {messageid} arrived to {metadata.ToString()} channel {metadata.GetPath()}");
 
             try
             {
@@ -115,17 +37,17 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {messageid} failed to {Name} channel {channelpath} {ex}");
+                Logger.Log($"Message {messageid} failed to {metadata.ToString()} channel {metadata.GetPath()} {ex}");
             }
             finally
             {
-                Logger.Log($"Message {messageid} completed to {Name} channel {channelpath}");
+                Logger.Log($"Message {messageid} completed to {metadata.ToString()} channel {metadata.GetPath()}");
             }
         }
 
-        public async Task OnMessageAsync(string channelpath, string messageid, Action @action, Func<Task> completeaction)
+        public async Task OnMessageAsync(ListenerMetadata metadata, string messageid, Action @action, Func<Task> completeaction)
         {
-            Logger.Log($"Message {messageid} arrived to {Name} channel {channelpath}");
+            Logger.Log($"Message {messageid} arrived to {metadata.ToString()} channel {metadata.GetPath()}");
 
             try
             {
@@ -135,11 +57,11 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {messageid} failed to {Name} channel {channelpath} {ex}");
+                Logger.Log($"Message {messageid} failed to {metadata.ToString()} channel {metadata.GetPath()} {ex}");
             }
             finally
             {
-                Logger.Log($"Message {messageid} completed to {Name} channel {channelpath}");
+                Logger.Log($"Message {messageid} completed to {metadata.ToString()} channel {metadata.GetPath()}");
             }
         }
     }

@@ -13,22 +13,25 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IConfiguration _configuration;
 
-        public PointToPointHandler(IComponentFactory factory, IConfiguration configuration)
+        private readonly ISender _sender;
+
+        public PointToPointHandler(IComponentFactory factory, IConfiguration configuration, ISender sender)
         {
             _factory = factory;
             _configuration = configuration;
+            _sender = sender;
         }
 
         public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
         {
-            if (middlewarecontext.Channel.IsValidEndpoint())
-            {
-                var channel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
+            //if (middlewarecontext.Channel.IsValidEndpoint())
+            //{
+            //    var channel = _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
 
-                channel.Send(middlewarecontext.Channel, context, middlewarecontext.Channel.GetPath(context.EndPoint.Name));
-            }
+            //    channel.Send(middlewarecontext.Channel, context, middlewarecontext.Channel.GetPath(context.EndPoint.Name));
+            //}
 
-            return null;
+            return _sender.Send(middlewarecontext.Channel, context);
         }
     }
 }

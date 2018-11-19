@@ -1,18 +1,21 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
+using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.StartupTask;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Management;
 using LightInject;
-using IMiddleware = Jal.Router.Interface.Inbound.IMiddleware;
 
 namespace Jal.Router.LightInject.Installer
 {
@@ -64,13 +67,13 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());
 
-            container.Register<Interface.Inbound.IPipeline, Impl.Inbound.Pipeline>(new PerContainerLifetime());
-
             container.Register<Interface.Outbound.IPipeline, Impl.Outbound.Pipeline>(new PerContainerLifetime());
 
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
             container.Register<IHost, Host>(new PerContainerLifetime());
+
+            container.Register<ISender, Sender>(new PerContainerLifetime());
 
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
 
@@ -94,15 +97,25 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdown, Shutdown>(new PerContainerLifetime());
 
-            container.Register<IStartupTask, ChannelStartupTask>(typeof (ChannelStartupTask).FullName,new PerContainerLifetime());
+            container.Register<IStartupTask, SubscriptionToPublishSubscribeChannelCreator>(typeof (SubscriptionToPublishSubscribeChannelCreator).FullName,new PerContainerLifetime());
 
-            container.Register<IStartupTask, StartupTask>(typeof (StartupTask).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, StartupBeatLogger>(typeof (StartupBeatLogger).FullName, new PerContainerLifetime());
 
             container.Register<IShutdownTask, ShutdownTask>(typeof (ShutdownTask).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, HandlerAndEndpointStartupTask>(typeof (HandlerAndEndpointStartupTask).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, EndpointsInitializer>(typeof (EndpointsInitializer).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, ListenerStartupTask>(typeof (ListenerStartupTask).FullName,new PerContainerLifetime());
+            container.Register<IStartupTask, RoutesInitializer>(typeof(RoutesInitializer).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, RuntimeConfigurationLoader>(typeof(RuntimeConfigurationLoader).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, PointToPointChannelCreator>(typeof(PointToPointChannelCreator).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, PublishSubscriberChannelCreator>(typeof(PublishSubscriberChannelCreator).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, ListenerLoader>(typeof (ListenerLoader).FullName,new PerContainerLifetime());
+
+            container.Register<IStartupTask, SenderLoader>(typeof(SenderLoader).FullName, new PerContainerLifetime());
 
             container.Register<IShutdownTask, ListenerShutdownTask>(typeof (ListenerShutdownTask).FullName,new PerContainerLifetime());
 
@@ -118,7 +131,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitoringTask, SubscriptionToPublishSubscribeChannelMonitor>(typeof (SubscriptionToPublishSubscribeChannelMonitor).FullName, new PerContainerLifetime());
 
-            container.Register<IMonitoringTask, HeartBeatMonitor>(typeof (HeartBeatMonitor).FullName, new PerContainerLifetime());
+            container.Register<IMonitoringTask, HeartBeatLogger>(typeof (HeartBeatLogger).FullName, new PerContainerLifetime());
 
             container.Register<IMessageSerializer, NullMessageSerializer>(typeof (NullMessageSerializer).FullName,new PerContainerLifetime());
 
@@ -138,23 +151,19 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 
-            container.Register<ILogger<HeartBeat>, HeartBeatLogger>(typeof (HeartBeatLogger).FullName,new PerContainerLifetime());
-
-            container.Register<ILogger<StartupBeat>, StartupBeatLogger>(typeof (StartupBeatLogger).FullName,new PerContainerLifetime());
-
-            container.Register<ILogger<ShutdownBeat>, ShutdownBeatLogger>(typeof (ShutdownBeatLogger).FullName,new PerContainerLifetime());
+            container.Register<ILogger<Beat>, BeatLogger>(typeof (BeatLogger).FullName,new PerContainerLifetime());
 
             container.Register<ISagaStorage, NullSagaStorage>(typeof (NullSagaStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware, FirstMessageHandler>(typeof (FirstMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, FirstMessageHandler>(typeof (FirstMessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware, LastMessageHandler>(typeof (LastMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, LastMessageHandler>(typeof (LastMessageHandler).FullName,new PerContainerLifetime());
 
             container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
 
@@ -171,7 +180,7 @@ namespace Jal.Router.LightInject.Installer
 #if NETSTANDARD2_0
             container.Register<IValueFinder, ConfigurationValueSettingFinder>(typeof (ConfigurationValueSettingFinder).FullName, new PerContainerLifetime());
 #endif
-            container.Register<IValueFinder, NullValueSettingFinder>(typeof(NullValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, NullValueFinder>(typeof(NullValueFinder).FullName, new PerContainerLifetime());
 
             container.Register<IValueFinder, EnvironmentSettingFinder>(typeof(EnvironmentSettingFinder).FullName, new PerContainerLifetime());
 

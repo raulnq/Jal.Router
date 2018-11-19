@@ -17,6 +17,7 @@ using LightInject;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
+using Jal.Router.Impl.MonitoringTask;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -166,7 +167,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             }
 
 
-            host.Configuration.AddMonitoringTask<HeartBeatMonitor>(_parameter.HeartBeatFrequency);
+            host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
 
             host.Configuration.UsingShutdownWatcher<ShutdownFileWatcher>();
 

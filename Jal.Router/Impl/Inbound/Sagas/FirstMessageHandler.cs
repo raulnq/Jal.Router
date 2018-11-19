@@ -1,4 +1,6 @@
 ﻿using System;
+using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -8,7 +10,7 @@ using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {
-    public class FirstMessageHandler : AbstractMessageHandler, IMiddleware
+    public class FirstMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
     {
         private readonly IComponentFactory _factory;
 
@@ -22,8 +24,10 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _router = router;
         }
 
-        public void Execute(MessageContext messagecontext, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
+        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
+            var messagecontext = context.Data;
+
             var data = Activator.CreateInstance(messagecontext.Saga.DataType);
 
             var storage = _factory.Create<ISagaStorage>(Configuration.SagaStorageType);
@@ -48,6 +52,5 @@ namespace Jal.Router.Impl.Inbound.Sagas
 
             SaveMessage(messagecontext, storage, sagaentity);
         }
-
     }
 }

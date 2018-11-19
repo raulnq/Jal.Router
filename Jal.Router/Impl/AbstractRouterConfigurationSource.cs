@@ -95,8 +95,8 @@ namespace Jal.Router.Impl
             }
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
-                ConnectionStringExtractorType = typeof(TExtractorConectionString),
-                ConnectionStringExtractor = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
+                ConnectionStringProvider = connectionstringextractor
             };
 
             if(rule!=null)
@@ -126,8 +126,8 @@ namespace Jal.Router.Impl
 
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
-                ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ConnectionStringExtractor = extractor,
+                ConnectionStringValueFinderType = typeof(NullValueFinder),
+                ConnectionStringProvider = extractor,
             };
 
 
@@ -153,8 +153,8 @@ namespace Jal.Router.Impl
             }
             var channel = new PointToPointChannel(path)
             {
-                ConnectionStringExtractorType = typeof (TExtractorConectionString),
-                ConnectionStringExtractor = connectionstringextractor
+                ConnectionStringValueFinderType = typeof (TExtractorConectionString),
+                ConnectionStringProvider = connectionstringextractor
             };
 
             _pointtopointchannels.Add(channel);
@@ -175,8 +175,8 @@ namespace Jal.Router.Impl
 
             var channel = new PointToPointChannel(path)
             {
-                ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ConnectionStringExtractor = extractor
+                ConnectionStringValueFinderType = typeof(NullValueFinder),
+                ConnectionStringProvider = extractor
             };
 
             _pointtopointchannels.Add(channel);
@@ -195,8 +195,8 @@ namespace Jal.Router.Impl
             }
             var channel = new PublishSubscribeChannel(path)
             {
-                ConnectionStringExtractorType = typeof(TExtractorConectionString),
-                ConnectionStringExtractor = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
+                ConnectionStringProvider = connectionstringextractor
             };
 
             _publishsubscriberchannels.Add(channel);
@@ -217,8 +217,8 @@ namespace Jal.Router.Impl
 
             var channel = new PublishSubscribeChannel(path)
             {
-                ConnectionStringExtractorType = typeof(NullValueSettingFinder),
-                ConnectionStringExtractor = extractor
+                ConnectionStringValueFinderType = typeof(NullValueFinder),
+                ConnectionStringProvider = extractor
             };
 
             _publishsubscriberchannels.Add(channel);

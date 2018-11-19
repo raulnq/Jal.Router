@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using Jal.ChainOfResponsability.Fluent.Interfaces;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -13,9 +13,9 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IConfiguration _configuration;
 
-        private readonly IPipeline _pipeline;
+        private readonly IPipelineBuilder _pipeline;
 
-        public Router(IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
+        public Router(IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline)
         {
             _factory = factory;
 
@@ -45,17 +45,21 @@ namespace Jal.Router.Impl.Inbound
 
                 try
                 {
-                    var middlewares = new List<Type> { typeof(MessageExceptionHandler) };
-
-                    middlewares.AddRange(_configuration.InboundMiddlewareTypes);
-
-                    middlewares.AddRange(route.MiddlewareTypes);
-
-                    middlewares.Add(typeof(MessageHandler));
-
                     context.Route = route;
 
-                    _pipeline.Execute(middlewares.ToArray(), context);
+                    var chain = _pipeline.For<MessageContext>().Use<MessageExceptionHandler>();
+
+                    foreach (var type in _configuration.InboundMiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    foreach (var type in route.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
+
+                    chain.Use<MessageHandler>().Run(context);
 
                     interceptor.OnSuccess(context);
                 }

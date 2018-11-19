@@ -1,13 +1,21 @@
 using System;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Interface
 {
     public interface IPublishSubscribeChannel
     {
-        void Send(Channel channel, MessageContext context, string channelpath);
+        Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata);
 
-        void Listen(ListenerMetadata metadata);
+        Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata);
+
+        Func<object[], object, string> SendMethodFactory(SenderMetadata metadata);
+
+        Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata);
+
+        Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata);
+
+        Action<object[]> ListenerMethodFactory(ListenerMetadata metadata);
     }
 }

@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.StartupTask;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
-        public RuntimeInfo RuntimeInfo { get; }
+        public Runtime Runtime { get; }
         public IdentityConfiguration Identity { get; }
         public string ChannelProviderName { get; set; }
         public StorageConfiguration Storage { get; set; }
@@ -86,7 +89,7 @@ namespace Jal.Router.Impl.Management
             SagaStorageType = typeof(TSagaStorage);
         }
 
-        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : Interface.Inbound.IMiddleware
+        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
         {
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
         }
@@ -118,9 +121,9 @@ namespace Jal.Router.Impl.Management
             }
         }
 
-        public void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask
+        public void AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
         {
-            MonitoringTaskTypes.Add(new TaskMetadata() {Type = typeof(TMonitoringTask), Interval = interval });
+            MonitoringTaskTypes.Add(new TaskMetadata() {Type = typeof(TMonitoringTask), Interval = intervalinseconds*1000 });
         }
         public void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
         {
@@ -152,19 +155,22 @@ namespace Jal.Router.Impl.Management
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             OutboundMiddlewareTypes = new List<Type>();
-            AddLogger<HeartBeatLogger, HeartBeat>();
-            AddLogger<StartupBeatLogger, StartupBeat>();    
-            AddLogger<ShutdownBeatLogger, ShutdownBeat>();
-            AddStartupTask<StartupTask>();
-            AddStartupTask<HandlerAndEndpointStartupTask>();
-            AddStartupTask<ChannelStartupTask>();
-            AddStartupTask<ListenerStartupTask>();
+            AddLogger<BeatLogger, Beat>(); 
+            AddStartupTask<StartupBeatLogger>();
+            AddStartupTask<RuntimeConfigurationLoader>();
+            AddStartupTask<EndpointsInitializer>();
+            AddStartupTask<RoutesInitializer>();
+            AddStartupTask<PointToPointChannelCreator>();
+            AddStartupTask<PublishSubscriberChannelCreator>();
+            AddStartupTask<SubscriptionToPublishSubscribeChannelCreator>();
+            AddStartupTask<ListenerLoader>();
+            AddStartupTask<SenderLoader>();
             AddShutdownTask<ListenerShutdownTask>();
             AddShutdownTask<ShutdownTask>();
             UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();
             Identity = new IdentityConfiguration();
-            RuntimeInfo = new RuntimeInfo();
+            Runtime = new Runtime();
             ApplicationName = "[Empty]";
             ChannelProviderName = "[Empty]";
         }

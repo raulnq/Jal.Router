@@ -5,6 +5,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 
@@ -13,77 +14,99 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     public class AzureServiceBusSession : AbstractChannel, IRequestReplyChannel
     {
         public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            : base("request replay",factory, configuration, logger)
+            : base(factory, configuration, logger)
         {
 
         }
 
-        public override MessageContext ReceiveOnQueue(Channel channel, MessageContext context, IMessageAdapter adapter)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPointToPointChannelMethodFactory(SenderMetadata metadata)
         {
-            var client = new SessionClient(channel.ToReplyConnectionString, channel.ToReplyPath);
-
-            var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
-
-            var message = channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
-
-            MessageContext outputcontext = null;
-
-            if (message != null)
+            return (context, adapter) =>
             {
-                outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+                var client = new SessionClient(metadata.ToReplyConnectionString, metadata.ToReplyPath);
 
-                messagesession.CompleteAsync(message.SystemProperties.LockToken);
-            }
+                var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
 
-            messagesession.CloseAsync().GetAwaiter().GetResult();
-            
-            client.CloseAsync().GetAwaiter().GetResult();
+                var message = metadata.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 
-            return outputcontext;
+                MessageContext outputcontext = null;
+
+                if (message != null)
+                {
+                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+
+                    messagesession.CompleteAsync(message.SystemProperties.LockToken);
+                }
+
+                messagesession.CloseAsync().GetAwaiter().GetResult();
+
+                client.CloseAsync().GetAwaiter().GetResult();
+
+                return outputcontext;
+            };
         }
 
-        public override MessageContext ReceiveOnTopic(Channel channel, MessageContext context, IMessageAdapter adapter)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscriberChannelMethodFactory(SenderMetadata metadata)
         {
-            var entity = EntityNameHelper.FormatSubscriptionPath(channel.ToReplyPath, channel.ToReplySubscription);
-
-            var client = new SessionClient(channel.ToReplyConnectionString, entity);
-
-            var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
-
-            var message = channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
-
-            MessageContext outputcontext = null;
-
-            if (message != null)
+            return (context, adapter) =>
             {
-                outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+                var entity = EntityNameHelper.FormatSubscriptionPath(metadata.ToReplyPath, metadata.ToReplySubscription);
 
-                messagesession.CompleteAsync(message.SystemProperties.LockToken);
-            }
+                var client = new SessionClient(metadata.ToReplyConnectionString, entity);
 
-            messagesession.CloseAsync().GetAwaiter().GetResult();
+                var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
 
-            client.CloseAsync().GetAwaiter().GetResult();
+                var message = metadata.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 
-            return outputcontext;
+                MessageContext outputcontext = null;
+
+                if (message != null)
+                {
+                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+
+                    messagesession.CompleteAsync(message.SystemProperties.LockToken);
+                }
+
+                messagesession.CloseAsync().GetAwaiter().GetResult();
+
+                client.CloseAsync().GetAwaiter().GetResult();
+
+                return outputcontext;
+            };
         }
 
-        public override string Send(Channel channel, object message)
+        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            var sender = new MessageSender(channel.ToConnectionString, channel.ToPath);
+            return () => new object[] { new QueueClient(metadata.ToConnectionString, metadata.ToPath) };
+        }
 
-            var sbmessage = message as Message;
-
-            if (sbmessage != null)
+        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        {
+            return sender =>
             {
-                sender.SendAsync(new List<Message>() {sbmessage}).GetAwaiter().GetResult();
+                var client = sender[0] as QueueClient;
 
-                sender.CloseAsync().GetAwaiter().GetResult();
+                client.CloseAsync().GetAwaiter().GetResult();
+            };
+        }
 
-                return sbmessage.MessageId;
-            }
+        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        {
+            return (sender, message) =>
+            {
+                var client = sender[0] as QueueClient;
 
-            return string.Empty;
+                var sbmessage = message as Message;
+
+                if (sbmessage != null)
+                {
+                    client.SendAsync(sbmessage).GetAwaiter().GetResult();
+
+                    return sbmessage.MessageId;
+                }
+
+                return string.Empty;
+            };
         }
     }
 }
