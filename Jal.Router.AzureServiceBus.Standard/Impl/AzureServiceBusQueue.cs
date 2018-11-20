@@ -75,11 +75,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             Action<Message> handler = message =>
             {
-                foreach (var routingaction in metadata.Routes.Select(x=>x.RuntimeHandler))
+                foreach (var runtimehandler in metadata.Routes.Select(x => x.RuntimeHandler))
                 {
                     var clone = message.Clone();
 
-                    routingaction(clone);
+                    runtimehandler(clone, metadata.Channel);
                 }
             };
 

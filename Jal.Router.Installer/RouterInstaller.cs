@@ -61,8 +61,6 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
-            container.Register(Component.For<ISagaExecutionCoordinator>().ImplementedBy<SagaExecutionCoordinator>().LifestyleSingleton());
-
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
             container.Register(Component.For<IHandlerMethodSelector>().ImplementedBy<HandlerMethodSelector>().LifestyleSingleton());

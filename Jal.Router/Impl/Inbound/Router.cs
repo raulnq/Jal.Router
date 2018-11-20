@@ -1,5 +1,6 @@
 ﻿using System;
 using Jal.ChainOfResponsability.Fluent.Interfaces;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
@@ -16,29 +17,31 @@ namespace Jal.Router.Impl.Inbound
 
         private readonly IPipelineBuilder _pipeline;
 
-        public Router(IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline)
+        private readonly ILogger _logger;
+
+        public Router(IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline, ILogger logger)
         {
             _factory = factory;
 
             _configuration = configuration;
 
             _pipeline = pipeline;
+
+            _logger = logger;
         }
-        public void Route(object message, Route route)
+        public void Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddleware<MessageContext>
         {
-            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
-
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
-
-            var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
             interceptor.OnEntry(context);
 
+            var name = context.Saga == null ? context.Route.Name : context.Saga.Name + "/" + context.Route.Name;
+
             var when = true;
 
-            if (route.When != null)
+            if (context.Route.When != null)
             {
-                when = route.When(context);
+                when = context.Route.When(context);
             }
 
             if (when)
@@ -46,8 +49,6 @@ namespace Jal.Router.Impl.Inbound
 
                 try
                 {
-                    context.Route = route;
-
                     var chain = _pipeline.For<MessageContext>().Use<MessageExceptionHandler>();
 
                     foreach (var type in _configuration.InboundMiddlewareTypes)
@@ -55,12 +56,12 @@ namespace Jal.Router.Impl.Inbound
                         chain.Use(type);
                     }
 
-                    foreach (var type in route.MiddlewareTypes)
+                    foreach (var type in context.Route.MiddlewareTypes)
                     {
                         chain.Use(type);
                     }
 
-                    chain.Use<MessageHandler>().Run(context);
+                    chain.Use<TMiddleware>().Run(context);
 
                     interceptor.OnSuccess(context);
                 }
@@ -73,8 +74,16 @@ namespace Jal.Router.Impl.Inbound
                 finally
                 {
                     interceptor.OnExit(context);
+
+                    _logger.Log($"Message {context.Identity.Id} handled by route {name}");
                 }
 
+            }
+            else
+            {
+                
+
+                _logger.Log($"Message {context.Identity.Id} skipped by route {name}");
             }
         }
     }

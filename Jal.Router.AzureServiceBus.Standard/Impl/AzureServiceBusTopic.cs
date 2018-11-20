@@ -79,7 +79,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     var clone = message.Clone();
 
-                    routingaction(clone);
+                    routingaction(clone, metadata.Channel);
                 }
             };
 

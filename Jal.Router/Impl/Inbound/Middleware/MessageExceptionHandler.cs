@@ -17,11 +17,14 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         private readonly IConfiguration _configuration;
 
-        public MessageExceptionHandler(IComponentFactory factory, IBus bus, IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public MessageExceptionHandler(IComponentFactory factory, IBus bus, IConfiguration configuration, ILogger logger)
         {
             _factory = factory;
             _bus = bus;
             _configuration = configuration;
+            _logger = logger;
         }
 
         private void SendRetry(Route route, MessageContext context, IRetryPolicy policy)
@@ -119,6 +122,8 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
             var messagecontext = context.Data;
 
+            var name = context.Data.Saga == null ? context.Data.Route.Name : context.Data.Saga.Name + "/" + context.Data.Route.Name;
+
             try
             {
                 if (HasRetry(messagecontext.Route))
@@ -149,16 +154,22 @@ namespace Jal.Router.Impl.Inbound.Middleware
                         {
                             if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnRetryEndPoint))
                             {
+                                _logger.Log($"Message {context.Data.Identity.Id} sending the message to the retry endpoint {messagecontext.Route.OnRetryEndPoint} retry count {messagecontext.RetryCount +1} by route {name}");
+
                                 SendRetry(messagecontext.Route, messagecontext, policy);
                             }
                             else
                             {
                                 if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                                 {
+                                    _logger.Log($"Message {context.Data.Identity.Id} policy without retry endpoint, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+
                                     SendError(messagecontext.Route, messagecontext, ex);
                                 }
                                 else
                                 {
+                                    _logger.Log($"Message {context.Data.Identity.Id} policy without retry endpoint by route {name}");
+
                                     throw;
                                 }
                             }
@@ -167,10 +178,14 @@ namespace Jal.Router.Impl.Inbound.Middleware
                         {
                             if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                             {
+                                _logger.Log($"Message {context.Data.Identity.Id} no more retries for the policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+
                                 SendError(messagecontext.Route, messagecontext, ex);
                             }
                             else
                             {
+                                _logger.Log($"Message {context.Data.Identity.Id} no more retries for the policy by route {name}");
+
                                 throw;
                             }
                         }
@@ -179,10 +194,14 @@ namespace Jal.Router.Impl.Inbound.Middleware
                     {
                         if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                         {
+                            _logger.Log($"Message {context.Data.Identity.Id} with an exeception not handled by the retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+
                             SendError(messagecontext.Route, messagecontext, ex);
                         }
                         else
                         {
+                            _logger.Log($"Message {context.Data.Identity.Id} with an exeception not handled by the retry policy by route {name}");
+
                             throw;
                         }
                     }
@@ -191,10 +210,14 @@ namespace Jal.Router.Impl.Inbound.Middleware
                 {
                     if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                     {
+                        _logger.Log($"Message {context.Data.Identity.Id} without retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+
                         SendError(messagecontext.Route, messagecontext, ex);
                     }
                     else
                     {
+                        _logger.Log($"Message {context.Data.Identity.Id} without retry policy by route {name}");
+
                         throw;
                     }
                 }

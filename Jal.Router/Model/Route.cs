@@ -26,7 +26,7 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Action<object> RuntimeHandler { get; set; }
+        public Action<object, Channel> RuntimeHandler { get; set; }
 
         public IdentityConfiguration IdentityConfiguration { get; }
 

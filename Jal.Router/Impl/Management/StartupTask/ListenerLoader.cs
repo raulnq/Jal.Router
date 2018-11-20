@@ -1,9 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
-using Jal.Router.Impl.Management;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Inbound;
 
@@ -12,15 +8,10 @@ namespace Jal.Router.Impl.StartupTask
 
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IRouter _router;
-
-        private readonly ISagaExecutionCoordinator _sec;
-
-        public ListenerLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger, ISagaExecutionCoordinator sec)
+        public ListenerLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, ILogger logger)
             :base(factory, configuration, logger)
         {
-            _router = router;
-            _sec = sec;
+
         }
 
         public void Run()

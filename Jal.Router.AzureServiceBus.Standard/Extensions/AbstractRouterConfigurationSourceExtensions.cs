@@ -48,7 +48,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
-            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule=null)
+            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor, string filter=null)
             where TExtractorConectionString : IValueFinder
         {
             Func<IValueFinder, string> extractor = finder =>
@@ -58,12 +58,27 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
 
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(subscription, topic, extractor, rule);
+            SubscriptionToPublishSubscribeChannelRule r = null;
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
+            }
+
+            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(subscription, topic, extractor, r);
         }
 
-        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, SubscriptionToPublishSubscribeChannelRule rule=null)
+        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, string filter=null)
         {
-            configuration.RegisterSubscriptionToPublishSubscriberChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), rule);
+
+            SubscriptionToPublishSubscribeChannelRule r = null;
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
+            }
+
+            configuration.RegisterSubscriptionToPublishSubscriberChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), r);
         }
     }
 }

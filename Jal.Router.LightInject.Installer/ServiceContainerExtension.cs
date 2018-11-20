@@ -79,8 +79,6 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
 
-            container.Register<ISagaExecutionCoordinator, SagaExecutionCoordinator>(new PerContainerLifetime());
-
             container.Register<IMessageRouter, MessageRouter>(new PerContainerLifetime());
 
             container.Register<IHandlerMethodSelector, HandlerMethodSelector>(new PerContainerLifetime());

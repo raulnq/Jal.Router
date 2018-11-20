@@ -10,7 +10,9 @@ namespace Jal.Router.Model
     public class MessageContext
     {
         private readonly IBus _bus;
+
         private readonly IMessageSerializer _serializer;
+
         private readonly ISagaStorage _storage;
         public Channel Channel { get; set; }
         public object Response { get; set; }

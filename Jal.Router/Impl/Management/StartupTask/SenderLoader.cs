@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
@@ -10,15 +8,11 @@ namespace Jal.Router.Impl.StartupTask
 {
     public class SenderLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IRouter _router;
 
-        private readonly ISagaExecutionCoordinator _sec;
-
-        public SenderLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger, ISagaExecutionCoordinator sec)
+        public SenderLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, ILogger logger)
             : base(factory, configuration, logger)
         {
-            _router = router;
-            _sec = sec;
+
         }
 
         public void Run()
