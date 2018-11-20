@@ -6,9 +6,9 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Inbound.Sagas;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl.Inbound.Middleware
 {
     public class MessageHandler : IMiddleware<MessageContext>
     {

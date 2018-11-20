@@ -106,7 +106,7 @@ namespace Jal.Router.Impl.Management
 
             if (_state != StateStoppingOrStopped)
             {
-                throw new InvalidOperationException("The host has not yet starteds");
+                throw new InvalidOperationException("The host has not yet started");
             }
 
             _logger.Log($"Stopping {Configuration.ApplicationName}");

@@ -24,11 +24,6 @@ namespace Jal.Router.Impl.Inbound.Sagas
             _router = router;
         }
 
-        public void Execute(MessageContext messagecontext, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
-        {
-
-        }
-
         public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
             var messagecontext = context.Data;

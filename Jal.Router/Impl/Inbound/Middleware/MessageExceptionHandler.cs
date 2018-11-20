@@ -6,9 +6,8 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl.Inbound.Middleware
 {
     public class MessageExceptionHandler : IMiddleware<MessageContext>
     {

@@ -5,11 +5,15 @@ using Castle.Windsor;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl;
 using Jal.Router.Impl.Inbound;
+using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.Outbound.ChannelShuffler;
+using Jal.Router.Impl.Outbound.Middleware;
 using Jal.Router.Impl.StartupTask;
+using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -54,8 +58,6 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IChannelShuffler>().ImplementedBy<FisherYatesChannelShuffler>().LifestyleSingleton().Named(typeof(FisherYatesChannelShuffler).FullName));
 
             container.Register(Component.For<ILogger>().ImplementedBy<Impl.ConsoleLogger>().LifestyleSingleton());
-
-            container.Register(Component.For<Interface.Outbound.IPipeline>().ImplementedBy<Impl.Outbound.Pipeline>().LifestyleSingleton());
 
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
 
@@ -149,24 +151,23 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(LastMessageHandler)).Named(typeof(LastMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
+            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
 
-            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
+            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
 
-            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
+            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
 
-            container.Register(Component.For<Interface.Outbound.IMiddleware>().ImplementedBy<RequestReplyHandler>().LifestyleSingleton().Named(typeof(RequestReplyHandler).FullName));
+            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<RequestReplyHandler>().LifestyleSingleton().Named(typeof(RequestReplyHandler).FullName));
 
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConnectionStringValueSettingFinder)).Named(typeof(ConnectionStringValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConnectionStringValueFinder)).Named(typeof(ConnectionStringValueFinder).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(AppSettingValueSettingFinder)).Named(typeof(AppSettingValueSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(AppSettingValueFinder)).Named(typeof(AppSettingValueFinder).FullName).LifestyleSingleton());
 
-#if NETSTANDARD2_0
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConfigurationValueSettingFinder)).Named(typeof(ConfigurationValueSettingFinder).FullName).LifestyleSingleton());
-#endif
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConfigurationValueFinder)).Named(typeof(ConfigurationValueFinder).FullName).LifestyleSingleton());
+
             container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(NullValueFinder)).Named(typeof(NullValueFinder).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(EnvironmentSettingFinder)).Named(typeof(EnvironmentSettingFinder).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(EnvironmentValueFinder)).Named(typeof(EnvironmentValueFinder).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 

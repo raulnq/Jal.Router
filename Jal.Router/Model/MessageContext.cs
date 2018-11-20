@@ -12,7 +12,8 @@ namespace Jal.Router.Model
         private readonly IBus _bus;
         private readonly IMessageSerializer _serializer;
         private readonly ISagaStorage _storage;
-
+        public Channel Channel { get; set; }
+        public object Response { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Version { get; set; }
         public int RetryCount { get; set; }

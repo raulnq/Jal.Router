@@ -1,6 +1,6 @@
 using Jal.Router.Interface;
 
-namespace Jal.Router.Impl
+namespace Jal.Router.Impl.ValueFinder
 {
     public class NullValueFinder : IValueFinder
     {

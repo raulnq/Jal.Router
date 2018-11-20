@@ -1,7 +1,6 @@
 ﻿using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Management;
 using LightInject;
@@ -22,7 +21,7 @@ namespace Jal.Router.ApplicationInsights.LightInject.Installer
 
             container.Register<IMiddleware<MessageContext>, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
 
-            container.Register<Interface.Outbound.IMiddleware, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
         }
     }
 }

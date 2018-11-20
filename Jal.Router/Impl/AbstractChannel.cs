@@ -27,7 +27,7 @@ namespace Jal.Router.Impl
 
         public void OnMessage(ListenerMetadata metadata, string messageid, Action @action, Action completeaction)
         {
-            Logger.Log($"Message {messageid} arrived to {metadata.ToString()} channel {metadata.GetPath()}");
+            Logger.Log($"Message {messageid} arrived to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
 
             try
             {
@@ -37,17 +37,17 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {messageid} failed to {metadata.ToString()} channel {metadata.GetPath()} {ex}");
+                Logger.Log($"Message {messageid} failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {ex}");
             }
             finally
             {
-                Logger.Log($"Message {messageid} completed to {metadata.ToString()} channel {metadata.GetPath()}");
+                Logger.Log($"Message {messageid} completed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
             }
         }
 
         public async Task OnMessageAsync(ListenerMetadata metadata, string messageid, Action @action, Func<Task> completeaction)
         {
-            Logger.Log($"Message {messageid} arrived to {metadata.ToString()} channel {metadata.GetPath()}");
+            Logger.Log($"Message {messageid} arrived to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
 
             try
             {
@@ -57,11 +57,11 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {messageid} failed to {metadata.ToString()} channel {metadata.GetPath()} {ex}");
+                Logger.Log($"Message {messageid} failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {ex}");
             }
             finally
             {
-                Logger.Log($"Message {messageid} completed to {metadata.ToString()} channel {metadata.GetPath()}");
+                Logger.Log($"Message {messageid} completed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
             }
         }
     }

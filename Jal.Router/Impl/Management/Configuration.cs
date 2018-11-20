@@ -4,6 +4,7 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.StartupTask;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
@@ -94,7 +95,7 @@ namespace Jal.Router.Impl.Management
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
         }
 
-        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Interface.Outbound.IMiddleware
+        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
         {
             OutboundMiddlewareTypes.Add(typeof(TMiddleware));
         }

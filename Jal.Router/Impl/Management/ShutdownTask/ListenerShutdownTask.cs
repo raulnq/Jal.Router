@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     listenermetadata.DestroyListenerMethod(listenermetadata.Listener);
 
-                    _logger.Log($"Shutdown {listenermetadata.GetPath()} {listenermetadata.ToString()} channel");
+                    _logger.Log($"Shutdown {listenermetadata.Channel.GetPath()} {listenermetadata.Channel.ToString()} channel");
                 }
             }
         }

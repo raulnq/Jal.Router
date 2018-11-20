@@ -5,6 +5,7 @@ using Jal.Router.Extensions;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
+
     public static class ListenerChannelBuilderExtensions
     {
         public static void AddQueue(this IListenerChannelBuilder builder, string path, string connectionstring)

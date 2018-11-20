@@ -45,7 +45,7 @@ namespace Jal.Router.Interface.Management
         void UsingSagaStorage<TStorage>() where TStorage : ISagaStorage;
         void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
-        void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
+        void AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
         void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         void UsingMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;

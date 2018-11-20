@@ -33,7 +33,7 @@ namespace Jal.Router.Impl.Outbound
 
                 var message = adapter.Write(context, context.EndPoint.UseClaimCheck);
 
-                var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.GetId() == channel.GetId());
+                var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                 if (metadata != null)
                 {

@@ -1,9 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
@@ -15,7 +15,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            return () => new object[] { new QueueClient(metadata.ToConnectionString, metadata.ToPath) };
+            return () => new object[] { new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath) };
         }
 
         public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
@@ -53,7 +53,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             return () =>
             {
-                var client = new QueueClient(metadata.ToConnectionString, metadata.ToPath);
+                var client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
 
                 return new object[] { client };
             };
@@ -75,7 +75,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             Action<Message> handler = message =>
             {
-                foreach (var routingaction in metadata.Handlers)
+                foreach (var routingaction in metadata.Routes.Select(x=>x.RuntimeHandler))
                 {
                     var clone = message.Clone();
 
@@ -99,7 +99,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Logger.Log($"Message failed to {metadata.ToString()} channel {metadata.GetPath()} {args.Exception}");
+                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {args.Exception}");
                 return Task.CompletedTask;
             } ;
 

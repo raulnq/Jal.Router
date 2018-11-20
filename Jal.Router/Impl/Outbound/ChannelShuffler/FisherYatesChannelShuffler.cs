@@ -2,7 +2,7 @@
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl.Outbound.ChannelShuffler
 {
     public class FisherYatesChannelShuffler : IChannelShuffler
     {

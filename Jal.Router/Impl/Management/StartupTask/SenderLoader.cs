@@ -35,7 +35,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 foreach (var channel in item.Channels)
                 {
-                    var sender = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.GetId() == channel.GetId());
+                    var sender = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                     if (sender != null)
                     {
@@ -43,7 +43,7 @@ namespace Jal.Router.Impl.StartupTask
                     }
                     else
                     {
-                        var newsender = new SenderMetadata(channel.ToPath, channel.ToConnectionString, channel.Type);
+                        var newsender = new SenderMetadata(channel);
 
                         newsender.Endpoints.Add(item);
 
@@ -54,7 +54,7 @@ namespace Jal.Router.Impl.StartupTask
 
             foreach (var sendermetadata in Configuration.Runtime.SendersMetadata)
             {
-                if (sendermetadata.Type==ChannelType.PointToPoint)
+                if (sendermetadata.Channel.Type==ChannelType.PointToPoint)
                 {
                     sendermetadata.CreateSenderMethod = pointtopointchannel.CreateSenderMethodFactory(sendermetadata);
 
@@ -64,10 +64,10 @@ namespace Jal.Router.Impl.StartupTask
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 
-                    Logger.Log($"Opening {sendermetadata.GetPath()} {sendermetadata.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x=>x.Name))}");
+                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x=>x.Name))}");
                 }
 
-                if (sendermetadata.Type == ChannelType.PublishSubscriber)
+                if (sendermetadata.Channel.Type == ChannelType.PublishSubscriber)
                 {
                     sendermetadata.CreateSenderMethod = publishsubscriberchannel.CreateSenderMethodFactory(sendermetadata);
 
@@ -77,10 +77,10 @@ namespace Jal.Router.Impl.StartupTask
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 
-                    Logger.Log($"Opening {sendermetadata.GetPath()} {sendermetadata.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
+                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
                 }
 
-                if (sendermetadata.Type == ChannelType.RequestReplyPointToPoint)
+                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToPointToPoint)
                 {
                     sendermetadata.CreateSenderMethod = requestreplychannel.CreateSenderMethodFactory(sendermetadata);
 
@@ -92,10 +92,10 @@ namespace Jal.Router.Impl.StartupTask
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 
-                    Logger.Log($"Opening {sendermetadata.GetPath()} {sendermetadata.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
+                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
                 }
 
-                if (sendermetadata.Type == ChannelType.RequestReplyPublishSubscriber)
+                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscriber)
                 {
                     sendermetadata.CreateSenderMethod = requestreplychannel.CreateSenderMethodFactory(sendermetadata);
 
@@ -107,7 +107,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 
-                    Logger.Log($"Opening {sendermetadata.GetPath()} {sendermetadata.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
+                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
                 }
             }
 

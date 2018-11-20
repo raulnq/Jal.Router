@@ -23,11 +23,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             return (context, adapter) =>
             {
-                var client = new SessionClient(metadata.ToReplyConnectionString, metadata.ToReplyPath);
+                var client = new SessionClient(metadata.Channel.ToReplyConnectionString, metadata.Channel.ToReplyPath);
 
                 var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
 
-                var message = metadata.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
+                var message = metadata.Channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.Channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 
                 MessageContext outputcontext = null;
 
@@ -50,13 +50,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             return (context, adapter) =>
             {
-                var entity = EntityNameHelper.FormatSubscriptionPath(metadata.ToReplyPath, metadata.ToReplySubscription);
+                var entity = EntityNameHelper.FormatSubscriptionPath(metadata.Channel.ToReplyPath, metadata.Channel.ToReplySubscription);
 
-                var client = new SessionClient(metadata.ToReplyConnectionString, entity);
+                var client = new SessionClient(metadata.Channel.ToReplyConnectionString, entity);
 
                 var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
 
-                var message = metadata.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
+                var message = metadata.Channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.Channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 
                 MessageContext outputcontext = null;
 
@@ -77,7 +77,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            return () => new object[] { new QueueClient(metadata.ToConnectionString, metadata.ToPath) };
+            return () => new object[] { new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath) };
         }
 
         public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)

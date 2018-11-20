@@ -13,16 +13,16 @@ namespace Jal.Router.Model.Management
             Rules = new List<SubscriptionToPublishSubscribeChannelRule>();
         }
 
-        public string Subscription { get; set; }
+        public string Subscription { get; }
 
         public Type ConnectionStringValueFinderType { get; set; }
 
         public object ConnectionStringProvider { get; set; }
 
-        public string Path { get; set; }
+        public string Path { get; }
 
         public string ConnectionString { get; set; }
 
-        public List<SubscriptionToPublishSubscribeChannelRule> Rules { get; set; }
+        public List<SubscriptionToPublishSubscribeChannelRule> Rules { get; }
     }
 }

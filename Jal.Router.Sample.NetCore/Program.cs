@@ -17,6 +17,7 @@ using Jal.Router.Model.Management;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.ChainOfResponsability.LightInject.Installer;
+using Jal.Router.Impl.Outbound.ChannelShuffler;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -38,7 +39,7 @@ namespace Jal.Router.Sample.NetCore
             host.Configuration.UsingAzureServiceBus();
             host.Configuration.UsingAzureSagaStorage();
             host.Configuration.UsingAzureMessageStorage();
-            host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
+            //host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(10);
             host.RunAndBlock();
         }

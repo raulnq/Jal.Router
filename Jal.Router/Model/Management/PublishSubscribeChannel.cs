@@ -8,7 +8,7 @@ namespace Jal.Router.Model.Management
         {
             Path = path;
         }
-        public string Path { get; set; }
+        public string Path { get; }
         public string ConnectionString { get; set; }
 
         public Type ConnectionStringValueFinderType { get; set; }

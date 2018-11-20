@@ -22,15 +22,15 @@ namespace Jal.Router.Model
             {
                 return "point to point";
             }
-            if (Type == ChannelType.RequestReplyPointToPoint)
+            if (Type == ChannelType.RequestReplyToPointToPoint)
             {
                 return "request reply to point to point";
             }
-            if (Type == ChannelType.RequestReplyPublishSubscriber)
+            if (Type == ChannelType.RequestReplyToSubscriptionToPublishSubscriber)
             {
-                return "request reply to publish subscriber";
+                return "request reply to subscription";
             }
-            if (Type == ChannelType.PublishSubscriber)
+            if (Type == ChannelType.PublishSubscriber)//TODO SubscriptionToPublishSubscriber on listen - PublishSubscriber on publish
             {
                 return "publish subscriber";
             }

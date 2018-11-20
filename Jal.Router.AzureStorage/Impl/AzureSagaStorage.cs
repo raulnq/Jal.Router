@@ -8,6 +8,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Inbound.Sagas;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 

@@ -5,7 +5,7 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IListenerChannelBuilder
     {
-        void AddPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder;
-        void AddPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder;
+        void AddPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder;
+        void AddPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder;
     }
 }

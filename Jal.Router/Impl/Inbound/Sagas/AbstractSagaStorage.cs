@@ -1,7 +1,7 @@
 ﻿using System;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Inbound.Sagas;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {

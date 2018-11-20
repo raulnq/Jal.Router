@@ -3,11 +3,15 @@ using System.Reflection;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl;
 using Jal.Router.Impl.Inbound;
+using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
+using Jal.Router.Impl.Outbound.ChannelShuffler;
+using Jal.Router.Impl.Outbound.Middleware;
 using Jal.Router.Impl.StartupTask;
+using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
@@ -66,8 +70,6 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IChannelShuffler, DefaultChannelShuffler>(typeof(DefaultChannelShuffler).FullName, new PerContainerLifetime());
 
             container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());
-
-            container.Register<Interface.Outbound.IPipeline, Impl.Outbound.Pipeline>(new PerContainerLifetime());
 
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
@@ -165,24 +167,23 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddleware<MessageContext>, LastMessageHandler>(typeof (LastMessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<Interface.Outbound.IMiddleware, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
 
-            container.Register<Interface.Outbound.IMiddleware, PublishSubscribeHandler>(typeof (PublishSubscribeHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, PublishSubscribeHandler>(typeof (PublishSubscribeHandler).FullName, new PerContainerLifetime());
 
-            container.Register<Interface.Outbound.IMiddleware, RequestReplyHandler>(typeof (RequestReplyHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, RequestReplyHandler>(typeof (RequestReplyHandler).FullName,new PerContainerLifetime());
 
-            container.Register<Interface.Outbound.IMiddleware, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IValueFinder, AppSettingValueSettingFinder>(typeof (AppSettingValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, AppSettingValueFinder>(typeof (AppSettingValueFinder).FullName, new PerContainerLifetime());
 
-            container.Register<IValueFinder, ConnectionStringValueSettingFinder>(typeof (ConnectionStringValueSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, ConnectionStringValueFinder>(typeof (ConnectionStringValueFinder).FullName, new PerContainerLifetime());
 
-#if NETSTANDARD2_0
-            container.Register<IValueFinder, ConfigurationValueSettingFinder>(typeof (ConfigurationValueSettingFinder).FullName, new PerContainerLifetime());
-#endif
+            container.Register<IValueFinder, ConfigurationValueFinder>(typeof (ConfigurationValueFinder).FullName, new PerContainerLifetime());
+
             container.Register<IValueFinder, NullValueFinder>(typeof(NullValueFinder).FullName, new PerContainerLifetime());
 
-            container.Register<IValueFinder, EnvironmentSettingFinder>(typeof(EnvironmentSettingFinder).FullName, new PerContainerLifetime());
+            container.Register<IValueFinder, EnvironmentValueFinder>(typeof(EnvironmentValueFinder).FullName, new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof (EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
         }

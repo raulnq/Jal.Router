@@ -1,22 +1,23 @@
 using System;
 using System.Diagnostics;
+using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class BusLogger : AbstractApplicationInsightsLogger, IMiddleware
+    public class BusLogger : AbstractApplicationInsightsLogger, IMiddleware<MessageContext>
     {
 
         public BusLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
         {
 
         }
-        public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
+
+        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -24,35 +25,33 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             var telemetry = new DependencyTelemetry()
             {
-                Name = context.EndPoint.Name,
+                Name = context.Data.EndPoint.Name,
 
-                Id = context.Identity.Id,
+                Id = context.Data.Identity.Id,
 
-                Timestamp = context.DateTimeUtc,
+                Timestamp = context.Data.DateTimeUtc,
 
-                Target = middlewarecontext.Channel.GetPath(),
+                Target = context.Data.Channel.GetPath(),
 
-                Data = context.Content,
+                Data = context.Data.Content,
 
                 Type = Configuration.ChannelProviderName,
             };
 
-            PopulateContext(telemetry.Context, context);
+            PopulateContext(telemetry.Context, context.Data);
 
-            PopulateProperties(telemetry.Properties, context);
+            PopulateProperties(telemetry.Properties, context.Data);
 
-            PopulateMetrics(telemetry.Metrics, context);
+            PopulateMetrics(telemetry.Metrics, context.Data);
 
 
             try
             {
-                var result = next(context, middlewarecontext);
+                next(context);
 
                 telemetry.Success = true;
 
                 telemetry.ResultCode = "200";
-
-                return result;
             }
             catch (Exception exception)
             {
@@ -62,11 +61,11 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 var telemetryexception = new ExceptionTelemetry(exception);
 
-                PopulateContext(telemetryexception.Context, context);
+                PopulateContext(telemetryexception.Context, context.Data);
 
-                PopulateProperties(telemetryexception.Properties, context);
+                PopulateProperties(telemetryexception.Properties, context.Data);
 
-                PopulateMetrics(telemetryexception.Metrics, context);
+                PopulateMetrics(telemetryexception.Metrics, context.Data);
 
                 Client.TrackException(telemetryexception);
 

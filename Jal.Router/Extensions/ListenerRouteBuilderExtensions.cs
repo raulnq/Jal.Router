@@ -1,11 +1,11 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
+using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {
-    public static class ListenerRouteBuilderExtensions
+        public static class ListenerRouteBuilderExtensions
     {
         public static void AddPointToPointChannel(this IListenerChannelBuilder builder, string path, string connectionstring)
         {
@@ -19,9 +19,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            builder.AddPointToPointChannel<NullValueFinder>(path, extractor);
+            builder.AddPointToPointChannel<NullValueFinder>(path, provider);
         }
 
         public static void AddPublishSubscribeChannel(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
@@ -39,9 +39,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            builder.AddPublishSubscribeChannel<NullValueFinder>(path, subscription, extractor);
+            builder.AddPublishSubscribeChannel<NullValueFinder>(path, subscription, provider);
         }
     }
 }

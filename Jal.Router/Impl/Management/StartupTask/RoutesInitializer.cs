@@ -19,7 +19,7 @@ namespace Jal.Router.Impl.StartupTask
 
             var errors = new StringBuilder();
 
-            foreach (var route in Configuration.Runtime.All)
+            foreach (var route in Configuration.Runtime.Routes)
             {
                 if (route.Channels.Any())
                 {

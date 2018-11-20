@@ -3,11 +3,9 @@ using System.Security;
 using System.Text;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl.Inbound.Middleware
 {
     public class BasicAuthenticationHandler : IMiddleware<MessageContext>
     {

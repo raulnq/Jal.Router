@@ -1,5 +1,6 @@
 ﻿using System;
 using Jal.ChainOfResponsability.Fluent.Interfaces;
+using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
+using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl.Outbound.Middleware
 {
 
-    public class DistributionHandler : IMiddleware
+    public class DistributionHandler : IMiddleware<MessageContext>
     {
         private readonly ILogger _logger;
 
@@ -24,46 +25,47 @@ namespace Jal.Router.Impl.Outbound
 
             _logger = logger;
         }
-        public object Execute(MessageContext context, Func<MessageContext, MiddlewareContext, object> next, MiddlewareContext middlewarecontext)
+ 
+        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
             var shuffler = _factory.Create<IChannelShuffler>(_configuration.ChannelShufflerType);
 
-            var channels = shuffler.Shuffle(context.EndPoint.Channels.ToArray());
+            var channels = shuffler.Shuffle(context.Data.EndPoint.Channels.ToArray());
 
             var numberofchannels = channels.Length;
 
             var count = 0;
 
-            var index = middlewarecontext.Index;
+            var index = context.Index;
 
             foreach (var channel in channels)
             {
-                middlewarecontext.Channel = channel;
+                context.Data.Channel = channel;
 
                 try
                 {
                     count++;
 
-                    return next(context, middlewarecontext);
+                    next(context);
+
+                    return;
                 }
                 catch (Exception)
                 {
-                    if(count < numberofchannels)
+                    if (count < numberofchannels)
                     {
-                        middlewarecontext.Index = index;
+                        context.Index = index;
 
-                        _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), moving to the next channel");
+                        _logger.Log($"Message {context.Data.Identity.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
-                        _logger.Log($"Message {context.Identity.Id} failed to distribute ({count}), no more channels");
+                        _logger.Log($"Message {context.Data.Identity.Id} failed to distribute ({count}), no more channels");
 
                         throw;
                     }
                 }
             }
-
-            return null;
         }
     }
 }

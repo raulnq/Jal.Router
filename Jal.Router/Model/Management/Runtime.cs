@@ -14,8 +14,6 @@ namespace Jal.Router.Model.Management
 
         public List<Route> Routes { get; }
 
-        public List<Route> All { get; }
-
         public List<SenderMetadata> SendersMetadata { get; }
 
         public List<PointToPointChannel> PointToPointChannels { get; }
@@ -35,8 +33,6 @@ namespace Jal.Router.Model.Management
             Sagas = new List<Saga>();
 
             Routes = new List<Route>();
-
-            All = new List<Route>();
 
             PointToPointChannels = new List<PointToPointChannel>();
 

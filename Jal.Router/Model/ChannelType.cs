@@ -5,7 +5,7 @@
         None,
         PointToPoint,
         PublishSubscriber,
-        RequestReplyPointToPoint,
-        RequestReplyPublishSubscriber
+        RequestReplyToPointToPoint,
+        RequestReplyToSubscriptionToPublishSubscriber
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
+using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
@@ -19,9 +19,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            return builder.AddPointToPointChannel<NullValueFinder>(extractor, path);
+            return builder.AddPointToPointChannel<NullValueFinder>(provider, path);
         }
 
         public static IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel(this IToChannelBuilder builder, string connectionstring, string path)
@@ -36,9 +36,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            return builder.AddPublishSubscriberChannel<NullValueFinder>(extractor, path);
+            return builder.AddPublishSubscriberChannel<NullValueFinder>(provider, path);
         }
 
         public static void AndWaitReplyFromPointToPointChannel(this IAndWaitReplyFromEndPointBuilder builder, string path, string connectionstring, int timeout = 60)
@@ -53,9 +53,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            builder.AndWaitReplyFromPointToPointChannel<NullValueFinder>(path, extractor);
+            builder.AndWaitReplyFromPointToPointChannel<NullValueFinder>(path, provider, timeout);
 
         }
         public static void AndWaitReplyFromPublishSubscribeChannel(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
@@ -75,9 +75,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            builder.AndWaitReplyFromPublishSubscribeChannel<NullValueFinder>(path, subscription, extractor);
+            builder.AndWaitReplyFromPublishSubscribeChannel<NullValueFinder>(path, subscription, provider, timeout);
         }
 
     }

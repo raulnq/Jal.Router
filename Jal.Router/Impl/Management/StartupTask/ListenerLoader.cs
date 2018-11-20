@@ -31,48 +31,21 @@ namespace Jal.Router.Impl.StartupTask
 
             var publishsubscriberchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
 
-            var routesmetadata = new List<RouteMetadata>();
-
-            routesmetadata.AddRange(Configuration.Runtime.Routes.Select(route => new RouteMetadata() { Route = route, Handler = message => _router.Route(message, route), Name = route.Name }));
-
-            foreach (var saga in Configuration.Runtime.Sagas)
+            foreach (var item in Configuration.Runtime.Routes)
             {
-                if (saga.FirstRoute != null)
+                foreach (var channel in item.Channels)
                 {
-                    routesmetadata.Add(new RouteMetadata() { Route = saga.FirstRoute, Handler = message => _sec.Start(message, saga, saga.FirstRoute), Name = $"{saga.Name}/{saga.FirstRoute.Name}" });
-                }
-
-                if (saga.LastRoute != null)
-                {
-                    routesmetadata.Add(new RouteMetadata() { Route = saga.LastRoute, Handler = message => _sec.End(message, saga, saga.LastRoute), Name = $"{saga.Name}/{saga.LastRoute.Name}" });
-                }
-
-                routesmetadata.AddRange(saga.Routes.Select(route => new RouteMetadata() { Route = route, Handler = message => _sec.Continue(message, saga, route), Name = $"{saga.Name}/{route.Name}" }));
-            }
-
-            foreach (var item in routesmetadata)
-            {
-                foreach (var channel in item.Route.Channels)
-                {
-                    var listener = Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.GetId() == channel.GetId());
+                    var listener = Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                     if (listener != null)
                     {
-                        listener.Handlers.Add(item.Handler);
-
-                        listener.Names.Add(item.Name);
-
-                        listener.Routes.Add(item.Route);
+                        listener.Routes.Add(item);
                     }
                     else
                     {
-                        var newlistener = new ListenerMetadata(channel.ToPath, channel.ToConnectionString, channel.ToSubscription, channel.Type);
+                        var newlistener = new ListenerMetadata(channel);
 
-                        newlistener.Handlers.Add(item.Handler);
-
-                        newlistener.Names.Add(item.Name);
-
-                        newlistener.Routes.Add(item.Route);
+                        newlistener.Routes.Add(item);
 
                         Configuration.Runtime.ListenersMetadata.Add(newlistener);
                     }
@@ -81,7 +54,7 @@ namespace Jal.Router.Impl.StartupTask
 
             foreach (var metadata in Configuration.Runtime.ListenersMetadata)
             {
-                if (metadata.Type == Model.ChannelType.PointToPoint)
+                if (metadata.Channel.Type == Model.ChannelType.PointToPoint)
                 {
                     metadata.CreateListenerMethod = pointtopointchannel.CreateListenerMethodFactory(metadata);
 
@@ -93,10 +66,10 @@ namespace Jal.Router.Impl.StartupTask
 
                     metadata.ListenMethod(metadata.Listener);
 
-                    Logger.Log($"Listening {metadata.GetPath()} {metadata.ToString()} channel ({metadata.Handlers.Count}): {string.Join(",", metadata.Names)}");
+                    Logger.Log($"Listening {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x=> x.Saga==null ? x.Name: $"{x.Saga.Name}/{x.Name}" ))}");
                 }
 
-                if (metadata.Type == Model.ChannelType.PublishSubscriber)
+                if (metadata.Channel.Type == Model.ChannelType.PublishSubscriber)
                 {
                     metadata.CreateListenerMethod = publishsubscriberchannel.CreateListenerMethodFactory(metadata);
 
@@ -108,7 +81,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     metadata.ListenMethod(metadata.Listener);
 
-                    Logger.Log($"Listening {metadata.GetPath()} {metadata.ToString()} channel ({metadata.Handlers.Count}): {string.Join(",", metadata.Names)}");
+                    Logger.Log($"Listening {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}");
                 }
             }
 

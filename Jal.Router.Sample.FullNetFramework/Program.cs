@@ -31,7 +31,7 @@ using Jal.Settings.Installer;
 using LightInject;
 using Microsoft.ServiceBus.Messaging;
 using Component = Castle.MicroKernel.Registration.Component;
-
+using Jal.Router.Impl.ValueFinder;
 
 namespace Jal.Router.Sample.FullNetFramework
 {
@@ -71,7 +71,7 @@ namespace Jal.Router.Sample.FullNetFramework
                 //    });
 
                 RegisterHandler<IMessageHandler>("handler")
-                    .ToListen(y=>y.AddQueue<AppSettingValueSettingFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
+                    .ToListen(y=>y.AddQueue<AppSettingValueFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
                 .ForMessage<Message>().Using<MessageHandler>(x =>
                 {
                     x.With(((request, handler, context) => handler.Handle(request)));

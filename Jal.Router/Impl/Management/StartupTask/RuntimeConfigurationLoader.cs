@@ -39,23 +39,35 @@ namespace Jal.Router.Impl.StartupTask
 
                 Configuration.Runtime.Sagas.AddRange(source.GetSagas());
 
-                Configuration.Runtime.Routes.AddRange(source.GetRoutes());
+                foreach (var route in source.GetRoutes())
+                {
+                    route.RuntimeHandler = message => _router.Route(message, route);
 
-                Configuration.Runtime.All.AddRange(source.GetRoutes());
+                    Configuration.Runtime.Routes.Add(route);
+                }
 
                 foreach (var saga in Configuration.Runtime.Sagas)
                 {
                     if (saga.FirstRoute != null)
                     {
-                        Configuration.Runtime.All.Add(saga.FirstRoute);
+                        Configuration.Runtime.Routes.Add(saga.FirstRoute);
+
+                        saga.FirstRoute.RuntimeHandler = message => _sec.Start(message, saga, saga.FirstRoute);
                     }
 
                     if (saga.LastRoute != null)
                     {
-                        Configuration.Runtime.All.Add(saga.LastRoute);
+                        Configuration.Runtime.Routes.Add(saga.LastRoute);
+
+                        saga.LastRoute.RuntimeHandler = message => _sec.End(message, saga, saga.LastRoute);
                     }
 
-                    Configuration.Runtime.All.AddRange(saga.Routes);
+                    foreach (var route in saga.Routes)
+                    {
+                        route.RuntimeHandler = message => _sec.Continue(message, saga, route);
+
+                        Configuration.Runtime.Routes.Add(route);
+                    }
                 }
             }
 

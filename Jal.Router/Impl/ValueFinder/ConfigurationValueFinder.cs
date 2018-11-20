@@ -1,14 +1,13 @@
-#if NETSTANDARD2_0
 using Microsoft.Extensions.Configuration;
 using Jal.Router.Interface;
 
-namespace Jal.Router.Impl
+namespace Jal.Router.Impl.ValueFinder
 {
-    public class ConfigurationValueSettingFinder : IValueFinder
+    public class ConfigurationValueFinder : IValueFinder
     {
         private readonly IConfiguration _configuration;
 
-        public ConfigurationValueSettingFinder(IConfiguration configuration)
+        public ConfigurationValueFinder(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -19,4 +18,3 @@ namespace Jal.Router.Impl
         }
     }
 }
-#endif

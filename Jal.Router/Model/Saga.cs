@@ -13,13 +13,13 @@ namespace Jal.Router.Model
 
             Routes = new List<Route>();
         }
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public Type DataType { get; set; }
+        public Type DataType { get; }
 
         public int Timeout { get; set; }
 
-        public List<Route> Routes { get; set; }
+        public List<Route> Routes { get; }
 
         public Route FirstRoute { get; set; }
 

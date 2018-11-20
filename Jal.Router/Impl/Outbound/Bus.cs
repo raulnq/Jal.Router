@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Jal.ChainOfResponsability.Fluent.Interfaces;
+using Jal.Router.Impl.Outbound.Middleware;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
@@ -16,9 +17,9 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IConfiguration _configuration;
 
-        private readonly IPipeline _pipeline;
+        private readonly IPipelineBuilder _pipeline;
 
-        public Bus(IEndPointProvider provider, IComponentFactory factory, IConfiguration configuration, IPipeline pipeline)
+        public Bus(IEndPointProvider provider, IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline)
         {
             _provider = provider;
             _factory = factory;
@@ -36,22 +37,23 @@ namespace Jal.Router.Impl.Outbound
             {
                 if (message.EndPoint.Channels.Any())
                 {
-                    var middlewares = new List<Type>
+                    var chain = _pipeline.For<MessageContext>().Use<DistributionHandler>();
+
+                    foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
-                        typeof(DistributionHandler)
-                    };
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    foreach (var type in message.EndPoint.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
-
-                    middlewares.Add(typeof(RequestReplyHandler));
-
-                    var result = _pipeline.Execute(middlewares.ToArray(), message, options, "Reply", typeof(TResult));
+                    chain.Use<RequestReplyHandler>().Run(message);
 
                     interceptor.OnSuccess(message, options);
 
-                    return (TResult)result;
+                    return (TResult)message.Response;
                 }
                 else
                 {
@@ -117,18 +119,19 @@ namespace Jal.Router.Impl.Outbound
             {
                 if (message.EndPoint.Channels.Any())
                 {
-                    var middlewares = new List<Type>
+                    var chain = _pipeline.For<MessageContext>().Use<DistributionHandler>();
+
+                    foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
-                        typeof(DistributionHandler)
-                    };
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    foreach (var type in message.EndPoint.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
-
-                    middlewares.Add(typeof(PointToPointHandler));
-
-                    _pipeline.Execute(middlewares.ToArray(), message, options, "Send");
+                    chain.Use<PointToPointHandler>().Run(message);
                 }
                 else
                 {
@@ -239,18 +242,19 @@ namespace Jal.Router.Impl.Outbound
             {
                 if (message.EndPoint.Channels.Any())
                 {
-                    var middlewares = new List<Type>
+                    var chain = _pipeline.For<MessageContext>().Use<DistributionHandler>();
+
+                    foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
-                        typeof(DistributionHandler)
-                    };
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(_configuration.OutboundMiddlewareTypes);
+                    foreach (var type in message.EndPoint.MiddlewareTypes)
+                    {
+                        chain.Use(type);
+                    }
 
-                    middlewares.AddRange(message.EndPoint.MiddlewareTypes);
-
-                    middlewares.Add(typeof(PublishSubscribeHandler));
-
-                    _pipeline.Execute(middlewares.ToArray(), message, options, "Publish");
+                    chain.Use<PublishSubscribeHandler>().Run(message);
                 }
                 else
                 {

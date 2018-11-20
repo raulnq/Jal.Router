@@ -1,7 +1,7 @@
 using System;
 using Jal.Router.Interface.Inbound;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl.Inbound.RetryPolicy
 {
     public class LinearRetryPolicy : IRetryPolicy
     {

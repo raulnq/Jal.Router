@@ -29,7 +29,9 @@ namespace Jal.Router.Fluent.Impl
         {
             _channelbuilder?.Invoke(this);
 
-            var value = new Route<TContent, THandler>(_name) { Channels = _channels };
+            var value = new Route<TContent, THandler>(_name);
+
+            value.Channels.AddRange(_channels);
 
             var builder = new HandlerBuilder<TContent, THandler>(value);
 

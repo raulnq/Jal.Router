@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
@@ -14,7 +15,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     {
         public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            return () => new object[] { new TopicClient(metadata.ToConnectionString, metadata.ToPath) };
+            return () => new object[] { new TopicClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath) };
         }
 
         public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
@@ -50,7 +51,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             return () =>
             {
-                var client = new SubscriptionClient(metadata.ToConnectionString, metadata.ToPath, metadata.ToSubscription);
+                var client = new SubscriptionClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath, metadata.Channel.ToSubscription);
 
                 return new object[] { client };
             };
@@ -68,13 +69,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
         {
-            var channelpath = metadata.GetPath();
+            var channelpath = metadata.Channel.GetPath();
 
             var options = CreateOptions(metadata);
 
             Action<Message> handler = message =>
             {
-                foreach (var routingaction in metadata.Handlers)
+                foreach (var routingaction in metadata.Routes.Select(x => x.RuntimeHandler))
                 {
                     var clone = message.Clone();
 
@@ -98,7 +99,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Console.WriteLine($"Message failed to {metadata.ToString()} channel {metadata.GetPath()} {args.Exception}");
+                Console.WriteLine($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {args.Exception}");
                 return Task.CompletedTask;
             };
 

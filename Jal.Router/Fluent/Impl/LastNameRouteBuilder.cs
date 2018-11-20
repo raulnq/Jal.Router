@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -32,7 +31,9 @@ namespace Jal.Router.Fluent.Impl
         {
             _channelbuilder?.Invoke(this);
 
-            var value = new Route<TContent, THandler>(_name) { Channels = _channels };
+            var value = new Route<TContent, THandler>(_saga, _name);
+
+            value.Channels.AddRange(_channels);
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 

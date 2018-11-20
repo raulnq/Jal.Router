@@ -1,6 +1,6 @@
 using System;
 
-namespace Jal.Router.Model.Inbound
+namespace Jal.Router.Model.Inbound.Sagas
 {
     public class SagaEntity
     {
