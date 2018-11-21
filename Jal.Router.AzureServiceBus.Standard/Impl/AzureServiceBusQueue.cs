@@ -23,7 +23,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return sender =>
             {
                 var client = sender[0] as QueueClient;
-
+                
                 client.CloseAsync().GetAwaiter().GetResult();
             };
         }
@@ -53,6 +53,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             return () =>
             {
+
                 var client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
 
                 return new object[] { client };
@@ -99,7 +100,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {args.Exception}");
+                var context = args.ExceptionReceivedContext;
+
+                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+
                 return Task.CompletedTask;
             } ;
 

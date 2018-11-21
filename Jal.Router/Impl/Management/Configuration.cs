@@ -38,7 +38,7 @@ namespace Jal.Router.Impl.Management
         public Type MessageStorageType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; }
         public Type RouterInterceptorType { get; set; }
-        public Type BusInterceptorType { get; private set; }
+        public Type BusInterceptorType { get; set; }
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
@@ -164,9 +164,10 @@ namespace Jal.Router.Impl.Management
             AddStartupTask<PointToPointChannelCreator>();
             AddStartupTask<PublishSubscriberChannelCreator>();
             AddStartupTask<SubscriptionToPublishSubscribeChannelCreator>();
-            AddStartupTask<ListenerLoader>();
             AddStartupTask<SenderLoader>();
+            AddStartupTask<ListenerLoader>();
             AddShutdownTask<ListenerShutdownTask>();
+            AddShutdownTask<SenderShutdownTask>();
             AddShutdownTask<ShutdownTask>();
             UsingShutdownWatcher<ShutdownNullWatcher>();
             Storage = new StorageConfiguration();

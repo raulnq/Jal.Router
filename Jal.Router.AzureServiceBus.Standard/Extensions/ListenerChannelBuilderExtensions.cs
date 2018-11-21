@@ -12,7 +12,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         {
             builder.AddPointToPointChannel(path, connectionstring);
         }
-        public static void AddTopic(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
+        public static void AddSubscriptionToTopic(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
         {
             builder.AddPublishSubscribeChannel(path, subscription, connectionstring);
         }
@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         {
             builder.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor);
         }
-        public static void AddTopic<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
+        public static void AddSubscriptionToTopic<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
         {
             builder.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
         }

@@ -6,6 +6,33 @@ namespace Jal.Router.Extensions
 {
     public static class MessageContextExtensions
     {
+        public static TResult Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, string id, string operationid, Dictionary<string, string> headers = null)
+        {
+            var options = context.CreateOptions(endpointname, id, operationid, headers);
+
+            options.Identity.ReplyToRequestId = Guid.NewGuid().ToString();
+
+            return context.Reply<TContent, TResult>(content, options);
+        }
+
+        public static TResult Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, string id, Dictionary<string, string> headers = null)
+        {
+            var options = context.CreateOptions(endpointname, id, headers);
+
+            options.Identity.ReplyToRequestId = Guid.NewGuid().ToString();
+
+            return context.Reply<TContent, TResult>(content, context.CreateOptions(endpointname, id, headers));
+        }
+
+        public static TResult Send<TContent, TResult>(this MessageContext context, TContent content, string endpointname, string id, string operationid, string sagaid, Dictionary<string, string> headers = null)
+        {
+            var options = context.CreateOptions(endpointname, id, operationid, sagaid, headers);
+
+            options.Identity.ReplyToRequestId = Guid.NewGuid().ToString();
+
+            return context.Reply<TContent, TResult>(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, operationid, sagaid, headers));
+        }
+
         public static void FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, string id, string operationid, string sagaid, Dictionary<string, string> headers = null)
         {
             context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, operationid, sagaid, headers));

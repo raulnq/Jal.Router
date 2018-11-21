@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
@@ -7,7 +6,6 @@ using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Core;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {

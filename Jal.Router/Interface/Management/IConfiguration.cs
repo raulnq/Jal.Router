@@ -30,7 +30,7 @@ namespace Jal.Router.Interface.Management
         Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; set; }
-        Type BusInterceptorType { get; }
+        Type BusInterceptorType { get; set; }
         Type MessageSerializerType { get; }
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }

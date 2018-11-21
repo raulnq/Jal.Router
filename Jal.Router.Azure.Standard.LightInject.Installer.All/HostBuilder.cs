@@ -18,6 +18,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.Impl.MonitoringTask;
+using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -85,6 +86,12 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
+        public IHostBuilder UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
+        {
+            _parameter.BusInterceptorType = typeof(IBusInterceptor);
+            return this;
+        }
+
         public IHostBuilder Using(Action<IConfiguration> setup)
         {
             _parameter.Setup = setup;
@@ -132,7 +139,12 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             {
                 _parameter.Container.Register(typeof(IRouterInterceptor), _parameter.RouterInterceptorType, _parameter.RouterInterceptorType.FullName, new PerContainerLifetime());
             }
-            
+
+            if (_parameter.BusInterceptorType != null)
+            {
+                _parameter.Container.Register(typeof(IBusInterceptor), _parameter.BusInterceptorType, _parameter.BusInterceptorType.FullName, new PerContainerLifetime());
+            }
+
             var host = _parameter.Container.GetInstance<IHost>();
 
             host.Configuration.UsingAzureServiceBus();
@@ -166,6 +178,11 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 host.Configuration.RouterInterceptorType = _parameter.RouterInterceptorType;
             }
 
+
+            if (_parameter.BusInterceptorType != null)
+            {
+                host.Configuration.BusInterceptorType = _parameter.BusInterceptorType;
+            }
 
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
 

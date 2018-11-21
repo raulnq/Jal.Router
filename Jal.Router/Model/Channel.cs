@@ -59,7 +59,7 @@ namespace Jal.Router.Model
 
             if (!string.IsNullOrWhiteSpace(ToReplyPath))
             {
-                description = $"- {description}/{ToReplyPath}";
+                description = $"{description} - /{ToReplyPath}";
             }
 
             if (!string.IsNullOrWhiteSpace(ToReplySubscription))

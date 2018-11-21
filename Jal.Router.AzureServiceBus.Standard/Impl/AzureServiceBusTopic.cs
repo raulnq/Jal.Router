@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
@@ -99,7 +98,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
-                Console.WriteLine($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {args.Exception}");
+                var context = args.ExceptionReceivedContext;
+
+                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+
                 return Task.CompletedTask;
             };
 

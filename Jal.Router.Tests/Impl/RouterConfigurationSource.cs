@@ -164,7 +164,7 @@ namespace Jal.Router.Tests.Impl
                 .To(y => y.AddPublishSubscriberChannel<AppSettingValueFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appdtopic"));
 
             RegisterHandler<IRequestResponseHandler<ResponseToSend>>("appd")
-                .ToListen(x => x.AddTopic<AppSettingValueFinder>("appdtopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
+                .ToListen(x => x.AddSubscriptionToTopic<AppSettingValueFinder>("appdtopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
                 .ForMessage<ResponseToSend>().Using<ResponseToSendAppDHandler>(x =>
                 {
                     x.With(((request, handler, context) => handler.Handle(request, context)));

@@ -1,11 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl
 {
