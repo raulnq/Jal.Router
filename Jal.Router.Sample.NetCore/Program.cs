@@ -167,7 +167,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_toreplyqueue, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<ToReplyHandler>(x =>
+            .ForMessage<Message>().Use<ToReplyHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -177,7 +177,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_fromreplyqueue, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<FromReplyHandler>(x =>
+            .ForMessage<Message>().Use<FromReplyHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -195,7 +195,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuetopublishtopic, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<ToPublishHandler>(x =>
+            .ForMessage<Message>().Use<ToPublishHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -205,7 +205,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddSubscriptionToTopic(_topicpublishedfromqueue, _subscription, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<FromPublishHandler>(x =>
+            .ForMessage<Message>().Use<FromPublishHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -221,7 +221,7 @@ namespace Jal.Router.Sample.NetCore
                 x.AddQueue(_handlingtwoqueuesinonehandlera, config.ConnectionString);
                 x.AddQueue(_handlingtwoqueuesinonehandlerb, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<HandlingTwoQueuesInOneHandler>(x =>
+            .ForMessage<Message>().Use<HandlingTwoQueuesInOneHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -231,7 +231,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbyonehandler, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByOneHandler>(x =>
+            .ForMessage<Message>().Use<QueueListenByOneHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -241,7 +241,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbytwohandlers, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByTwoAHandlers>(x =>
+            .ForMessage<Message>().Use<QueueListenByTwoAHandlers>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -251,7 +251,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbytwohandlers, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByTwoBHandlers>(x =>
+            .ForMessage<Message>().Use<QueueListenByTwoBHandlers>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -259,9 +259,9 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler<IMessageHandler<Message>>(_topiclistenbyonehandler + "_handler")
             .ToListen(x =>
             {
-                x.AddPublishSubscribeChannel(_topiclistenbyonehandler, _subscription, config.ConnectionString);
+                x.AddSubscriptionToPublishSubscribeChannel(_topiclistenbyonehandler, _subscription, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<TopicListenByOneHandler>(x =>
+            .ForMessage<Message>().Use<TopicListenByOneHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -271,7 +271,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbyonehandlerwithwhen, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByOneHandler>(x =>
+            .ForMessage<Message>().Use<QueueListenByOneHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             }).When(x=>x.Headers.ContainsKey("test"));
@@ -281,7 +281,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbyonehandlerwithmiddleware, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByOneHandler>(x =>
+            .ForMessage<Message>().Use<QueueListenByOneHandler>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             }).UseMiddleware(x => x.Add<Middleware>());
@@ -291,7 +291,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbyonehandlerwithexception, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByOneHandlerWithException>(x =>
+            .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             }).OnErrorSendFailedMessageTo(_errorqueueendpoint);
@@ -301,11 +301,11 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_queuelistenbyonehandlerwithexceptionandretry, config.ConnectionString);
             })
-            .ForMessage<Message>().Using<QueueListenByOneHandlerWithException>(x =>
+            .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint").Using(new LinearRetryPolicy(5,3))
+            .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint").Use(new LinearRetryPolicy(5,3))
             .OnErrorSendFailedMessageTo(_errorqueueendpoint); 
 
             RegisterEndPoint(_errorqueueendpoint)
@@ -319,7 +319,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterSaga<Data>("saga", x => {
                 x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("start")
                 .ToListen(y => y.AddQueue(_queuestart, config.ConnectionString))
-                .ForMessage<Message>().Using<StartHandler>(y => {
+                .ForMessage<Message>().Use<StartHandler>(y => {
                     y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
             },
@@ -327,7 +327,7 @@ namespace Jal.Router.Sample.NetCore
                 {
                     x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("continue")
                     .ToListen(y => y.AddQueue(_queuecontinue, config.ConnectionString))
-                    .ForMessage<Message>().Using<ContinueHandler>(y =>
+                    .ForMessage<Message>().Use<ContinueHandler>(y =>
                     {
                         y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "CONTINUE");
                     });
@@ -336,7 +336,7 @@ namespace Jal.Router.Sample.NetCore
                 {
                     x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("end")
                     .ToListen(y => y.AddQueue(_queueend, config.ConnectionString))
-                    .ForMessage<Message>().Using<EndHandler>(y =>
+                    .ForMessage<Message>().Use<EndHandler>(y =>
                     {
                         y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data),"END");
                     });

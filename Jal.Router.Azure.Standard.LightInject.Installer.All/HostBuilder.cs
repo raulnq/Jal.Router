@@ -92,7 +92,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder Using(Action<IConfiguration> setup)
+        public IHostBuilder Use(Action<IConfiguration> setup)
         {
             _parameter.Setup = setup;
             return this;
@@ -170,7 +170,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
             {
-                host.Configuration.UsingApplicationInsights();
+                host.Configuration.UseApplicationInsights();
             }
 
             if (_parameter.RouterInterceptorType != null)
@@ -186,7 +186,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
 
-            host.Configuration.UsingShutdownWatcher<ShutdownFileWatcher>();
+            host.Configuration.UseShutdownWatcher<ShutdownFileWatcher>();
 
             if (_parameter.Setup != null)
             {

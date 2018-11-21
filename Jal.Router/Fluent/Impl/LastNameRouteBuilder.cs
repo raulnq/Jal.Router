@@ -64,7 +64,7 @@ namespace Jal.Router.Fluent.Impl
             });
         }
 
-        public void AddPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
+        public void AddSubscriptionToPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {

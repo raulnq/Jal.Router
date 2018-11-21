@@ -64,7 +64,7 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("Start has already been called");
             }
 
-            _logger.Log($"Starting {Configuration.ApplicationName}");
+            _logger.Log($"Starting Host");
 
             _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
 
@@ -75,6 +75,8 @@ namespace Jal.Router.Impl.Management
             _watcher.Start(_cancellationtokensource);
 
             _state = StateStarted;
+
+            _logger.Log($"Host started");
 
             return Task.FromResult(0);
         }
@@ -109,11 +111,13 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("The host has not yet started");
             }
 
-            _logger.Log($"Stopping {Configuration.ApplicationName}");
+            _logger.Log($"Stopping Host");
 
             Shutdown();
 
             _watcher.Stop();
+
+            _logger.Log($"Host stopped");
 
             _cancellationtokensource.Dispose();
 

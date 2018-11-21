@@ -6,7 +6,7 @@ namespace Jal.Router.ApplicationInsights.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static void UsingApplicationInsights(this IConfiguration configuration)
+        public static void UseApplicationInsights(this IConfiguration configuration)
         {
             configuration.AddOutboundMiddleware<BusLogger>();
 

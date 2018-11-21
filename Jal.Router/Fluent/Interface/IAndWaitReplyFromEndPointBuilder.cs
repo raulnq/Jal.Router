@@ -7,7 +7,7 @@ namespace Jal.Router.Fluent.Interface
     {
         void AndWaitReplyFromPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, int timeout = 60)
             where TValueFinder : IValueFinder;
-        void AndWaitReplyFromPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider, int timeout = 60)
+        void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider, int timeout = 60)
             where TValueFinder : IValueFinder;
     }
 }

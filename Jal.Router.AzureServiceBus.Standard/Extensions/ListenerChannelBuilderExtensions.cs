@@ -14,7 +14,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
         public static void AddSubscriptionToTopic(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
         {
-            builder.AddPublishSubscribeChannel(path, subscription, connectionstring);
+            builder.AddSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring);
         }
         public static void AddQueue<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
         {
@@ -22,7 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
         public static void AddSubscriptionToTopic<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
         {
-            builder.AddPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
+            builder.AddSubscriptionToPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
         }
     }
 }

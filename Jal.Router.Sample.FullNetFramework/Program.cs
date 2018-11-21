@@ -72,7 +72,7 @@ namespace Jal.Router.Sample.FullNetFramework
 
                 RegisterHandler<IMessageHandler>("handler")
                     .ToListen(y=>y.AddQueue<AppSettingValueFinder>("testqueue", x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
-                .ForMessage<Message>().Using<MessageHandler>(x =>
+                .ForMessage<Message>().Use<MessageHandler>(x =>
                 {
                     x.With(((request, handler, context) => handler.Handle(request)));
                 });

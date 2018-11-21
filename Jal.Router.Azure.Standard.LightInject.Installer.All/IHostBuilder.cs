@@ -16,7 +16,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         IHostBuilder UsingHeartBeatMonitor(int frequency);
         IHostBuilder UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IHostBuilder UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        IHostBuilder Using(Action<IConfiguration> setup);
+        IHostBuilder Use(Action<IConfiguration> setup);
         IHost Build();
     }
 }

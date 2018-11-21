@@ -24,7 +24,7 @@ namespace Jal.Router.Extensions
             builder.AddPointToPointChannel<NullValueFinder>(path, provider);
         }
 
-        public static void AddPublishSubscribeChannel(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
+        public static void AddSubscriptionToPublishSubscribeChannel(this IListenerChannelBuilder builder, string path, string subscription, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -41,7 +41,7 @@ namespace Jal.Router.Extensions
 
             Func<IValueFinder, string> provider = x => connectionstring;
 
-            builder.AddPublishSubscribeChannel<NullValueFinder>(path, subscription, provider);
+            builder.AddSubscriptionToPublishSubscribeChannel<NullValueFinder>(path, subscription, provider);
         }
     }
 }

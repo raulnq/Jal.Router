@@ -7,14 +7,14 @@ namespace Jal.Router.AzureStorage.Extensions
     {
         public static void UsingAzureSagaStorage(this IConfiguration configuration)
         {
-            configuration.UsingSagaStorage<AzureSagaStorage>();
+            configuration.UseSagaStorage<AzureSagaStorage>();
 
             configuration.AddStartupTask<AzureSagaStorageStartupTask>();
         }
 
         public static void UsingAzureMessageStorage(this IConfiguration configuration)
         {
-            configuration.UsingMessageStorage<AzureMessageStorage>();
+            configuration.UseMessageStorage<AzureMessageStorage>();
 
             configuration.AddStartupTask<AzureMessageStorageStartupTask>();
         }

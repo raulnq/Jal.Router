@@ -35,20 +35,20 @@ namespace Jal.Router.Interface.Management
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
-        void UsingChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
-        void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
-        void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
-        void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
-        void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
-        void UsingMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
-        void UsingSagaStorage<TStorage>() where TStorage : ISagaStorage;
-        void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
+        void UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
+        void UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
+        void UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
+        void UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
+        void UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
+        void UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
+        void UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
+        void UseSagaStorage<TStorage>() where TStorage : ISagaStorage;
+        void UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
         void AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
-        void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
-        void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        void UsingMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
+        void UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
+        void UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
+        void UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
         void AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask;
         void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;

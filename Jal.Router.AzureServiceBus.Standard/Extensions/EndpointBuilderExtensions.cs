@@ -40,12 +40,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
         public static void AndWaitReplyFromSubscription(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
         {
-            builder.AndWaitReplyFromPublishSubscribeChannel(path, subscription, connectionstring, timeout);
+            builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring, timeout);
         }
 
         public static void AndWaitReplyFromSubscription<TExtractorConectionString>(this IAndWaitReplyFromEndPointBuilder builder, Func<IValueFinder, string> connectionstringextractor, string path, string subscription, int timeout = 60) where TExtractorConectionString : IValueFinder
         {
-            builder.AndWaitReplyFromPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor, timeout);
+            builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor, timeout);
         }
     }
 }
