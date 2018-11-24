@@ -7,7 +7,7 @@ namespace Jal.Router.Model.Management
             Path = path;
         }
 
-        public string Path { get; set; }
+        public string Path { get; }
 
         public long MessageCount { get; set; }
 

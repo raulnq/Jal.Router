@@ -77,26 +77,28 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, SubscriptionToPublishSubscribeChannelRule rule)
+        public bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    namespaceManager.GetSubscription(path, subscription);
+                    namespaceManager.GetSubscription(channel.Path, channel.Subscription);
 
                     return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var subscriptiondescription = new SubscriptionDescription(path, subscription)
+                    var subscriptiondescription = new SubscriptionDescription(channel.Path, channel.Subscription)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
 
                         LockDuration = TimeSpan.FromMinutes(5),
                     };
+
+                    var rule = channel.Rules.FirstOrDefault();
 
                     if (rule!=null)
                     {
@@ -117,21 +119,21 @@ namespace Jal.Router.AzureServiceBus.Impl
             return false;
         }
 
-        public bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path)
+        public bool CreateIfNotExist(PublishSubscribeChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    namespaceManager.GetTopic(path);
+                    namespaceManager.GetTopic(channel.Path);
 
                     return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var topicDescription = new TopicDescription(path)
+                    var topicDescription = new TopicDescription(channel.Path)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
 
@@ -149,16 +151,16 @@ namespace Jal.Router.AzureServiceBus.Impl
 
 
 
-        public PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string path)
+        public PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    var entity = namespaceManager.GetTopic(path);
-                    var info = new PublishSubscribeChannelInfo(path)
+                    var entity = namespaceManager.GetTopic(channel.Path);
+                    var info = new PublishSubscribeChannelInfo(channel.Path)
                     {
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
@@ -178,16 +180,16 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription)
+        public SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    var entity = namespaceManager.GetSubscription(path, subscription);
-                    var info = new SubscriptionToPublishSubscribeChannelInfo(subscription, path)
+                    var entity = namespaceManager.GetSubscription(channel.Path, channel.Subscription);
+                    var info = new SubscriptionToPublishSubscribeChannelInfo(channel.Subscription, channel.Path)
                     {
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
@@ -205,17 +207,17 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string path)
+        public PointToPointChannelInfo GetInfo(PointToPointChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    var entity = namespaceManager.GetQueue(path);
+                    var entity = namespaceManager.GetQueue(channel.Path);
 
-                    var info = new PointToPointChannelInfo(path)
+                    var info = new PointToPointChannelInfo(channel.Path)
                     {
                         DeadLetterMessageCount = entity.MessageCountDetails.DeadLetterMessageCount,
                         MessageCount = entity.MessageCountDetails.ActiveMessageCount,
@@ -234,21 +236,21 @@ namespace Jal.Router.AzureServiceBus.Impl
             return null;
         }
 
-        public bool CreateIfNotExistPointToPointChannel(string connectionstring, string path)
+        public bool CreateIfNotExist(PointToPointChannel channel)
         {
-            var namespaceManager = GetNamespaceManager(connectionstring);
+            var namespaceManager = GetNamespaceManager(channel.ConnectionString);
 
             if (namespaceManager != null)
             {
                 try
                 {
-                    namespaceManager.GetQueue(path);
+                    namespaceManager.GetQueue(channel.Path);
 
                     return false;
                 }
                 catch (MessagingEntityNotFoundException)
                 {
-                    var queueDescription = new QueueDescription(path)
+                    var queueDescription = new QueueDescription(channel.Path)
                     {
                         DefaultMessageTimeToLive = TimeSpan.FromDays(14),
                         LockDuration = TimeSpan.FromMinutes(5),

@@ -4,16 +4,16 @@ namespace Jal.Router.Interface.Management
 {
     public interface IChannelManager
     {
-        bool CreateIfNotExistSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription, SubscriptionToPublishSubscribeChannelRule rule);
+        bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel);
 
-        bool CreateIfNotExistPublishSubscribeChannel(string connectionstring, string path);
+        bool CreateIfNotExist(PublishSubscribeChannel channel);
 
-        bool CreateIfNotExistPointToPointChannel(string connectionstring, string path);
+        bool CreateIfNotExist(PointToPointChannel channel);
 
-        PublishSubscribeChannelInfo GetPublishSubscribeChannel(string connectionstring, string path);
+        PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel);
 
-        PointToPointChannelInfo GetPointToPointChannel(string connectionstring, string path);
+        PointToPointChannelInfo GetInfo(PointToPointChannel channel);
 
-        SubscriptionToPublishSubscribeChannelInfo GetSubscriptionToPublishSubscribeChannel(string connectionstring, string path, string subscription);
+        SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel);
     }
 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Jal.Router.Tests</RootNamespace>
     <AssemblyName>Jal.Router.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -125,13 +125,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Installer\Jal.Router.AzureServiceBus.Installer.csproj">
-      <Project>{49513199-2f7a-41c1-9f4b-42974bdcdeef}</Project>
-      <Name>Jal.Router.AzureServiceBus.Installer</Name>
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard.LightInject.Installer\Jal.Router.AzureServiceBus.Standard.LightInject.Installer.csproj">
+      <Project>{e60683d0-4c84-4ba1-a322-55794d7ff02c}</Project>
+      <Name>Jal.Router.AzureServiceBus.Standard.LightInject.Installer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Jal.Router.AzureServiceBus\Jal.Router.AzureServiceBus.csproj">
-      <Project>{f016307f-797e-4fa0-b671-baea91188be9}</Project>
-      <Name>Jal.Router.AzureServiceBus</Name>
+    <ProjectReference Include="..\Jal.Router.AzureServiceBus.Standard\Jal.Router.AzureServiceBus.Standard.csproj">
+      <Project>{8c4085fd-2233-492d-84a3-4ce655ba9510}</Project>
+      <Name>Jal.Router.AzureServiceBus.Standard</Name>
     </ProjectReference>
     <ProjectReference Include="..\Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj">
       <Project>{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}</Project>

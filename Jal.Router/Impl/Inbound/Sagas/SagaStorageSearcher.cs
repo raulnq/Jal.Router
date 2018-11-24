@@ -3,6 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Inbound;
+using Jal.Router.Model.Inbound.Sagas;
 
 namespace Jal.Router.Impl.Inbound.Sagas
 {

@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _channel = channel;
         }
 
-        public void AndWaitReplyFromPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+        public void AndWaitReplyFromPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -25,15 +25,17 @@ namespace Jal.Router.Fluent.Impl
             }
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringExtractor = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
 
-            _channel.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+            _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
+
+            _channel.Type = ChannelType.RequestReplyToPointToPoint;
 
             _channel.ToReplyTimeOut = timeout;
         }
 
-        public void AndWaitReplyFromPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription,
-            Func<IValueSettingFinder, string> connectionstringextractor, int timeout = 60) where TExtractorConectionString : IValueSettingFinder
+        public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription,
+            Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -50,11 +52,13 @@ namespace Jal.Router.Fluent.Impl
 
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringExtractor = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
 
-            _channel.ReplyConnectionStringExtractorType = typeof(TExtractorConectionString);
+            _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
 
             _channel.ToReplySubscription = subscription;
+
+            _channel.Type = ChannelType.RequestReplyToSubscriptionToPublishSubscriber;
 
             _channel.ToReplyTimeOut = timeout;
         }

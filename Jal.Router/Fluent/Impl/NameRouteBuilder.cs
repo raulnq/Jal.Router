@@ -29,7 +29,9 @@ namespace Jal.Router.Fluent.Impl
         {
             _channelbuilder?.Invoke(this);
 
-            var value = new Route<TContent, THandler>(_name) { Channels = _channels };
+            var value = new Route<TContent, THandler>(_name);
+
+            value.Channels.AddRange(_channels);
 
             var builder = new HandlerBuilder<TContent, THandler>(value);
 
@@ -38,7 +40,7 @@ namespace Jal.Router.Fluent.Impl
             return builder;
         }
 
-        public void AddPointToPointChannel<TExtractorConectionString>(string path, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        public void AddPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -50,17 +52,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstringextractor));
             }
 
-            _channels.Add(new Channel
+            _channels.Add(new Channel(ChannelType.PointToPoint)
             {
                 ToPath = path,
 
-                ToConnectionStringExtractor = connectionstringextractor,
+                ToConnectionStringProvider = connectionstringextractor,
 
-                ConnectionStringExtractorType = typeof(TExtractorConectionString)
+                ConnectionStringValueFinderType = typeof(TExtractorConectionString)
             });
         }
 
-        public void AddPublishSubscribeChannel<TExtractorConectionString>(string path, string subscription, Func<IValueSettingFinder, string> connectionstringextractor) where TExtractorConectionString : IValueSettingFinder
+        public void AddSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -75,13 +77,13 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel
+            _channels.Add(new Channel(ChannelType.PublishSubscriber)
             {
                 ToPath = path,
 
-                ToConnectionStringExtractor = connectionstringextractor,
+                ToConnectionStringProvider = connectionstringextractor,
 
-                ConnectionStringExtractorType = typeof(TExtractorConectionString),
+                ConnectionStringValueFinderType = typeof(TValueFinder),
 
                 ToSubscription = subscription
             });

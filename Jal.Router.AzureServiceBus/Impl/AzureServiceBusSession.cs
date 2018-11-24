@@ -4,6 +4,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
+using Jal.Router.Model.Outbound;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Jal.Router.AzureServiceBus.Impl
@@ -11,75 +12,97 @@ namespace Jal.Router.AzureServiceBus.Impl
     public class AzureServiceBusSession : AbstractChannel, IRequestReplyChannel
     {
         public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            : base("request replay",factory, configuration, logger)
+            : base(factory, configuration, logger)
         {
 
         }
 
-        public override MessageContext ReceiveOnQueue(Channel channel, MessageContext context, IMessageAdapter adapter)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPointToPointChannelMethodFactory(SenderMetadata metadata)
         {
-            var client = QueueClient.CreateFromConnectionString(channel.ToReplyConnectionString, channel.ToReplyPath);
-
-            var messagesession = client.AcceptMessageSession(context.Identity.ReplyToRequestId);
-
-            var message = channel.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(channel.ToReplyTimeOut)) : messagesession.Receive();
-
-            MessageContext outputcontext = null;
-
-            if (message != null)
+            return (context, adapter) =>
             {
-                outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+                var client = QueueClient.CreateFromConnectionString(metadata.ToReplyConnectionString, metadata.ToReplyPath);
 
-                message.Complete();
-            }
+                var messagesession = client.AcceptMessageSession(context.Identity.ReplyToRequestId);
 
-            messagesession.Close();
+                var message = metadata.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)) : messagesession.Receive();
 
-            client.Close();
+                MessageContext outputcontext = null;
 
-            return outputcontext;
+                if (message != null)
+                {
+                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+
+                    message.Complete();
+                }
+
+                messagesession.Close();
+
+                client.Close();
+
+                return outputcontext;
+            };
         }
 
-        public override MessageContext ReceiveOnTopic(Channel channel, MessageContext inputcontext, IMessageAdapter adapter)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscriberChannelMethodFactory(SenderMetadata metadata)
         {
-            var client = SubscriptionClient.CreateFromConnectionString(channel.ToReplyConnectionString, channel.ToReplyPath, channel.ToReplySubscription);
-
-            var messagesession = client.AcceptMessageSession(inputcontext.Identity.ReplyToRequestId);
-
-            var message = channel.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(channel.ToReplyTimeOut)) : messagesession.Receive();
-
-            MessageContext outputcontext = null;
-
-            if (message != null)
+            return (context, adapter) =>
             {
-                outputcontext = adapter.Read(message, inputcontext.ResultType, inputcontext.EndPoint.UseClaimCheck);
+                var client = SubscriptionClient.CreateFromConnectionString(metadata.ToReplyConnectionString, metadata.ToReplyPath, metadata.ToReplySubscription);
 
-                message.Complete();
-            }
+                var messagesession = client.AcceptMessageSession(context.Identity.ReplyToRequestId);
 
-            messagesession.Close();
+                var message = metadata.ToReplyTimeOut != 0 ? messagesession.Receive(TimeSpan.FromSeconds(metadata.ToReplyTimeOut)) : messagesession.Receive();
 
-            client.Close();
+                MessageContext outputcontext = null;
 
-            return outputcontext;
+                if (message != null)
+                {
+                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+
+                    message.Complete();
+                }
+
+                messagesession.Close();
+
+                client.Close();
+
+                return outputcontext;
+            };
         }
 
-        public override string Send(Channel channel, object message)
+        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
-            var queueclient = QueueClient.CreateFromConnectionString(channel.ToConnectionString, channel.ToPath);
+            return () => new object[] { QueueClient.CreateFromConnectionString(metadata.ToConnectionString, metadata.ToPath) };
+        }
 
-            var bm = message as BrokeredMessage;
-
-            if (bm != null)
+        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        {
+            return sender =>
             {
-                queueclient.Send(bm);
+                var client = sender[0] as QueueClient;
 
-                queueclient.Close();
+                client.Close();
+            };
+        }
 
-                return bm.MessageId;
-            }
+        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        {
+            return (sender, message) =>
+            {
+                var client = sender[0] as QueueClient;
 
-            return string.Empty;
+                var bm = message as BrokeredMessage;
+
+                if (bm != null)
+                {
+                    client.Send(bm);
+
+                    return bm.MessageId;
+                }
+
+                return string.Empty;
+            };
         }
     }
 }

@@ -7,17 +7,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
     {
         public static void UsingAzureServiceBus(this IConfiguration configuration)
         {
-            configuration.UsingPointToPointChannel<AzureServiceBusQueue>();
+            configuration.UsePointToPointChannel<AzureServiceBusQueue>();
 
-            configuration.UsingPublishSubscribeChannel<AzureServiceBusTopic>();
+            configuration.UsePublishSubscribeChannel<AzureServiceBusTopic>();
 
-            configuration.UsingRequestReplyChannel<AzureServiceBusSession>();
+            configuration.UseRequestReplyChannel<AzureServiceBusSession>();
 
-            configuration.UsingChannelManager<AzureServiceBusManager>();
+            configuration.UseChannelManager<AzureServiceBusManager>();
 
-            configuration.UsingMessageAdapter<MessageAdapter>();
+            configuration.UseMessageAdapter<MessageAdapter>();
 
-            configuration.UsingMessageSerializer<JsonMessageSerializer>();
+            configuration.UseMessageSerializer<JsonMessageSerializer>();
 
             configuration.ChannelProviderName = "Azure Service Bus";
         }

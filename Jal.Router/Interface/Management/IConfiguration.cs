@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.Model;
 using Jal.Router.Model.Management;
 
 namespace Jal.Router.Interface.Management
 {
     public interface IConfiguration
     {
+        Runtime Runtime { get; }
         IdentityConfiguration Identity { get; }
         StorageConfiguration Storage { get; set; }
         string ApplicationName { get; set; }
@@ -27,26 +30,26 @@ namespace Jal.Router.Interface.Management
         Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; set; }
-        Type BusInterceptorType { get; }
+        Type BusInterceptorType { get; set; }
         Type MessageSerializerType { get; }
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
-        void UsingChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
-        void UsingRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
-        void UsingPublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
-        void UsingPointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        void UsingChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
-        void UsingMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
-        void UsingMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
-        void UsingSagaStorage<TStorage>() where TStorage : ISagaStorage;
-        void UsingShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
-        void AddInboundMiddleware<TMiddleware>() where TMiddleware : Inbound.IMiddleware;
-        void AddOutboundMiddleware<TMiddleware>() where TMiddleware : Outbound.IMiddleware;
-        void UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
-        void UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        void UsingMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
-        void AddMonitoringTask<TMonitoringTask>(int interval) where TMonitoringTask : IMonitoringTask;
+        void UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
+        void UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
+        void UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
+        void UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
+        void UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
+        void UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
+        void UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
+        void UseSagaStorage<TStorage>() where TStorage : ISagaStorage;
+        void UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
+        void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
+        void AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
+        void UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
+        void UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
+        void UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
+        void AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask;
         void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         void AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;
         void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;

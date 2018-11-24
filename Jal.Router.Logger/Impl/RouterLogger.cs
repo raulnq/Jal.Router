@@ -1,13 +1,15 @@
 using System;
 using System.Diagnostics;
 using Common.Logging;
+using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Logger.Impl
 {
-    public class RouterLogger : IMiddleware
+    public class RouterLogger : IMiddleware<MessageContext>
     {
         private readonly ILog _log;
 
@@ -16,7 +18,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public void Execute(MessageContext context, Action<MessageContext, MiddlewareContext> next, MiddlewareContext middlewarecontext)
+        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -24,15 +26,15 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Router.cs, Route, {context.Identity.Id}] Start Call. Message arrived. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {context.Route?.Name} saga: {context.Saga?.Name} operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
+                _log.Info($"[Router.cs, Route, {context.Data.Identity.Id}] Start Call. Message arrived. id: {context.Data.Identity.Id} sagaid: {context.Data.SagaContext?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} retry: {context.Data.RetryCount} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.Identity.OperationId} parentid: {context.Data.Identity.ParentId}");
 
-                next(context, middlewarecontext);
+                next(context);
 
-                _log.Info($"[Router.cs, Route, {context.Identity.Id}] Message routed. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {context.Route?.Name} saga: {context.Saga?.Name} operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
+                _log.Info($"[Router.cs, Route, {context.Data.Identity.Id}] Message routed. id: {context.Data.Identity.Id} sagaid: {context.Data.SagaContext?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} retry: {context.Data.RetryCount} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.Identity.OperationId} parentid: {context.Data.Identity.ParentId}");
             }
             catch (Exception exception)
             {
-                _log.Error($"[Router.cs, Route, {context.Identity.Id}] Exception. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {context.Route?.Name} saga: {context.Saga?.Name} operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}", exception);
+                _log.Error($"[Router.cs, Route, {context.Data.Identity.Id}] Exception. id: {context.Data.Identity.Id} sagaid: {context.Data.SagaContext?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} retry: {context.Data.RetryCount} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.Identity.OperationId} parentid: {context.Data.Identity.ParentId}", exception);
 
                 throw;
             }
@@ -40,7 +42,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Router.cs, Route, {context.Identity.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Identity.Id} sagaid: {context.SagaContext?.Id} from: {context.Origin.From} origin: {context.Origin.Key} retry: {context.RetryCount} route: {context.Route?.Name} saga: {context.Saga?.Name} operationid: {context.Identity.OperationId} parentid: {context.Identity.ParentId}");
+                _log.Info($"[Router.cs, Route, {context.Data.Identity.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Data.Identity.Id} sagaid: {context.Data.SagaContext?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} retry: {context.Data.RetryCount} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.Identity.OperationId} parentid: {context.Data.Identity.ParentId}");
             }
         }
     }

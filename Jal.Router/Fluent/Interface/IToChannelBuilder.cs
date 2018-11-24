@@ -5,7 +5,10 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IToChannelBuilder
     {
-        IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path)
-    where TExtractorConnectionString : IValueSettingFinder;
+        IAndWaitReplyFromEndPointBuilder AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path)
+    where TValueFinder : IValueFinder;
+
+        IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel<TValue>(Func<IValueFinder, string> connectionstringprovider, string path)
+    where TValue : IValueFinder;
     }
 }

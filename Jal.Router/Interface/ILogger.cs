@@ -2,9 +2,9 @@ using System;
 
 namespace Jal.Router.Interface
 {
-    public interface ILogger<in TInfo>
+    public interface ILogger<in TMessage>
     {
-        void Log(TInfo info, DateTime datetime);
+        void Log(TMessage message, DateTime datetime);
     }
 
     public interface ILogger

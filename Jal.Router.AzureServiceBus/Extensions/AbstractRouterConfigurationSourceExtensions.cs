@@ -7,8 +7,8 @@ namespace Jal.Router.AzureServiceBus.Extensions
 {
     public static class AbstractRouterConfigurationSourceExtensions
     {
-        public static void RegisterQueue<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name, Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+        public static void RegisterQueue<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name, Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             configuration.RegisterPointToPointChannel<TExtractorConectionString>(name, connectionstringextractor);
         }
@@ -19,8 +19,8 @@ namespace Jal.Router.AzureServiceBus.Extensions
         }
 
         public static void RegisterTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name,
-            Func<IValueSettingFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueSettingFinder
+            Func<IValueFinder, string> connectionstringextractor)
+            where TExtractorConectionString : IValueFinder
         {
             configuration.RegisterPublishSubscriberChannel<TExtractorConectionString>(name, connectionstringextractor);
         }
@@ -31,8 +31,8 @@ namespace Jal.Router.AzureServiceBus.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string name, string path,
-            Func<IValueSettingFinder, string> connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
-            where TExtractorConectionString : IValueSettingFinder
+            Func<IValueFinder, string> connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
+            where TExtractorConectionString : IValueFinder
         {
             configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(name, path, connectionstring, rule);
         }

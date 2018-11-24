@@ -9,6 +9,8 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
     public class HostBuilderParameter
     {
         public Type RouterInterceptorType { get; set; }
+
+        public Type BusInterceptorType { get; set; }
         public Action<IConfiguration> Setup { get; set; }
         public ServiceContainer Container { get; set; }
         public IRouterConfigurationSource[] Sources { get; set; }
@@ -48,7 +50,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             MessageStorageName = "messages";
             TableNameSufix = DateTime.UtcNow.ToString("yyyyMM");
             ApplicationName = "App";
-            HeartBeatFrequency = 600000;
+            HeartBeatFrequency = 600;
         }
     }
 }

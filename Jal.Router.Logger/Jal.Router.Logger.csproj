@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with Common Logging</Description>
     <Copyright />
@@ -11,10 +11,12 @@
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
     <PackageTags />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
+    <PackageReference Include="Jal.ChainOfResponsability" Version="1.0.1" />
   </ItemGroup>
 
 

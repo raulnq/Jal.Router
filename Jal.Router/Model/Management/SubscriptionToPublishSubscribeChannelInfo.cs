@@ -8,9 +8,9 @@ namespace Jal.Router.Model.Management
             Path = path;
         }
 
-        public string Subscription { get; set; }
+        public string Subscription { get; }
 
-        public string Path { get; set; }
+        public string Path { get; }
 
         public long MessageCount { get; set; }
 

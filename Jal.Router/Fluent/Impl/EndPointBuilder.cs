@@ -21,11 +21,11 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IAndWaitReplyFromEndPointBuilder Add<TExtractorConnectionString>(Func<IValueSettingFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueSettingFinder
+        public IAndWaitReplyFromEndPointBuilder AddPointToPointChannel<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
         {
-            var channel = new Channel
+            var channel = new Channel(ChannelType.PointToPoint)
             {
-                ConnectionStringExtractorType = typeof(TExtractorConnectionString)
+                ConnectionStringValueFinderType = typeof(TExtractorConnectionString)
             };
 
             if (connectionstringextractor == null)
@@ -38,7 +38,33 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            channel.ToConnectionStringExtractor = connectionstringextractor;
+            channel.ToConnectionStringProvider = connectionstringextractor;
+
+            channel.ToPath = path;
+
+            _endpoint.Channels.Add(channel);
+
+            return new AndWaitReplyFromEndPointBuilder(channel);
+        }
+
+        public IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel<TExtractorConnectionString>(Func<IValueFinder, string> connectionstringextractor, string path) where TExtractorConnectionString : IValueFinder
+        {
+            var channel = new Channel(ChannelType.PublishSubscriber)
+            {
+                ConnectionStringValueFinderType = typeof(TExtractorConnectionString)
+            };
+
+            if (connectionstringextractor == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringextractor));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            channel.ToConnectionStringProvider = connectionstringextractor;
 
             channel.ToPath = path;
 

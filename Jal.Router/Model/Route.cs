@@ -19,17 +19,26 @@ namespace Jal.Router.Model
             StorageConfiguration = new StorageConfiguration();
         }
 
-        public IdentityConfiguration IdentityConfiguration { get; set; }
+        public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype) : this(name, contenttype, consumerinterfacetype)
+        {
+            Saga = saga;
+        }
 
-        public StorageConfiguration StorageConfiguration { get; set; }
+        public Saga Saga { get; }
 
-        public IList<Channel> Channels { get; set; }
+        public Action<object, Channel> RuntimeHandler { get; set; }
 
-        public Type ConsumerInterfaceType { get; set; }
+        public IdentityConfiguration IdentityConfiguration { get; }
+
+        public StorageConfiguration StorageConfiguration { get; }
+
+        public List<Channel> Channels { get; }
+
+        public Type ConsumerInterfaceType { get; }
 
         public string Name { get; set; }
 
-        public Type ContentType { get; set; }
+        public Type ContentType { get; }
 
         public Type RetryExceptionType { get; set; }
 
@@ -39,9 +48,9 @@ namespace Jal.Router.Model
 
         public string OnErrorEndPoint { get; set; }
 
-        public Func<IValueSettingFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
+        public Func<IValueFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
 
-        public IList<Type> MiddlewareTypes { get; set; }
+        public List<Type> MiddlewareTypes { get; }
 
         public string ForwardEndPoint { get; set; }
 
@@ -52,11 +61,16 @@ namespace Jal.Router.Model
 
     public class Route<TContent, TConsumer> : Route
     {
-        public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; set; }
+        public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
 
         public Type ConsumerType { get; set; }
 
         public Route(string name) : base(name, typeof(TContent), typeof(TConsumer))
+        {
+            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
+        }
+
+        public Route(Saga saga, string name) : base(saga, name, typeof(TContent), typeof(TConsumer))
         {
             RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
         }
