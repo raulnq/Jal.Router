@@ -54,11 +54,15 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandlerWithData<Message, Data>, EndHandler>(typeof(EndHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToReplyHandler>(typeof(ToReplyHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromReplyHandler>(typeof(FromReplyHandler).FullName, new PerContainerLifetime());
-            
+
+            container.Register<IMessageHandler<Message>, QueueToRead>(typeof(QueueToRead).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
+
             var host = container.GetInstance<IHost>();
             host.Configuration.UsingAzureServiceBus();
             host.Configuration.UsingAzureSagaStorage();
             host.Configuration.UsingAzureMessageStorage();
+
             //host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(1000);
             host.RunAndBlock();
@@ -67,6 +71,10 @@ namespace Jal.Router.Sample.NetCore
 
     public class RouterConfigurationSmokeTest : AbstractRouterConfigurationSource
     {
+        private readonly string _queueperformancetosend = "queueperformancetosend";
+
+        private readonly string _queueperformancetoread = "queueperformancetoread";
+
         private readonly string _toreplyqueue = "toreplyqueue";
 
         private readonly string _replyqueue = "replyqueue";
@@ -122,6 +130,10 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterOrigin("smoketestapp", "123");
 
+            this.RegisterQueue(_queueperformancetosend, config);
+
+            this.RegisterQueue(_queueperformancetoread, config);
+
             this.RegisterQueue(_replyqueue, config);
 
             this.RegisterQueue(_fromreplyqueue, config);
@@ -161,6 +173,31 @@ namespace Jal.Router.Sample.NetCore
             this.RegisterTopic(_topiclistenbyonehandler,  config);
 
             this.RegisterSubscriptionToTopic(_subscription, _topiclistenbyonehandler, config, "1=1");
+
+
+            RegisterHandler<IMessageHandler<Message>>(_queueperformancetoread + "_handler")
+            .ToListen(x =>
+            {
+                x.AddQueue(_queueperformancetoread, config.ConnectionString);
+            })
+            .ForMessage<Message>().Use<QueueToRead>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterHandler<IMessageHandler<Message>>(_queueperformancetosend + "_handler")
+            .ToListen(x =>
+            {
+                x.AddQueue(_queueperformancetosend, config.ConnectionString);
+            })
+            .ForMessage<Message>().Use<QueueToSend>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterEndPoint("queueperformanceendpoint")
+            .ForMessage<Message>()
+            .To(x => x.AddQueue(config.ConnectionString, _queueperformancetoread));
 
             RegisterHandler<IMessageHandler<Message>>(_toreplyqueue + "_handler")
             .ToListen(x =>
@@ -454,6 +491,29 @@ namespace Jal.Router.Sample.NetCore
         public override void HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+        }
+    }
+
+    public class QueueToRead : AbstractMessageHandler<Message>
+    {
+        public override void HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name);
+        }
+    }
+
+    public class QueueToSend : AbstractMessageHandler<Message>
+    {
+        public override void HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name);
+
+            for (int i = 0; i < 1000; i++)
+            {
+                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.Identity.Id, context.Identity.OperationId);
+            }
+
+            
         }
     }
 

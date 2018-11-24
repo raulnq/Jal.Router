@@ -40,7 +40,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return new HostBuilder(container, applicationname);
         }
 
-        public IHostBuilder UsingAzureServiceBus(IRouterConfigurationSource[] sources, string shutdownfile = "",
+        public IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, string shutdownfile = "",
             double autorenewtimeout = 60, int maxconcurrentcalls = 4)
         {
             _parameter.Sources = sources;
@@ -50,20 +50,20 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder UsingCommonLogging(ILog log)
+        public IHostBuilder UseCommonLogging(ILog log)
         {
             _parameter.Log = log;
             return this;
         }
 
-        public IHostBuilder UsingApplicationInsights(string applicationinsightskey="")
+        public IHostBuilder UseApplicationInsights(string applicationinsightskey="")
         {
             _parameter.ApplicationInsightsKey = applicationinsightskey;
             _parameter.UseApplicationInsights = true;
             return this;
         }
 
-        public IHostBuilder UsingAzureStorage(string connectionstring, string sagastoragename = "sagas",
+        public IHostBuilder UseAzureStorage(string connectionstring, string sagastoragename = "sagas",
             string messagestoragename = "messages", string tablenamesufix = "", string container="")
         {
             _parameter.StorageConnectionString = connectionstring;
@@ -74,19 +74,19 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder UsingHeartBeatMonitor(int frequency)
+        public IHostBuilder UseHeartBeatMonitor(int frequency)
         {
             _parameter.HeartBeatFrequency = frequency;
             return this;
         }
 
-        public IHostBuilder UsingRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
+        public IHostBuilder UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
         {
             _parameter.RouterInterceptorType = typeof(TRouterInterceptor);
             return this;
         }
 
-        public IHostBuilder UsingBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
+        public IHostBuilder UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
         {
             _parameter.BusInterceptorType = typeof(IBusInterceptor);
             return this;
