@@ -91,12 +91,12 @@ namespace Jal.Router.Sample.FullNetFramework
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSourceSample() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
-            container.RegisterAzureServiceBusRouter();
+            container.RegisterFrom<AzureServiceBusCompositionRoot>();
 
             container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
 
             var host = container.GetInstance<IHost>();
-            host.Configuration.UsingAzureServiceBus();
+            host.Configuration.UseAzureServiceBus();
             host.Run();
             Console.ReadLine();
         }

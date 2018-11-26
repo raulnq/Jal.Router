@@ -19,6 +19,8 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Interface.Outbound;
+using Jal.Router.AzureServiceBus.Standard.Model;
+using Jal.Router.AzureStorage.Model;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -40,13 +42,10 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return new HostBuilder(container, applicationname);
         }
 
-        public IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, string shutdownfile = "",
-            double autorenewtimeout = 60, int maxconcurrentcalls = 4)
+        public IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, Action<AzureServiceBusParameter> action=null)
         {
             _parameter.Sources = sources;
-            _parameter.ShutdownFile = shutdownfile;
-            _parameter.AutoRenewTimeout = autorenewtimeout;
-            _parameter.MaxConcurrentCalls = maxconcurrentcalls;
+            action?.Invoke(_parameter.AzureServiceBusParameter);
             return this;
         }
 
@@ -63,14 +62,10 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder UseAzureStorage(string connectionstring, string sagastoragename = "sagas",
-            string messagestoragename = "messages", string tablenamesufix = "", string container="")
+        public IHostBuilder UseAzureStorage(Action<AzureStorageParameter> action)
         {
-            _parameter.StorageConnectionString = connectionstring;
-            _parameter.SagaStorageName = sagastoragename;
-            _parameter.MessageStorageName = messagestoragename;
-            _parameter.TableNameSufix = tablenamesufix;
-            _parameter.StorageContainer = container;
+            action?.Invoke(_parameter.AzureStorageParameter);
+            _parameter.UseAzureStorage = true;
             return this;
         }
 
@@ -102,22 +97,22 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         {
             _parameter.Container.RegisterFrom<ServiceLocatorCompositionRoot>();
 
-            _parameter.Container.RegisterRouter(_parameter.Sources, _parameter.ShutdownFile);
+            _parameter.Container.RegisterRouter(_parameter.Sources);
 
-            _parameter.Container.RegisterAzureServiceBusRouter(_parameter.MaxConcurrentCalls, TimeSpan.FromMinutes(_parameter.AutoRenewTimeout));
+            _parameter.Container.RegisterFrom<AzureServiceBusCompositionRoot>();
 
             if (_parameter.Log != null)
             {
                 _parameter.Container.Register(x => _parameter.Log, new PerContainerLifetime());
 
-                _parameter.Container.RegisterRouterLogger();
+                _parameter.Container.RegisterFrom<CommonLoggingCompositionRoot>();
             }
 
             if (_parameter.UseApplicationInsights)
             {
                 _parameter.Container.Register<TelemetryClient>(new PerContainerLifetime());
 
-                _parameter.Container.RegisterApplicationInsights();
+                _parameter.Container.RegisterFrom<ApplicationInsightsCompositionRoot>();
             }
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
@@ -125,14 +120,9 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 TelemetryConfiguration.Active.InstrumentationKey = _parameter.ApplicationInsightsKey;
             }
 
-            if (!string.IsNullOrWhiteSpace(_parameter.StorageConnectionString))
+            if (_parameter.UseAzureStorage)
             {
-                _parameter.Container.RegisterAzureSagaStorage(_parameter.StorageConnectionString, _parameter.SagaStorageName, _parameter.MessageStorageName, _parameter.TableNameSufix);
-
-                if(!string.IsNullOrWhiteSpace(_parameter.StorageContainer))
-                {
-                    _parameter.Container.RegisterAzureMessageStorage(_parameter.StorageConnectionString, _parameter.StorageContainer);
-                }
+                _parameter.Container.RegisterFrom<AzureStorageCompositionRoot>();
             }
 
             if (_parameter.RouterInterceptorType != null)
@@ -147,23 +137,18 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             var host = _parameter.Container.GetInstance<IHost>();
 
-            host.Configuration.UsingAzureServiceBus();
+            host.Configuration.UseAzureServiceBus(_parameter.AzureServiceBusParameter);
 
             if (_parameter.Log != null)
             {
-                host.Configuration.UsingCommonLogging();
+                host.Configuration.UseCommonLogging();
             }
 
-            host.Configuration.ApplicationName = _parameter.ApplicationName;
+            host.Configuration.SetApplicationName(_parameter.ApplicationName);
 
-            if (!string.IsNullOrWhiteSpace(_parameter.StorageConnectionString))
+            if (_parameter.UseAzureStorage)
             {
-                host.Configuration.UsingAzureSagaStorage();
-
-                if (!string.IsNullOrWhiteSpace(_parameter.StorageContainer))
-                {
-                    host.Configuration.UsingAzureMessageStorage();
-                }
+                host.Configuration.UseAzureStorage(_parameter.AzureStorageParameter);
             }
 
             host.Configuration.Storage.IgnoreExceptionOnSaveMessage = true;
@@ -185,8 +170,6 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             }
 
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
-
-            host.Configuration.UseShutdownWatcher<ShutdownFileWatcher>();
 
             if (_parameter.Setup != null)
             {

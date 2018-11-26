@@ -5,10 +5,10 @@ using Microsoft.ApplicationInsights;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsPointToPointChannelInfoLogger : ILogger<PointToPointChannelInfo>
+    public class PointToPointChannelInfoLogger : ILogger<PointToPointChannelInfo>
     {
         private readonly TelemetryClient _client;
-        public ApplicationInsightsPointToPointChannelInfoLogger(TelemetryClient client)
+        public PointToPointChannelInfoLogger(TelemetryClient client)
         {
             _client = client;
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
@@ -10,6 +11,7 @@ using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
+
     public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
     {
 
@@ -109,26 +111,23 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var options = new MessageHandlerOptions(handler) {AutoComplete = false};
 
-            if (_maxconcurrentcalls > 0)
+            if (_parameter.MaxConcurrentCalls > 0)
             {
-                options.MaxConcurrentCalls = _maxconcurrentcalls;
+                options.MaxConcurrentCalls = _parameter.MaxConcurrentCalls;
             }
-            if (_autorenewtimeout != null)
+            if (_parameter.AutoRenewTimeoutInMinutes > 0)
             {
-                options.MaxAutoRenewDuration = _autorenewtimeout.Value;
+                options.MaxAutoRenewDuration = TimeSpan.FromMinutes(_parameter.AutoRenewTimeoutInMinutes);
             }
             return options;
         }
 
-        private readonly int _maxconcurrentcalls;
+        private readonly AzureServiceBusParameter _parameter;
 
-        private readonly TimeSpan? _autorenewtimeout;
-
-        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, ILogger logger, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null) 
+        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, ILogger logger, IParameterProvider provider) 
             : base(factory, configuration, logger)
         {
-            _maxconcurrentcalls = maxconcurrentcalls;
-            _autorenewtimeout = autorenewtimeout;
+            _parameter = provider.Get<AzureServiceBusParameter>();
         }
     }
 }

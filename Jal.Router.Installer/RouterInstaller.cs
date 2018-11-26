@@ -8,6 +8,7 @@ using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
+using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
@@ -28,27 +29,16 @@ namespace Jal.Router.Installer
     {
         private readonly Assembly[] _sourceassemblies;
 
-        private readonly string _shutdownfile;
-
         private readonly IRouterConfigurationSource[] _sources;
 
-        public RouterInstaller(string shutdownfile = "")
-        {
-            _shutdownfile = shutdownfile;
-        }
-
-        public RouterInstaller(Assembly[] sourceassemblies, string shutdownfile = "")
+        public RouterInstaller(Assembly[] sourceassemblies)
         {
             _sourceassemblies = sourceassemblies;
-
-            _shutdownfile = shutdownfile;
         }
 
-        public RouterInstaller(IRouterConfigurationSource[] sources, string shutdownfile = "")
+        public RouterInstaller(IRouterConfigurationSource[] sources)
         {
             _sources = sources;
-
-            _shutdownfile = shutdownfile;
         }
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
@@ -60,6 +50,8 @@ namespace Jal.Router.Installer
             container.Register(Component.For<ILogger>().ImplementedBy<Impl.ConsoleLogger>().LifestyleSingleton());
 
             container.Register(Component.For<IRouter>().ImplementedBy<Impl.Inbound.Router>().LifestyleSingleton());
+
+            container.Register(Component.For<IParameterProvider>().ImplementedBy<ParameterProvider>().LifestyleSingleton());
 
             container.Register(Component.For<IMessageRouter>().ImplementedBy<MessageRouter>().LifestyleSingleton());
             
@@ -123,7 +115,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMessageStorage>().ImplementedBy<NullMessageStorage>().LifestyleSingleton().Named(typeof(NullMessageStorage).FullName));
 
-            container.Register(Component.For<IShutdownWatcher>().Instance(new ShutdownFileWatcher(_shutdownfile)).LifestyleSingleton().Named(typeof(ShutdownFileWatcher).FullName));
+            container.Register(Component.For<IShutdownWatcher>().ImplementedBy<ShutdownFileWatcher>().LifestyleSingleton().Named(typeof(ShutdownFileWatcher).FullName));
 
             container.Register(Component.For(typeof(IRouterInterceptor)).ImplementedBy(typeof(NullRouterInterceptor)).Named(typeof(NullRouterInterceptor).FullName).LifestyleSingleton());
 

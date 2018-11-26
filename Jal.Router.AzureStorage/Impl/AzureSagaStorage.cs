@@ -16,31 +16,19 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureSagaStorage : AbstractSagaStorage
     {
-        private readonly string _connectionstring;
-
-        private readonly string _sagastoragename;
-
-        private readonly string _messagestorgename;
-
-        private readonly string _currenttablenamesufix;
-
         private readonly IComponentFactory _factory;
 
         private readonly IConfiguration _configuration;
 
-        public AzureSagaStorage(string connectionstring, IComponentFactory factory, IConfiguration configuration, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
-        {
-            _connectionstring = connectionstring;
+        private readonly AzureStorageParameter _parameter;
 
+        public AzureSagaStorage(IComponentFactory factory, IConfiguration configuration, IParameterProvider provider)
+        {
             _factory = factory;
 
             _configuration = configuration;
 
-            _sagastoragename = sagastoragename;
-
-            _messagestorgename = messagestorgename;
-
-            _currenttablenamesufix = tablenamesufix;
+            _parameter = provider.Get<AzureStorageParameter>();
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -56,11 +44,11 @@ namespace Jal.Router.AzureStorage.Impl
 
         public override SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "")
         {
-            var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
+            var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
             if (!string.IsNullOrWhiteSpace(sagastoragename))
             {
-                table = GetCloudTable(_connectionstring, $"{sagastoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{sagastoragename}");
             }
 
             var diff = (end - start).TotalDays;
@@ -131,11 +119,11 @@ namespace Jal.Router.AzureStorage.Impl
         {
             var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-            var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+            var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
             if (!string.IsNullOrWhiteSpace(messagestoragename))
             {
-                table = GetCloudTable(_connectionstring, $"{messagestoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{messagestoragename}");
             }
 
             var where = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sagaentity.Key);
@@ -164,11 +152,11 @@ namespace Jal.Router.AzureStorage.Impl
 
         public override MessageEntity[] GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "")
         {
-            var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+            var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
             if (!string.IsNullOrWhiteSpace(messagestoragename))
             {
-                table = GetCloudTable(_connectionstring, $"{messagestoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{messagestoragename}");
             }
 
             var diff = (int)(end - start).TotalDays;
@@ -234,7 +222,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var tablenamesufix = GetTableNameSufix(sagaid);
 
-                var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{tablenamesufix}");
+                var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{tablenamesufix}");
 
                 var record = new MessageRecord(sagaentity.Key, $"{messageentity.Name}_{Guid.NewGuid()}")
                 {
@@ -300,7 +288,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
-                    var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
+                    var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
                     var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
 
@@ -356,9 +344,9 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Saga.Name}";
 
-                var id = $"{partition}@{sagaentity.Key}@{_currenttablenamesufix}";
+                var id = $"{partition}@{sagaentity.Key}@{_parameter.TableSufix}";
                 
-                var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{_currenttablenamesufix}");
+                var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
                 var record = new SagaRecord(partition, sagaentity.Key)
                 {
@@ -393,7 +381,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{context.Route.Name}";
 
-                var table = GetCloudTable(_connectionstring, $"{_messagestorgename}{_currenttablenamesufix}");
+                var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
@@ -444,7 +432,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
-                    var table = GetCloudTable(_connectionstring, $"{_sagastoragename}{tablenamesufix}");
+                    var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
                     var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
 

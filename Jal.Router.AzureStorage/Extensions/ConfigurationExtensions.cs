@@ -1,22 +1,19 @@
 using Jal.Router.AzureStorage.Impl;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface.Management;
 
 namespace Jal.Router.AzureStorage.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static void UsingAzureSagaStorage(this IConfiguration configuration)
+        public static IConfiguration UseAzureStorage(this IConfiguration configuration, AzureStorageParameter parameter)
         {
-            configuration.UseSagaStorage<AzureSagaStorage>();
-
-            configuration.AddStartupTask<AzureSagaStorageStartupTask>();
-        }
-
-        public static void UsingAzureMessageStorage(this IConfiguration configuration)
-        {
-            configuration.UseMessageStorage<AzureMessageStorage>();
-
-            configuration.AddStartupTask<AzureMessageStorageStartupTask>();
+            return configuration
+                .UseSagaStorage<AzureSagaStorage>()
+                .AddStartupTask<AzureSagaStorageStartupTask>()
+                .UseMessageStorage<AzureMessageStorage>()
+                .AddStartupTask<AzureMessageStorageStartupTask>()
+                .AddParameter(parameter);
         }
     }
 }

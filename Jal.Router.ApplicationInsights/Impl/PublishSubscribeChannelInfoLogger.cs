@@ -5,10 +5,10 @@ using Microsoft.ApplicationInsights;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class ApplicationInsightsPublishSubscribeChannelInfoLogger : ILogger<PublishSubscribeChannelInfo>
+    public class PublishSubscribeChannelInfoLogger : ILogger<PublishSubscribeChannelInfo>
     {
         private readonly TelemetryClient _client;
-        public ApplicationInsightsPublishSubscribeChannelInfoLogger(TelemetryClient client)
+        public PublishSubscribeChannelInfoLogger(TelemetryClient client)
         {
             _client = client;
         }

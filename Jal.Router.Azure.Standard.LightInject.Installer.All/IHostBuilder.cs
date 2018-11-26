@@ -1,4 +1,6 @@
 ﻿using Common.Logging;
+using Jal.Router.AzureServiceBus.Standard.Model;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -9,14 +11,14 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
     public interface IHostBuilder
     {
-        IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, string shutdownfile="", double autorenewtimeout=60, int maxconcurrentcalls=4);
+        IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, Action<AzureServiceBusParameter> action=null);
         IHostBuilder UseCommonLogging(ILog log);
         IHostBuilder UseApplicationInsights(string applicationinsightskey="");
-        IHostBuilder UseAzureStorage(string connectionstring, string sagastoragename="sagas", string messagestoragename="messages", string tablenamesufix="", string container="");
+        IHostBuilder UseAzureStorage(Action<AzureStorageParameter> action = null);
         IHostBuilder UseHeartBeatMonitor(int frequency);
         IHostBuilder UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IHostBuilder UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
-        IHostBuilder Use(Action<IConfiguration> setup);
+        IHostBuilder Use(Action<IConfiguration> action);
         IHost Build();
     }
 }

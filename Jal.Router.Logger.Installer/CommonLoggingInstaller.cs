@@ -9,7 +9,7 @@ using Jal.Router.Model.Management;
 
 namespace Jal.Router.Logger.Installer
 {
-    public class RouterLoggerInstaller : IWindsorInstaller
+    public class CommonLoggingInstaller : IWindsorInstaller
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {

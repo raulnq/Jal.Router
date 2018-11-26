@@ -6,13 +6,12 @@ namespace Jal.Router.Logger.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static void UsingCommonLogging(this IConfiguration configuration)
+        public static IConfiguration UseCommonLogging(this IConfiguration configuration)
         {
-            configuration.AddOutboundMiddleware<BusLogger>();
-
-            configuration.AddInboundMiddleware<RouterLogger>();
-
-            configuration.AddLogger<BeatLogger, Beat>();
+            return configuration
+                .AddOutboundMiddleware<BusLogger>()
+                .AddInboundMiddleware<RouterLogger>()
+                .AddLogger<BeatLogger, Beat>();
         }
     }
 }

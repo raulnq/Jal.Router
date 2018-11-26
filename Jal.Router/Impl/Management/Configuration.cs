@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Sagas;
+using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.StartupTask;
@@ -20,9 +21,9 @@ namespace Jal.Router.Impl.Management
     {
         public Runtime Runtime { get; }
         public IdentityConfiguration Identity { get; }
-        public string ChannelProviderName { get; set; }
+        public string ChannelProviderName { get; private set; }
         public StorageConfiguration Storage { get; set; }
-        public string ApplicationName { get; set; }
+        public string ApplicationName { get; private set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
@@ -42,74 +43,98 @@ namespace Jal.Router.Impl.Management
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
-        public void UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler
+        public IDictionary<string, object> Parameters { get; private set; }
+        public IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler
         {
             ChannelShufflerType = typeof(TChannelShuffler);
+            return this;
         }
-        public void UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
+        public IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel
         {
             PublishSubscribeChannelType = typeof(TPublishSubscribeChannel);
+            return this;
         }
-        public void UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter
+        public IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter
         {
             MessageAdapterType = typeof(TMessageAdapter);
+            return this;
         }
 
-        public void UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage
+        public IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage
         {
             MessageStorageType = typeof(TMessageStorage);
+            return this;
         }
 
-        public void UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
+        public IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
         {
             PointToPointChannelType = typeof(TPointToPointChannel);
+            return this;
         }
 
-        public void UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel
+        public IConfiguration UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel
         {
             RequestReplyChannelType = typeof(TRequestReplyChannel);
+            return this;
         }
 
-        public void UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager
+        public IConfiguration UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager
         {
             ChannelManagerType = typeof(TChannelManager);
+            return this;
         }
 
-        public void UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher
+        public IConfiguration UseShutdownWatcher<TShutdownWatcher, TParameter>(TParameter parameter) where TShutdownWatcher : IShutdownWatcher
         {
             ShutdownWatcherType = typeof(TShutdownWatcher);
+
+            AddParameter(parameter);
+
+            return this;
         }
 
-        public void UseMessageSerializer<TMessageBodySerializer>() where TMessageBodySerializer : IMessageSerializer
+        public IConfiguration UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher
+        {
+            ShutdownWatcherType = typeof(TShutdownWatcher);
+            return this;
+        }
+
+        public IConfiguration UseMessageSerializer<TMessageBodySerializer>() where TMessageBodySerializer : IMessageSerializer
         {
             MessageSerializerType = typeof(TMessageBodySerializer);
+            return this;
         }
 
-        public void UseSagaStorage<TSagaStorage>() where TSagaStorage : ISagaStorage
+        public IConfiguration UseSagaStorage<TSagaStorage>() where TSagaStorage : ISagaStorage
         {
             SagaStorageType = typeof(TSagaStorage);
+            return this;
         }
 
-        public void AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
+        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
         {
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
+            return this;
         }
 
-        public void AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
+        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
         {
             OutboundMiddlewareTypes.Add(typeof(TMiddleware));
+            return this;
         }
 
-        public void UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
+        public IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
         {
             RouterInterceptorType = typeof(TRouterInterceptor);
+            return this;
         }
-        public void UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
+        public IConfiguration UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
         {
             BusInterceptorType = typeof(TBusInterceptor);
+            return this;
         }
 
-        public void AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>
+        public IConfiguration AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>
         {
             if (LoggerTypes.ContainsKey(typeof (TInfo)))
             {
@@ -120,20 +145,51 @@ namespace Jal.Router.Impl.Management
             {
                 LoggerTypes.Add(typeof(TInfo), new List<Type>() {typeof(TLogger)});
             }
+            return this;
         }
 
-        public void AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
+        public IConfiguration AddParameter<TParameter>(TParameter parameter)
+        {
+            var key = typeof(TParameter).FullName;
+
+            if (Parameters.ContainsKey(key))
+            {
+                Parameters[key] = parameter;
+            }
+            else
+            {
+                Parameters.Add(key, parameter);
+            }
+            return this;
+        }
+
+        public IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
         {
             MonitoringTaskTypes.Add(new TaskMetadata() {Type = typeof(TMonitoringTask), Interval = intervalinseconds*1000 });
+            return this;
         }
-        public void AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
+        public IConfiguration AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
         {
             StartupTaskTypes.Add(typeof(TStartupTask));
+            return this;
         }
 
-        public void AddShutdownTask<TShutdownTask>() where TShutdownTask : IShutdownTask
+        public IConfiguration AddShutdownTask<TShutdownTask>() where TShutdownTask : IShutdownTask
         {
             ShutdownTaskTypes.Add(typeof(TShutdownTask));
+            return this;
+        }
+
+        public IConfiguration SetChannelProviderName(string name)
+        {
+            ChannelProviderName = name;
+            return this;
+        }
+
+        public IConfiguration SetApplicationName(string name)
+        {
+            ApplicationName = name;
+            return this;
         }
 
         public Configuration()
@@ -155,6 +211,7 @@ namespace Jal.Router.Impl.Management
             StartupTaskTypes = new List<Type>();
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
+            Parameters = new Dictionary<string, object>();
             OutboundMiddlewareTypes = new List<Type>();
             AddLogger<BeatLogger, Beat>(); 
             AddStartupTask<StartupBeatLogger>();

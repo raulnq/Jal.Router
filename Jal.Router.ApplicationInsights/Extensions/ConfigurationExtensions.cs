@@ -6,19 +6,15 @@ namespace Jal.Router.ApplicationInsights.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static void UseApplicationInsights(this IConfiguration configuration)
+        public static IConfiguration UseApplicationInsights(this IConfiguration configuration)
         {
-            configuration.AddOutboundMiddleware<BusLogger>();
-
-            configuration.AddInboundMiddleware<RouterLogger>();
-
-            configuration.AddLogger<BeatLogger, Beat>();
-
-            configuration.AddLogger<ApplicationInsightsPointToPointChannelInfoLogger, PointToPointChannelInfo>();
-
-            configuration.AddLogger<ApplicationInsightsPublishSubscribeChannelInfoLogger, PublishSubscribeChannelInfo>();
-
-            configuration.AddLogger<ApplicationInsightsSubscriptionToPublishSubscribeChannelInfoLogger, SubscriptionToPublishSubscribeChannelInfo>();
+            return configuration
+                .AddOutboundMiddleware<BusLogger>()
+                .AddInboundMiddleware<RouterLogger>()
+                .AddLogger<BeatLogger, Beat>()
+                .AddLogger<PointToPointChannelInfoLogger, PointToPointChannelInfo>()
+                .AddLogger<PublishSubscribeChannelInfoLogger, PublishSubscribeChannelInfo>()
+                .AddLogger<SubscriptionToPublishSubscribeChannelInfoLogger, SubscriptionToPublishSubscribeChannelInfo>();
         }
     }
 }

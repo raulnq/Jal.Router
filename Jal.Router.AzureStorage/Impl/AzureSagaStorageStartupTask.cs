@@ -1,4 +1,5 @@
 using System;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
@@ -8,25 +9,14 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureSagaStorageStartupTask : IStartupTask
     {
-        private readonly string _connectionstring;
-
-        private readonly string _sagastoragename;
-
-        private readonly string _messagestorgename;
-
-        private readonly string _tablenamesufix;
 
         private readonly ILogger _logger;
 
-        public AzureSagaStorageStartupTask(ILogger logger, string connectionstring, string sagastoragename = "sagas", string messagestorgename = "messages", string tablenamesufix = "")
+        private readonly AzureStorageParameter _parameter;
+
+        public AzureSagaStorageStartupTask(ILogger logger, IParameterProvider provider)
         {
-            _connectionstring = connectionstring;
-
-            _tablenamesufix = tablenamesufix;
-
-            _sagastoragename = sagastoragename;
-
-            _messagestorgename = messagestorgename;
+            _parameter = provider.Get<AzureStorageParameter>();
 
             _logger = logger;
         }
@@ -44,17 +34,33 @@ namespace Jal.Router.AzureStorage.Impl
 
         public void Run()
         {
-            var sagatable = GetCloudTable(_connectionstring, $"{_sagastoragename}{_tablenamesufix}");
+            var sagatable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
             var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            _logger.Log($"Created {sagatable} table");
 
-            var messagetable = GetCloudTable(_connectionstring, $"{_messagestorgename}{_tablenamesufix}");
+            if(sagaresult)
+            {
+                _logger.Log($"Created {sagatable} table");
+            }
+            else
+            {
+                _logger.Log($"Table {sagatable} already exists");
+            }
+
+            var messagetable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
             var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            _logger.Log($"Created {messagetable} table");
+            if (messageresult)
+            {
+                _logger.Log($"Created {messagetable} table");
+            }
+            else
+            {
+                _logger.Log($"Table {messagetable} already exists");
+            }
+            
         }
     }
 }

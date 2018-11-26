@@ -1,5 +1,7 @@
 ﻿using System;
 using Common.Logging;
+using Jal.Router.AzureServiceBus.Standard.Model;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using LightInject;
@@ -9,48 +11,25 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
     public class HostBuilderParameter
     {
         public Type RouterInterceptorType { get; set; }
-
         public Type BusInterceptorType { get; set; }
         public Action<IConfiguration> Setup { get; set; }
         public ServiceContainer Container { get; set; }
         public IRouterConfigurationSource[] Sources { get; set; }
-
         public ILog Log { get; set; }
-
-        public int MaxConcurrentCalls { get; set; }
-
-        public double AutoRenewTimeout { get; set; }
-
-        public string ShutdownFile { get; set; }
-
-        public string StorageConnectionString { get; set; }
-
-        public string SagaStorageName { get; set; }
-
-        public string MessageStorageName { get; set; }
-
-        public string StorageContainer { get; set; }
-
-        public string TableNameSufix { get; set; }
-
         public string ApplicationName { get; set; }
-
         public int HeartBeatFrequency { get; set; }
-
         public bool UseApplicationInsights { get; set; }
-
         public string ApplicationInsightsKey { get; set; }
-
+        public AzureServiceBusParameter AzureServiceBusParameter { get; set; }
+        public AzureStorageParameter AzureStorageParameter { get; set; }
+        public bool UseAzureStorage { get; set; }
         public HostBuilderParameter()
         {
             Sources = new IRouterConfigurationSource[]{};
-            MaxConcurrentCalls = 4;
-            AutoRenewTimeout = 60;
-            SagaStorageName = "sagas";
-            MessageStorageName = "messages";
-            TableNameSufix = DateTime.UtcNow.ToString("yyyyMM");
             ApplicationName = "App";
             HeartBeatFrequency = 600;
+            AzureServiceBusParameter = new AzureServiceBusParameter();
+            AzureStorageParameter = new AzureStorageParameter();
         }
     }
 }

@@ -6,6 +6,7 @@ using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
+using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
@@ -25,10 +26,9 @@ namespace Jal.Router.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterRouter(this IServiceContainer container, IRouterConfigurationSource[] sources,
-            string shutdownfile = "")
+        public static void RegisterRouter(this IServiceContainer container, IRouterConfigurationSource[] sources)
         {
-            RegisterRouter(container, shutdownfile);
+            RegisterRouter(container);
 
             if (sources != null)
             {
@@ -41,9 +41,9 @@ namespace Jal.Router.LightInject.Installer
         }
 
 
-        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies, string shutdownfile="")
+        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies)
         {
-            RegisterRouter(container, shutdownfile);
+            RegisterRouter(container);
 
             if (sourceassemblies != null)
             {
@@ -65,13 +65,15 @@ namespace Jal.Router.LightInject.Installer
             }
         }
 
-        public static void RegisterRouter(this IServiceContainer container, string shutdownfile = "")
+        public static void RegisterRouter(this IServiceContainer container)
         {
             container.Register<IChannelShuffler, DefaultChannelShuffler>(typeof(DefaultChannelShuffler).FullName, new PerContainerLifetime());
 
             container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());
 
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
+
+            container.Register<IParameterProvider, ParameterProvider>(new PerContainerLifetime());
 
             container.Register<IHost, Host>(new PerContainerLifetime());
 
@@ -123,7 +125,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdownWatcher, ShutdownNullWatcher>(typeof (ShutdownNullWatcher).FullName,new PerContainerLifetime());
 
-            container.Register<IShutdownWatcher>(x => new ShutdownFileWatcher(shutdownfile),typeof (ShutdownFileWatcher).FullName, new PerContainerLifetime());
+            container.Register<IShutdownWatcher, ShutdownFileWatcher>(typeof (ShutdownFileWatcher).FullName, new PerContainerLifetime());
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 

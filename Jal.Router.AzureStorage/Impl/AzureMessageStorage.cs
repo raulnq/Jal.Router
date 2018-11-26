@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -8,14 +9,11 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureMessageStorage : IMessageStorage
     {
-        private readonly string _connectionstring;
+        private readonly AzureStorageParameter _parameter;
 
-        private readonly string _path;
-
-        public AzureMessageStorage(string connectionstring, string path)
+        public AzureMessageStorage(string connectionstring, string path, IParameterProvider provider)
         {
-            _connectionstring = connectionstring;
-            _path = path;
+            _parameter = provider.Get<AzureStorageParameter>();
         }
 
         private static CloudBlobContainer GetContainer(string connectionstring, string containername)
@@ -34,7 +32,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var container = GetContainer(_connectionstring, _path);
+                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
 
                 var blob = container.GetBlockBlobReference(id);
 
@@ -57,7 +55,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var container = GetContainer(_connectionstring, _path);
+                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
 
                 var blob = container.GetBlockBlobReference(id);
 

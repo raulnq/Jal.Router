@@ -1,31 +1,40 @@
 using System;
 using System.IO;
 using System.Threading;
+using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
-namespace Jal.Router.Impl.Management
+namespace Jal.Router.Impl.Management.ShutdownWatcher
 {
+    public class ShutdownFileWatcherParameter
+    {
+        public string File { get; set; }
+    }
+
     public class ShutdownFileWatcher : IShutdownWatcher
     {
         private FileSystemWatcher _watcher;
 
-        private readonly string _shutdownfile;
+        private readonly ShutdownFileWatcherParameter _parameter;
 
-        public ShutdownFileWatcher(string shutdownfile)
+        private readonly ILogger _log;
+
+        public ShutdownFileWatcher(IParameterProvider provider, ILogger log)
         {
-            _shutdownfile = shutdownfile;
+            _parameter = provider.Get<ShutdownFileWatcherParameter>();
+            _log = log;
         }
 
         public void Start(CancellationTokenSource tokensource)
         {
-            Console.WriteLine($"Starting shutdown file watcher, path: {_shutdownfile}");
+            _log.Log($"Starting shutdown file watcher, path: {_parameter.File}");
 
-            if (string.IsNullOrWhiteSpace(_shutdownfile))
+            if (string.IsNullOrWhiteSpace(_parameter.File))
             {
                 return;
             }
 
-            var directoryname = Path.GetDirectoryName(_shutdownfile);
+            var directoryname = Path.GetDirectoryName(_parameter.File);
 
             if (directoryname == null)
             {
@@ -38,16 +47,16 @@ namespace Jal.Router.Impl.Management
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception on shutdown file watcher: {ex}");
+                _log.Log($"Exception on the shutdown file watcher: {ex}");
 
                 throw;
             }
 
             FileSystemEventHandler onchange = (o, e) =>
             {
-                if (!string.IsNullOrWhiteSpace(_shutdownfile))
+                if (!string.IsNullOrWhiteSpace(_parameter.File))
                 {
-                    if (e.FullPath.IndexOf(Path.GetFileName(_shutdownfile), StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (e.FullPath.IndexOf(Path.GetFileName(_parameter.File), StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         tokensource?.Cancel();
                     }
@@ -60,7 +69,7 @@ namespace Jal.Router.Impl.Management
             _watcher.IncludeSubdirectories = false;
             _watcher.EnableRaisingEvents = true;
 
-            Console.WriteLine("Shutdown file watcher started correctly");
+            _log.Log("Shutdown file watcher started");
         }
 
         public void Stop()

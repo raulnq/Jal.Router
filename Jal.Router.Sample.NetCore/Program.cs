@@ -33,12 +33,9 @@ namespace Jal.Router.Sample.NetCore
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
-            container.RegisterAzureServiceBusRouter();
+            container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
-            container.RegisterAzureSagaStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "sagasmoke", "messagessmoke", DateTime.UtcNow.ToString("yyyyMMdd"));
-            container.RegisterAzureMessageStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "messages");
-            //container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
-            //container.Register<IMessageHandler, MessageHandlerB>(typeof(MessageHandlerB).FullName, new PerContainerLifetime());
+            container.RegisterFrom<AzureStorageCompositionRoot>();
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -59,12 +56,10 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
 
             var host = container.GetInstance<IHost>();
-            host.Configuration.UsingAzureServiceBus();
-            host.Configuration.UsingAzureSagaStorage();
-            host.Configuration.UsingAzureMessageStorage();
-
-            //host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
-            host.Configuration.AddMonitoringTask<HeartBeatLogger>(1000);
+            host.Configuration
+                .UseAzureServiceBus(new AzureServiceBusParameter() { MaxConcurrentCalls = 4, AutoRenewTimeoutInMinutes = 60 })
+                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName= "sagasmoke", MessageTableName= "messagessmoke", TableSufix= DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName= "messages" })
+                .AddMonitoringTask<HeartBeatLogger>(1000);
             host.RunAndBlock();
         }
     }
