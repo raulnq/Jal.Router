@@ -57,7 +57,7 @@ namespace Jal.Router.Sample.NetCore
 
             var host = container.GetInstance<IHost>();
             host.Configuration
-                .UseAzureServiceBus(new AzureServiceBusParameter() { MaxConcurrentCalls = 4, AutoRenewTimeoutInMinutes = 60 })
+                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName= "sagasmoke", MessageTableName= "messagessmoke", TableSufix= DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName= "messages" })
                 .AddMonitoringTask<HeartBeatLogger>(1000);
             host.RunAndBlock();

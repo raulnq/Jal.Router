@@ -34,33 +34,40 @@ namespace Jal.Router.AzureStorage.Impl
 
         public void Run()
         {
-            var sagatable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
-            var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
-
-
-            if(sagaresult)
+            if(!string.IsNullOrWhiteSpace(_parameter.TableStorageConnectionString))
             {
-                _logger.Log($"Created {sagatable} table");
+                var sagatable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
+
+                var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+
+
+                if (sagaresult)
+                {
+                    _logger.Log($"Created {sagatable} table");
+                }
+                else
+                {
+                    _logger.Log($"Table {sagatable} already exists");
+                }
+
+                var messagetable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
+
+                var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+
+                if (messageresult)
+                {
+                    _logger.Log($"Created {messagetable} table");
+                }
+                else
+                {
+                    _logger.Log($"Table {messagetable} already exists");
+                }
             }
             else
             {
-                _logger.Log($"Table {sagatable} already exists");
+                _logger.Log($"Skipped creation of table for sagas and messages");
             }
-
-            var messagetable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
-
-            var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
-
-            if (messageresult)
-            {
-                _logger.Log($"Created {messagetable} table");
-            }
-            else
-            {
-                _logger.Log($"Table {messagetable} already exists");
-            }
-            
         }
     }
 }

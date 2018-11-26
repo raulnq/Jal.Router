@@ -33,17 +33,24 @@ namespace Jal.Router.AzureStorage.Impl
 
         public void Run()
         {
-            var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
-
-            var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
-
-            if(result)
+            if(!string.IsNullOrEmpty(_parameter.BlobConnectionString))
             {
-                _logger.Log($"Created {_parameter.ContainerName} container");
+                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
+
+                var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+
+                if (result)
+                {
+                    _logger.Log($"Created {_parameter.ContainerName} container");
+                }
+                else
+                {
+                    _logger.Log($"Container {_parameter.ContainerName} already exists");
+                }
             }
             else
             {
-                _logger.Log($"Container {_parameter.ContainerName} already exists");
+                _logger.Log($"Skipped creation of container for messages");
             }
             
         }
