@@ -171,10 +171,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
 
-            if (_parameter.Setup != null)
-            {
-                _parameter.Setup(host.Configuration);
-            }
+            _parameter.Setup?.Invoke(host.Configuration);
 
             return host;
         }
