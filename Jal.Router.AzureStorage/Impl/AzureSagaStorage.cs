@@ -22,6 +22,12 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly AzureStorageParameter _parameter;
 
+        private readonly int _kilobyte = 1024;
+
+        private readonly Action<MessageRecord, byte[]>[] MessageContentFiller;
+
+        private readonly Action<MessageRecord, byte[]>[] MessageDataFiller;
+
         public AzureSagaStorage(IComponentFactory factory, IConfiguration configuration, IParameterProvider provider)
         {
             _factory = factory;
@@ -29,6 +35,10 @@ namespace Jal.Router.AzureStorage.Impl
             _configuration = configuration;
 
             _parameter = provider.Get<AzureStorageParameter>();
+
+            MessageContentFiller = new Action<MessageRecord, byte[]>[] { (x, y) => x.Content0 = y, (x, y) => x.Content1 = y , (x, y) => x.Content2 = y , (x, y) => x.Content3 = y , (x, y) => x.Content4 = y };
+
+            MessageDataFiller = new Action<MessageRecord, byte[]>[] { (x, y) => x.Data0 = y, (x, y) => x.Data1 = y, (x, y) => x.Data2 = y, (x, y) => x.Data3 = y, (x, y) => x.Data4 = y };
         }
 
         private static CloudTable GetCloudTable(string connectionstring, string tablename)
@@ -383,9 +393,10 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
+                var bytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Content);
+
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
-                    Content = messageentity.Content,
                     ContentType = messageentity.ContentType,
                     Identity = serializer.Serialize(messageentity.Identity),
                     Version = messageentity.Version,
@@ -400,12 +411,13 @@ namespace Jal.Router.AzureStorage.Impl
                     Data = messageentity.Data,
                 };
 
-
-                var size = Encoding.UTF8.GetByteCount(record.Content);
-
-                if (size >= 64000)
+                if (bytescount < _parameter.TableStorageColumnLimitSizeOnKilobytes * _kilobyte)
                 {
-                    record.Content = LimitByteLength(record.Content, 63000) + "...";
+                    record.Content = messageentity.Content;
+                }
+                else
+                {
+                    record.NumberOfContentArrays = PopulateArrays(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Content), bytescount, (i, buffer) => MessageContentFiller[i].Invoke(record, buffer));
                 }
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
@@ -418,6 +430,35 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 throw new ApplicationException($"Error during the message record creation with content {context.ContentType.FullName} and route {context.Route.Name}", ex);
             }
+        }
+
+        private int PopulateArrays(byte[] contentinbytes, int bytescount, Action<int, byte[]> action)
+        {
+            var maxbytescount = _parameter.TableStorageColumnLimitSizeOnKilobytes * _kilobyte;
+
+            var chunks = (int)Math.Ceiling((decimal)bytescount / maxbytescount);
+
+            var remainingbytescount = bytescount;
+
+            for (int i = 0; i < chunks; i++)
+            {
+                var buffersize = maxbytescount;
+
+                if (remainingbytescount < maxbytescount)
+                {
+                    buffersize = remainingbytescount;
+                }
+
+                var buffer = new byte[buffersize];
+
+                Buffer.BlockCopy(contentinbytes, maxbytescount * i, buffer, 0, buffersize);
+
+                remainingbytescount = remainingbytescount - maxbytescount;
+
+                action(i, buffer);
+            }
+
+            return chunks;
         }
 
         public override void UpdateSaga(MessageContext context, string sagaid, SagaEntity sagaentity)

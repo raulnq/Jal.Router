@@ -68,7 +68,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Use<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
+        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
         {
             _route.RetryValueFinderType = typeof(TValueFinder);
 
@@ -82,7 +82,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Use(IRetryPolicy policy)
+        public IOnRouteOptionBuilder With(IRetryPolicy policy)
         {
             _route.RetryValueFinderType = typeof(NullValueFinder);
 
@@ -223,7 +223,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Use<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
+        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
         {
             _route.RetryValueFinderType = typeof(TValueFinder);
 
@@ -237,7 +237,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder Use(IRetryPolicy policy)
+        public IOnRouteOptionBuilder With(IRetryPolicy policy)
         {
             _route.RetryValueFinderType = typeof(NullValueFinder);
 

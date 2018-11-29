@@ -9,20 +9,34 @@ namespace Jal.Router.AzureStorage.Model
         {
             PartitionKey = partitionkey;
             RowKey = rowkey;
+            NumberOfDataArrays = 0;
+            NumberOfContentArrays = 0;
         }
 
         public MessageRecord()
         {
-
+            NumberOfDataArrays = 0;
+            NumberOfContentArrays = 0;
         }
 
         public string Tracks { get; set; }
         public string Data { get; set; }
+        public byte[] Data0 { get; set; }
+        public byte[] Data1 { get; set; }
+        public byte[] Data2 { get; set; }
+        public byte[] Data3 { get; set; }
+        public byte[] Data4 { get; set; }
+        public int NumberOfDataArrays { get; set; }
         public string ContentId { get; set; }
         public DateTime DateTimeUtc { get; set; }
 
         public string Content { get; set; }
-
+        public byte[] Content0 { get; set; }
+        public byte[] Content1 { get; set; }
+        public byte[] Content2 { get; set; }
+        public byte[] Content3 { get; set; }
+        public byte[] Content4 { get; set; }
+        public int NumberOfContentArrays { get; set; }
         public string Identity { get; set; }
 
         public string Version { get; set; }

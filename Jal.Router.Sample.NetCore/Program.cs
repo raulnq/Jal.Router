@@ -58,7 +58,7 @@ namespace Jal.Router.Sample.NetCore
             var host = container.GetInstance<IHost>();
             host.Configuration
                 .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
-                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName= "sagasmoke", MessageTableName= "messagessmoke", TableSufix= DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName= "messages" })
+                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName= "sagasmoke", MessageTableName= "messagessmoke", TableSufix= DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName= "messages", TableStorageColumnLimitSizeOnKilobytes=32 })
                 .AddMonitoringTask<HeartBeatLogger>(1000);
             host.RunAndBlock();
         }
@@ -337,9 +337,10 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).Use(new LinearRetryPolicy(5, 3))
-            .OnEntry(x=>x.IgnoreExceptionOnSaveMessage)
-            .OnErrorSendFailedMessageTo(_errorqueueendpoint); 
+            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
+            .OnEntry(x=>x.IgnoreExceptionOnSaveMessage(true))
+            .OnErrorSendFailedMessageTo(_errorqueueendpoint)
+            ; 
 
             RegisterEndPoint(_errorqueueendpoint)
                 .ForMessage<Message>()

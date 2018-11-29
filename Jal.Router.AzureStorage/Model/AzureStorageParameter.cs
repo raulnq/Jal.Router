@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Jal.Router.AzureStorage.Model
 {
@@ -7,6 +8,10 @@ namespace Jal.Router.AzureStorage.Model
         public string TableStorageConnectionString { get; set; }
 
         public string BlobConnectionString { get; set; }
+
+        public Encoding TableStorageStringEncoding { get; set; }
+
+        public int TableStorageColumnLimitSizeOnKilobytes { get; set; }
 
         public string SagaTableName { get; set; }
 
@@ -25,6 +30,10 @@ namespace Jal.Router.AzureStorage.Model
             TableSufix = DateTime.UtcNow.ToString("yyyyMM");
 
             ContainerName = "messages";
+
+            TableStorageStringEncoding = Encoding.Unicode;
+
+            TableStorageColumnLimitSizeOnKilobytes = 64;
         }
 
         public AzureStorageParameter(string connectionstring)
@@ -40,6 +49,10 @@ namespace Jal.Router.AzureStorage.Model
             TableStorageConnectionString = connectionstring;
 
             BlobConnectionString = connectionstring;
+
+            TableStorageStringEncoding = Encoding.Unicode;
+
+            TableStorageColumnLimitSizeOnKilobytes = 64;
         }
 
         public AzureStorageParameter(string tablestorageconnectionstring, string blobconnectionstring)
@@ -55,6 +68,10 @@ namespace Jal.Router.AzureStorage.Model
             TableStorageConnectionString = tablestorageconnectionstring;
 
             BlobConnectionString = blobconnectionstring;
+
+            TableStorageStringEncoding = Encoding.Unicode;
+
+            TableStorageColumnLimitSizeOnKilobytes = 64;
         }
     }
 }
