@@ -28,9 +28,9 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                    var extractor = channel.ConnectionStringProvider as Func<IValueFinder, string>;
+                    var provider = channel.ConnectionStringProvider as Func<IValueFinder, string>;
 
-                    channel.ConnectionString = extractor?.Invoke(finder);
+                    channel.ConnectionString = provider?.Invoke(finder);
 
                     if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                     {

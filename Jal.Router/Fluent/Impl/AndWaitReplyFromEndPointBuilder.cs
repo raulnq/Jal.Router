@@ -13,19 +13,19 @@ namespace Jal.Router.Fluent.Impl
             _channel = channel;
         }
 
-        public void AndWaitReplyFromPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TValueFinder : IValueFinder
+        public void AndWaitReplyFromPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, int timeout = 60) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringprovider;
 
             _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
 
@@ -35,15 +35,15 @@ namespace Jal.Router.Fluent.Impl
         }
 
         public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription,
-            Func<IValueFinder, string> connectionstringextractor, int timeout = 60) where TValueFinder : IValueFinder
+            Func<IValueFinder, string> connectionstringprovider, int timeout = 60) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             if (subscription == null)
             {
@@ -52,7 +52,7 @@ namespace Jal.Router.Fluent.Impl
 
             _channel.ToReplyPath = path;
 
-            _channel.ToReplyConnectionStringProvider = connectionstringextractor;
+            _channel.ToReplyConnectionStringProvider = connectionstringprovider;
 
             _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
 

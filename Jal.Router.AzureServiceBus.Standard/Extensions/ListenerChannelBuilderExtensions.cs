@@ -16,13 +16,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         {
             builder.AddSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring);
         }
-        public static void AddQueue<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
+        public static void AddQueue<TValueFinder>(this IListenerChannelBuilder builder, string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
-            builder.AddPointToPointChannel<TExtractorConectionString>(path, connectionstringextractor);
+            builder.AddPointToPointChannel<TValueFinder>(path, connectionstringprovider);
         }
-        public static void AddSubscriptionToTopic<TExtractorConectionString>(this IListenerChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TExtractorConectionString : IValueFinder
+        public static void AddSubscriptionToTopic<TValueFinder>(this IListenerChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
-            builder.AddSubscriptionToPublishSubscribeChannel<TExtractorConectionString>(path, subscription, connectionstringextractor);
+            builder.AddSubscriptionToPublishSubscribeChannel<TValueFinder>(path, subscription, connectionstringprovider);
         }
     }
 }

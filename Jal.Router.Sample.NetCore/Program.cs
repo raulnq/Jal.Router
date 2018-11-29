@@ -192,7 +192,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("queueperformanceendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddQueue(config.ConnectionString, _queueperformancetoread));
+            .To(x => x.AddPointToPointChannel(config.ConnectionString, _queueperformancetoread));
 
             RegisterHandler<IMessageHandler<Message>>(_toreplyqueue + "_handler")
             .ToListen(x =>
@@ -244,7 +244,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("fromqueueendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddTopic(config.ConnectionString, _topicpublishedfromqueue));
+            .To(x => x.AddPublishSubscriberChannel(config.ConnectionString, _topicpublishedfromqueue));
 
 
             RegisterHandler<IMessageHandler<Message>>("handlingtwoqueuesinonehandler_handler")
@@ -337,7 +337,8 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint").Use(new LinearRetryPolicy(5,3))
+            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).Use(new LinearRetryPolicy(5, 3))
+            .OnEntry(x=>x.IgnoreExceptionOnSaveMessage)
             .OnErrorSendFailedMessageTo(_errorqueueendpoint); 
 
             RegisterEndPoint(_errorqueueendpoint)

@@ -9,18 +9,18 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class AbstractRouterConfigurationSourceExtensions
     {
-        public static void RegisterQueue<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public static void RegisterQueue<TValueFinder>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider)
+            where TValueFinder : IValueFinder
         {
 
-            Func<IValueFinder, string> extractor = finder =>
+            Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringextractor(finder);
+                var servicebusconfiguration = connectionstringprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
 
-            configuration.RegisterPointToPointChannel<TExtractorConectionString>(queue, extractor);
+            configuration.RegisterPointToPointChannel<TValueFinder>(queue, provider);
         }
 
         public static void RegisterQueue(this AbstractRouterConfigurationSource configuration, string queue, ServiceBusConfiguration servicebusconfiguration)
@@ -28,18 +28,18 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             configuration.RegisterPointToPointChannel(queue, JsonConvert.SerializeObject(servicebusconfiguration));
         }
 
-        public static void RegisterTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string topic,
-            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public static void RegisterTopic<TValueFinder>(this AbstractRouterConfigurationSource configuration, string topic,
+            Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider)
+            where TValueFinder : IValueFinder
         {
-            Func<IValueFinder, string> extractor = finder =>
+            Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringextractor(finder);
+                var servicebusconfiguration = connectionstringprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
 
-            configuration.RegisterPublishSubscriberChannel<TExtractorConectionString>(topic, extractor);
+            configuration.RegisterPublishSubscriberChannel<TValueFinder>(topic, provider);
         }
 
         public static void RegisterTopic(this AbstractRouterConfigurationSource configuration, string topic, ServiceBusConfiguration servicebusconfiguration)
@@ -47,13 +47,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             configuration.RegisterPublishSubscriberChannel(topic, JsonConvert.SerializeObject(servicebusconfiguration));
         }
 
-        public static void RegisterSubscriptionToTopic<TExtractorConectionString>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
-            Func<IValueFinder, ServiceBusConfiguration> connectionstringextractor, string filter=null)
-            where TExtractorConectionString : IValueFinder
+        public static void RegisterSubscriptionToTopic<TValueFinder>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
+            Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider, string filter=null)
+            where TValueFinder : IValueFinder
         {
-            Func<IValueFinder, string> extractor = finder =>
+            Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringextractor(finder);
+                var servicebusconfiguration = connectionstringprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
@@ -65,7 +65,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
             }
 
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(subscription, topic, extractor, r);
+            configuration.RegisterSubscriptionToPublishSubscriberChannel<TValueFinder>(subscription, topic, provider, r);
         }
 
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, string filter=null)

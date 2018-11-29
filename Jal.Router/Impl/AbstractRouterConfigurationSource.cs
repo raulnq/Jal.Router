@@ -79,8 +79,8 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueFinder, string> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule = null)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterSubscriptionToPublishSubscriberChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, SubscriptionToPublishSubscribeChannelRule rule = null)
+            where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -90,14 +90,14 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
-                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TValueFinder),
+                ConnectionStringProvider = connectionstringprovider
             };
 
             if(rule!=null)
@@ -123,12 +123,12 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor,
+                ConnectionStringProvider = provider,
             };
 
 
@@ -141,21 +141,21 @@ namespace Jal.Router.Impl
         }
 
 
-        public void RegisterPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider)
+            where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new PointToPointChannel(path)
             {
-                ConnectionStringValueFinderType = typeof (TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof (TValueFinder),
+                ConnectionStringProvider = connectionstringprovider
             };
 
             _pointtopointchannels.Add(channel);
@@ -172,32 +172,32 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new PointToPointChannel(path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor
+                ConnectionStringProvider = provider
             };
 
             _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterPublishSubscriberChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider)
+            where TValueFinder : IValueFinder
         { 
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new PublishSubscribeChannel(path)
             {
-                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TValueFinder),
+                ConnectionStringProvider = connectionstringprovider
             };
 
             _publishsubscriberchannels.Add(channel);
@@ -214,12 +214,12 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new PublishSubscribeChannel(path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor
+                ConnectionStringProvider = provider
             };
 
             _publishsubscriberchannels.Add(channel);

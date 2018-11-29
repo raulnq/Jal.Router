@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
@@ -107,13 +108,31 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         private IRetryPolicy GetRetryPolicy(Route route)
         {
-            var extractor = _factory.Create<IValueFinder>(route.RetryExtractorType);
+            var finder = _factory.Create<IValueFinder>(route.RetryValueFinderType);
 
-            return route.RetryPolicyExtractor(extractor);
+            return route.RetryPolicyProvider(finder);
         }
+
+        private bool CanHandle(Route route, Exception ex)
+        {
+            var retry = route.RetryExceptionTypes.FirstOrDefault(x=>x == ex.GetType());
+
+            if(retry!=null)
+            {
+                return true;
+            }
+
+            if(ex.InnerException != null)
+            {
+                return route.RetryExceptionTypes.FirstOrDefault(x => x == ex.InnerException.GetType())!=null;
+            }
+
+            return false;
+        }
+
         private bool HasRetry(Route route)
         {
-            return route.RetryExceptionType != null && route.RetryPolicyExtractor != null;
+            return route.RetryExceptionTypes.Count>0 && route.RetryPolicyProvider != null;
         }
 
         public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
@@ -148,7 +167,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
             {
                 if (policy != null)
                 {
-                    if (messagecontext.Route.RetryExceptionType == ex.GetType() || (ex.InnerException != null && messagecontext.Route.RetryExceptionType == ex.InnerException.GetType()))
+                    if (CanHandle(messagecontext.Route, ex))
                     {
                         if (!messagecontext.LastRetry)
                         {

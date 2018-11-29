@@ -233,8 +233,8 @@ namespace Jal.Router.Tests.Impl
                 {
                     x.With(((request, handler, context) => handler.Handle(request, context)));
                 })
-                .OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
-                .Use<AppSettingValueFinder>(y => new LinearRetryPolicy(3, 3))
+                //.OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
+                //.Use<AppSettingValueFinder>(y => new LinearRetryPolicy(3, 3))
                 .OnErrorSendFailedMessageTo("appgretryerror");
 
             RegisterHandler<IRequestResponseHandler<Trigger>>("triggerflowe")
