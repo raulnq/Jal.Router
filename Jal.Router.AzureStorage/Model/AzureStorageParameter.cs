@@ -11,7 +11,7 @@ namespace Jal.Router.AzureStorage.Model
 
         public Encoding TableStorageStringEncoding { get; set; }
 
-        public int TableStorageColumnLimitSizeOnKilobytes { get; set; }
+        public int TableStorageMaxColumnSizeOnKilobytes { get; set; }
 
         public string SagaTableName { get; set; }
 
@@ -33,7 +33,7 @@ namespace Jal.Router.AzureStorage.Model
 
             TableStorageStringEncoding = Encoding.Unicode;
 
-            TableStorageColumnLimitSizeOnKilobytes = 64;
+            TableStorageMaxColumnSizeOnKilobytes = 64;
         }
 
         public AzureStorageParameter(string connectionstring)
@@ -52,7 +52,7 @@ namespace Jal.Router.AzureStorage.Model
 
             TableStorageStringEncoding = Encoding.Unicode;
 
-            TableStorageColumnLimitSizeOnKilobytes = 64;
+            TableStorageMaxColumnSizeOnKilobytes = 64;
         }
 
         public AzureStorageParameter(string tablestorageconnectionstring, string blobconnectionstring)
@@ -71,7 +71,7 @@ namespace Jal.Router.AzureStorage.Model
 
             TableStorageStringEncoding = Encoding.Unicode;
 
-            TableStorageColumnLimitSizeOnKilobytes = 64;
+            TableStorageMaxColumnSizeOnKilobytes = 64;
         }
     }
 }

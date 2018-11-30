@@ -11,12 +11,16 @@ namespace Jal.Router.AzureStorage.Model
             RowKey = rowkey;
             NumberOfDataArrays = 0;
             NumberOfContentArrays = 0;
+            SizeOfDataArraysOnKilobytes = 0;
+            SizeOfContentArraysOnKilobytes = 0;
         }
 
         public MessageRecord()
         {
             NumberOfDataArrays = 0;
             NumberOfContentArrays = 0;
+            SizeOfDataArraysOnKilobytes = 0;
+            SizeOfContentArraysOnKilobytes = 0;
         }
 
         public string Tracks { get; set; }
@@ -27,6 +31,7 @@ namespace Jal.Router.AzureStorage.Model
         public byte[] Data3 { get; set; }
         public byte[] Data4 { get; set; }
         public int NumberOfDataArrays { get; set; }
+        public int SizeOfDataArraysOnKilobytes { get; set; }
         public string ContentId { get; set; }
         public DateTime DateTimeUtc { get; set; }
 
@@ -37,6 +42,7 @@ namespace Jal.Router.AzureStorage.Model
         public byte[] Content3 { get; set; }
         public byte[] Content4 { get; set; }
         public int NumberOfContentArrays { get; set; }
+        public int SizeOfContentArraysOnKilobytes { get; set; }
         public string Identity { get; set; }
 
         public string Version { get; set; }

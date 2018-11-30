@@ -411,12 +411,13 @@ namespace Jal.Router.AzureStorage.Impl
                     Data = messageentity.Data,
                 };
 
-                if (bytescount < _parameter.TableStorageColumnLimitSizeOnKilobytes * _kilobyte)
+                if (bytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
                 {
                     record.Content = messageentity.Content;
                 }
                 else
                 {
+                    record.SizeOfContentArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
                     record.NumberOfContentArrays = PopulateArrays(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Content), bytescount, (i, buffer) => MessageContentFiller[i].Invoke(record, buffer));
                 }
 
@@ -434,7 +435,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private int PopulateArrays(byte[] contentinbytes, int bytescount, Action<int, byte[]> action)
         {
-            var maxbytescount = _parameter.TableStorageColumnLimitSizeOnKilobytes * _kilobyte;
+            var maxbytescount = _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte;
 
             var chunks = (int)Math.Ceiling((decimal)bytescount / maxbytescount);
 
