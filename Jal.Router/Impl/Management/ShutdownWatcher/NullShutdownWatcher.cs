@@ -3,7 +3,7 @@ using Jal.Router.Interface.Management;
 
 namespace Jal.Router.Impl.Management.ShutdownWatcher
 {
-    public class ShutdownNullWatcher : IShutdownWatcher
+    public class NullShutdownWatcher : IShutdownWatcher
     {
         public void Start(CancellationTokenSource tokensource)
         {

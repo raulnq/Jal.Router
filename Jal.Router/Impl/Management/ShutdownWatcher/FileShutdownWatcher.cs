@@ -11,7 +11,7 @@ namespace Jal.Router.Impl.Management.ShutdownWatcher
         public string File { get; set; }
     }
 
-    public class ShutdownFileWatcher : IShutdownWatcher
+    public class FileShutdownWatcher : IShutdownWatcher
     {
         private FileSystemWatcher _watcher;
 
@@ -19,7 +19,7 @@ namespace Jal.Router.Impl.Management.ShutdownWatcher
 
         private readonly ILogger _log;
 
-        public ShutdownFileWatcher(IParameterProvider provider, ILogger log)
+        public FileShutdownWatcher(IParameterProvider provider, ILogger log)
         {
             _parameter = provider.Get<ShutdownFileWatcherParameter>();
             _log = log;

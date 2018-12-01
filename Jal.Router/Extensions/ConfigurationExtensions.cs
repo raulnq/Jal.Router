@@ -7,7 +7,7 @@ namespace Jal.Router.Extensions
     {
         public static IConfiguration UseShutdownFileWatcher(this IConfiguration configuration, string filepath)
         {
-            return configuration.UseShutdownWatcher<ShutdownFileWatcher, ShutdownFileWatcherParameter>(new ShutdownFileWatcherParameter() { File = filepath });
+            return configuration.UseShutdownWatcher<FileShutdownWatcher, ShutdownFileWatcherParameter>(new ShutdownFileWatcherParameter() { File = filepath });
         }
     }
 }

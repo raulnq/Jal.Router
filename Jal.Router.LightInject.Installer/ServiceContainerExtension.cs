@@ -123,9 +123,11 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdownTask, SenderShutdownTask>(typeof(SenderShutdownTask).FullName, new PerContainerLifetime());
 
-            container.Register<IShutdownWatcher, ShutdownNullWatcher>(typeof (ShutdownNullWatcher).FullName,new PerContainerLifetime());
+            container.Register<IShutdownWatcher, NullShutdownWatcher>(typeof (NullShutdownWatcher).FullName,new PerContainerLifetime());
 
-            container.Register<IShutdownWatcher, ShutdownFileWatcher>(typeof (ShutdownFileWatcher).FullName, new PerContainerLifetime());
+            container.Register<IShutdownWatcher, FileShutdownWatcher>(typeof (FileShutdownWatcher).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownWatcher, CtrlCShutdownWatcher>(typeof(CtrlCShutdownWatcher).FullName, new PerContainerLifetime());
 
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 

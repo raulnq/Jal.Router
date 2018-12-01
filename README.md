@@ -4,7 +4,7 @@ Just another library to route in/out messages
 [Wiki](https://github.com/raulnq/Jal.Router/wiki/10.-Home)
 ## Road Map
 * Multiple exception handling
-* Host class rework
+* Host class rework: Multiple shoutdown watcher
 * Store large messages and sagas
 * Outgoing message storage
 * Outgoing message error handling: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc)

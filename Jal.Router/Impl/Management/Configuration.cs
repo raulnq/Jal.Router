@@ -226,7 +226,7 @@ namespace Jal.Router.Impl.Management
             AddShutdownTask<ListenerShutdownTask>();
             AddShutdownTask<SenderShutdownTask>();
             AddShutdownTask<ShutdownTask>();
-            UseShutdownWatcher<ShutdownNullWatcher>();
+            UseShutdownWatcher<CtrlCShutdownWatcher>();
             Storage = new StorageConfiguration();
             Identity = new IdentityConfiguration();
             Runtime = new Runtime();
