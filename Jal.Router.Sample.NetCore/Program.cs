@@ -9,20 +9,17 @@ using Jal.Router.LightInject.Installer;
 using Jal.Router.Model;
 using LightInject;
 using Jal.Router.Extensions;
-using Jal.Router.Impl.Management;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.LightInject.Installer;
-using Jal.Router.Model.Management;
-using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.ChainOfResponsability.LightInject.Installer;
-using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.Patterns;
 using Jal.Router.Interface.Patterns;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Impl.Inbound.RetryPolicy;
+using Jal.Router.Impl.Management.ShutdownWatcher;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -58,8 +55,10 @@ namespace Jal.Router.Sample.NetCore
             var host = container.GetInstance<IHost>();
             host.Configuration
                 .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
-                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName= "sagasmoke", MessageTableName= "messagessmoke", TableSufix= DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName= "messages", TableStorageMaxColumnSizeOnKilobytes=64 })
-                .AddMonitoringTask<HeartBeatLogger>(1000);
+                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .AddMonitoringTask<HeartBeatLogger>(1000)
+                .AddShutdownWatcher<SignTermShutdownWatcher>();
+                
             host.RunAndBlock();
         }
     }
@@ -395,6 +394,8 @@ namespace Jal.Router.Sample.NetCore
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
             data.Status = "end";
+
+            data.Name = message.Name;
         }
     }
 
@@ -406,7 +407,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Status = "continue";
 
-            context.Send(data, new Message() { }, "endendpoint", context.Identity.Id+"_end", context.Identity.OperationId, context.SagaContext.Id);
+            data.Name = "continue";
+
+            context.Send(data, new Message() { Name = message.Name }, "endendpoint", context.Identity.Id+"_end", context.Identity.OperationId, context.SagaContext.Id);
         }
     }
 
@@ -420,7 +423,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Status = "start";
 
-            context.Send(data, new Message() { }, "continueendpoint", context.Identity.Id+ "_continue", context.Identity.OperationId, context.SagaContext.Id);
+            data.Name = message.Name;
+
+            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", context.Identity.Id+ "_continue", context.Identity.OperationId, context.SagaContext.Id);
         }
     }
 
@@ -505,7 +510,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.Identity.Id, context.Identity.OperationId);
             }
@@ -551,6 +556,7 @@ namespace Jal.Router.Sample.NetCore
     public class Data
     {
         public string Status { get; set; }
+        public string Name { get; internal set; }
     }
 
     public class Message

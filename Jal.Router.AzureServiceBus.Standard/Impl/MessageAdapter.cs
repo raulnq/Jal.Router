@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -31,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (sbmessage != null)
             {
-                var storage = Factory.Create<ISagaStorage>(Configuration.SagaStorageType);
+                var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 

@@ -1,10 +1,10 @@
 using System;
 
-namespace Jal.Router.Model.Inbound.Sagas
+namespace Jal.Router.Model
 {
     public class SagaEntity
     {
-        public string Key { get; set; }
+        public string EntityId { get; set; }
         public string Data { get; set; }
         public string DataType { get; set; }
         public string Name { get; set; }

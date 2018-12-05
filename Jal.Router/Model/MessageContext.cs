@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Model
@@ -13,7 +12,7 @@ namespace Jal.Router.Model
 
         private readonly IMessageSerializer _serializer;
 
-        private readonly ISagaStorage _storage;
+        private readonly IEntityStorage _storage;
         public Channel Channel { get; set; }
         public object Response { get; set; }
         public IDictionary<string, string> Headers { get; set; }
@@ -33,7 +32,7 @@ namespace Jal.Router.Model
         public string ContentId { get; set; }
         public List<Track> Tracks { get; set; }
         public Identity Identity { get; set; }
-        public MessageContext(IBus bus, IMessageSerializer serializer, ISagaStorage storage)
+        public MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage)
         {
             _bus = bus;
             _serializer = serializer;
@@ -137,7 +136,7 @@ namespace Jal.Router.Model
         {
             if (_storage != null && _serializer != null)
             {
-                var sagaentity = _storage.GetSaga(SagaContext.Id);
+                var sagaentity = _storage.GetSagaEntity(SagaContext.Id);
 
                 if (sagaentity != null)
                 {
@@ -147,7 +146,7 @@ namespace Jal.Router.Model
 
                     sagaentity.Status = SagaContext.Status;
 
-                    _storage.UpdateSaga(this, SagaContext.Id, sagaentity);
+                    _storage.UpdateSagaEntity(this, sagaentity);
                 }
             }
         }

@@ -1,9 +1,9 @@
 ﻿using System;
-using Jal.Router.Model.Inbound.Sagas;
+using Jal.Router.Model;
 
-namespace Jal.Router.Interface.Inbound.Sagas
+namespace Jal.Router.Interface
 {
-    public interface ISagaStorageSearcher
+    public interface IStorageSearcher
     {
         SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "");
         MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "");

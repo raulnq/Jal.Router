@@ -1,4 +1,3 @@
-using System;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
@@ -7,14 +6,14 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Jal.Router.AzureStorage.Impl
 {
-    public class AzureSagaStorageStartupTask : IStartupTask
+    public class AzureEntityStorageStartupTask : IStartupTask
     {
 
         private readonly ILogger _logger;
 
         private readonly AzureStorageParameter _parameter;
 
-        public AzureSagaStorageStartupTask(ILogger logger, IParameterProvider provider)
+        public AzureEntityStorageStartupTask(ILogger logger, IParameterProvider provider)
         {
             _parameter = provider.Get<AzureStorageParameter>();
 

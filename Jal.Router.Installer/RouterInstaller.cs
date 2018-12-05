@@ -6,7 +6,6 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Impl.Inbound.Middleware;
-using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management;
 using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.MonitoringTask;
@@ -17,7 +16,6 @@ using Jal.Router.Impl.StartupTask;
 using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -101,7 +99,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<ISagaStorageSearcher>().ImplementedBy<SagaStorageSearcher>().LifestyleSingleton());
+            container.Register(Component.For<IStorageSearcher>().ImplementedBy<StorageSearcher>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
@@ -118,7 +116,9 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IShutdownWatcher>().ImplementedBy<FileShutdownWatcher>().LifestyleSingleton().Named(typeof(FileShutdownWatcher).FullName));
 
             container.Register(Component.For<IShutdownWatcher>().ImplementedBy<CtrlCShutdownWatcher>().LifestyleSingleton().Named(typeof(CtrlCShutdownWatcher).FullName));
-            
+
+            container.Register(Component.For<IShutdownWatcher>().ImplementedBy<SignTermShutdownWatcher>().LifestyleSingleton().Named(typeof(SignTermShutdownWatcher).FullName));
+
             container.Register(Component.For(typeof(IRouterInterceptor)).ImplementedBy(typeof(NullRouterInterceptor)).Named(typeof(NullRouterInterceptor).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IPointToPointChannel)).ImplementedBy(typeof(NullPointToPointChannel)).Named(typeof(NullPointToPointChannel).FullName).LifestyleSingleton());
@@ -133,7 +133,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IBusInterceptor)).ImplementedBy(typeof(NullBusInterceptor)).Named(typeof(NullBusInterceptor).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(ISagaStorage)).ImplementedBy(typeof(NullSagaStorage)).Named(typeof(NullSagaStorage).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IEntityStorage)).ImplementedBy(typeof(NullStorage)).Named(typeof(NullStorage).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
 

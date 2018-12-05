@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Jal.Router.Model.Inbound.Sagas
+namespace Jal.Router.Model
 {
     public class MessageEntity
     {
@@ -19,5 +19,14 @@ namespace Jal.Router.Model.Inbound.Sagas
         public string ContentType { get; set; }
         public List<Track> Tracks { get; set; }
         public Identity Identity { get; set; }
+        public MessageEntityType Type { get; set; }
+
+        public MessageEntity()
+        {
+            Origin = new Origin();
+            Saga = new SagaContext();
+            Tracks = new List<Track>();
+            Identity = new Identity();
+        }
     }
 }

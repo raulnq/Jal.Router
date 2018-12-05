@@ -9,15 +9,25 @@ namespace Jal.Router.AzureStorage.Model
         {
             PartitionKey = partitionkey;
             RowKey = rowkey;
+            NumberOfDataArrays = 0;
+            SizeOfDataArraysOnKilobytes = 0;
         }
 
         public SagaRecord()
         {
-            
+            NumberOfDataArrays = 0;
+            SizeOfDataArraysOnKilobytes = 0;
         }
 
         public string Data { get; set; }
-
+        public string Id { get; set; }
+        public byte[] Data0 { get; set; }
+        public byte[] Data1 { get; set; }
+        public byte[] Data2 { get; set; }
+        public byte[] Data3 { get; set; }
+        public byte[] Data4 { get; set; }
+        public int NumberOfDataArrays { get; set; }
+        public int SizeOfDataArraysOnKilobytes { get; set; }
         public string DataType { get; set; }
 
         public string Name { get; set; }

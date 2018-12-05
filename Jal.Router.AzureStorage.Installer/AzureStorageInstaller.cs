@@ -3,7 +3,6 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Jal.Router.AzureStorage.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 
 namespace Jal.Router.AzureStorage.Installer
@@ -16,9 +15,9 @@ namespace Jal.Router.AzureStorage.Installer
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<AzureMessageStorageStartupTask>().Named(typeof(AzureMessageStorageStartupTask).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<ISagaStorage>().ImplementedBy<AzureSagaStorage>().Named(typeof(AzureSagaStorage).FullName).LifestyleSingleton());
+            container.Register(Component.For<IEntityStorage>().ImplementedBy<Impl.AzureEntityStorage>().Named(typeof(Impl.AzureEntityStorage).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IStartupTask>().ImplementedBy<AzureSagaStorageStartupTask>().Named(typeof(AzureSagaStorageStartupTask).FullName).LifestyleSingleton());
+            container.Register(Component.For<IStartupTask>().ImplementedBy<AzureEntityStorageStartupTask>().Named(typeof(AzureEntityStorageStartupTask).FullName).LifestyleSingleton());
         }
     }
 }

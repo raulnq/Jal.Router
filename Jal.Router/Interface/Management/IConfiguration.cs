@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Jal.Router.Model.Management;
@@ -22,12 +21,12 @@ namespace Jal.Router.Interface.Management
         IList<Type> ShutdownTaskTypes { get; }
         IList<TaskMetadata> MonitoringTaskTypes { get; }
         Type ChannelManagerType { get; }
-        Type ShutdownWatcherType { get; }
+        IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
         Type RequestReplyChannelType { get; }
         Type PublishSubscribeChannelType { get; }
-        Type SagaStorageType { get;  }
+        Type StorageType { get;  }
         Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
         Type RouterInterceptorType { get; set; }
@@ -45,8 +44,8 @@ namespace Jal.Router.Interface.Management
         IConfiguration UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
-        IConfiguration UseSagaStorage<TStorage>() where TStorage : ISagaStorage;
-        IConfiguration UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
+        IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;
+        IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
         IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
         IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
@@ -57,6 +56,6 @@ namespace Jal.Router.Interface.Management
         IConfiguration AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;
         IConfiguration AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;
         IConfiguration AddParameter<TParameter>(TParameter parameter);
-        IConfiguration UseShutdownWatcher<TShutdownWatcher, TParameter>(TParameter parameter) where TShutdownWatcher : IShutdownWatcher;
+        IConfiguration AddShutdownWatcher<TShutdownWatcher, TParameter>(TParameter parameter) where TShutdownWatcher : IShutdownWatcher;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
@@ -23,7 +24,7 @@ namespace Jal.Router.Impl.Management
 
         private readonly IShutdown _shutdown;
 
-        private IShutdownWatcher _watcher;
+        private List<IShutdownWatcher> _watchers;
 
         private readonly IComponentFactory _factory;
 
@@ -41,6 +42,7 @@ namespace Jal.Router.Impl.Management
             _factory = factory;
             _cancellationtokensource = new CancellationTokenSource();
             _logger = logger;
+            _watchers = new List<IShutdownWatcher>();
         }
 
         public void Startup()
@@ -50,14 +52,22 @@ namespace Jal.Router.Impl.Management
 
         private void Watch()
         {
-            _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
+            foreach (var watcher in Configuration.ShutdownWatcherTypes)
+            {
+                var w = _factory.Create<IShutdownWatcher>(watcher);
 
-            _watcher.Start(_cancellationtokensource);
+                _watchers.Add(w);
+
+                w.Start(_cancellationtokensource);
+            }
         }
 
         private void UnWatch()
         {
-            _watcher.Stop();
+            foreach (var watcher in _watchers)
+            {
+                watcher.Stop();
+            }
         }
 
         private void Monitor()

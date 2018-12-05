@@ -20,7 +20,10 @@ namespace Jal.Router.Impl.Management.ShutdownWatcher
             {
                 e.Cancel = true;
 
-                tokensource?.Cancel();
+                if (tokensource != null && !tokensource.IsCancellationRequested)
+                {
+                    tokensource.Cancel();
+                }  
             };
 
             _logger.Log("Press Ctrl+C to shut down");

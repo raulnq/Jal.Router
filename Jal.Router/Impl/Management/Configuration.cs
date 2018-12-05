@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound;
-using Jal.Router.Impl.Inbound.Sagas;
 using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.StartupTask;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -29,11 +27,11 @@ namespace Jal.Router.Impl.Management
         public IList<Type> ShutdownTaskTypes { get; }
         public IList<TaskMetadata> MonitoringTaskTypes { get; }
         public Type ChannelManagerType { get; private set; }
-        public Type ShutdownWatcherType { get; private set; }
+        public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type RequestReplyChannelType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
-        public Type SagaStorageType { get; private set; }
+        public Type StorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
         public Type ChannelShufflerType { get; private set; }
         public Type MessageStorageType { get; private set; }
@@ -84,18 +82,19 @@ namespace Jal.Router.Impl.Management
             return this;
         }
 
-        public IConfiguration UseShutdownWatcher<TShutdownWatcher, TParameter>(TParameter parameter) where TShutdownWatcher : IShutdownWatcher
+        public IConfiguration AddShutdownWatcher<TShutdownWatcher, TParameter>(TParameter parameter) where TShutdownWatcher : IShutdownWatcher
         {
-            ShutdownWatcherType = typeof(TShutdownWatcher);
+            ShutdownWatcherTypes.Add(typeof(TShutdownWatcher));
 
             AddParameter(parameter);
 
             return this;
         }
 
-        public IConfiguration UseShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher
+        public IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher
         {
-            ShutdownWatcherType = typeof(TShutdownWatcher);
+            ShutdownWatcherTypes.Add(typeof(TShutdownWatcher));
+
             return this;
         }
 
@@ -105,9 +104,9 @@ namespace Jal.Router.Impl.Management
             return this;
         }
 
-        public IConfiguration UseSagaStorage<TSagaStorage>() where TSagaStorage : ISagaStorage
+        public IConfiguration UseStorage<TSagaStorage>() where TSagaStorage : IEntityStorage
         {
-            SagaStorageType = typeof(TSagaStorage);
+            StorageType = typeof(TSagaStorage);
             return this;
         }
 
@@ -197,7 +196,7 @@ namespace Jal.Router.Impl.Management
             UseChannelShuffler<DefaultChannelShuffler>();
             UseRouterInterceptor<NullRouterInterceptor>();
             UseBusInterceptor<NullBusInterceptor>();
-            UseSagaStorage<NullSagaStorage>();
+            UseStorage<NullStorage>();
             UseMessageStorage<NullMessageStorage>();
             UseChannelManager<NullChannelManager>();
             UsePointToPointChannel<NullPointToPointChannel>();
@@ -213,6 +212,7 @@ namespace Jal.Router.Impl.Management
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             Parameters = new Dictionary<string, object>();
             OutboundMiddlewareTypes = new List<Type>();
+            ShutdownWatcherTypes = new List<Type>();
             AddLogger<BeatLogger, Beat>(); 
             AddStartupTask<StartupBeatLogger>();
             AddStartupTask<RuntimeConfigurationLoader>();
@@ -226,7 +226,7 @@ namespace Jal.Router.Impl.Management
             AddShutdownTask<ListenerShutdownTask>();
             AddShutdownTask<SenderShutdownTask>();
             AddShutdownTask<ShutdownTask>();
-            UseShutdownWatcher<CtrlCShutdownWatcher>();
+            AddShutdownWatcher<CtrlCShutdownWatcher>();
             Storage = new StorageConfiguration();
             Identity = new IdentityConfiguration();
             Runtime = new Runtime();

@@ -34,7 +34,7 @@ namespace Jal.Router.AzureStorage.Model
         public int SizeOfDataArraysOnKilobytes { get; set; }
         public string ContentId { get; set; }
         public DateTime DateTimeUtc { get; set; }
-
+        public string Type { get; set; }
         public string Content { get; set; }
         public byte[] Content0 { get; set; }
         public byte[] Content1 { get; set; }
