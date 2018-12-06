@@ -132,6 +132,11 @@ namespace Jal.Router.Model
             return null;
         }
 
+        public bool IsSaga()
+        {
+            return Saga != null;
+        }
+
         public void Update(object data)
         {
             if (_storage != null && _serializer != null)

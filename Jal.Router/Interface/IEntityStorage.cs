@@ -5,13 +5,13 @@ namespace Jal.Router.Interface
 {
     public interface IEntityStorage
     {
-        void CreateMessageEntity(MessageContext context, MessageEntity messageentity);
+        MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity);
 
-        void CreateSagaEntity(MessageContext context, SagaEntity sagaentity);
+        SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity);
 
         void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity);
 
-        void CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity);
+        MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity);
 
         SagaEntity GetSagaEntity(string entityid);
 

@@ -27,9 +27,9 @@ namespace Jal.Router.Impl.Inbound
 
             var sagaentity = CreateSagaEntity(context.Data, data);
 
-            context.Data.SagaContext.Id = sagaentity.EntityId;
-
             context.Data.AddTrack(context.Data.Identity, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
+
+            CreateInboundMessageEntity(context.Data, sagaentity);
 
             _router.Route(context.Data, data);
 

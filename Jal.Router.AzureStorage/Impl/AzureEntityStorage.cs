@@ -121,7 +121,7 @@ namespace Jal.Router.AzureStorage.Impl
                     Timeout = record.Timeout,
                     Status = record.Status,
                     Duration = record.Duration,
-                    EntityId = record.Id
+                    Id = record.Id
                 };
 
                 ReadSaga(record, entity);
@@ -170,7 +170,7 @@ namespace Jal.Router.AzureStorage.Impl
                 table = GetCloudTable(_parameter.TableStorageConnectionString, $"{messagestoragename}");
             }
 
-            var key = GetRowKey(sagaentity.EntityId);
+            var key = GetRowKey(sagaentity.Id);
 
             var where = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, key);
 
@@ -297,19 +297,25 @@ namespace Jal.Router.AzureStorage.Impl
             }).ToArray();
         }
 
-        public override void CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
+        public override MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
         {
             try
             {
                 var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
-                var tablenamesufix = GetTableNameSufix(sagaentity.EntityId);
+                var tablenamesufix = GetTableNameSufix(sagaentity.Id);
 
-                var partition = GetRowKey(sagaentity.EntityId);
+                var partition = GetRowKey(sagaentity.Id);
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{tablenamesufix}");
 
-                var record = new MessageRecord(partition, $"{messageentity.Name}_{Guid.NewGuid()}")
+                var rowkey = $"{messageentity.Name}_{Guid.NewGuid()}";
+
+                var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
+
+                messageentity.Id = id;
+
+                var record = new MessageRecord(partition, rowkey)
                 {
                     ContentType = messageentity.ContentType,
                     Identity = serializer.Serialize(messageentity.Identity),
@@ -323,12 +329,15 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Name = messageentity.Name,
                     ContentId = messageentity.ContentId,
-                    Type = messageentity.Type.ToString()
+                    Type = messageentity.Type.ToString(),
+                    Id  = messageentity.Id
                 };
 
                 WriteMessage(messageentity, record);
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
+
+                return messageentity;
             }
             catch (StorageException s)
             {
@@ -343,7 +352,7 @@ namespace Jal.Router.AzureStorage.Impl
         private void WriteMessage(MessageEntity messageentity, MessageRecord record)
         {
             var bytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Content);
-
+            record.SizeOfContent = bytescount;
             if (bytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
                 record.Content = messageentity.Content;
@@ -357,7 +366,7 @@ namespace Jal.Router.AzureStorage.Impl
             if(messageentity.Data!=null)
             {
                 var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Data);
-
+                record.SizeOfData = databytescount;
                 if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
                 {
                     record.Data = messageentity.Data;
@@ -408,7 +417,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                         entity.Duration = record.Duration;
 
-                        entity.EntityId = record.Id;
+                        entity.Id = record.Id;
 
                         ReadSaga(record, entity);
 
@@ -434,7 +443,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override void CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public override SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
             try
             {
@@ -463,11 +472,13 @@ namespace Jal.Router.AzureStorage.Impl
                     Id = id
                 };
 
-                sagaentity.EntityId = id;
+                sagaentity.Id = id;
 
                 WriteSaga(sagaentity, record);
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
+
+                return sagaentity;
             }
             catch (StorageException s)
             {
@@ -482,7 +493,7 @@ namespace Jal.Router.AzureStorage.Impl
         private void WriteSaga(SagaEntity sagaentity, SagaRecord record)
         {
             var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(sagaentity.Data);
-
+            record.SizeOfData = databytescount;
             if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
                 record.Data = sagaentity.Data;
@@ -494,13 +505,19 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override void CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public override MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
             try
             {
                 var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
 
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
+
+                var rowkey = $"{Guid.NewGuid()}";
+
+                var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
+
+                messageentity.Id = id;
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
@@ -520,11 +537,14 @@ namespace Jal.Router.AzureStorage.Impl
                     Data = messageentity.Data,
                     Type = messageentity.Type.ToString(),
                     Saga = serializer.Serialize(messageentity.Saga),
+                    Id = messageentity.Id
                 };
 
                 WriteMessage(messageentity, record);
 
                 var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
+
+                return messageentity;
             }
             catch(StorageException s)
             {
@@ -594,11 +614,11 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var tablenamesufix = GetTableNameSufix(sagaentity.EntityId);
+                var tablenamesufix = GetTableNameSufix(sagaentity.Id);
 
-                var partitionkey = GetPartitionKey(sagaentity.EntityId);
+                var partitionkey = GetPartitionKey(sagaentity.Id);
 
-                var rowkey = GetRowKey(sagaentity.EntityId);
+                var rowkey = GetRowKey(sagaentity.Id);
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
@@ -648,12 +668,12 @@ namespace Jal.Router.AzureStorage.Impl
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga id {sagaentity.EntityId}");
+                        throw new ApplicationException($"Record not found for saga id {sagaentity.Id}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga id format {sagaentity.EntityId}");
+                    throw new ApplicationException($"Invalid saga id format {sagaentity.Id}");
                 }
             }
             catch (StorageException s)

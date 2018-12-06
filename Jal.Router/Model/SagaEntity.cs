@@ -4,7 +4,7 @@ namespace Jal.Router.Model
 {
     public class SagaEntity
     {
-        public string EntityId { get; set; }
+        public string Id { get; set; }
         public string Data { get; set; }
         public string DataType { get; set; }
         public string Name { get; set; }

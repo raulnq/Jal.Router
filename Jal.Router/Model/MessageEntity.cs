@@ -5,6 +5,7 @@ namespace Jal.Router.Model
 {
     public class MessageEntity
     {
+        public string Id { get; set; }
         public string Data { get; set; }
         public DateTime DateTimeUtc { get; set; }
         public string Content { get; set; }

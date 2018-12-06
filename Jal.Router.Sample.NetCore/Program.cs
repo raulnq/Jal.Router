@@ -556,7 +556,7 @@ namespace Jal.Router.Sample.NetCore
     public class Data
     {
         public string Status { get; set; }
-        public string Name { get; internal set; }
+        public string Name { get; set; }
     }
 
     public class Message

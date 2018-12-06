@@ -29,6 +29,8 @@ namespace Jal.Router.Impl.Inbound
             {
                 context.Data.AddTrack(context.Data.Identity, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
 
+                CreateInboundMessageEntity(context.Data, sagaentity);
+
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
                 var data = serializer.Deserialize(sagaentity.Data, context.Data.Saga.DataType);

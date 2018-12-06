@@ -7,19 +7,19 @@ namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractEntityStorage : IEntityStorage
     {
-        public virtual void CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public virtual MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
-
+            return null;
         }
 
-        public virtual void CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
-
+            return null;
         }
 
-        public virtual void CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
+        public virtual MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
         {
-
+            return null;
         }
 
         public virtual void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)

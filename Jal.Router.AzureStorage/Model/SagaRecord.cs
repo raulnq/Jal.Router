@@ -42,5 +42,6 @@ namespace Jal.Router.AzureStorage.Model
         public string Status { get; set; }
 
         public double Duration { get; set; }
+        public int SizeOfData { get; set; }
     }
 }

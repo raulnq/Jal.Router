@@ -26,17 +26,19 @@ namespace Jal.Router.Impl
             return sagaentity;
         }
 
-        protected SagaEntity CreateSagaEntity(MessageContext messagecontext, object data)
+        protected SagaEntity CreateSagaEntity(MessageContext context, object data)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
             var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
-            var sagaentity = MessageContextToSagaEntity(messagecontext);
+            var sagaentity = MessageContextToSagaEntity(context);
 
             sagaentity.Data = serializer.Serialize(data);
 
-            storage.CreateSagaEntity(messagecontext, sagaentity);
+            storage.CreateSagaEntity(context, sagaentity);
+
+            context.SagaContext.Id = sagaentity.Id;
 
             return sagaentity;
         }
@@ -52,26 +54,9 @@ namespace Jal.Router.Impl
             sagaentity.Status = messagecontext.SagaContext.Status;
 
             storage.UpdateSagaEntity(messagecontext, sagaentity);
-
-            if (Configuration.Storage.SaveMessage)
-            {
-                try
-                {
-                    var messageentity = MessageContextToMessageEntity(messagecontext, sagaentity);
-
-                    storage.CreateMessageEntity(messagecontext, sagaentity, messageentity);
-                }
-                catch (Exception)
-                {
-                    if (!Configuration.Storage.IgnoreExceptionOnSaveMessage)
-                    {
-                        throw;
-                    }
-                }
-            }
         }
 
-        protected void CreateInboundMessageEntity(MessageContext messagecontext)
+        protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext)
         {
             if (Configuration.Storage.SaveMessage)
             {
@@ -82,6 +67,8 @@ namespace Jal.Router.Impl
                     var messageentity = MessageContextToInboundMessageEntity(messagecontext);
 
                     storage.CreateMessageEntity(messagecontext, messageentity);
+
+                    return messageentity;
                 }
                 catch (Exception)
                 {
@@ -91,10 +78,37 @@ namespace Jal.Router.Impl
                     }
                 }
             }
+
+            return null;
         }
 
+        protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext, SagaEntity sagaentity)
+        {
+            if (Configuration.Storage.SaveMessage)
+            {
+                try
+                {
+                    var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
-        protected void CreateOutboundMessageEntity(MessageContext messagecontext)
+                    var messageentity = MessageContextToMessageEntity(messagecontext, sagaentity);
+
+                    storage.CreateMessageEntity(messagecontext, sagaentity, messageentity);
+
+                    return messageentity;
+                }
+                catch (Exception)
+                {
+                    if (!Configuration.Storage.IgnoreExceptionOnSaveMessage)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        protected MessageEntity CreateOutboundMessageEntity(MessageContext messagecontext)
         {
             if (Configuration.Storage.SaveMessage)
             {
@@ -105,6 +119,8 @@ namespace Jal.Router.Impl
                     var messageentity = MessageContextToOuboundMessageEntity(messagecontext);
 
                     storage.CreateMessageEntity(messagecontext, messageentity);
+
+                    return messageentity;
                 }
                 catch (Exception)
                 {
@@ -114,6 +130,8 @@ namespace Jal.Router.Impl
                     }
                 }
             }
+
+            return null;
         }
 
         private SagaEntity MessageContextToSagaEntity(MessageContext context)
