@@ -45,13 +45,13 @@ namespace Jal.Router.Fluent.Impl
 
         public IOnRouteEntryBuilder IgnoreExceptionOnSaveMessage(bool ignore)
         {
-            _route.StorageConfiguration.IgnoreExceptionOnSaveMessage = ignore;
+            _route.StorageConfiguration.IgnoreExceptions = ignore;
             return this;
         }
 
         public IOnRouteEntryBuilder SaveMessage(bool save)
         {
-            _route.StorageConfiguration.SaveMessage = save;
+            _route.StorageConfiguration.Enabled = save;
             return this;
         }
     }

@@ -151,7 +151,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 host.Configuration.UseAzureStorage(_parameter.AzureStorageParameter);
             }
 
-            host.Configuration.Storage.IgnoreExceptionOnSaveMessage = true;
+            host.Configuration.Storage.IgnoreExceptions = true;
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
             {

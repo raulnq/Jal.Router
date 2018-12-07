@@ -58,7 +58,7 @@ namespace Jal.Router.Impl
 
         protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext)
         {
-            if (Configuration.Storage.SaveMessage)
+            if (Configuration.Storage.Enabled)
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace Jal.Router.Impl
                 }
                 catch (Exception)
                 {
-                    if (!Configuration.Storage.IgnoreExceptionOnSaveMessage)
+                    if (!Configuration.Storage.IgnoreExceptions)
                     {
                         throw;
                     }
@@ -84,7 +84,7 @@ namespace Jal.Router.Impl
 
         protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext, SagaEntity sagaentity)
         {
-            if (Configuration.Storage.SaveMessage)
+            if (Configuration.Storage.Enabled)
             {
                 try
                 {
@@ -98,7 +98,7 @@ namespace Jal.Router.Impl
                 }
                 catch (Exception)
                 {
-                    if (!Configuration.Storage.IgnoreExceptionOnSaveMessage)
+                    if (!Configuration.Storage.IgnoreExceptions)
                     {
                         throw;
                     }
@@ -110,7 +110,7 @@ namespace Jal.Router.Impl
 
         protected MessageEntity CreateOutboundMessageEntity(MessageContext messagecontext)
         {
-            if (Configuration.Storage.SaveMessage)
+            if (Configuration.Storage.Enabled)
             {
                 try
                 {
@@ -124,7 +124,7 @@ namespace Jal.Router.Impl
                 }
                 catch (Exception)
                 {
-                    if (!Configuration.Storage.IgnoreExceptionOnSaveMessage)
+                    if (!Configuration.Storage.IgnoreExceptions)
                     {
                         throw;
                     }

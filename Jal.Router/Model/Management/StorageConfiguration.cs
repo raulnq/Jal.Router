@@ -2,13 +2,13 @@
 {
     public class StorageConfiguration
     {
-        public bool SaveMessage { get; set; }
-        public bool IgnoreExceptionOnSaveMessage { get; set; }
+        public bool Enabled { get; set; }
+        public bool IgnoreExceptions { get; set; }
 
         public StorageConfiguration()
         {
-            SaveMessage = true;
-            IgnoreExceptionOnSaveMessage = false;
+            Enabled = true;
+            IgnoreExceptions = false;
         }
     }
 }
