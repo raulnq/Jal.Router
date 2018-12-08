@@ -2,7 +2,7 @@
 {
     public enum MessageEntityType
     {
-        Input=0,
-        Output
+        Inbound=0,
+        Outbound=1
     }
 }

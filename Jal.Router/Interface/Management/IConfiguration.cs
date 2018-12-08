@@ -11,8 +11,8 @@ namespace Jal.Router.Interface.Management
     public interface IConfiguration
     {
         Runtime Runtime { get; }
-        IdentityConfiguration Identity { get; }
-        StorageConfiguration Storage { get; }
+        Identity Identity { get; }
+        Storage Storage { get; }
         string ApplicationName { get; }
         string ChannelProviderName { get; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
@@ -35,6 +35,8 @@ namespace Jal.Router.Interface.Management
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
+        IConfiguration EnableEntityStorage(bool ignoreexceptions = true);
+        IConfiguration DisableEntityStorage();
         IConfiguration SetChannelProviderName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;

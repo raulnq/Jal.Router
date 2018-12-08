@@ -27,9 +27,9 @@ namespace Jal.Router.Impl.Inbound
 
             if (sagaentity != null)
             {
-                context.Data.AddTrack(context.Data.Identity, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
+                context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
 
-                CreateInboundMessageEntity(context.Data, sagaentity);
+                CreateMessageEntity(context.Data, MessageEntityType.Inbound, sagaentity);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
@@ -43,16 +43,18 @@ namespace Jal.Router.Impl.Inbound
 
                     sagaentity.Duration = (sagaentity.Ended.Value - sagaentity.Created).TotalMilliseconds;
 
-                    UpdateSagaEntity(context.Data, sagaentity, data);
+                    sagaentity.Data = serializer.Serialize(data);
+
+                    UpdateSagaEntity(context.Data, sagaentity);
                 }
                 else
                 {
-                    throw new ApplicationException($"Empty/Invalid data {context.Data.Saga.DataType.FullName} for {context.Data.Route.ContentType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                    throw new ApplicationException($"Empty/Invalid saga record data {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
                 }
             }
             else
             {
-                throw new ApplicationException($"No data {context.Data.Saga.DataType.FullName} for {context.Data.Route.ContentType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                throw new ApplicationException($"No saga record type {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
             }
         }
     }

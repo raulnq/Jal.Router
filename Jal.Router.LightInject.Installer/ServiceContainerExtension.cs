@@ -110,7 +110,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IStartupTask, PointToPointChannelCreator>(typeof(PointToPointChannelCreator).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, PublishSubscriberChannelCreator>(typeof(PublishSubscriberChannelCreator).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, PublishSubscribeChannelCreator>(typeof(PublishSubscribeChannelCreator).FullName, new PerContainerLifetime());
 
             container.Register<IStartupTask, ListenerLoader>(typeof (ListenerLoader).FullName,new PerContainerLifetime());
 
@@ -130,7 +130,7 @@ namespace Jal.Router.LightInject.Installer
             
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
-            container.Register<IStorageSearcher, StorageSearcher>(new PerContainerLifetime());
+            container.Register<IEntityStorageFacade, EntityStorageFacade>(new PerContainerLifetime());
 
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof (PointToPointChannelMonitor).FullName,new PerContainerLifetime());
 

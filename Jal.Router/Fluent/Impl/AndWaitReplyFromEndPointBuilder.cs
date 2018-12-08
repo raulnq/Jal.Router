@@ -58,7 +58,7 @@ namespace Jal.Router.Fluent.Impl
 
             _channel.ToReplySubscription = subscription;
 
-            _channel.Type = ChannelType.RequestReplyToSubscriptionToPublishSubscriber;
+            _channel.Type = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
 
             _channel.ToReplyTimeOut = timeout;
         }

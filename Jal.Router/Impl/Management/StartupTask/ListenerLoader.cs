@@ -20,7 +20,7 @@ namespace Jal.Router.Impl.StartupTask
 
             var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
 
-            var publishsubscriberchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+            var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
 
             foreach (var item in Configuration.Runtime.Routes)
             {
@@ -60,13 +60,13 @@ namespace Jal.Router.Impl.StartupTask
                     Logger.Log($"Listening {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x=> x.Saga==null ? x.Name: $"{x.Saga.Name}/{x.Name}" ))}");
                 }
 
-                if (metadata.Channel.Type == Model.ChannelType.PublishSubscriber)
+                if (metadata.Channel.Type == Model.ChannelType.PublishSubscribe)
                 {
-                    metadata.CreateListenerMethod = publishsubscriberchannel.CreateListenerMethodFactory(metadata);
+                    metadata.CreateListenerMethod = publishsubscribechannel.CreateListenerMethodFactory(metadata);
 
-                    metadata.DestroyListenerMethod = publishsubscriberchannel.DestroyListenerMethodFactory(metadata);
+                    metadata.DestroyListenerMethod = publishsubscribechannel.DestroyListenerMethodFactory(metadata);
 
-                    metadata.ListenMethod = publishsubscriberchannel.ListenerMethodFactory(metadata);
+                    metadata.ListenMethod = publishsubscribechannel.ListenerMethodFactory(metadata);
 
                     metadata.Listener = metadata.CreateListenerMethod();
 

@@ -52,7 +52,7 @@ namespace Jal.Router.AzureStorage.Model
         public int RetryCount { get; set; }
 
         public bool LastRetry { get; set; }
-
+        public string SagaId { get; set; }
         public string Origin { get; set; }
         public string Saga { get; set; }
         public string Headers { get; set; }

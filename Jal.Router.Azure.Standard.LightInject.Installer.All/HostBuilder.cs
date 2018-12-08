@@ -9,7 +9,6 @@ using Jal.Router.Interface.Management;
 using Jal.Router.LightInject.Installer;
 using Jal.Router.Logger.LightInject.Installer;
 using Jal.Router.AzureStorage.Extensions;
-using Jal.Router.Impl.Management;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Logger.Extensions;

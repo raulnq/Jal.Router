@@ -57,9 +57,13 @@ namespace Jal.Router.Sample.NetCore
                 .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 .AddMonitoringTask<HeartBeatLogger>(1000)
+                .EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
 
-            host.Configuration.Storage.Enabled = true;
+            var facade = container.GetInstance<IEntityStorageFacade>();
+
+            var messages = facade.GetMessages(new DateTime(2018, 12, 7), new DateTime(2018, 12, 9), "queueperformancetoread_handler");
+
             host.RunAndBlock();
         }
     }
@@ -244,7 +248,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("fromqueueendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddPublishSubscriberChannel(config.ConnectionString, _topicpublishedfromqueue));
+            .To(x => x.AddPublishSubscribeChannel(config.ConnectionString, _topicpublishedfromqueue));
 
 
             RegisterHandler<IMessageHandler<Message>>("handlingtwoqueuesinonehandler_handler")
@@ -338,7 +342,7 @@ namespace Jal.Router.Sample.NetCore
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
             .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
-            .OnEntry(x=>x.IgnoreExceptionOnSaveMessage(true))
+            .OnEntry(x=>x.EnableEntityStorage(true))
             .OnErrorSendFailedMessageTo(_errorqueueendpoint)
             ; 
 
@@ -410,7 +414,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            context.Send(data, new Message() { Name = message.Name }, "endendpoint", context.Identity.Id+"_end", context.Identity.OperationId, context.SagaContext.Id);
+            context.Send(data, new Message() { Name = message.Name }, "endendpoint", context.IdentityContext.Id+"_end", context.IdentityContext.OperationId, context.SagaContext.Id);
         }
     }
 
@@ -426,7 +430,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", context.Identity.Id+ "_continue", context.Identity.OperationId, context.SagaContext.Id);
+            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", context.IdentityContext.Id+ "_continue", context.IdentityContext.OperationId, context.SagaContext.Id);
         }
     }
 
@@ -456,7 +460,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.Identity.Id, context.Identity.OperationId);
+            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext.Id, context.IdentityContext.OperationId);
         }
     }
 
@@ -466,7 +470,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.Identity.Id, context.Identity.OperationId);
+            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext.Id, context.IdentityContext.OperationId);
         }
     }
 
@@ -477,7 +481,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Publish(new Message() { }, "fromqueueendpoint", context.Identity.Id, context.Identity.OperationId);
+            context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext.Id, context.IdentityContext.OperationId);
         }
     }
 
@@ -513,7 +517,7 @@ namespace Jal.Router.Sample.NetCore
 
             for (int i = 0; i < 100; i++)
             {
-                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.Identity.Id, context.Identity.OperationId);
+                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext.Id, context.IdentityContext.OperationId);
             }
 
             

@@ -1,6 +1,5 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;

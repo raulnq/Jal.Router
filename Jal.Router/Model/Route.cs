@@ -15,8 +15,8 @@ namespace Jal.Router.Model
             MiddlewareTypes = new List<Type>();
             Name = name;
             Channels = new List<Channel>();
-            IdentityConfiguration = new IdentityConfiguration();
-            StorageConfiguration = new StorageConfiguration();
+            IdentityConfiguration = new Identity();
+            StorageConfiguration = new Storage();
             RetryExceptionTypes = new List<Type>();
         }
 
@@ -37,9 +37,9 @@ namespace Jal.Router.Model
 
         public Action<object, Channel> RuntimeHandler { get; set; }
 
-        public IdentityConfiguration IdentityConfiguration { get; }
+        public Identity IdentityConfiguration { get; }
 
-        public StorageConfiguration StorageConfiguration { get; }
+        public Storage StorageConfiguration { get; }
 
         public List<Channel> Channels { get; }
 

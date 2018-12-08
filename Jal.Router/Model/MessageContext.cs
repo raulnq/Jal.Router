@@ -31,7 +31,7 @@ namespace Jal.Router.Model
         public string Content { get; set; }
         public string ContentId { get; set; }
         public List<Track> Tracks { get; set; }
-        public Identity Identity { get; set; }
+        public IdentityContext IdentityContext { get; set; }
         public MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage)
         {
             _bus = bus;
@@ -43,7 +43,7 @@ namespace Jal.Router.Model
             Origin = new Origin();
             SagaContext = new SagaContext();
             Tracks = new List<Track>();
-            Identity = new Identity();
+            IdentityContext = new IdentityContext();
         }
 
         public MessageContext(EndPoint endpoint, Options options)
@@ -53,7 +53,7 @@ namespace Jal.Router.Model
             LastRetry = true;
             Origin = new Origin();
             EndPoint = endpoint;
-            Identity = options.Identity;
+            IdentityContext = options.Identity;
             Headers = options.Headers;
             Version = options.Version;
             ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
@@ -64,7 +64,7 @@ namespace Jal.Router.Model
 
         }
 
-        public void AddTrack(Identity identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
+        public void AddTrack(IdentityContext identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
         {
             var tracking = new Track()
             {
@@ -79,7 +79,7 @@ namespace Jal.Router.Model
             Tracks.Add(tracking);
         }
 
-        public Track[] GetTracksOfTheSaga()
+        public Track[] GetTracksOfTheCurrentSaga()
         {
             if (!string.IsNullOrWhiteSpace(SagaContext.Id))
             {

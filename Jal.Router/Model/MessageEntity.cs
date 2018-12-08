@@ -6,6 +6,7 @@ namespace Jal.Router.Model
     public class MessageEntity
     {
         public string Id { get; set; }
+        public string SagaId { get; set; }
         public string Data { get; set; }
         public DateTime DateTimeUtc { get; set; }
         public string Content { get; set; }
@@ -19,7 +20,7 @@ namespace Jal.Router.Model
         public string Name { get; set; }
         public string ContentType { get; set; }
         public List<Track> Tracks { get; set; }
-        public Identity Identity { get; set; }
+        public IdentityContext Identity { get; set; }
         public MessageEntityType Type { get; set; }
 
         public MessageEntity()
@@ -27,7 +28,7 @@ namespace Jal.Router.Model
             Origin = new Origin();
             Saga = new SagaContext();
             Tracks = new List<Track>();
-            Identity = new Identity();
+            Identity = new IdentityContext();
         }
     }
 }

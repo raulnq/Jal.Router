@@ -2,10 +2,8 @@ using System;
 using System.Diagnostics;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
@@ -40,7 +38,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             {
                 telemetry.Timestamp = context.Data.DateTimeUtc;
 
-                telemetry.Id = $"{context.Data.Identity.Id}";
+                telemetry.Id = $"{context.Data.IdentityContext.Id}";
 
                 telemetry.Name = name;
 

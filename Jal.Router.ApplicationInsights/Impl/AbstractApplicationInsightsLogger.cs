@@ -20,8 +20,8 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateContext(TelemetryContext telemetrycontext, MessageContext context)
         {
-            telemetrycontext.Operation.Id = $"{context.Identity.OperationId}";
-            telemetrycontext.Operation.ParentId = $"{context.Identity.ParentId}";
+            telemetrycontext.Operation.Id = $"{context.IdentityContext.OperationId}";
+            telemetrycontext.Operation.ParentId = $"{context.IdentityContext.ParentId}";
 
             if (!string.IsNullOrWhiteSpace(Configuration.ApplicationName))
             {
@@ -36,11 +36,11 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
-            properties.Add("identity_id", context.Identity?.Id);
-            properties.Add("identity_replytorequestid", context.Identity?.ReplyToRequestId);
-            properties.Add("identity_requestid", context.Identity?.RequestId);
-            properties.Add("identity_operationid", context.Identity?.OperationId);
-            properties.Add("identity_parentid", context.Identity?.ParentId);
+            properties.Add("identity_id", context.IdentityContext?.Id);
+            properties.Add("identity_replytorequestid", context.IdentityContext?.ReplyToRequestId);
+            properties.Add("identity_requestid", context.IdentityContext?.RequestId);
+            properties.Add("identity_operationid", context.IdentityContext?.OperationId);
+            properties.Add("identity_parentid", context.IdentityContext?.ParentId);
 
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);
@@ -54,6 +54,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             properties.Add("lastretry", context.LastRetry.ToString());
 
             properties.Add("route_name", context.Route?.Name);
+            properties.Add("endpoint_name", context.EndPoint?.Name);
 
             foreach (var h in context.Headers)
             {

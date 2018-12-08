@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.6.1</Version>
+    <Version>1.6.4</Version>
     <Company>Raul Naupari</Company>
     <Description>LightInject installer for the Jal.Router.Logger library</Description>
     <Copyright />

@@ -39,20 +39,20 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     DateTimeUtc = DateTime.UtcNow,
                 };
 
-                context.Identity.Id = sbmessage.MessageId;
+                context.IdentityContext.Id = sbmessage.MessageId;
 
-                context.Identity.ReplyToRequestId = sbmessage.ReplyToSessionId;
+                context.IdentityContext.ReplyToRequestId = sbmessage.ReplyToSessionId;
 
-                context.Identity.RequestId = sbmessage.SessionId;
+                context.IdentityContext.RequestId = sbmessage.SessionId;
 
                 if (sbmessage.UserProperties.ContainsKey(OperationId))
                 {
-                    context.Identity.OperationId = sbmessage.UserProperties[OperationId].ToString();
+                    context.IdentityContext.OperationId = sbmessage.UserProperties[OperationId].ToString();
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(ParentId))
                 {
-                    context.Identity.ParentId = sbmessage.UserProperties[ParentId].ToString();
+                    context.IdentityContext.ParentId = sbmessage.UserProperties[ParentId].ToString();
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(From))
@@ -198,29 +198,29 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(Origin, context.Origin.Key);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.Id))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.Id))
             {
-                brokeredmessage.MessageId = context.Identity.Id;
+                brokeredmessage.MessageId = context.IdentityContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                brokeredmessage.ReplyToSessionId = context.Identity.ReplyToRequestId;
+                brokeredmessage.ReplyToSessionId = context.IdentityContext.ReplyToRequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.RequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.RequestId))
             {
-                brokeredmessage.SessionId = context.Identity.RequestId;
+                brokeredmessage.SessionId = context.IdentityContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
             {
-                brokeredmessage.UserProperties.Add(OperationId, context.Identity.OperationId);
+                brokeredmessage.UserProperties.Add(OperationId, context.IdentityContext.OperationId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ParentId))
             {
-                brokeredmessage.UserProperties.Add(ParentId, context.Identity.ParentId);
+                brokeredmessage.UserProperties.Add(ParentId, context.IdentityContext.ParentId);
             }
 
             brokeredmessage.UserProperties.Add(RetryCount, context.RetryCount.ToString());

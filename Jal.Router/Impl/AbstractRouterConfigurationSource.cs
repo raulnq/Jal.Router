@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
 
         private readonly List<SubscriptionToPublishSubscribeChannel> _subscriptions = new List<SubscriptionToPublishSubscribeChannel>();
 
-        private readonly List<PublishSubscribeChannel> _publishsubscriberchannels = new List<PublishSubscribeChannel>();
+        private readonly List<PublishSubscribeChannel> _publishsubscribechannels = new List<PublishSubscribeChannel>();
 
         private readonly List<PointToPointChannel> _pointtopointchannels = new List<PointToPointChannel>();
 
@@ -63,7 +63,7 @@ namespace Jal.Router.Impl
 
         public PublishSubscribeChannel[] GetPublishSubscribeChannels()
         {
-            return _publishsubscriberchannels.ToArray();
+            return _publishsubscribechannels.ToArray();
         }
 
 
@@ -79,7 +79,7 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, SubscriptionToPublishSubscribeChannelRule rule = null)
+        public void RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, SubscriptionToPublishSubscribeChannelRule rule = null)
             where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
@@ -108,7 +108,7 @@ namespace Jal.Router.Impl
             _subscriptions.Add(channel);
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel(string subscription, string path, string connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
+        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -183,7 +183,7 @@ namespace Jal.Router.Impl
             _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider)
+        public void RegisterPublishSubscribeChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider)
             where TValueFinder : IValueFinder
         { 
             if (string.IsNullOrWhiteSpace(path))
@@ -200,10 +200,10 @@ namespace Jal.Router.Impl
                 ConnectionStringProvider = connectionstringprovider
             };
 
-            _publishsubscriberchannels.Add(channel);
+            _publishsubscribechannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel(string path, string connectionstring)
+        public void RegisterPublishSubscribeChannel(string path, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -222,7 +222,7 @@ namespace Jal.Router.Impl
                 ConnectionStringProvider = provider
             };
 
-            _publishsubscriberchannels.Add(channel);
+            _publishsubscribechannels.Add(channel);
         }
 
         public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IFirstRouteBuilder<TData>> start, Action<IMiddleRouteBuilder<TData>> @continue=null, Action<ILastRouteBuilder<TData>> end = null) where TData : class, new()

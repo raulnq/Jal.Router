@@ -77,7 +77,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel(ChannelType.PublishSubscriber)
+            _channels.Add(new Channel(ChannelType.PublishSubscribe)
             {
                 ToPath = path,
 

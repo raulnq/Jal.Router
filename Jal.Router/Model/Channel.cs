@@ -26,13 +26,13 @@ namespace Jal.Router.Model
             {
                 return "request reply to point to point";
             }
-            if (Type == ChannelType.RequestReplyToSubscriptionToPublishSubscriber)
+            if (Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
             {
                 return "request reply to subscription";
             }
-            if (Type == ChannelType.PublishSubscriber)//TODO SubscriptionToPublishSubscriber on listen - PublishSubscriber on publish
+            if (Type == ChannelType.PublishSubscribe)//TODO SubscriptionToPublishSubscribe on listen - PublishSubscriber on publish
             {
-                return "publish subscriber";
+                return "publish subscribe";
             }
 
             return string.Empty;

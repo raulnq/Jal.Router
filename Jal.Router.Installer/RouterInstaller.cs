@@ -83,7 +83,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<PointToPointChannelCreator>().LifestyleSingleton().Named(typeof(PointToPointChannelCreator).FullName));
 
-            container.Register(Component.For<IStartupTask>().ImplementedBy<PublishSubscriberChannelCreator>().LifestyleSingleton().Named(typeof(PublishSubscriberChannelCreator).FullName));
+            container.Register(Component.For<IStartupTask>().ImplementedBy<PublishSubscribeChannelCreator>().LifestyleSingleton().Named(typeof(PublishSubscribeChannelCreator).FullName));
 
             container.Register(Component.For<IStartupTask>().ImplementedBy<RoutesInitializer>().LifestyleSingleton().Named(typeof(RoutesInitializer).FullName));
 
@@ -99,7 +99,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<IStorageSearcher>().ImplementedBy<StorageSearcher>().LifestyleSingleton());
+            container.Register(Component.For<IEntityStorageFacade>().ImplementedBy<EntityStorageFacade>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 

@@ -3,7 +3,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Interface
 {
-    public interface IStorageSearcher
+    public interface IEntityStorageFacade
     {
         SagaEntity[] GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "");
         MessageEntity[] GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "");

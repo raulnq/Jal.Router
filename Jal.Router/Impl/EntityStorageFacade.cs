@@ -5,12 +5,12 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class StorageSearcher : IStorageSearcher
+    public class EntityStorageFacade : IEntityStorageFacade
     {
         private readonly IComponentFactory _factory;
 
         private readonly IConfiguration _configuration;
-        public StorageSearcher(IComponentFactory factory, IConfiguration configuration)
+        public EntityStorageFacade(IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
             _configuration = configuration;

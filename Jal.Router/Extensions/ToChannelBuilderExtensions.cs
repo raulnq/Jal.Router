@@ -5,7 +5,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {
-    public static class EndpointBuilderExtensions
+    public static class ToChannelBuilderExtensions
     {
         public static IAndWaitReplyFromEndPointBuilder AddPointToPointChannel(this IToChannelBuilder builder, string connectionstring, string path)
         {
@@ -24,7 +24,7 @@ namespace Jal.Router.Extensions
             return builder.AddPointToPointChannel<NullValueFinder>(provider, path);
         }
 
-        public static IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel(this IToChannelBuilder builder, string connectionstring, string path)
+        public static IAndWaitReplyFromEndPointBuilder AddPublishSubscribeChannel(this IToChannelBuilder builder, string connectionstring, string path)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -38,7 +38,7 @@ namespace Jal.Router.Extensions
 
             Func<IValueFinder, string> provider = x => connectionstring;
 
-            return builder.AddPublishSubscriberChannel<NullValueFinder>(provider, path);
+            return builder.AddPublishSubscribeChannel<NullValueFinder>(provider, path);
         }
 
         public static void AndWaitReplyFromPointToPointChannel(this IAndWaitReplyFromEndPointBuilder builder, string path, string connectionstring, int timeout = 60)

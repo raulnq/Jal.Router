@@ -19,9 +19,9 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
-            context.Data.AddTrack(context.Data.Identity, context.Data.Origin, context.Data.Route);
+            context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route);
 
-            CreateInboundMessageEntity(context.Data);
+            CreateMessageEntity(context.Data);
 
             _router.Route(context.Data);
         }

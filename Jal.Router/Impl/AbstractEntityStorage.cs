@@ -17,11 +17,6 @@ namespace Jal.Router.Impl.Inbound
             return null;
         }
 
-        public virtual MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
-        {
-            return null;
-        }
-
         public virtual void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
             
@@ -42,7 +37,7 @@ namespace Jal.Router.Impl.Inbound
             return null;
         }
 
-        public virtual MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "")
+        public virtual MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, string messagestoragename = "")
         {
             return null;
         }

@@ -18,9 +18,9 @@ namespace Jal.Router.Impl.Management
     public class Configuration : IConfiguration
     {
         public Runtime Runtime { get; }
-        public IdentityConfiguration Identity { get; }
+        public Identity Identity { get; }
         public string ChannelProviderName { get; private set; }
-        public StorageConfiguration Storage { get; set; }
+        public Storage Storage { get; set; }
         public string ApplicationName { get; private set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
@@ -42,6 +42,19 @@ namespace Jal.Router.Impl.Management
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
         public IDictionary<string, object> Parameters { get; private set; }
+        public IConfiguration EnableEntityStorage(bool ignoreexceptions = true)
+        {
+            Storage.Enabled = true;
+            Storage.IgnoreExceptions = ignoreexceptions;
+            return this;
+        }
+
+        public IConfiguration DisableEntityStorage()
+        {
+            Storage.Enabled = false;
+            Storage.IgnoreExceptions = true;
+            return this;
+        }
         public IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler
         {
             ChannelShufflerType = typeof(TChannelShuffler);
@@ -219,7 +232,7 @@ namespace Jal.Router.Impl.Management
             AddStartupTask<EndpointsInitializer>();
             AddStartupTask<RoutesInitializer>();
             AddStartupTask<PointToPointChannelCreator>();
-            AddStartupTask<PublishSubscriberChannelCreator>();
+            AddStartupTask<PublishSubscribeChannelCreator>();
             AddStartupTask<SubscriptionToPublishSubscribeChannelCreator>();
             AddStartupTask<SenderLoader>();
             AddStartupTask<ListenerLoader>();
@@ -227,8 +240,8 @@ namespace Jal.Router.Impl.Management
             AddShutdownTask<SenderShutdownTask>();
             AddShutdownTask<ShutdownTask>();
             AddShutdownWatcher<CtrlCShutdownWatcher>();
-            Storage = new StorageConfiguration();
-            Identity = new IdentityConfiguration();
+            Storage = new Storage();
+            Identity = new Identity();
             Runtime = new Runtime();
             ApplicationName = "Empty app name";
             ChannelProviderName = "Empty channel provider name";

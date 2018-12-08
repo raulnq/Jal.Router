@@ -49,13 +49,13 @@ namespace Jal.Router.Impl.Outbound
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Message {outputcontext?.Identity.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
+                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
 
                             throw;
                         }
                         finally
                         {
-                            Logger.Log($"Message {outputcontext?.Identity.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
+                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
                         }
 
                         if (outputcontext != null)

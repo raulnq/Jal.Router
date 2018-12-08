@@ -5,9 +5,9 @@ using Jal.Router.Interface.Management;
 
 namespace Jal.Router.Impl.StartupTask
 {
-    public class PublishSubscriberChannelCreator : AbstractStartupTask, IStartupTask
+    public class PublishSubscribeChannelCreator : AbstractStartupTask, IStartupTask
     {
-        public PublishSubscriberChannelCreator(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        public PublishSubscribeChannelCreator(IComponentFactory factory, IConfiguration configuration, ILogger logger)
             : base(factory, configuration, logger)
         {
         }
@@ -16,7 +16,7 @@ namespace Jal.Router.Impl.StartupTask
         {
             var errors = new StringBuilder();
 
-            Logger.Log("Creating publish subscriber channels");
+            Logger.Log("Creating publish subscribe channels");
 
             var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
 
@@ -33,7 +33,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                     {
-                        var error = $"Empty connection string, publish subscriber channel {channel.Path}";
+                        var error = $"Empty connection string, publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -44,7 +44,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (string.IsNullOrWhiteSpace(channel.Path))
                     {
-                        var error = $"Empty path, publish subscriber channel {channel.Path}";
+                        var error = $"Empty path, publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -59,16 +59,16 @@ namespace Jal.Router.Impl.StartupTask
 
                         if (created)
                         {
-                            Logger.Log($"Created {channel.Path} publish subscriber channel");
+                            Logger.Log($"Created {channel.Path} publish subscribe channel");
                         }
                         else
                         {
-                            Logger.Log($"Publish subscriber channel {channel.Path} already exists");
+                            Logger.Log($"Publish subscribe channel {channel.Path} already exists");
                         }
                     }
                     catch (Exception ex)
                     {
-                        var error = $"Exception {channel.Path} publish subscriber channel: {ex}";
+                        var error = $"Exception {channel.Path} publish subscribe channel: {ex}";
 
                         errors.AppendLine(error);
 
@@ -82,7 +82,7 @@ namespace Jal.Router.Impl.StartupTask
                 throw new Exception(errors.ToString());
             }
 
-            Logger.Log("Publish subscriber channels created");
+            Logger.Log("Publish subscribe channels created");
         }
     }
 }

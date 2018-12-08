@@ -1,11 +1,11 @@
-﻿namespace Jal.Router.Model.Management
+﻿namespace Jal.Router.Model
 {
-    public class StorageConfiguration
+    public class Storage
     {
         public bool Enabled { get; set; }
         public bool IgnoreExceptions { get; set; }
 
-        public StorageConfiguration()
+        public Storage()
         {
             Enabled = true;
             IgnoreExceptions = false;

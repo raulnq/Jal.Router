@@ -26,15 +26,11 @@ namespace Jal.Router.Impl
             return sagaentity;
         }
 
-        protected SagaEntity CreateSagaEntity(MessageContext context, object data)
+        protected SagaEntity CreateSagaEntity(MessageContext context)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
-            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
             var sagaentity = MessageContextToSagaEntity(context);
-
-            sagaentity.Data = serializer.Serialize(data);
 
             storage.CreateSagaEntity(context, sagaentity);
 
@@ -43,20 +39,16 @@ namespace Jal.Router.Impl
             return sagaentity;
         }
 
-        protected void UpdateSagaEntity(MessageContext messagecontext, SagaEntity sagaentity, object data)
+        protected void UpdateSagaEntity(MessageContext messagecontext, SagaEntity sagaentity)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
-            sagaentity.Data = serializer.Serialize(data);
 
             sagaentity.Status = messagecontext.SagaContext.Status;
 
             storage.UpdateSagaEntity(messagecontext, sagaentity);
         }
 
-        protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext)
+        protected MessageEntity CreateMessageEntity(MessageContext messagecontext, MessageEntityType type = MessageEntityType.Inbound, SagaEntity sagaentity = null)
         {
             if (Configuration.Storage.Enabled)
             {
@@ -64,59 +56,7 @@ namespace Jal.Router.Impl
                 {
                     var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
-                    var messageentity = MessageContextToInboundMessageEntity(messagecontext);
-
-                    storage.CreateMessageEntity(messagecontext, messageentity);
-
-                    return messageentity;
-                }
-                catch (Exception)
-                {
-                    if (!Configuration.Storage.IgnoreExceptions)
-                    {
-                        throw;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        protected MessageEntity CreateInboundMessageEntity(MessageContext messagecontext, SagaEntity sagaentity)
-        {
-            if (Configuration.Storage.Enabled)
-            {
-                try
-                {
-                    var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-                    var messageentity = MessageContextToMessageEntity(messagecontext, sagaentity);
-
-                    storage.CreateMessageEntity(messagecontext, sagaentity, messageentity);
-
-                    return messageentity;
-                }
-                catch (Exception)
-                {
-                    if (!Configuration.Storage.IgnoreExceptions)
-                    {
-                        throw;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        protected MessageEntity CreateOutboundMessageEntity(MessageContext messagecontext)
-        {
-            if (Configuration.Storage.Enabled)
-            {
-                try
-                {
-                    var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-                    var messageentity = MessageContextToOuboundMessageEntity(messagecontext);
+                    var messageentity = MessageContextToMessageEntity(messagecontext, type, sagaentity);
 
                     storage.CreateMessageEntity(messagecontext, messageentity);
 
@@ -144,16 +84,17 @@ namespace Jal.Router.Impl
                 DataType = context.Saga.DataType.FullName,
                 Timeout = context.Saga.Timeout,
                 Status = context.SagaContext.Status,
+                Data = string.Empty
             };
         }
 
-        private MessageEntity MessageContextToMessageEntity(MessageContext context, SagaEntity sagaentity)
+        private MessageEntity MessageContextToMessageEntity(MessageContext context, MessageEntityType type, SagaEntity sagaentity)
         {
-            return new MessageEntity
+
+            var entity = new MessageEntity()
             {
                 Content = context.Content,
-                ContentType = context.Route.ContentType.FullName,
-                Identity = context.Identity,
+                Identity = context.IdentityContext,
                 Version = context.Version,
                 RetryCount = context.RetryCount,
                 LastRetry = context.LastRetry,
@@ -161,55 +102,30 @@ namespace Jal.Router.Impl
                 Saga = context.SagaContext,
                 Headers = context.Headers,
                 DateTimeUtc = context.DateTimeUtc,
-                Data = sagaentity.Data,
-                Name = context.Route.Name,
                 Tracks = context.Tracks,
                 ContentId = context.ContentId,
-                Type = MessageEntityType.Input,
+                Type = type,
             };
-        }
-        private MessageEntity MessageContextToInboundMessageEntity(MessageContext context)
-        {
 
-            return new MessageEntity()
+            if(sagaentity!=null)
             {
-                Content = context.Content,
-                ContentType = context.Route.ContentType.FullName,
-                Identity = context.Identity,
-                Version = context.Version,
-                RetryCount = context.RetryCount,
-                LastRetry = context.LastRetry,
-                Origin = context.Origin,
+                entity.Data = sagaentity.Data;
+                entity.SagaId = sagaentity.Id;
+            }
 
-                Headers = context.Headers,
-                DateTimeUtc = context.DateTimeUtc,
-                Data = string.Empty,
-                Name = context.Route.Name,
-                Tracks = context.Tracks,
-                ContentId = context.ContentId,
-                Type = MessageEntityType.Input,
-            };
-        }
-
-        private MessageEntity MessageContextToOuboundMessageEntity(MessageContext context)
-        {
-
-            return new MessageEntity()
+            if(type== MessageEntityType.Inbound)
             {
-                Content = context.Content,
-                ContentType = context.EndPoint.MessageType.FullName,
-                Identity = context.Identity,
-                Version = context.Version,
-                Origin = context.Origin,
-                Saga = context.SagaContext,
-                Headers = context.Headers,
-                DateTimeUtc = context.DateTimeUtc,
-                Data = string.Empty,
-                Name = context.EndPoint.Name,
-                Tracks = context.Tracks,
-                ContentId = context.ContentId,
-                Type = MessageEntityType.Output,
-            };
+                entity.ContentType = context.Route.ContentType.FullName;
+                entity.Name = context.Route.Name;
+            }
+
+            if (type == MessageEntityType.Outbound)
+            {
+                entity.ContentType = context.EndPoint.MessageType.FullName;
+                entity.Name = context.EndPoint.Name;
+            }
+
+            return entity;
         }
     }
 }

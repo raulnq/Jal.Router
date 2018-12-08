@@ -129,12 +129,12 @@ namespace Jal.Router.Extensions
 
             options.Identity.Id = id;
 
-            options.Identity.ParentId = context.Identity.Id;
+            options.Identity.ParentId = context.IdentityContext.Id;
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                options.Identity.RequestId = context.Identity.ReplyToRequestId;
-                options.Identity.ReplyToRequestId = context.Identity.ReplyToRequestId;
+                options.Identity.RequestId = context.IdentityContext.ReplyToRequestId;
+                options.Identity.ReplyToRequestId = context.IdentityContext.ReplyToRequestId;
             }
 
             if (headers != null)
@@ -169,14 +169,14 @@ namespace Jal.Router.Extensions
 
             options.Identity.OperationId = operationid;
 
-            options.Identity.ParentId = context.Identity.Id;
+            options.Identity.ParentId = context.IdentityContext.Id;
 
 
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                options.Identity.RequestId = context.Identity.ReplyToRequestId;
-                options.Identity.ReplyToRequestId = context.Identity.ReplyToRequestId;
+                options.Identity.RequestId = context.IdentityContext.ReplyToRequestId;
+                options.Identity.ReplyToRequestId = context.IdentityContext.ReplyToRequestId;
             }
 
             if (headers != null)
@@ -214,12 +214,12 @@ namespace Jal.Router.Extensions
 
             options.Identity.OperationId = operationid;
 
-            options.Identity.ParentId = context.Identity.Id;
+            options.Identity.ParentId = context.IdentityContext.Id;
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                options.Identity.RequestId = context.Identity.ReplyToRequestId;
-                options.Identity.ReplyToRequestId = context.Identity.ReplyToRequestId;
+                options.Identity.RequestId = context.IdentityContext.ReplyToRequestId;
+                options.Identity.ReplyToRequestId = context.IdentityContext.ReplyToRequestId;
             }
 
             if (headers != null)

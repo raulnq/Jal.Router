@@ -19,7 +19,7 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
         public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
         {
-            CreateOutboundMessageEntity(context.Data);
+            CreateMessageEntity(context.Data, MessageEntityType.Outbound);
 
             _sender.Send(context.Data.Channel, context.Data);
         }

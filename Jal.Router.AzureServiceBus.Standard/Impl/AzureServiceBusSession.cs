@@ -23,7 +23,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var client = new SessionClient(metadata.Channel.ToReplyConnectionString, metadata.Channel.ToReplyPath);
 
-                var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
+                var messagesession = client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).GetAwaiter().GetResult();
 
                 var message = metadata.Channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.Channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 
@@ -44,7 +44,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             };
         }
 
-        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscriberChannelMethodFactory(SenderMetadata metadata)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscribeChannelMethodFactory(SenderMetadata metadata)
         {
             return (context, adapter) =>
             {
@@ -52,7 +52,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 var client = new SessionClient(metadata.Channel.ToReplyConnectionString, entity);
 
-                var messagesession = client.AcceptMessageSessionAsync(context.Identity.ReplyToRequestId).GetAwaiter().GetResult();
+                var messagesession = client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).GetAwaiter().GetResult();
 
                 var message = metadata.Channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(metadata.Channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
 

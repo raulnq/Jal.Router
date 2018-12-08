@@ -9,12 +9,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
     {
         public static IAndWaitReplyFromEndPointBuilder AddTopic(this IToChannelBuilder builder, string connectionstring, string path)
         {
-            return builder.AddPublishSubscriberChannel(connectionstring, path);
+            return builder.AddPublishSubscribeChannel(connectionstring, path);
         }
 
         public static IAndWaitReplyFromEndPointBuilder AddTopic<TValueFinder>(this IToChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
-            return builder.AddPublishSubscriberChannel<TValueFinder>(connectionstringprovider, path);
+            return builder.AddPublishSubscribeChannel<TValueFinder>(connectionstringprovider, path);
         }
 
         public static IAndWaitReplyFromEndPointBuilder AddQueue(this IToChannelBuilder builder, string connectionstring, string path)
@@ -38,12 +38,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
         }
 
-        public static void AndWaitReplyFromSubscription(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
+        public static void AndWaitReplyFromSubscriptionToTopic(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
         {
             builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring, timeout);
         }
 
-        public static void AndWaitReplyFromSubscription<TValueFinder>(this IAndWaitReplyFromEndPointBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path, string subscription, int timeout = 60) where TValueFinder : IValueFinder
+        public static void AndWaitReplyFromSubscriptionToTopic<TValueFinder>(this IAndWaitReplyFromEndPointBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path, string subscription, int timeout = 60) where TValueFinder : IValueFinder
         {
             builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(path, subscription, connectionstringprovider, timeout);
         }

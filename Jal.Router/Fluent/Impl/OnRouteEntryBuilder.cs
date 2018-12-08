@@ -13,45 +13,28 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public IOnRouteEntryBuilder BuildIdWith(Func<MessageContext, string> builder)
+        public IOnRouteEntryBuilder BuildIdentityWith(Func<MessageContext, IdentityContext> builder)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
-            _route.IdentityConfiguration.IdBuilder = builder;
+            _route.IdentityConfiguration.Builder = builder;
             return this;
         }
 
-        public IOnRouteEntryBuilder BuildOperationIdWith(Func<MessageContext, string> builder)
+
+        public IOnRouteEntryBuilder EnableEntityStorage(bool ignoreexceptions=true)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-            _route.IdentityConfiguration.OperationIdBuilder = builder;
+            _route.StorageConfiguration.Enabled = true;
+            _route.StorageConfiguration.IgnoreExceptions = ignoreexceptions;
             return this;
         }
 
-        public IOnRouteEntryBuilder BuildParentIdWith(Func<MessageContext, string> builder)
+        public IOnRouteEntryBuilder DisableEntityStorage()
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-            _route.IdentityConfiguration.ParentIdBuilder = builder;
-            return this;
-        }
-
-        public IOnRouteEntryBuilder IgnoreExceptionOnSaveMessage(bool ignore)
-        {
-            _route.StorageConfiguration.IgnoreExceptions = ignore;
-            return this;
-        }
-
-        public IOnRouteEntryBuilder SaveMessage(bool save)
-        {
-            _route.StorageConfiguration.Enabled = save;
+            _route.StorageConfiguration.Enabled = false;
+            _route.StorageConfiguration.IgnoreExceptions = true;
             return this;
         }
     }

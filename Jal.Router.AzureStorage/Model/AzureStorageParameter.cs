@@ -7,7 +7,7 @@ namespace Jal.Router.AzureStorage.Model
     {
         public string TableStorageConnectionString { get; set; }
 
-        public string BlobConnectionString { get; set; }
+        public string BlobStorageConnectionString { get; set; }
 
         public Encoding TableStorageStringEncoding { get; set; }
 
@@ -48,7 +48,7 @@ namespace Jal.Router.AzureStorage.Model
 
             TableStorageConnectionString = connectionstring;
 
-            BlobConnectionString = connectionstring;
+            BlobStorageConnectionString = connectionstring;
 
             TableStorageStringEncoding = Encoding.Unicode;
 
@@ -67,7 +67,7 @@ namespace Jal.Router.AzureStorage.Model
 
             TableStorageConnectionString = tablestorageconnectionstring;
 
-            BlobConnectionString = blobconnectionstring;
+            BlobStorageConnectionString = blobconnectionstring;
 
             TableStorageStringEncoding = Encoding.Unicode;
 

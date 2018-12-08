@@ -32,7 +32,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
+                var container = GetContainer(_parameter.BlobStorageConnectionString, _parameter.ContainerName);
 
                 var blob = container.GetBlockBlobReference(id);
 
@@ -55,7 +55,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
+                var container = GetContainer(_parameter.BlobStorageConnectionString, _parameter.ContainerName);
 
                 var blob = container.GetBlockBlobReference(id);
 

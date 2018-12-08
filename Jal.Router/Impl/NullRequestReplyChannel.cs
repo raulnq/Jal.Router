@@ -13,7 +13,7 @@ namespace Jal.Router.Impl
             return (c, a) => null;
         }
 
-        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscriberChannelMethodFactory(SenderMetadata metadata)
+        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscribeChannelMethodFactory(SenderMetadata metadata)
         {
             return (c, a) => null;
         }

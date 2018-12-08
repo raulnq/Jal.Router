@@ -33,9 +33,9 @@ namespace Jal.Router.AzureStorage.Impl
 
         public void Run()
         {
-            if(!string.IsNullOrEmpty(_parameter.BlobConnectionString))
+            if(!string.IsNullOrEmpty(_parameter.BlobStorageConnectionString))
             {
-                var container = GetContainer(_parameter.BlobConnectionString, _parameter.ContainerName);
+                var container = GetContainer(_parameter.BlobStorageConnectionString, _parameter.ContainerName);
 
                 var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 

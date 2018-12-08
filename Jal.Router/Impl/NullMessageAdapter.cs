@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
 
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext Read(object message, Type type, bool useclaimcheck, IdentityConfiguration identityconfiguration)
+        public MessageContext Read(object message, Type type, bool useclaimcheck, Identity identityconfiguration)
         {
             return new MessageContext(new EndPoint(string.Empty), new Options());
         }

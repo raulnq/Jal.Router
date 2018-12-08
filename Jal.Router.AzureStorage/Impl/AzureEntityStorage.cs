@@ -183,7 +183,7 @@ namespace Jal.Router.AzureStorage.Impl
                 var entity = new MessageEntity()
                 {
                     ContentType = record.ContentType,
-                    Identity = string.IsNullOrWhiteSpace(record.Identity) ? null : serializer.Deserialize<Identity>(record.Identity),
+                    Identity = string.IsNullOrWhiteSpace(record.Identity) ? null : serializer.Deserialize<IdentityContext>(record.Identity),
                     Version = record.Version,
                     RetryCount = record.RetryCount,
                     LastRetry = record.LastRetry,
@@ -193,7 +193,9 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = record.DateTimeUtc,
                     Name = record.Name,
                     ContentId = record.ContentId,
-                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type) : MessageEntityType.Input
+                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type) : MessageEntityType.Inbound,
+                    SagaId = record.SagaId,
+                    Id = record.Id
                 };
 
                 ReadMessage(record, entity);
@@ -276,7 +278,7 @@ namespace Jal.Router.AzureStorage.Impl
                 var entity = new MessageEntity()
                 {
                     ContentType = record.ContentType,
-                    Identity = !string.IsNullOrWhiteSpace(record.Identity) ? serializer.Deserialize<Identity>(record.Identity) : null,
+                    Identity = !string.IsNullOrWhiteSpace(record.Identity) ? serializer.Deserialize<IdentityContext>(record.Identity) : null,
                     Version = record.Version,
                     RetryCount = record.RetryCount,
                     LastRetry = record.LastRetry,
@@ -287,7 +289,9 @@ namespace Jal.Router.AzureStorage.Impl
                     DateTimeUtc = record.DateTimeUtc,
                     Name = record.Name,
                     ContentId = record.ContentId,
-                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type): MessageEntityType.Input
+                    SagaId = record.SagaId,
+                    Id = record.Id,
+                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type): MessageEntityType.Inbound
                 };
 
                 ReadMessage(record, entity);
@@ -295,58 +299,6 @@ namespace Jal.Router.AzureStorage.Impl
                 return entity;
 
             }).ToArray();
-        }
-
-        public override MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity)
-        {
-            try
-            {
-                var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
-
-                var tablenamesufix = GetTableNameSufix(sagaentity.Id);
-
-                var partition = GetRowKey(sagaentity.Id);
-
-                var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{tablenamesufix}");
-
-                var rowkey = $"{messageentity.Name}_{Guid.NewGuid()}";
-
-                var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
-
-                messageentity.Id = id;
-
-                var record = new MessageRecord(partition, rowkey)
-                {
-                    ContentType = messageentity.ContentType,
-                    Identity = serializer.Serialize(messageentity.Identity),
-                    Version = messageentity.Version,
-                    RetryCount = messageentity.RetryCount,
-                    LastRetry = messageentity.LastRetry,
-                    Origin = serializer.Serialize(messageentity.Origin),
-                    Saga = serializer.Serialize(messageentity.Saga),
-                    Headers = serializer.Serialize(messageentity.Headers),
-                    Tracks = serializer.Serialize(messageentity.Tracks),
-                    DateTimeUtc = messageentity.DateTimeUtc,
-                    Name = messageentity.Name,
-                    ContentId = messageentity.ContentId,
-                    Type = messageentity.Type.ToString(),
-                    Id  = messageentity.Id
-                };
-
-                WriteMessage(messageentity, record);
-
-                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
-
-                return messageentity;
-            }
-            catch (StorageException s)
-            {
-                throw new ApplicationException($"Error during the message record creation for saga {sagaentity.Name} with content {messageentity.ContentType} and route {messageentity.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"Error during the message record creation for saga {sagaentity.Name} with content {messageentity.ContentType} and route {messageentity.Name}", ex);
-            }
         }
 
         private void WriteMessage(MessageEntity messageentity, MessageRecord record)
@@ -515,6 +467,13 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var rowkey = $"{Guid.NewGuid()}";
 
+                if(!string.IsNullOrWhiteSpace(messageentity.SagaId))
+                {
+                    partition = GetRowKey(messageentity.SagaId);
+
+                    rowkey = $"{messageentity.Name}_{Guid.NewGuid()}";
+                }
+
                 var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
 
                 messageentity.Id = id;
@@ -534,10 +493,10 @@ namespace Jal.Router.AzureStorage.Impl
                     Name = messageentity.Name,
                     Tracks = serializer.Serialize(messageentity.Tracks),
                     ContentId = messageentity.ContentId,
-                    Data = messageentity.Data,
                     Type = messageentity.Type.ToString(),
                     Saga = serializer.Serialize(messageentity.Saga),
-                    Id = messageentity.Id
+                    Id = messageentity.Id,
+                    SagaId=messageentity.SagaId
                 };
 
                 WriteMessage(messageentity, record);

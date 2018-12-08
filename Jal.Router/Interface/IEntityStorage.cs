@@ -11,9 +11,7 @@ namespace Jal.Router.Interface
 
         void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity);
 
-        MessageEntity CreateMessageEntity(MessageContext context, SagaEntity sagaentity, MessageEntity messageentity);
-
-        SagaEntity GetSagaEntity(string entityid);
+        SagaEntity GetSagaEntity(string id);
 
         SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "");
 

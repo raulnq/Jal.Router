@@ -8,7 +8,7 @@ namespace Jal.Router.Fluent.Interface
         IAndWaitReplyFromEndPointBuilder AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path)
     where TValueFinder : IValueFinder;
 
-        IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel<TValue>(Func<IValueFinder, string> connectionstringprovider, string path)
+        IAndWaitReplyFromEndPointBuilder AddPublishSubscribeChannel<TValue>(Func<IValueFinder, string> connectionstringprovider, string path)
     where TValue : IValueFinder;
     }
 }

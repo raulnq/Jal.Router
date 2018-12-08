@@ -9,7 +9,7 @@ namespace Jal.Router.Interface
     {
         Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPointToPointChannelMethodFactory(SenderMetadata metadata);
 
-        Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscriberChannelMethodFactory(SenderMetadata metadata);
+        Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnPublishSubscribeChannelMethodFactory(SenderMetadata metadata);
 
         Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata);
 

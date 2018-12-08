@@ -9,13 +9,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class AbstractRouterConfigurationSourceExtensions
     {
-        public static void RegisterQueue<TValueFinder>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider)
+        public static void RegisterQueue<TValueFinder>(this AbstractRouterConfigurationSource configuration, string queue, Func<IValueFinder, ServiceBusConfiguration> servicebusconfigurationprovider)
             where TValueFinder : IValueFinder
         {
 
             Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringprovider(finder);
+                var servicebusconfiguration = servicebusconfigurationprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
@@ -29,31 +29,31 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterTopic<TValueFinder>(this AbstractRouterConfigurationSource configuration, string topic,
-            Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider)
+            Func<IValueFinder, ServiceBusConfiguration> servicebusconfigurationprovider)
             where TValueFinder : IValueFinder
         {
             Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringprovider(finder);
+                var servicebusconfiguration = servicebusconfigurationprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
 
-            configuration.RegisterPublishSubscriberChannel<TValueFinder>(topic, provider);
+            configuration.RegisterPublishSubscribeChannel<TValueFinder>(topic, provider);
         }
 
         public static void RegisterTopic(this AbstractRouterConfigurationSource configuration, string topic, ServiceBusConfiguration servicebusconfiguration)
         {
-            configuration.RegisterPublishSubscriberChannel(topic, JsonConvert.SerializeObject(servicebusconfiguration));
+            configuration.RegisterPublishSubscribeChannel(topic, JsonConvert.SerializeObject(servicebusconfiguration));
         }
 
         public static void RegisterSubscriptionToTopic<TValueFinder>(this AbstractRouterConfigurationSource configuration, string subscription, string topic,
-            Func<IValueFinder, ServiceBusConfiguration> connectionstringprovider, string filter=null)
+            Func<IValueFinder, ServiceBusConfiguration> servicebusconfigurationprovider, string filter=null)
             where TValueFinder : IValueFinder
         {
             Func<IValueFinder, string> provider = finder =>
             {
-                var servicebusconfiguration = connectionstringprovider(finder);
+                var servicebusconfiguration = servicebusconfigurationprovider(finder);
 
                 return JsonConvert.SerializeObject(servicebusconfiguration);
             };
@@ -65,7 +65,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
             }
 
-            configuration.RegisterSubscriptionToPublishSubscriberChannel<TValueFinder>(subscription, topic, provider, r);
+            configuration.RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(subscription, topic, provider, r);
         }
 
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, ServiceBusConfiguration servicebusconfiguration, string filter=null)
@@ -78,7 +78,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
             }
 
-            configuration.RegisterSubscriptionToPublishSubscriberChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), r);
+            configuration.RegisterSubscriptionToPublishSubscribeChannel(subscription, topic, JsonConvert.SerializeObject(servicebusconfiguration), r);
         }
     }
 }

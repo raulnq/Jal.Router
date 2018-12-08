@@ -23,19 +23,23 @@ namespace Jal.Router.Impl.Inbound
         {
             var data = Activator.CreateInstance(context.Data.Saga.DataType);
 
+            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
+
             context.Data.SagaContext.Status = DefaultStatus;
 
-            var sagaentity = CreateSagaEntity(context.Data, data);
+            var sagaentity = CreateSagaEntity(context.Data);
 
-            context.Data.AddTrack(context.Data.Identity, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
+            sagaentity.Data = serializer.Serialize(data);
 
-            CreateInboundMessageEntity(context.Data, sagaentity);
+            context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
+
+            CreateMessageEntity(context.Data, MessageEntityType.Inbound, sagaentity);
 
             _router.Route(context.Data, data);
 
-            sagaentity.Updated = context.Data.DateTimeUtc;
+            sagaentity.Data = serializer.Serialize(data);
 
-            UpdateSagaEntity(context.Data, sagaentity, data);
+            UpdateSagaEntity(context.Data, sagaentity);
         }
     }
 }

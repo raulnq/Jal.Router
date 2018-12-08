@@ -47,9 +47,9 @@ namespace Jal.Router.Fluent.Impl
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public IAndWaitReplyFromEndPointBuilder AddPublishSubscriberChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public IAndWaitReplyFromEndPointBuilder AddPublishSubscribeChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
-            var channel = new Channel(ChannelType.PublishSubscriber)
+            var channel = new Channel(ChannelType.PublishSubscribe)
             {
                 ConnectionStringValueFinderType = typeof(TValueFinder)
             };
