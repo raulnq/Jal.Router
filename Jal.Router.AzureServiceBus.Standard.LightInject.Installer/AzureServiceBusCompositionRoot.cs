@@ -19,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer
 
             serviceRegistry.Register<IPointToPointChannel, AzureServiceBusQueue>(typeof(AzureServiceBusQueue).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IRequestReplyChannel, AzureServiceBusSession>(typeof(AzureServiceBusSession).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IRequestReplyChannel, AzureServiceBusRequestReply>(typeof(AzureServiceBusRequestReply).FullName, new PerContainerLifetime());
 
             serviceRegistry.Register<IPublishSubscribeChannel, AzureServiceBusTopic>(typeof(AzureServiceBusTopic).FullName, new PerContainerLifetime());
         }

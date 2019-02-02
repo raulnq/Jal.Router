@@ -5,6 +5,7 @@ using Jal.Router.Extensions;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
+
     public static class EndpointBuilderExtensions
     {
         public static IAndWaitReplyFromEndPointBuilder AddTopic(this IToChannelBuilder builder, string connectionstring, string path)

@@ -7,11 +7,12 @@
         public string ParentId { get; set; }
         public string ReplyToRequestId { get; set; }
         public string RequestId { get; set; }
-
+        public string GroupId { get; set; }
         public IdentityContext()
         {
             RequestId = string.Empty;
             ReplyToRequestId = string.Empty;
+            GroupId = string.Empty;
         }
     }
 }

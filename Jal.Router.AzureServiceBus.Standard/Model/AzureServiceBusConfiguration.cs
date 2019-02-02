@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.AzureServiceBus.Standard.Model
 {
-    public class ServiceBusConfiguration
+    public class AzureServiceBusConfiguration
     {
 
         public string ConnectionString { get; set; }

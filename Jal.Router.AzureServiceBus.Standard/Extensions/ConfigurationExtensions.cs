@@ -17,9 +17,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
             return configuration
                 .SetChannelProviderName("Azure Service Bus")
-                .UsePointToPointChannel<AzureServiceBusQueue>()
-                .UsePublishSubscribeChannel<AzureServiceBusTopic>()
-                .UseRequestReplyChannel<AzureServiceBusSession>()
+                .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
+                .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
+                .UseRequestReplyChannel<AzureServiceBusRequestReply>()
                 .UseChannelManager<AzureServiceBusManager>()
                 .UseMessageAdapter<MessageAdapter>()
                 .UseMessageSerializer<JsonMessageSerializer>()

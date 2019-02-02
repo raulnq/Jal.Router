@@ -5,6 +5,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {
+
     public static class ToChannelBuilderExtensions
     {
         public static IAndWaitReplyFromEndPointBuilder AddPointToPointChannel(this IToChannelBuilder builder, string connectionstring, string path)

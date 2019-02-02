@@ -29,6 +29,8 @@ namespace Jal.Router.Impl.StartupTask
             {
                 Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
 
+                Configuration.Runtime.Groups.AddRange(source.GetGroups());
+
                 Configuration.Runtime.PointToPointChannels.AddRange(source.GetPointToPointChannels());
 
                 Configuration.Runtime.PublishSubscribeChannels.AddRange(source.GetPublishSubscribeChannels());
@@ -41,7 +43,7 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     route.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                        var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
                         context.Channel = channel;
 
@@ -62,7 +64,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     saga.FirstRoute.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.Read(message, saga.FirstRoute.ContentType, saga.FirstRoute.UseClaimCheck, saga.FirstRoute.IdentityConfiguration);
+                        var context = adapter.ReadMetadataAndContent(message, saga.FirstRoute.ContentType, saga.FirstRoute.UseClaimCheck, saga.FirstRoute.IdentityConfiguration);
 
                         context.Channel = channel;
 
@@ -80,7 +82,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     saga.LastRoute.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.Read(message, saga.LastRoute.ContentType, saga.LastRoute.UseClaimCheck, saga.LastRoute.IdentityConfiguration);
+                        var context = adapter.ReadMetadataAndContent(message, saga.LastRoute.ContentType, saga.LastRoute.UseClaimCheck, saga.LastRoute.IdentityConfiguration);
 
                         context.Channel = channel;
 
@@ -96,7 +98,7 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     route.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.Read(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                        var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
                         context.Channel = channel;
 

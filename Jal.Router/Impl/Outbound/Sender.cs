@@ -31,7 +31,7 @@ namespace Jal.Router.Impl.Outbound
             {
                 var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
 
-                var message = adapter.Write(context, context.EndPoint.UseClaimCheck);
+                var message = adapter.WriteMetadataAndContent(context, context.EndPoint.UseClaimCheck);
 
                 var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 

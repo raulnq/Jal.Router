@@ -8,12 +8,12 @@ namespace Jal.Router.Impl
 
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext Read(object message, Type type, bool useclaimcheck, Identity identityconfiguration)
+        public MessageContext ReadMetadataAndContent(object message, Type type, bool useclaimcheck, Identity identityconfiguration)
         {
             return new MessageContext(new EndPoint(string.Empty), new Options());
         }
 
-        public object Write(MessageContext context, bool useclaimcheck)
+        public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
         {
             return null;
         }
@@ -33,7 +33,12 @@ namespace Jal.Router.Impl
             return string.Empty;
         }
 
-        public MessageContext Read(object message, Type contenttype)
+        public MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null)
+        {
+            return context;
+        }
+
+        public MessageContext ReadMetadata(object message)
         {
             return new MessageContext(new EndPoint(string.Empty), new Options());
         }

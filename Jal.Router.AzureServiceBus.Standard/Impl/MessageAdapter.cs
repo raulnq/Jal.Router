@@ -24,7 +24,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
         }
 
-        protected override MessageContext Read(object message)
+        public override MessageContext ReadMetadata(object message)
         {
             var sbmessage = message as Message;
 
@@ -44,6 +44,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 context.IdentityContext.ReplyToRequestId = sbmessage.ReplyToSessionId;
 
                 context.IdentityContext.RequestId = sbmessage.SessionId;
+
+                context.IdentityContext.GroupId = sbmessage.SessionId;
 
                 if (sbmessage.UserProperties.ContainsKey(OperationId))
                 {
@@ -211,6 +213,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.RequestId))
             {
                 brokeredmessage.SessionId = context.IdentityContext.RequestId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.GroupId))
+            {
+                brokeredmessage.SessionId = context.IdentityContext.GroupId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))

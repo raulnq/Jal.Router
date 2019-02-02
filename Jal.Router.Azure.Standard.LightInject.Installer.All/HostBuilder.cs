@@ -20,6 +20,7 @@ using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Model;
+using Jal.ChainOfResponsability.LightInject.Installer;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -95,6 +96,8 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         public IHost Build()
         {
             _parameter.Container.RegisterFrom<ServiceLocatorCompositionRoot>();
+
+            _parameter.Container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
 
             _parameter.Container.RegisterRouter(_parameter.Sources);
 

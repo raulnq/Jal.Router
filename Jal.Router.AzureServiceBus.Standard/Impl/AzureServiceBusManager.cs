@@ -22,7 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -42,10 +42,30 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                         {
-                            topic.Subscriptions.Define(channel.Subscription)
-                                .WithDefaultMessageTTL(TimeSpan.FromDays(14))
-                                .WithMessageLockDurationInSeconds(300)
-                                .Create();
+                            var messagettl = 14;
+
+                            var lockduration = 300;
+
+                            if (channel.Properties.ContainsKey("defaultmessagettlindays"))
+                            {
+                                messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                            }
+
+                            if (channel.Properties.ContainsKey("messagelockdurationinseconds"))
+                            {
+                                lockduration = Convert.ToInt32(channel.Properties["messagelockdurationinseconds"]);
+                            }
+
+                            var descriptor = topic.Subscriptions.Define(channel.Subscription)
+                                .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl))
+                                .WithMessageLockDurationInSeconds(lockduration);
+
+                            if (channel.Properties.ContainsKey("sessionenabled"))
+                            {
+                                descriptor = descriptor.WithSession();
+                            }
+
+                            descriptor.Create();
 
                             var subs = new Microsoft.Azure.ServiceBus.SubscriptionClient(configuration.ConnectionString, channel.Path, channel.Subscription);
 
@@ -75,7 +95,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public bool CreateIfNotExist(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -91,9 +111,34 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        serviceBusNamespace.Topics.Define(channel.Path)
-                            .WithDefaultMessageTTL(TimeSpan.FromDays(14))
-                            .Create();
+                        var messagettl = 14;
+
+                        if (channel.Properties.ContainsKey("defaultmessagettlindays"))
+                        {
+                            messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                        } 
+
+                        var descriptor = serviceBusNamespace.Topics.Define(channel.Path)
+                            .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl));
+
+                        if (channel.Properties.ContainsKey("duplicatemessagedetectioninminutes"))
+                        {
+                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties["duplicatemessagedetectioninminutes"]);
+
+                            descriptor = descriptor.WithDuplicateMessageDetection(TimeSpan.FromMinutes(duplicatemessagedetectioninminutes));
+                        }
+
+                        if (channel.Properties.ContainsKey("partitioningenabled"))
+                        {
+                            descriptor = descriptor.WithPartitioning();
+                        }
+
+                        if (channel.Properties.ContainsKey("expressmessageenabled"))
+                        {
+                            descriptor = descriptor.WithExpressMessage();
+                        }
+
+                        descriptor.Create();
 
                         return true;
 
@@ -106,7 +151,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -138,7 +183,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -170,7 +215,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public PointToPointChannelInfo GetInfo(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -201,7 +246,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public bool CreateIfNotExist(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<ServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = GetServiceBusNamespace(configuration);
 
@@ -217,10 +262,48 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     if (ex.Response.StatusCode == HttpStatusCode.NotFound)
                     {
-                        serviceBusNamespace.Queues.Define(channel.Path)
-                            .WithDefaultMessageTTL(TimeSpan.FromDays(14))
-                            .WithMessageLockDurationInSeconds(300)
-                            .Create();
+                        var messagettl =14;
+
+                        var lockduration = 300;
+
+                        if(channel.Properties.ContainsKey("defaultmessagettlindays"))
+                        {
+                            messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                        }
+
+                        if (channel.Properties.ContainsKey("messagelockdurationinseconds"))
+                        {
+                            lockduration = Convert.ToInt32(channel.Properties["messagelockdurationinseconds"]);
+                        }
+
+                        var descriptor = serviceBusNamespace.Queues.Define(channel.Path)
+                            .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl))
+                            .WithMessageLockDurationInSeconds(lockduration);
+
+                        if (channel.Properties.ContainsKey("duplicatemessagedetectioninminutes"))
+                        {
+                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties["duplicatemessagedetectioninminutes"]);
+
+                            descriptor = descriptor.WithDuplicateMessageDetection(TimeSpan.FromMinutes(duplicatemessagedetectioninminutes));
+                        }
+
+                        if (channel.Properties.ContainsKey("sessionenabled"))
+                        {
+                            descriptor = descriptor.WithSession();
+                        }
+
+                        if (channel.Properties.ContainsKey("partitioningenabled"))
+                        {
+                            descriptor = descriptor.WithPartitioning();
+                        }
+
+                        if (channel.Properties.ContainsKey("expressmessageenabled"))
+                        {
+                            descriptor = descriptor.WithExpressMessage();
+                        }
+
+
+                        descriptor.Create();
 
                         return true;
                     }
@@ -231,7 +314,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        private IServiceBusNamespace GetServiceBusNamespace(ServiceBusConfiguration configuration)
+        private IServiceBusNamespace GetServiceBusNamespace(AzureServiceBusConfiguration configuration)
         {
             try
             {

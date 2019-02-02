@@ -84,10 +84,8 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public MessageContext Read(object message, Type contenttype, bool useclaimcheck, Identity identityconfiguration=null)
+        public MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null)
         {
-            var context = Read(message);
-
             context.ContentType = contenttype;
 
             if (identityconfiguration?.Builder != null)
@@ -109,7 +107,14 @@ namespace Jal.Router.Impl.Inbound
             return context;
         }
 
-        public object Write(MessageContext context, bool useclaimcheck)
+        public MessageContext ReadMetadataAndContent(object message, Type contenttype, bool useclaimcheck, Identity identityconfiguration=null)
+        {
+            var context = ReadMetadata(message);
+
+            return ReadContent(message, context, contenttype, useclaimcheck, identityconfiguration);
+        }
+
+        public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
         {
             var content = context.Content;
 
@@ -133,7 +138,7 @@ namespace Jal.Router.Impl.Inbound
 
         protected abstract object Write(MessageContext context);
 
-        protected abstract MessageContext Read(object message);
+        public abstract MessageContext ReadMetadata(object message);
 
         protected abstract string GetContent(object message);
     }

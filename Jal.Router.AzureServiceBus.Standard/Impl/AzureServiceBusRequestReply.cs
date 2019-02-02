@@ -9,9 +9,9 @@ using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusSession : AbstractChannel, IRequestReplyChannel
+    public class AzureServiceBusRequestReply : AbstractChannel, IRequestReplyChannel
     {
-        public AzureServiceBusSession(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        public AzureServiceBusRequestReply(IComponentFactory factory, IConfiguration configuration, ILogger logger)
             : base(factory, configuration, logger)
         {
 
@@ -31,7 +31,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 if (message != null)
                 {
-                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+                    outputcontext = adapter.ReadMetadataAndContent(message, context.ResultType, context.EndPoint.UseClaimCheck);
 
                     messagesession.CompleteAsync(message.SystemProperties.LockToken);
                 }
@@ -60,7 +60,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 if (message != null)
                 {
-                    outputcontext = adapter.Read(message, context.ResultType, context.EndPoint.UseClaimCheck);
+                    outputcontext = adapter.ReadMetadataAndContent(message, context.ResultType, context.EndPoint.UseClaimCheck);
 
                     messagesession.CompleteAsync(message.SystemProperties.LockToken);
                 }

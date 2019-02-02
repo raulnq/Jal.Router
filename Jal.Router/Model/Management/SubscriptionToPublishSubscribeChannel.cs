@@ -11,6 +11,7 @@ namespace Jal.Router.Model.Management
             Subscription = subscription;
             Path = path;
             Rules = new List<SubscriptionToPublishSubscribeChannelRule>();
+            Properties = new Dictionary<string, string>();
         }
 
         public string Subscription { get; }
@@ -24,5 +25,7 @@ namespace Jal.Router.Model.Management
         public string ConnectionString { get; set; }
 
         public List<SubscriptionToPublishSubscribeChannelRule> Rules { get; }
+
+        public Dictionary<string, string> Properties { get; set; }
     }
 }
