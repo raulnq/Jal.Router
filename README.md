@@ -7,6 +7,7 @@ Just another library to route in/out messages
 * Multiple shoutdown watchers (done)
 * Store big messages and sagas (done)
 * Store data of the host
+* Message compression and encryption
 * Nuget reference cleanup
 * Outgoing message storage (done)
 * Documentation

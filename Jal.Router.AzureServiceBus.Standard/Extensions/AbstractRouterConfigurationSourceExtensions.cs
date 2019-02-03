@@ -51,11 +51,16 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             configuration.RegisterPointToPointChannel<TValueFinder>(queue.Name, provider, dictionary);
         }
 
+        public static void RegisterQueue(this AbstractRouterConfigurationSource configuration, string queue, AzureServiceBusConfiguration servicebusconfiguration)
+        {
+            RegisterQueue(configuration, new AzureServiceBusQueue(queue), servicebusconfiguration);
+        }
+
         public static void RegisterQueue(this AbstractRouterConfigurationSource configuration, AzureServiceBusQueue queue, AzureServiceBusConfiguration servicebusconfiguration)
         {
             var dictionary = new Dictionary<string, string>();
 
-            if(queue.DefaultMessageTtlInDays>0)
+            if (queue.DefaultMessageTtlInDays > 0)
             {
                 dictionary.Add("defaultmessagettlindays", queue.DefaultMessageTtlInDays.ToString());
             }
@@ -63,7 +68,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             {
                 dictionary.Add("duplicatemessagedetectioninminutes", queue.DuplicateMessageDetectionInMinutes.ToString());
             }
-            if (queue.ExpressMessageEnabled!=null)
+            if (queue.ExpressMessageEnabled != null)
             {
                 dictionary.Add("expressmessageenabled", "true");
             }
@@ -79,7 +84,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             {
                 dictionary.Add("sessionenabled", "true");
             }
-            
+
             configuration.RegisterPointToPointChannel(queue.Name, JsonConvert.SerializeObject(servicebusconfiguration), dictionary);
         }
 
@@ -116,6 +121,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             configuration.RegisterPublishSubscribeChannel<TValueFinder>(topic.Name, provider, dictionary);
         }
 
+        public static void RegisterTopic(this AbstractRouterConfigurationSource configuration, string topic, AzureServiceBusConfiguration servicebusconfiguration)
+        {
+            RegisterTopic(configuration, new AzureServiceBusTopic(topic), servicebusconfiguration);
+        }
+
         public static void RegisterTopic(this AbstractRouterConfigurationSource configuration, AzureServiceBusTopic topic, AzureServiceBusConfiguration servicebusconfiguration)
         {
             var dictionary = new Dictionary<string, string>();
@@ -141,7 +151,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         }
 
         public static void RegisterSubscriptionToTopic<TValueFinder>(this AbstractRouterConfigurationSource configuration, AzureServiceBusSubscriptionToTopic subscription,
-            Func<IValueFinder, AzureServiceBusConfiguration> servicebusconfigurationprovider, string filter=null)
+            Func<IValueFinder, AzureServiceBusConfiguration> servicebusconfigurationprovider, string filter = null)
             where TValueFinder : IValueFinder
         {
             Func<IValueFinder, string> provider = finder =>
@@ -176,7 +186,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             configuration.RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(subscription.Name, subscription.Topic, provider, dictionary, r);
         }
 
-        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, AzureServiceBusSubscriptionToTopic subscription, AzureServiceBusConfiguration servicebusconfiguration, string filter=null)
+        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, AzureServiceBusSubscriptionToTopic subscription, AzureServiceBusConfiguration servicebusconfiguration, string filter = null)
         {
 
             SubscriptionToPublishSubscribeChannelRule r = null;
@@ -202,6 +212,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             }
 
             configuration.RegisterSubscriptionToPublishSubscribeChannel(subscription.Name, subscription.Topic, JsonConvert.SerializeObject(servicebusconfiguration), dictionary, r);
+        }
+
+        public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, AzureServiceBusConfiguration servicebusconfiguration, string filter = null)
+        {
+            RegisterSubscriptionToTopic(configuration, new AzureServiceBusSubscriptionToTopic(subscription, topic), servicebusconfiguration);
         }
     }
 }
