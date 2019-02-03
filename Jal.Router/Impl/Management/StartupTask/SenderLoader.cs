@@ -21,7 +21,7 @@ namespace Jal.Router.Impl.StartupTask
 
             var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
 
-            var publishsubscriberchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+            var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
 
             var requestreplychannel = Factory.Create<IRequestReplyChannel>(Configuration.RequestReplyChannelType);
 
@@ -61,13 +61,13 @@ namespace Jal.Router.Impl.StartupTask
                     Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x=>x.Name))}");
                 }
 
-                if (sendermetadata.Channel.Type == ChannelType.PublishSubscriber)
+                if (sendermetadata.Channel.Type == ChannelType.PublishSubscribe)
                 {
-                    sendermetadata.CreateSenderMethod = publishsubscriberchannel.CreateSenderMethodFactory(sendermetadata);
+                    sendermetadata.CreateSenderMethod = publishsubscribechannel.CreateSenderMethodFactory(sendermetadata);
 
-                    sendermetadata.DestroySenderMethod = publishsubscriberchannel.DestroySenderMethodFactory(sendermetadata);
+                    sendermetadata.DestroySenderMethod = publishsubscribechannel.DestroySenderMethodFactory(sendermetadata);
 
-                    sendermetadata.SendMethod = publishsubscriberchannel.SendMethodFactory(sendermetadata);
+                    sendermetadata.SendMethod = publishsubscribechannel.SendMethodFactory(sendermetadata);
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 
@@ -89,7 +89,7 @@ namespace Jal.Router.Impl.StartupTask
                     Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
                 }
 
-                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscriber)
+                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
                 {
                     sendermetadata.CreateSenderMethod = requestreplychannel.CreateSenderMethodFactory(sendermetadata);
 
@@ -97,7 +97,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     sendermetadata.SendMethod = requestreplychannel.SendMethodFactory(sendermetadata);
 
-                    sendermetadata.ReceiveOnMethod = requestreplychannel.ReceiveOnPublishSubscriberChannelMethodFactory(sendermetadata);
+                    sendermetadata.ReceiveOnMethod = requestreplychannel.ReceiveOnPublishSubscribeChannelMethodFactory(sendermetadata);
 
                     sendermetadata.Sender = sendermetadata.CreateSenderMethod();
 

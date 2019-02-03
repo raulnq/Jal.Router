@@ -11,6 +11,8 @@ namespace Jal.Router.Interface
 
         EndPoint[] GetEndPoints();
 
+        Group[] GetGroups();
+
         SubscriptionToPublishSubscribeChannel[] GetSubscriptionsToPublishSubscribeChannel();
 
         PublishSubscribeChannel[] GetPublishSubscribeChannels();

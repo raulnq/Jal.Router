@@ -4,7 +4,6 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -85,23 +84,13 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public MessageContext Read(object message, Type contenttype, bool useclaimcheck, IdentityConfiguration identityconfiguration=null)
+        public MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null)
         {
-            var context = Read(message);
-
             context.ContentType = contenttype;
 
-            if (identityconfiguration?.OperationIdBuilder != null)
+            if (identityconfiguration?.Builder != null)
             {
-                context.Identity.OperationId = identityconfiguration?.OperationIdBuilder(context);
-            }
-            if (identityconfiguration?.ParentIdBuilder != null)
-            {
-                context.Identity.ParentId = identityconfiguration?.ParentIdBuilder(context);
-            }
-            if (identityconfiguration?.IdBuilder != null)
-            {
-                context.Identity.Id = identityconfiguration?.IdBuilder(context);
+                context.IdentityContext = identityconfiguration?.Builder(context);
             }
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
@@ -118,7 +107,14 @@ namespace Jal.Router.Impl.Inbound
             return context;
         }
 
-        public object Write(MessageContext context, bool useclaimcheck)
+        public MessageContext ReadMetadataAndContent(object message, Type contenttype, bool useclaimcheck, Identity identityconfiguration=null)
+        {
+            var context = ReadMetadata(message);
+
+            return ReadContent(message, context, contenttype, useclaimcheck, identityconfiguration);
+        }
+
+        public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
         {
             var content = context.Content;
 
@@ -142,7 +138,7 @@ namespace Jal.Router.Impl.Inbound
 
         protected abstract object Write(MessageContext context);
 
-        protected abstract MessageContext Read(object message);
+        public abstract MessageContext ReadMetadata(object message);
 
         protected abstract string GetContent(object message);
     }

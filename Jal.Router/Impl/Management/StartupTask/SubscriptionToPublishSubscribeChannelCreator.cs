@@ -18,7 +18,7 @@ namespace Jal.Router.Impl.StartupTask
         {
             var errors = new StringBuilder();
 
-            Logger.Log("Creating subscription to publish subscriber channels");
+            Logger.Log("Creating subscription to publish subscribe channels");
 
             var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
 
@@ -28,13 +28,13 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                    var extractor = channel.ConnectionStringProvider as Func<IValueFinder, string>;
+                    var provider = channel.ConnectionStringProvider as Func<IValueFinder, string>;
 
-                    channel.ConnectionString = extractor?.Invoke(finder);
+                    channel.ConnectionString = provider?.Invoke(finder);
 
                     if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                     {
-                        var error = $"Empty connection string, subscription {channel.Subscription} to publish subscriber channel {channel.Path}";
+                        var error = $"Empty connection string, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -45,7 +45,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (string.IsNullOrWhiteSpace(channel.Path))
                     {
-                        var error = $"Empty path, subscription {channel.Subscription} to publish subscriber channel {channel.Path}";
+                        var error = $"Empty path, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -56,7 +56,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (string.IsNullOrWhiteSpace(channel.Subscription))
                     {
-                        var error = $"Empty subscription, subscription {channel.Subscription} to publish subscriber channel {channel.Path}";
+                        var error = $"Empty subscription, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -67,7 +67,7 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (channel.Rules.Count == 0)
                     {
-                        var error = $"Missing rules, subscription {channel.Subscription}  to publish subscriber channel {channel.Path}";
+                        var error = $"Missing rules, subscription {channel.Subscription}  to publish subscribe channel {channel.Path}";
 
                         errors.AppendLine(error);
 
@@ -82,16 +82,16 @@ namespace Jal.Router.Impl.StartupTask
 
                         if (created)
                         {
-                            Logger.Log($"Created subscription {channel.Subscription} to publish subscriber channel {channel.Path}");
+                            Logger.Log($"Created subscription {channel.Subscription} to publish subscribe channel {channel.Path}");
                         }
                         else
                         {
-                            Logger.Log($"Subscription {channel.Subscription} to publish subscriber channel {channel.Path} already exists");
+                            Logger.Log($"Subscription {channel.Subscription} to publish subscribe channel {channel.Path} already exists");
                         }
                     }
                     catch (Exception ex)
                     {
-                        var error = $"Exception subscription {channel.Subscription} to publish subscriber channel {channel.Path}: {ex}";
+                        var error = $"Exception subscription {channel.Subscription} to publish subscribe channel {channel.Path}: {ex}";
 
                         errors.AppendLine(error);
 
@@ -105,7 +105,7 @@ namespace Jal.Router.Impl.StartupTask
                 throw new ApplicationException(errors.ToString());
             }
 
-            Logger.Log("Subscription to publish subscriber channels created");
+            Logger.Log("Subscription to publish subscribe channels created");
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
@@ -25,13 +24,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
         }
 
-        protected override MessageContext Read(object message)
+        public override MessageContext ReadMetadata(object message)
         {
             var sbmessage = message as Message;
 
             if (sbmessage != null)
             {
-                var storage = Factory.Create<ISagaStorage>(Configuration.SagaStorageType);
+                var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
@@ -40,20 +39,22 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     DateTimeUtc = DateTime.UtcNow,
                 };
 
-                context.Identity.Id = sbmessage.MessageId;
+                context.IdentityContext.Id = sbmessage.MessageId;
 
-                context.Identity.ReplyToRequestId = sbmessage.ReplyToSessionId;
+                context.IdentityContext.ReplyToRequestId = sbmessage.ReplyToSessionId;
 
-                context.Identity.RequestId = sbmessage.SessionId;
+                context.IdentityContext.RequestId = sbmessage.SessionId;
+
+                context.IdentityContext.GroupId = sbmessage.SessionId;
 
                 if (sbmessage.UserProperties.ContainsKey(OperationId))
                 {
-                    context.Identity.OperationId = sbmessage.UserProperties[OperationId].ToString();
+                    context.IdentityContext.OperationId = sbmessage.UserProperties[OperationId].ToString();
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(ParentId))
                 {
-                    context.Identity.ParentId = sbmessage.UserProperties[ParentId].ToString();
+                    context.IdentityContext.ParentId = sbmessage.UserProperties[ParentId].ToString();
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(From))
@@ -199,29 +200,34 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(Origin, context.Origin.Key);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.Id))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.Id))
             {
-                brokeredmessage.MessageId = context.Identity.Id;
+                brokeredmessage.MessageId = context.IdentityContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                brokeredmessage.ReplyToSessionId = context.Identity.ReplyToRequestId;
+                brokeredmessage.ReplyToSessionId = context.IdentityContext.ReplyToRequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.RequestId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.RequestId))
             {
-                brokeredmessage.SessionId = context.Identity.RequestId;
+                brokeredmessage.SessionId = context.IdentityContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.GroupId))
             {
-                brokeredmessage.UserProperties.Add(OperationId, context.Identity.OperationId);
+                brokeredmessage.SessionId = context.IdentityContext.GroupId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Identity.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
             {
-                brokeredmessage.UserProperties.Add(ParentId, context.Identity.ParentId);
+                brokeredmessage.UserProperties.Add(OperationId, context.IdentityContext.OperationId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ParentId))
+            {
+                brokeredmessage.UserProperties.Add(ParentId, context.IdentityContext.ParentId);
             }
 
             brokeredmessage.UserProperties.Add(RetryCount, context.RetryCount.ToString());

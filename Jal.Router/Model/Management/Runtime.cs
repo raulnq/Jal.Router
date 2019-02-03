@@ -10,6 +10,8 @@ namespace Jal.Router.Model.Management
 
         public List<EndPoint> EndPoints { get; }
 
+        public List<Group> Groups { get; }
+
         public List<Saga> Sagas { get; }
 
         public List<Route> Routes { get; }
@@ -39,6 +41,8 @@ namespace Jal.Router.Model.Management
             PublishSubscribeChannels = new List<PublishSubscribeChannel>();
 
             SubscriptionToPublishSubscribeChannels = new List<SubscriptionToPublishSubscribeChannel>();
+
+            Groups = new List<Group>();
         }
     }
 }

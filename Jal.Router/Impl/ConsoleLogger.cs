@@ -1,6 +1,7 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using System;
+using System.Threading;
 
 namespace Jal.Router.Impl
 {
@@ -15,7 +16,9 @@ namespace Jal.Router.Impl
 
         public void Log(string message)
         {
-            Console.WriteLine($"[{DateTime.UtcNow},{_configuration.ApplicationName}] {message}");
+            var id = Thread.CurrentThread.ManagedThreadId;
+
+            Console.WriteLine($"[{DateTime.UtcNow},{id},{_configuration.ApplicationName}] {message}");
         }
     }
 }

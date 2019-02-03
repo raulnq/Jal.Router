@@ -7,6 +7,8 @@ namespace Jal.Router.Model.Inbound
     {
         public Channel Channel { get; }
 
+        public Group Group { get; set; }
+
         public Func<object[]> CreateListenerMethod { get; set; }
 
         public Action<object[]> DestroyListenerMethod { get; set; }

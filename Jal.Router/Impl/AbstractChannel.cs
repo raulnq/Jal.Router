@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 
 namespace Jal.Router.Impl
@@ -42,9 +43,9 @@ namespace Jal.Router.Impl
             }
         }
 
-        public async Task OnMessageAsync(ListenerMetadata metadata, string messageid, Action @action, Func<Task> completeaction)
+        public async Task OnMessageAsync(ListenerMetadata metadata, MessageContext context, Action @action, Func<Task> completeaction)
         {
-            Logger.Log($"Message {messageid} arrived to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
+            Logger.Log($"Message {context.IdentityContext.Id} arrived to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
 
             try
             {
@@ -54,11 +55,36 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {messageid} failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {ex}");
+                Logger.Log($"Message {context.IdentityContext.Id} failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {ex}");
             }
             finally
             {
-                Logger.Log($"Message {messageid} completed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
+                Logger.Log($"Message {context.IdentityContext.Id} completed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
+            }
+        }
+
+        public async Task OnMessageAsync(ListenerMetadata metadata, MessageContext context, Action @action, Func<Task> completeaction, Func<Task> completegroup)
+        {
+            Logger.Log($"Message {context.IdentityContext.Id} arrived to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
+
+            try
+            {
+                action();
+
+                await completeaction();
+
+                if(metadata.Group.Until(context))
+                {
+                    await completegroup();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Message {context.IdentityContext.Id} failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} {ex}");
+            }
+            finally
+            {
+                Logger.Log($"Message {context.IdentityContext.Id} completed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()}");
             }
         }
     }

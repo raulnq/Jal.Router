@@ -1,4 +1,5 @@
 ﻿using System;
+using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
@@ -8,17 +9,13 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureMessageStorageStartupTask : IStartupTask
     {
-        private readonly string _connectionstring;
-
-        private readonly string _container;
-
         private readonly ILogger _logger;
 
-        public AzureMessageStorageStartupTask(ILogger logger,string connectionstring, string container)
-        {
-            _connectionstring = connectionstring;
+        private readonly AzureStorageParameter _parameter;
 
-            _container = container;
+        public AzureMessageStorageStartupTask(ILogger logger, IParameterProvider provider)
+        {
+            _parameter = provider.Get<AzureStorageParameter>();
 
             _logger = logger;
         }
@@ -36,11 +33,26 @@ namespace Jal.Router.AzureStorage.Impl
 
         public void Run()
         {
-            var container = GetContainer(_connectionstring, _container);
+            if(!string.IsNullOrEmpty(_parameter.BlobStorageConnectionString))
+            {
+                var container = GetContainer(_parameter.BlobStorageConnectionString, _parameter.ContainerName);
 
-            var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            _logger.Log($"Created {_container} container");
+                if (result)
+                {
+                    _logger.Log($"Created {_parameter.ContainerName} container");
+                }
+                else
+                {
+                    _logger.Log($"Container {_parameter.ContainerName} already exists");
+                }
+            }
+            else
+            {
+                _logger.Log($"Skipped creation of container for messages");
+            }
+            
         }
     }
 }

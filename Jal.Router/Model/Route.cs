@@ -15,8 +15,9 @@ namespace Jal.Router.Model
             MiddlewareTypes = new List<Type>();
             Name = name;
             Channels = new List<Channel>();
-            IdentityConfiguration = new IdentityConfiguration();
-            StorageConfiguration = new StorageConfiguration();
+            IdentityConfiguration = new Identity();
+            StorageConfiguration = new Storage();
+            RetryExceptionTypes = new List<Type>();
         }
 
         public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype) : this(name, contenttype, consumerinterfacetype)
@@ -24,13 +25,21 @@ namespace Jal.Router.Model
             Saga = saga;
         }
 
+        public List<Type> RetryExceptionTypes { get; set; }
+
+        public Type RetryValueFinderType { get; set; }
+
+        public string OnRetryEndPoint { get; set; }
+
+        public Func<IValueFinder, IRetryPolicy> RetryPolicyProvider { get; set; }
+
         public Saga Saga { get; }
 
         public Action<object, Channel> RuntimeHandler { get; set; }
 
-        public IdentityConfiguration IdentityConfiguration { get; }
+        public Identity IdentityConfiguration { get; }
 
-        public StorageConfiguration StorageConfiguration { get; }
+        public Storage StorageConfiguration { get; }
 
         public List<Channel> Channels { get; }
 
@@ -40,15 +49,7 @@ namespace Jal.Router.Model
 
         public Type ContentType { get; }
 
-        public Type RetryExceptionType { get; set; }
-
-        public Type RetryExtractorType { get; set; }
-
-        public string OnRetryEndPoint { get; set; }
-
         public string OnErrorEndPoint { get; set; }
-
-        public Func<IValueFinder, IRetryPolicy> RetryPolicyExtractor { get; set; }
 
         public List<Type> MiddlewareTypes { get; }
 

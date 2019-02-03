@@ -9,20 +9,18 @@ using Jal.Router.LightInject.Installer;
 using Jal.Router.Model;
 using LightInject;
 using Jal.Router.Extensions;
-using Jal.Router.Impl.Management;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.LightInject.Installer;
-using Jal.Router.Model.Management;
-using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.MonitoringTask;
 using Jal.ChainOfResponsability.LightInject.Installer;
-using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.Patterns;
 using Jal.Router.Interface.Patterns;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Impl.Inbound.RetryPolicy;
+using Jal.Router.Impl.Management.ShutdownWatcher;
+using Jal.Router.Impl.ValueFinder;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -33,12 +31,9 @@ namespace Jal.Router.Sample.NetCore
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
-            container.RegisterAzureServiceBusRouter();
+            container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
-            container.RegisterAzureSagaStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "sagasmoke", "messagessmoke", DateTime.UtcNow.ToString("yyyyMMdd"));
-            container.RegisterAzureMessageStorage("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==", "messages");
-            //container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
-            //container.Register<IMessageHandler, MessageHandlerB>(typeof(MessageHandlerB).FullName, new PerContainerLifetime());
+            container.RegisterFrom<AzureStorageCompositionRoot>();
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -57,14 +52,21 @@ namespace Jal.Router.Sample.NetCore
 
             container.Register<IMessageHandler<Message>, QueueToRead>(typeof(QueueToRead).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
-
+            container.Register<IMessageHandler<Message>, QueueToReadGroup>(typeof(QueueToReadGroup).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, QueueListenSessionSenderHandlers>(typeof(QueueListenSessionSenderHandlers).FullName, new PerContainerLifetime());
+            
             var host = container.GetInstance<IHost>();
-            host.Configuration.UsingAzureServiceBus();
-            host.Configuration.UsingAzureSagaStorage();
-            host.Configuration.UsingAzureMessageStorage();
+            host.Configuration
+                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1 })
+                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .AddMonitoringTask<HeartBeatLogger>(1000)
+                .EnableEntityStorage()
+                .AddShutdownWatcher<SignTermShutdownWatcher>();
 
-            //host.Configuration.UsingChannelShuffler<FisherYatesChannelShuffler>();
-            host.Configuration.AddMonitoringTask<HeartBeatLogger>(1000);
+            //var facade = container.GetInstance<IEntityStorageFacade>();
+
+            //var messages = facade.GetMessages(new DateTime(2018, 12, 7), new DateTime(2018, 12, 9), "queueperformancetoread_handler");
+
             host.RunAndBlock();
         }
     }
@@ -115,9 +117,15 @@ namespace Jal.Router.Sample.NetCore
 
         private readonly string _errorqueueendpoint = "errorqueueendpoint";
 
+        private readonly string _sessionqueue = "sessionqueue";
+
+        private readonly string _sessiontopic = "sessiontopic";
+
+        private readonly string _sendersessionqueue = "sendersessionqueue";
+
         public RouterConfigurationSmokeTest()
         {
-            var config = new ServiceBusConfiguration()
+            var config = new AzureServiceBusConfiguration()
             {
                 ClientId = "e40d9bbb-c50f-436e-8a5f-8494e0f84242",
                 ClientSecret = "OkDfucL/DT9h1FISlh79OfAnmwu9/h/TRx4ryFG+hIc=",
@@ -128,51 +136,102 @@ namespace Jal.Router.Sample.NetCore
                 TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
             };
 
+            RegisterGroup("xx").ForQueue(_sessionqueue, config.ConnectionString).Until(x => false);
+
+            RegisterGroup("yy").ForSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).Until(x => false);
+
+
+            RegisterHandler<IMessageHandler<Message>>(_sendersessionqueue + "_handler")
+            .ToListen(x =>
+            {
+                x.AddQueue(_sendersessionqueue, config.ConnectionString);
+            })
+            .ForMessage<Message>().Use<QueueListenSessionSenderHandlers>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterHandler<IMessageHandler<Message>>(_sessionqueue + "_handler")
+            .ToListen(x =>
+            {
+                x.AddQueue(_sessionqueue, config.ConnectionString);
+            })
+            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterHandler<IMessageHandler<Message>>(_sessiontopic + "_handler")
+            .ToListen(x =>
+            {
+                x.AddSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString);
+            })
+            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterEndPoint("sessionqueueendpoint")
+            .ForMessage<Message>()
+            .To(x => x.AddQueue(config.ConnectionString, _sessionqueue));
+
+            RegisterEndPoint("sessiontopicendpoint")
+            .ForMessage<Message>()
+            .To(x => x.AddTopic(config.ConnectionString, _sessiontopic));
+
             RegisterOrigin("smoketestapp", "123");
 
-            this.RegisterQueue(_queueperformancetosend, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_sendersessionqueue) { }, config);
 
-            this.RegisterQueue(_queueperformancetoread, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_sessionqueue) { SessionEnabled = true }, config);
 
-            this.RegisterQueue(_replyqueue, config);
+            this.RegisterTopic(new AzureServiceBusTopic(_sessiontopic) { }, config);
 
-            this.RegisterQueue(_fromreplyqueue, config);
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _sessiontopic) { SessionEnabled = true }, config, "1=1");
 
-            this.RegisterQueue(_toreplyqueue, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetosend), config);
 
-            this.RegisterQueue(_queuelistenbyonehandler, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetoread), config);
 
-            this.RegisterQueue(_queuetopublishtopic, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_replyqueue) { SessionEnabled = true }, config);
 
-            this.RegisterTopic(_topicpublishedfromqueue, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_fromreplyqueue), config);
 
-            this.RegisterSubscriptionToTopic(_subscription, _topicpublishedfromqueue, config, "1=1");
+            this.RegisterQueue(new AzureServiceBusQueue(_toreplyqueue), config);
 
-            this.RegisterQueue(_queuestart, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandler), config);
 
-            this.RegisterQueue(_queuecontinue, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuetopublishtopic), config);
 
-            this.RegisterQueue(_queueend, config);
+            this.RegisterTopic(new AzureServiceBusTopic(_topicpublishedfromqueue), config);
 
-            this.RegisterQueue(_errorqueue, config);
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topicpublishedfromqueue), config, "1=1");
+
+            this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_queueend), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_errorqueue), config);
             
-            this.RegisterQueue(_queuelistenbyonehandlerwithexceptionandretry, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config);
 
-            this.RegisterQueue(_queuelistenbyonehandlerwithexception, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config);
 
-            this.RegisterQueue(_queuelistenbyonehandlerwithmiddleware, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config);
 
-            this.RegisterQueue(_queuelistenbyonehandlerwithwhen, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithwhen), config);
             
-            this.RegisterQueue(_handlingtwoqueuesinonehandlera, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlera), config);
 
-            this.RegisterQueue(_handlingtwoqueuesinonehandlerb, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlerb), config);
 
-            this.RegisterQueue(_queuelistenbytwohandlers, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbytwohandlers), config);
 
-            this.RegisterTopic(_topiclistenbyonehandler,  config);
+            this.RegisterTopic(new AzureServiceBusTopic(_topiclistenbyonehandler),  config);
 
-            this.RegisterSubscriptionToTopic(_subscription, _topiclistenbyonehandler, config, "1=1");
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topiclistenbyonehandler), config, "1=1");
 
 
             RegisterHandler<IMessageHandler<Message>>(_queueperformancetoread + "_handler")
@@ -197,7 +256,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("queueperformanceendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddQueue(config.ConnectionString, _queueperformancetoread));
+            .To(x => x.AddPointToPointChannel(config.ConnectionString, _queueperformancetoread));
 
             RegisterHandler<IMessageHandler<Message>>(_toreplyqueue + "_handler")
             .ToListen(x =>
@@ -249,7 +308,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("fromqueueendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddTopic(config.ConnectionString, _topicpublishedfromqueue));
+            .To(x => x.AddPublishSubscribeChannel(config.ConnectionString, _topicpublishedfromqueue));
 
 
             RegisterHandler<IMessageHandler<Message>>("handlingtwoqueuesinonehandler_handler")
@@ -342,8 +401,10 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo<ApplicationException>("retryendpoint").Use(new LinearRetryPolicy(5,3))
-            .OnErrorSendFailedMessageTo(_errorqueueendpoint); 
+            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
+            .OnEntry(x=>x.EnableEntityStorage(true))
+            .OnErrorSendFailedMessageTo(_errorqueueendpoint)
+            ; 
 
             RegisterEndPoint(_errorqueueendpoint)
                 .ForMessage<Message>()
@@ -398,6 +459,8 @@ namespace Jal.Router.Sample.NetCore
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
             data.Status = "end";
+
+            data.Name = message.Name;
         }
     }
 
@@ -409,7 +472,11 @@ namespace Jal.Router.Sample.NetCore
 
             data.Status = "continue";
 
-            context.Send(data, new Message() { }, "endendpoint", context.Identity.Id+"_end", context.Identity.OperationId, context.SagaContext.Id);
+            data.Name = "continue";
+
+            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_end", OperationId = context.IdentityContext.OperationId };
+
+            context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
         }
     }
 
@@ -423,7 +490,11 @@ namespace Jal.Router.Sample.NetCore
 
             data.Status = "start";
 
-            context.Send(data, new Message() { }, "continueendpoint", context.Identity.Id+ "_continue", context.Identity.OperationId, context.SagaContext.Id);
+            data.Name = message.Name;
+
+            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
+
+            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
         }
     }
 
@@ -453,7 +524,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.Identity.Id, context.Identity.OperationId);
+            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
         }
     }
 
@@ -463,7 +534,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.Identity.Id, context.Identity.OperationId);
+            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
         }
     }
 
@@ -474,7 +545,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Publish(new Message() { }, "fromqueueendpoint", context.Identity.Id, context.Identity.OperationId);
+            context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
         }
     }
 
@@ -502,15 +573,23 @@ namespace Jal.Router.Sample.NetCore
         }
     }
 
+    public class QueueToReadGroup : AbstractMessageHandler<Message>
+    {
+        public override void HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.GroupId);
+        }
+    }
+
     public class QueueToSend : AbstractMessageHandler<Message>
     {
         public override void HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
             {
-                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.Identity.Id, context.Identity.OperationId);
+                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
             }
 
             
@@ -550,10 +629,25 @@ namespace Jal.Router.Sample.NetCore
         }
     }
 
-  
+    public class QueueListenSessionSenderHandlers : AbstractMessageHandler<Message>
+    {
+        public override void HandleWithContext(Message message, MessageContext context)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"1-{i}", GroupId = i.ToString() },"X");
+                context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"2-{i}", GroupId = i.ToString() }, "X");
+                context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
+                context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
+            }
+        }
+    }
+
+
     public class Data
     {
         public string Status { get; set; }
+        public string Name { get; set; }
     }
 
     public class Message

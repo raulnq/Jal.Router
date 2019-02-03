@@ -1,6 +1,5 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
@@ -8,6 +7,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
+
     public class HandlerBuilder<TContent, THandler> : IHandlerBuilder<TContent, THandler>, IWhenHandlerBuilder, IOnRetryUsingBuilder
     {
         private readonly Route<TContent, THandler> _route;
@@ -46,37 +46,44 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo<TExeption>(string endpointname) where TExeption : Exception
+        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo(string endpointname, Action<IForExceptionBuilder> action)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(nameof(endpointname));
             }
 
-            _route.RetryExceptionType = typeof(TExeption);
+            if (action==null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new ForExceptionBuilder(_route.RetryExceptionTypes);
+
+            action(builder);
 
             _route.OnRetryEndPoint = endpointname;
 
             return this;
         }
 
-        public IOnRouteOptionBuilder Use<TExtractor>(Func<IValueFinder, IRetryPolicy> policycreator) where TExtractor : IValueFinder
+        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
         {
-            _route.RetryExtractorType = typeof(TExtractor);
+            _route.RetryValueFinderType = typeof(TValueFinder);
 
             if (policycreator == null)
             {
                 throw new ArgumentNullException(nameof(policycreator));
             }
 
-            _route.RetryPolicyExtractor = policycreator;
+            _route.RetryPolicyProvider = policycreator;
 
             return this;
         }
 
-        public IOnRouteOptionBuilder Use(IRetryPolicy policy)
+        public IOnRouteOptionBuilder With(IRetryPolicy policy)
         {
-            _route.RetryExtractorType = typeof(NullValueFinder);
+            _route.RetryValueFinderType = typeof(NullValueFinder);
 
             if (policy == null)
             {
@@ -85,7 +92,7 @@ namespace Jal.Router.Fluent.Impl
 
             Func<IValueFinder, IRetryPolicy> creator = x => policy;
 
-            _route.RetryPolicyExtractor = creator;
+            _route.RetryPolicyProvider = creator;
 
             return this;
         }
@@ -194,37 +201,44 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo<TExeption>(string endpointname) where TExeption : Exception
+        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo(string endpointname, Action<IForExceptionBuilder> action)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(nameof(endpointname));
             }
 
-            _route.RetryExceptionType = typeof(TExeption);
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new ForExceptionBuilder(_route.RetryExceptionTypes);
+
+            action(builder);
 
             _route.OnRetryEndPoint = endpointname;
 
             return this;
         }
 
-        public IOnRouteOptionBuilder Use<TExtractor>(Func<IValueFinder, IRetryPolicy> policycreator) where TExtractor : IValueFinder
+        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
         {
-            _route.RetryExtractorType = typeof(TExtractor);
+            _route.RetryValueFinderType = typeof(TValueFinder);
 
             if (policycreator == null)
             {
                 throw new ArgumentNullException(nameof(policycreator));
             }
 
-            _route.RetryPolicyExtractor = policycreator;
+            _route.RetryPolicyProvider = policycreator;
 
             return this;
         }
 
-        public IOnRouteOptionBuilder Use(IRetryPolicy policy)
+        public IOnRouteOptionBuilder With(IRetryPolicy policy)
         {
-            _route.RetryExtractorType = typeof(NullValueFinder);
+            _route.RetryValueFinderType = typeof(NullValueFinder);
 
             if (policy == null)
             {
@@ -233,7 +247,7 @@ namespace Jal.Router.Fluent.Impl
 
             Func<IValueFinder, IRetryPolicy> creator = x => policy;
 
-            _route.RetryPolicyExtractor = creator;
+            _route.RetryPolicyProvider = creator;
 
             return this;
         }

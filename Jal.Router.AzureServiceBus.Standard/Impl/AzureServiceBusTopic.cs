@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
+using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
@@ -56,6 +59,34 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             };
         }
 
+        private SessionHandlerOptions CreateSessionOptions(ListenerMetadata metadata)
+        {
+            Func<ExceptionReceivedEventArgs, Task> handler = args =>
+            {
+                var context = args.ExceptionReceivedContext;
+
+                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+
+                return Task.CompletedTask;
+            };
+
+            var options = new SessionHandlerOptions(handler) { AutoComplete = false };
+
+            if (_parameter.MaxConcurrentGroups > 0)
+            {
+                options.MaxConcurrentSessions = _parameter.MaxConcurrentGroups;
+            }
+            if (_parameter.AutoRenewGroupTimeoutInSeconds > 0)
+            {
+                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewGroupTimeoutInSeconds);
+            }
+            if (_parameter.MessageGroupTimeoutInSeconds > 0)
+            {
+                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessageGroupTimeoutInSeconds);
+            }
+            return options;
+        }
+
         public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
         {
             return listener =>
@@ -72,13 +103,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var options = CreateOptions(metadata);
 
-            Action<Message> handler = message =>
+            var sessionoptions = CreateSessionOptions(metadata);
+
+            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+
+            Action<Message, MessageContext> handler = (message, context) =>
             {
-                foreach (var routingaction in metadata.Routes.Select(x => x.RuntimeHandler))
+                foreach (var runtimehandler in metadata.Routes.Select(x => x.RuntimeHandler))
                 {
                     var clone = message.Clone();
 
-                    routingaction(clone, metadata.Channel);
+                    runtimehandler(clone, metadata.Channel);
                 }
             };
 
@@ -86,11 +121,26 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var client = listener[0] as SubscriptionClient;
 
-                client.RegisterMessageHandler(async (message, token) =>
+                if(metadata.Group != null)
                 {
-                    await OnMessageAsync(metadata, message.MessageId, () => handler(message), () => client.CompleteAsync(message.SystemProperties.LockToken));
-                }, options);
+                    client.RegisterSessionHandler(async (ms, message, token) => {
 
+                        var context = adapter.ReadMetadata(message);
+
+                        await OnMessageAsync(metadata, context, () => handler(message, context), () => Task.CompletedTask, () => ms.CloseAsync());
+
+                    }, sessionoptions);
+                }
+                else
+                {
+                    client.RegisterMessageHandler(async (message, token) =>
+                    {
+                        var context = adapter.ReadMetadata(message);
+
+                        await OnMessageAsync(metadata, context, () => handler(message, context), () => client.CompleteAsync(message.SystemProperties.LockToken));
+
+                    }, options);
+                }
             };
         }
 
@@ -107,26 +157,24 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var options = new MessageHandlerOptions(handler) { AutoComplete = false };
 
-            if (_maxconcurrentcalls > 0)
+            if (_parameter.MaxConcurrentCalls > 0)
             {
-                options.MaxConcurrentCalls = _maxconcurrentcalls;
+                options.MaxConcurrentCalls = _parameter.MaxConcurrentCalls;
             }
-            if (_autorenewtimeout != null)
+            if (_parameter.AutoRenewTimeoutInMinutes > 0)
             {
-                options.MaxAutoRenewDuration = _autorenewtimeout.Value;
+                options.MaxAutoRenewDuration = TimeSpan.FromMinutes(_parameter.AutoRenewTimeoutInMinutes);
             }
+
             return options;
         }
 
-        private readonly int _maxconcurrentcalls;
+        private readonly AzureServiceBusParameter _parameter;
 
-        private readonly TimeSpan? _autorenewtimeout;
-
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, ILogger logger, int maxconcurrentcalls=0, TimeSpan? autorenewtimeout=null)
+        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, ILogger logger, IParameterProvider provider)
             : base(factory, configuration, logger)
         {
-            _maxconcurrentcalls = maxconcurrentcalls;
-            _autorenewtimeout = autorenewtimeout;
+            _parameter = provider.Get<AzureServiceBusParameter>();
         }
     }
 }

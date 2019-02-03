@@ -31,7 +31,7 @@ namespace Jal.Router.Impl.Outbound
             {
                 var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
 
-                var message = adapter.Write(context, context.EndPoint.UseClaimCheck);
+                var message = adapter.WriteMetadataAndContent(context, context.EndPoint.UseClaimCheck);
 
                 var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
@@ -49,13 +49,13 @@ namespace Jal.Router.Impl.Outbound
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Message {outputcontext?.Identity.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
+                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
 
                             throw;
                         }
                         finally
                         {
-                            Logger.Log($"Message {outputcontext?.Identity.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
+                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
                         }
 
                         if (outputcontext != null)

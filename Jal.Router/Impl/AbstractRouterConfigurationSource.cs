@@ -13,11 +13,13 @@ namespace Jal.Router.Impl
     {
         private readonly List<Route> _routes = new List<Route>();
 
+        private readonly List<Group> _group = new List<Group>();
+
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
         private readonly List<SubscriptionToPublishSubscribeChannel> _subscriptions = new List<SubscriptionToPublishSubscribeChannel>();
 
-        private readonly List<PublishSubscribeChannel> _publishsubscriberchannels = new List<PublishSubscribeChannel>();
+        private readonly List<PublishSubscribeChannel> _publishsubscribechannels = new List<PublishSubscribeChannel>();
 
         private readonly List<PointToPointChannel> _pointtopointchannels = new List<PointToPointChannel>();
 
@@ -28,6 +30,11 @@ namespace Jal.Router.Impl
         public Route[] GetRoutes()
         {
             return _routes.ToArray();
+        }
+
+        public Group[] GetGroups()
+        {
+            return _group.ToArray();
         }
 
         public Saga[] GetSagas()
@@ -63,7 +70,7 @@ namespace Jal.Router.Impl
 
         public PublishSubscribeChannel[] GetPublishSubscribeChannels()
         {
-            return _publishsubscriberchannels.ToArray();
+            return _publishsubscribechannels.ToArray();
         }
 
 
@@ -79,8 +86,8 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel<TExtractorConectionString>(string subscription, string path, Func<IValueFinder, string> connectionstringextractor, SubscriptionToPublishSubscribeChannelRule rule = null)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
+            where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -90,14 +97,15 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
-                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TValueFinder),
+                ConnectionStringProvider = connectionstringprovider,
+                Properties = properties
             };
 
             if(rule!=null)
@@ -108,7 +116,7 @@ namespace Jal.Router.Impl
             _subscriptions.Add(channel);
         }
 
-        public void RegisterSubscriptionToPublishSubscriberChannel(string subscription, string path, string connectionstring, SubscriptionToPublishSubscribeChannelRule rule = null)
+        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -123,12 +131,13 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor,
+                ConnectionStringProvider = provider,
+                Properties = properties
             };
 
 
@@ -141,27 +150,28 @@ namespace Jal.Router.Impl
         }
 
 
-        public void RegisterPointToPointChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties)
+            where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new PointToPointChannel(path)
             {
-                ConnectionStringValueFinderType = typeof (TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof (TValueFinder),
+                ConnectionStringProvider = connectionstringprovider,
+                Properties = properties
             };
 
             _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPointToPointChannel(string path, string connectionstring)
+        public void RegisterPointToPointChannel(string path, string connectionstring, Dictionary<string, string> properties)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -172,38 +182,40 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new PointToPointChannel(path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor
+                ConnectionStringProvider = provider,
+                Properties = properties
             };
 
             _pointtopointchannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel<TExtractorConectionString>(string path, Func<IValueFinder, string> connectionstringextractor)
-            where TExtractorConectionString : IValueFinder
+        public void RegisterPublishSubscribeChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties)
+            where TValueFinder : IValueFinder
         { 
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             var channel = new PublishSubscribeChannel(path)
             {
-                ConnectionStringValueFinderType = typeof(TExtractorConectionString),
-                ConnectionStringProvider = connectionstringextractor
+                ConnectionStringValueFinderType = typeof(TValueFinder),
+                ConnectionStringProvider = connectionstringprovider,
+                Properties = properties
             };
 
-            _publishsubscriberchannels.Add(channel);
+            _publishsubscribechannels.Add(channel);
         }
 
-        public void RegisterPublishSubscriberChannel(string path, string connectionstring)
+        public void RegisterPublishSubscribeChannel(string path, string connectionstring, Dictionary<string, string> properties)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -214,15 +226,16 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> extractor = x => connectionstring;
+            Func<IValueFinder, string> provider = x => connectionstring;
 
             var channel = new PublishSubscribeChannel(path)
             {
                 ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = extractor
+                ConnectionStringProvider = provider,
+                Properties = properties
             };
 
-            _publishsubscriberchannels.Add(channel);
+            _publishsubscribechannels.Add(channel);
         }
 
         public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IFirstRouteBuilder<TData>> start, Action<IMiddleRouteBuilder<TData>> @continue=null, Action<ILastRouteBuilder<TData>> end = null) where TData : class, new()
@@ -258,6 +271,20 @@ namespace Jal.Router.Impl
             _origin.From = name;
 
             _origin.Key = key;
+        }
+
+        public IGroupForChannelBuilder RegisterGroup(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            var group = new Group(name);
+
+            _group.Add(group);
+
+            return new GroupForChannelBuilder(group);
         }
 
         public INameEndPointBuilder RegisterEndPoint(string name)

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -14,7 +14,9 @@ namespace Jal.Router.Impl.Management
 
         private const int StateStarted = 2;
 
-        private const int StateStoppingOrStopped = 3;
+        private const int StateStopping = 3;
+
+        private const int StateStopped = 4;
 
         private readonly IStartup _startup;
 
@@ -22,7 +24,7 @@ namespace Jal.Router.Impl.Management
 
         private readonly IShutdown _shutdown;
 
-        private IShutdownWatcher _watcher;
+        private List<IShutdownWatcher> _watchers;
 
         private readonly IComponentFactory _factory;
 
@@ -40,11 +42,7 @@ namespace Jal.Router.Impl.Management
             _factory = factory;
             _cancellationtokensource = new CancellationTokenSource();
             _logger = logger;
-        }
-
-        private void Start()
-        {
-            Task.Run(() => StartAsync()).GetAwaiter().GetResult();
+            _watchers = new List<IShutdownWatcher>();
         }
 
         public void Startup()
@@ -52,76 +50,87 @@ namespace Jal.Router.Impl.Management
             _startup.Start();
         }
 
+        private void Watch()
+        {
+            foreach (var watcher in Configuration.ShutdownWatcherTypes)
+            {
+                var w = _factory.Create<IShutdownWatcher>(watcher);
+
+                _watchers.Add(w);
+
+                w.Start(_cancellationtokensource);
+            }
+        }
+
+        private void UnWatch()
+        {
+            foreach (var watcher in _watchers)
+            {
+                watcher.Stop();
+            }
+        }
+
+        private void Monitor()
+        {
+            _monitor.Start();
+        }
+
         public void Shutdown()
         {
             _shutdown.Stop();
         }
 
-        private Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (Interlocked.CompareExchange(ref _state, StateStarting, StateNotStarted) != StateNotStarted)
-            {
-                throw new InvalidOperationException("Start has already been called");
-            }
-
-            _logger.Log($"Starting Host");
-
-            _watcher = _factory.Create<IShutdownWatcher>(Configuration.ShutdownWatcherType);
-
-            Startup();
-
-            _monitor.Start();
-
-            _watcher.Start(_cancellationtokensource);
-
-            _state = StateStarted;
-
-            _logger.Log($"Host started");
-
-            return Task.FromResult(0);
-        }
-
         private void Stop()
         {
-            Task.Run(StopAsync).GetAwaiter().GetResult();
+            Interlocked.CompareExchange(ref _state, StateStopping, StateStarted);
+
+            if (_state != StateStopping)
+            {
+                throw new InvalidOperationException("The host is not running");
+            }
+
+            Shutdown();
+
+            _state = StateStopped;
         }
 
         public void RunAndBlock()
         {
-            Start();
+            _logger.Log($"Starting Host");
+
+            Run();
+
+            Watch();
+
+            _logger.Log($"Host started");
 
             _cancellationtokensource.Token.WaitHandle.WaitOne();
 
+            _logger.Log($"Stopping Host");
+
+            UnWatch();
+
             Stop();
+
+            _cancellationtokensource.Dispose();
+
+            _logger.Log($"Host stopped");
         }
 
         public void Run()
         {
-            Start();
+            if (Interlocked.CompareExchange(ref _state, StateStarting, StateNotStarted) != StateNotStarted)
+            {
+                throw new InvalidOperationException("Run has already been called");
+            }
+
+            Startup();
+
+            Monitor();
+
+            _state = StateStarted;
         }
 
         public IConfiguration Configuration { get; }
-
-        private Task StopAsync()
-        {
-            Interlocked.CompareExchange(ref _state, StateStoppingOrStopped, StateStarted);
-
-            if (_state != StateStoppingOrStopped)
-            {
-                throw new InvalidOperationException("The host has not yet started");
-            }
-
-            _logger.Log($"Stopping Host");
-
-            Shutdown();
-
-            _watcher.Stop();
-
-            _logger.Log($"Host stopped");
-
-            _cancellationtokensource.Dispose();
-
-            return Task.FromResult(0);
-        }
     }
 }

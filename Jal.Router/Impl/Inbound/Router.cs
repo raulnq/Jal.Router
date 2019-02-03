@@ -75,7 +75,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     interceptor.OnExit(context);
 
-                    _logger.Log($"Message {context.Identity.Id} handled by route {name}");
+                    _logger.Log($"Message {context.IdentityContext.Id} handled by route {name}");
                 }
 
             }
@@ -83,7 +83,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 
 
-                _logger.Log($"Message {context.Identity.Id} skipped by route {name}");
+                _logger.Log($"Message {context.IdentityContext.Id} skipped by route {name}");
             }
         }
     }

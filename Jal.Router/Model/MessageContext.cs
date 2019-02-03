@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound.Sagas;
 using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Model
@@ -13,7 +12,7 @@ namespace Jal.Router.Model
 
         private readonly IMessageSerializer _serializer;
 
-        private readonly ISagaStorage _storage;
+        private readonly IEntityStorage _storage;
         public Channel Channel { get; set; }
         public object Response { get; set; }
         public IDictionary<string, string> Headers { get; set; }
@@ -32,8 +31,8 @@ namespace Jal.Router.Model
         public string Content { get; set; }
         public string ContentId { get; set; }
         public List<Track> Tracks { get; set; }
-        public Identity Identity { get; set; }
-        public MessageContext(IBus bus, IMessageSerializer serializer, ISagaStorage storage)
+        public IdentityContext IdentityContext { get; set; }
+        public MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage)
         {
             _bus = bus;
             _serializer = serializer;
@@ -44,7 +43,7 @@ namespace Jal.Router.Model
             Origin = new Origin();
             SagaContext = new SagaContext();
             Tracks = new List<Track>();
-            Identity = new Identity();
+            IdentityContext = new IdentityContext();
         }
 
         public MessageContext(EndPoint endpoint, Options options)
@@ -54,7 +53,7 @@ namespace Jal.Router.Model
             LastRetry = true;
             Origin = new Origin();
             EndPoint = endpoint;
-            Identity = options.Identity;
+            IdentityContext = options.Identity;
             Headers = options.Headers;
             Version = options.Version;
             ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
@@ -65,7 +64,7 @@ namespace Jal.Router.Model
 
         }
 
-        public void AddTrack(Identity identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
+        public void AddTrack(IdentityContext identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
         {
             var tracking = new Track()
             {
@@ -80,7 +79,7 @@ namespace Jal.Router.Model
             Tracks.Add(tracking);
         }
 
-        public Track[] GetTracksOfTheSaga()
+        public Track[] GetTracksOfTheCurrentSaga()
         {
             if (!string.IsNullOrWhiteSpace(SagaContext.Id))
             {
@@ -133,11 +132,16 @@ namespace Jal.Router.Model
             return null;
         }
 
+        public bool IsSaga()
+        {
+            return Saga != null;
+        }
+
         public void Update(object data)
         {
             if (_storage != null && _serializer != null)
             {
-                var sagaentity = _storage.GetSaga(SagaContext.Id);
+                var sagaentity = _storage.GetSagaEntity(SagaContext.Id);
 
                 if (sagaentity != null)
                 {
@@ -147,7 +151,7 @@ namespace Jal.Router.Model
 
                     sagaentity.Status = SagaContext.Status;
 
-                    _storage.UpdateSaga(this, SagaContext.Id, sagaentity);
+                    _storage.UpdateSagaEntity(this, sagaentity);
                 }
             }
         }

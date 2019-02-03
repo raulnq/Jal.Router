@@ -43,48 +43,48 @@ namespace Jal.Router.Fluent.Impl
             return builder;
         }
 
-        public void AddPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringextractor) where TValueFinder : IValueFinder
+        public void AddPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
             _channels.Add(new Channel(ChannelType.PointToPoint)
             {
                 ToPath = path,
 
-                ToConnectionStringProvider = connectionstringextractor,
+                ToConnectionStringProvider = connectionstringprovider,
 
                 ConnectionStringValueFinderType = typeof(TValueFinder)
             });
         }
 
-        public void AddSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringextractor) where TValueFinder : IValueFinder
+        public void AddSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringextractor == null)
+            if (connectionstringprovider == null)
             {
-                throw new ArgumentNullException(nameof(connectionstringextractor));
+                throw new ArgumentNullException(nameof(connectionstringprovider));
             }
             if (subscription == null)
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel(ChannelType.PublishSubscriber)
+            _channels.Add(new Channel(ChannelType.PublishSubscribe)
             {
                 ToPath = path,
 
-                ToConnectionStringProvider = connectionstringextractor,
+                ToConnectionStringProvider = connectionstringprovider,
 
                 ConnectionStringValueFinderType = typeof(TValueFinder),
 

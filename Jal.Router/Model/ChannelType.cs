@@ -4,8 +4,8 @@
     {
         None,
         PointToPoint,
-        PublishSubscriber,
+        PublishSubscribe,
         RequestReplyToPointToPoint,
-        RequestReplyToSubscriptionToPublishSubscriber
+        RequestReplyToSubscriptionToPublishSubscribe
     }
 }

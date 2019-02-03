@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
@@ -33,7 +34,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
             {
                 EndPointName = route.OnRetryEndPoint,
                 Headers = context.Headers,
-                Identity = context.Identity,
+                Identity = context.IdentityContext,
                 Version = context.Version,
                 ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(context.RetryCount + 1)),
                 RetryCount = context.RetryCount + 1,
@@ -53,7 +54,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
             {
                 EndPointName = route.OnErrorEndPoint,
                 Headers = context.Headers,
-                Identity = context.Identity,
+                Identity = context.IdentityContext,
                 Version = context.Version,
                 SagaContext = context.SagaContext,
             };
@@ -107,13 +108,31 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         private IRetryPolicy GetRetryPolicy(Route route)
         {
-            var extractor = _factory.Create<IValueFinder>(route.RetryExtractorType);
+            var finder = _factory.Create<IValueFinder>(route.RetryValueFinderType);
 
-            return route.RetryPolicyExtractor(extractor);
+            return route.RetryPolicyProvider(finder);
         }
+
+        private bool CanHandle(Route route, Exception ex)
+        {
+            var retry = route.RetryExceptionTypes.FirstOrDefault(x=>x == ex.GetType());
+
+            if(retry!=null)
+            {
+                return true;
+            }
+
+            if(ex.InnerException != null)
+            {
+                return route.RetryExceptionTypes.FirstOrDefault(x => x == ex.InnerException.GetType())!=null;
+            }
+
+            return false;
+        }
+
         private bool HasRetry(Route route)
         {
-            return route.RetryExceptionType != null && route.RetryPolicyExtractor != null;
+            return route.RetryExceptionTypes.Count>0 && route.RetryPolicyProvider != null;
         }
 
         public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
@@ -148,13 +167,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
             {
                 if (policy != null)
                 {
-                    if (messagecontext.Route.RetryExceptionType == ex.GetType() || (ex.InnerException != null && messagecontext.Route.RetryExceptionType == ex.InnerException.GetType()))
+                    if (CanHandle(messagecontext.Route, ex))
                     {
                         if (!messagecontext.LastRetry)
                         {
                             if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnRetryEndPoint))
                             {
-                                _logger.Log($"Message {context.Data.Identity.Id} sending the message to the retry endpoint {messagecontext.Route.OnRetryEndPoint} retry count {messagecontext.RetryCount +1} by route {name}");
+                                _logger.Log($"Message {context.Data.IdentityContext.Id} sending the message to the retry endpoint {messagecontext.Route.OnRetryEndPoint} retry count {messagecontext.RetryCount +1} by route {name}");
 
                                 SendRetry(messagecontext.Route, messagecontext, policy);
                             }
@@ -162,13 +181,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
                             {
                                 if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                                 {
-                                    _logger.Log($"Message {context.Data.Identity.Id} policy without retry endpoint, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+                                    _logger.Log($"Message {context.Data.IdentityContext.Id} policy without retry endpoint, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
 
                                     SendError(messagecontext.Route, messagecontext, ex);
                                 }
                                 else
                                 {
-                                    _logger.Log($"Message {context.Data.Identity.Id} policy without retry endpoint by route {name}");
+                                    _logger.Log($"Message {context.Data.IdentityContext.Id} policy without retry endpoint by route {name}");
 
                                     throw;
                                 }
@@ -178,13 +197,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
                         {
                             if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                             {
-                                _logger.Log($"Message {context.Data.Identity.Id} no more retries for the policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+                                _logger.Log($"Message {context.Data.IdentityContext.Id} no more retries for the policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
 
                                 SendError(messagecontext.Route, messagecontext, ex);
                             }
                             else
                             {
-                                _logger.Log($"Message {context.Data.Identity.Id} no more retries for the policy by route {name}");
+                                _logger.Log($"Message {context.Data.IdentityContext.Id} no more retries for the policy by route {name}");
 
                                 throw;
                             }
@@ -194,13 +213,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
                     {
                         if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                         {
-                            _logger.Log($"Message {context.Data.Identity.Id} with an exeception not handled by the retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+                            _logger.Log($"Message {context.Data.IdentityContext.Id} with an exeception not handled by the retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
 
                             SendError(messagecontext.Route, messagecontext, ex);
                         }
                         else
                         {
-                            _logger.Log($"Message {context.Data.Identity.Id} with an exeception not handled by the retry policy by route {name}");
+                            _logger.Log($"Message {context.Data.IdentityContext.Id} with an exeception not handled by the retry policy by route {name}");
 
                             throw;
                         }
@@ -210,13 +229,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
                 {
                     if (!string.IsNullOrWhiteSpace(messagecontext.Route.OnErrorEndPoint))
                     {
-                        _logger.Log($"Message {context.Data.Identity.Id} without retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
+                        _logger.Log($"Message {context.Data.IdentityContext.Id} without retry policy, sending the message to the error endpoint {messagecontext.Route.OnErrorEndPoint} by route {name}");
 
                         SendError(messagecontext.Route, messagecontext, ex);
                     }
                     else
                     {
-                        _logger.Log($"Message {context.Data.Identity.Id} without retry policy by route {name}");
+                        _logger.Log($"Message {context.Data.IdentityContext.Id} without retry policy by route {name}");
 
                         throw;
                     }

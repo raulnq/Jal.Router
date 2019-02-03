@@ -12,9 +12,9 @@ namespace Jal.Router.Model
             RetryCount = 0;
             SagaContext = new SagaContext();
             Tracks = new List<Track>();
-            Identity = new Identity();
+            Identity = new IdentityContext();          
         }
-        public Identity Identity { get; set; }
+        public IdentityContext Identity { get; set; }
 
         public SagaContext SagaContext { get; set; }
 

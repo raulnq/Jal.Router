@@ -19,6 +19,34 @@ namespace Jal.Router.Impl.StartupTask
 
             var errors = new StringBuilder();
 
+            foreach (var group in Configuration.Runtime.Groups)
+            {
+                var finder = Factory.Create<IValueFinder>(group.Channel.ConnectionStringValueFinderType);
+
+                var provider = group.Channel.ToConnectionStringProvider as Func<IValueFinder, string>;
+
+                group.Channel.ToConnectionString = provider?.Invoke(finder);
+
+                if (string.IsNullOrWhiteSpace(group.Channel.ToConnectionString))
+                {
+                    var error = $"Empty connection string, Group {group.Name}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+                }
+
+
+                if (string.IsNullOrWhiteSpace(group.Channel.ToPath))
+                {
+                    var error = $"Empty path, Group {group.Name}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+                }
+            }
+
             foreach (var route in Configuration.Runtime.Routes)
             {
                 if (route.Channels.Any())

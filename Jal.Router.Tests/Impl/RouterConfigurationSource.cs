@@ -94,7 +94,7 @@ namespace Jal.Router.Tests.Impl
 
             RegisterEndPoint("toresponsetopic")
                 .ForMessage<ResponseToSend>()
-                .To(y => y.AddPublishSubscriberChannel<AppSettingValueFinder>(x=>"Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "responsetopic"));
+                .To(y => y.AddPublishSubscribeChannel<AppSettingValueFinder>(x=>"Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "responsetopic"));
                 
 
             RegisterHandler<IRequestResponseHandler<RequestToSend>>("request")
@@ -161,7 +161,7 @@ namespace Jal.Router.Tests.Impl
 
             RegisterEndPoint("appd")
                 .ForMessage<ResponseToSend>()
-                .To(y => y.AddPublishSubscriberChannel<AppSettingValueFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appdtopic"));
+                .To(y => y.AddPublishSubscribeChannel<AppSettingValueFinder>(x => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "appdtopic"));
 
             RegisterHandler<IRequestResponseHandler<ResponseToSend>>("appd")
                 .ToListen(x => x.AddSubscriptionToTopic<AppSettingValueFinder>("appdtopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))
@@ -233,8 +233,8 @@ namespace Jal.Router.Tests.Impl
                 {
                     x.With(((request, handler, context) => handler.Handle(request, context)));
                 })
-                .OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
-                .Use<AppSettingValueFinder>(y => new LinearRetryPolicy(3, 3))
+                //.OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
+                //.Use<AppSettingValueFinder>(y => new LinearRetryPolicy(3, 3))
                 .OnErrorSendFailedMessageTo("appgretryerror");
 
             RegisterHandler<IRequestResponseHandler<Trigger>>("triggerflowe")
