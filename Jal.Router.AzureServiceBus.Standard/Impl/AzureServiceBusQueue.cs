@@ -102,7 +102,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                         var context=adapter.ReadMetadata(message);
 
-                        await OnMessageAsync(metadata, context, () => handler(message, context), () => Task.CompletedTask, ()=> ms.CloseAsync());
+                        await OnMessageAsync(metadata, context, () => handler(message, context), () => ms.CompleteAsync(message.SystemProperties.LockToken), ()=> ms.CloseAsync());
 
                     }, sessionoptions);
                 }
@@ -130,7 +130,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 return Task.CompletedTask;
             };
 
-            var options = new SessionHandlerOptions(handler) { AutoComplete = true };
+            var options = new SessionHandlerOptions(handler) { AutoComplete = false };
 
             if (_parameter.MaxConcurrentGroups > 0)
             {
