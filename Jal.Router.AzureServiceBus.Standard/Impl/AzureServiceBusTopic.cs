@@ -97,6 +97,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             };
         }
 
+        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
+        {
+            return listener => {
+                var client = listener[0] as SubscriptionClient;
+                return !client.IsClosedOrClosing;
+            };
+        }
+
         public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
         {
             var channelpath = metadata.Channel.GetPath();

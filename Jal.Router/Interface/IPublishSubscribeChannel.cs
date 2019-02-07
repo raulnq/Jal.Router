@@ -14,6 +14,8 @@ namespace Jal.Router.Interface
 
         Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata);
 
+        Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata);
+
         Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata);
 
         Action<object[]> ListenerMethodFactory(ListenerMetadata metadata);

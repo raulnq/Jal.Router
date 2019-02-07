@@ -32,6 +32,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             };
         }
 
+        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
+        {
+            return listener => {
+                var client = listener[0] as QueueClient;
+                return !client.IsClosedOrClosing;
+            };
+        }
+
         public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
         {
             return (sender, message) =>
@@ -59,7 +67,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
 
                 var client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
-
+                
                 return new object[] { client };
             };
         }

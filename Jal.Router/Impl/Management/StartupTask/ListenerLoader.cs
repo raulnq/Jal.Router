@@ -63,6 +63,8 @@ namespace Jal.Router.Impl.StartupTask
 
                     metadata.ListenMethod = pointtopointchannel.ListenerMethodFactory(metadata);
 
+                    metadata.IsActiveMethod = pointtopointchannel.IsActiveMethodFactory(metadata);
+
                     metadata.Listener = metadata.CreateListenerMethod();
 
                     metadata.ListenMethod(metadata.Listener);
@@ -77,6 +79,8 @@ namespace Jal.Router.Impl.StartupTask
                     metadata.DestroyListenerMethod = publishsubscribechannel.DestroyListenerMethodFactory(metadata);
 
                     metadata.ListenMethod = publishsubscribechannel.ListenerMethodFactory(metadata);
+
+                    metadata.IsActiveMethod = publishsubscribechannel.IsActiveMethodFactory(metadata);
 
                     metadata.Listener = metadata.CreateListenerMethod();
 

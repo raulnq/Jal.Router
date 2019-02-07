@@ -107,6 +107,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<HeartBeatLogger>().LifestyleSingleton().Named(typeof(HeartBeatLogger).FullName));
 
+            container.Register(Component.For<IMonitoringTask>().ImplementedBy<ListenerMonitor>().LifestyleSingleton().Named(typeof(ListenerMonitor).FullName));
+            
             container.Register(Component.For<IMessageSerializer>().ImplementedBy<NullMessageSerializer>().LifestyleSingleton().Named(typeof(NullMessageSerializer).FullName));
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<NullMessageAdapter>().LifestyleSingleton().Named(typeof(NullMessageAdapter).FullName));

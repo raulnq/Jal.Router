@@ -138,6 +138,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMonitoringTask, HeartBeatLogger>(typeof (HeartBeatLogger).FullName, new PerContainerLifetime());
 
+            container.Register<IMonitoringTask, ListenerMonitor>(typeof(ListenerMonitor).FullName, new PerContainerLifetime());
+
             container.Register<IMessageSerializer, NullMessageSerializer>(typeof (NullMessageSerializer).FullName,new PerContainerLifetime());
 
             container.Register<IMessageAdapter, NullMessageAdapter>(typeof (NullMessageAdapter).FullName,new PerContainerLifetime());

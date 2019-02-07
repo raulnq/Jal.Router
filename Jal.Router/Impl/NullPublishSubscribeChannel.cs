@@ -37,5 +37,10 @@ namespace Jal.Router.Impl
         {
             return o => { };
         }
+
+        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
+        {
+            return o => { return true; };
+        }
     }
 }

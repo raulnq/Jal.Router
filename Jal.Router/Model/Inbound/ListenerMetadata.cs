@@ -15,6 +15,8 @@ namespace Jal.Router.Model.Inbound
 
         public Action<object[]> ListenMethod { get; set; }
 
+        public Func<object[], bool> IsActiveMethod { get; set; }
+
         public List<Route> Routes { get;  }
 
         public object[] Listener { get; set; }
