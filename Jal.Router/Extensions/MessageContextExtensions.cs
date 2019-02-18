@@ -122,7 +122,14 @@ namespace Jal.Router.Extensions
             {
                 foreach (var header in headers)
                 {
-                    options.Headers.Add(header);
+                    if(headers.ContainsKey(header.Key))
+                    {
+                        options.Headers[header.Key]= header.Value;
+                    }
+                    else
+                    {
+                        options.Headers.Add(header);
+                    }
                 }
             }
 
