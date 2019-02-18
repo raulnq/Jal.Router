@@ -23,3 +23,4 @@ Just another library to route in/out messages
 * Allow customization at the moment to create resources (done)
 * Allow message consumption during scheduled periods of time
 * Second level retry logic
+* Send a message directly to the pipeline.

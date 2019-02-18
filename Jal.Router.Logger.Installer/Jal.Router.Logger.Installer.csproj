@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.6.8</Version>
+    <Version>1.7.0</Version>
     <Company>Raul Naupari</Company>
     <Description>Castle Windsor installer for the Jal.Router.Logger library</Description>
     <Copyright />
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
+    <PackageReference Include="Castle.Windsor" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
