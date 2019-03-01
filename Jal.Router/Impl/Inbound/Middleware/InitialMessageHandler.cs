@@ -8,13 +8,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class FirstMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
+    public class InitialMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
     {
         private readonly IMessageRouter _router;
 
         private const string DefaultStatus = "STARTED";
 
-        public FirstMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration):base(configuration, factory)
+        public InitialMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration):base(configuration, factory)
         {
             _router = router;
         }

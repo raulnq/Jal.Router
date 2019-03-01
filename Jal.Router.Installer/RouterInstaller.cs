@@ -141,11 +141,11 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(MessageExceptionHandler)).Named(typeof(MessageExceptionHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(FirstMessageHandler)).Named(typeof(FirstMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(InitialMessageHandler)).Named(typeof(InitialMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(MiddleMessageHandler)).Named(typeof(MiddleMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(LastMessageHandler)).Named(typeof(LastMessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddleware<MessageContext>)).ImplementedBy(typeof(FinalMessageHandler)).Named(typeof(FinalMessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
 

@@ -58,58 +58,67 @@ namespace Jal.Router.Impl.StartupTask
 
             foreach (var saga in Configuration.Runtime.Sagas)
             {
-                if (saga.FirstRoute != null)
+                if (saga.InitialRoutes != null)
                 {
-                    Configuration.Runtime.Routes.Add(saga.FirstRoute);
+                    foreach (var route in saga.InitialRoutes)
+                    {
+                        route.RuntimeHandler = (message, channel) => {
 
-                    saga.FirstRoute.RuntimeHandler = (message, channel) => {
+                            var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
-                        var context = adapter.ReadMetadataAndContent(message, saga.FirstRoute.ContentType, saga.FirstRoute.UseClaimCheck, saga.FirstRoute.IdentityConfiguration);
+                            context.Channel = channel;
 
-                        context.Channel = channel;
+                            context.Route = route;
 
-                        context.Route = saga.FirstRoute;
+                            context.Saga = saga;
 
-                        context.Saga = saga;
+                            _router.Route<InitialMessageHandler>(context);
+                        };
 
-                        _router.Route<FirstMessageHandler>(context);
-                    };
+                        Configuration.Runtime.Routes.Add(route);
+                    }
                 }
 
-                if (saga.LastRoute != null)
+                if (saga.FinalRoutes != null)
                 {
-                    Configuration.Runtime.Routes.Add(saga.LastRoute);
+                    foreach (var routes in saga.FinalRoutes)
+                    {
+                        Configuration.Runtime.Routes.Add(routes);
 
-                    saga.LastRoute.RuntimeHandler = (message, channel) => {
+                        routes.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.ReadMetadataAndContent(message, saga.LastRoute.ContentType, saga.LastRoute.UseClaimCheck, saga.LastRoute.IdentityConfiguration);
+                            var context = adapter.ReadMetadataAndContent(message, routes.ContentType, routes.UseClaimCheck, routes.IdentityConfiguration);
 
-                        context.Channel = channel;
+                            context.Channel = channel;
 
-                        context.Route = saga.LastRoute;
+                            context.Route = routes;
 
-                        context.Saga = saga;
+                            context.Saga = saga;
 
-                        _router.Route<LastMessageHandler>(context);
-                    };
+                            _router.Route<FinalMessageHandler>(context);
+                        };
+                    }
                 }
 
-                foreach (var route in saga.Routes)
+                if(saga.Routes!=null)
                 {
-                    route.RuntimeHandler = (message, channel) => {
+                    foreach (var route in saga.Routes)
+                    {
+                        route.RuntimeHandler = (message, channel) => {
 
-                        var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                            var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
 
-                        context.Channel = channel;
+                            context.Channel = channel;
 
-                        context.Route = route;
+                            context.Route = route;
 
-                        context.Saga = saga;
+                            context.Saga = saga;
 
-                        _router.Route<MiddleMessageHandler>(context);
-                    };
+                            _router.Route<MiddleMessageHandler>(context);
+                        };
 
-                    Configuration.Runtime.Routes.Add(route);
+                        Configuration.Runtime.Routes.Add(route);
+                    }
                 }
             }
 

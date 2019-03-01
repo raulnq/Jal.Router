@@ -8,13 +8,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class LastMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
+    public class FinalMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
     {
         private readonly IMessageRouter _router;
 
         private const string DefaultStatus = "ENDED";
 
-        public LastMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration) : base(configuration, factory)
+        public FinalMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration) : base(configuration, factory)
         {
             _router = router;
         }

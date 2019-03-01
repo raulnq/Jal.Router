@@ -12,6 +12,10 @@ namespace Jal.Router.Model
             DataType = datatype;
 
             Routes = new List<Route>();
+
+            InitialRoutes = new List<Route>();
+
+            FinalRoutes = new List<Route>();
         }
         public string Name { get; }
 
@@ -21,8 +25,8 @@ namespace Jal.Router.Model
 
         public List<Route> Routes { get; }
 
-        public Route FirstRoute { get; set; }
+        public List<Route> InitialRoutes { get; set; }
 
-        public Route LastRoute { get; set; }
+        public List<Route> FinalRoutes { get; set; }
     }
 }

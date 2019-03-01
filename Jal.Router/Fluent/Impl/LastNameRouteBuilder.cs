@@ -37,7 +37,7 @@ namespace Jal.Router.Fluent.Impl
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 
-            _saga.LastRoute = value;
+            _saga.FinalRoutes.Add(value);
 
             return builder;
         }

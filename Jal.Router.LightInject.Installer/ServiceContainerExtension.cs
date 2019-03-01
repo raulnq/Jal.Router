@@ -166,11 +166,11 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddleware<MessageContext>, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, FirstMessageHandler>(typeof (FirstMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, InitialMessageHandler>(typeof (InitialMessageHandler).FullName,new PerContainerLifetime());
 
             container.Register<IMiddleware<MessageContext>, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, LastMessageHandler>(typeof (LastMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddleware<MessageContext>, FinalMessageHandler>(typeof (FinalMessageHandler).FullName,new PerContainerLifetime());
 
             container.Register<IMiddleware<MessageContext>, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
 

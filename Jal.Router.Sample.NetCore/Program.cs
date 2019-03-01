@@ -45,6 +45,7 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, EndHandler>(typeof(EndHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToReplyHandler>(typeof(ToReplyHandler).FullName, new PerContainerLifetime());
@@ -89,6 +90,8 @@ namespace Jal.Router.Sample.NetCore
         private readonly string _topicpublishedfromqueue = "topicpublishedfromqueue";
 
         private readonly string _queuestart = "queuestart";
+
+        private readonly string _alternativequeuestart = "alternativequeuestart";
 
         private readonly string _queuecontinue = "queuecontinue";
 
@@ -209,6 +212,8 @@ namespace Jal.Router.Sample.NetCore
             this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topicpublishedfromqueue), config, "1=1");
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_alternativequeuestart), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config);
 
@@ -421,6 +426,12 @@ namespace Jal.Router.Sample.NetCore
                 .ForMessage<Message>().Use<StartHandler>(y => {
                     y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
+
+                x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("alternative")
+                .ToListen(y => y.AddQueue(_alternativequeuestart, config.ConnectionString))
+                .ForMessage<Message>().Use<AlternativeStartHandler>(y => {
+                    y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
+                });
             },
                 x =>
                 {
@@ -496,6 +507,24 @@ namespace Jal.Router.Sample.NetCore
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
 
             context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+        }
+    }
+
+    public class AlternativeStartHandler : AbstractMessageHandlerWithData<Message, Data>
+    {
+        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        {
+            data.Status = "initial";
+
+            Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
+
+            data.Status = "start";
+
+            data.Name = message.Name;
+
+            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
+
+            context.Send(data, new Message() { Name = message.Name }, "continueendpoint", identity, context.SagaContext.Id);
         }
     }
 

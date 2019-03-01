@@ -37,7 +37,7 @@ namespace Jal.Router.Fluent.Impl
 
             var builder = new HandlerBuilder<TContent, THandler, TData>(value);
 
-            _saga.FirstRoute = value;
+            _saga.InitialRoutes.Add(value);
 
             return builder;
         }
