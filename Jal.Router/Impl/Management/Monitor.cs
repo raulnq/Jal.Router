@@ -29,6 +29,8 @@ namespace Jal.Router.Impl.Management
 
                 Task.Factory.StartNew(() =>
                 {
+                    Thread.Sleep(type.Interval);
+
                     while (true)
                     {
                         try

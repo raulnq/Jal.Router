@@ -24,3 +24,4 @@ Just another library to route in/out messages
 * Allow message consumption during scheduled periods of time
 * Second level retry logic
 * Send a message directly to the pipeline.
+* Saga and handler 

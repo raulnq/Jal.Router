@@ -86,6 +86,11 @@ namespace Jal.Router.Impl
             return builder;
         }
 
+        public IListenerRouteBuilder<THandler> RegisterHandler<THandler>()
+        {
+            return RegisterHandler<THandler>(typeof(THandler).Name.ToLower());
+        }
+
         public void RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
             where TValueFinder : IValueFinder
         {
@@ -148,7 +153,6 @@ namespace Jal.Router.Impl
 
             _subscriptions.Add(channel);
         }
-
 
         public void RegisterPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties)
             where TValueFinder : IValueFinder
@@ -264,6 +268,11 @@ namespace Jal.Router.Impl
             var timeoutbuilder = new TimeoutBuilder(saga);
 
             return timeoutbuilder;
+        }
+
+        public ITimeoutBuilder RegisterSaga<TData>(Action<IFirstRouteBuilder<TData>> start, Action<IMiddleRouteBuilder<TData>> @continue = null, Action<ILastRouteBuilder<TData>> end = null) where TData : class, new()
+        {
+            return RegisterSaga<TData>(typeof(TData).Name.ToLower(), start, @continue, end);
         }
 
         public void RegisterOrigin(string name, string key="")

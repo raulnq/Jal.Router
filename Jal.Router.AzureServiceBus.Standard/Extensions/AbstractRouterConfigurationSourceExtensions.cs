@@ -216,7 +216,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, AzureServiceBusConfiguration servicebusconfiguration, string filter = null)
         {
-            RegisterSubscriptionToTopic(configuration, new AzureServiceBusSubscriptionToTopic(subscription, topic), servicebusconfiguration);
+            RegisterSubscriptionToTopic(configuration, new AzureServiceBusSubscriptionToTopic(subscription, topic), servicebusconfiguration, filter);
         }
     }
 }
