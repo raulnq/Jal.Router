@@ -5,6 +5,7 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
+using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
@@ -35,33 +36,35 @@ namespace Jal.Router.Impl.Outbound
 
                 var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
-                if (metadata != null)
+                if (metadata == null)
                 {
-                    id = metadata.SendMethod(metadata.Sender, message);
+                    metadata = DynamicEndpointLoader(channel, context);
+                }
 
-                    if (metadata.ReceiveOnMethod != null)
+                id = metadata.SendMethod(metadata.Sender, message);
+
+                if (metadata.ReceiveOnMethod != null)
+                {
+                    MessageContext outputcontext = null;
+
+                    try
                     {
-                        MessageContext outputcontext = null;
+                        outputcontext = metadata.ReceiveOnMethod(context, adapter);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
 
-                        try
-                        {
-                            outputcontext = metadata.ReceiveOnMethod(context, adapter);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
+                        throw;
+                    }
+                    finally
+                    {
+                        Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
+                    }
 
-                            throw;
-                        }
-                        finally
-                        {
-                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
-                        }
-
-                        if (outputcontext != null)
-                        {
-                            return adapter.Deserialize(outputcontext.Content, outputcontext.ContentType);
-                        }
+                    if (outputcontext != null)
+                    {
+                        return adapter.Deserialize(outputcontext.Content, outputcontext.ContentType);
                     }
                 }
             }
@@ -77,6 +80,47 @@ namespace Jal.Router.Impl.Outbound
             }
 
             return null;
+        }
+
+        private SenderMetadata DynamicEndpointLoader(Channel channel, MessageContext context)
+        {
+            var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
+
+            var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+
+            var newsender = new SenderMetadata(channel);
+
+            newsender.Endpoints.Add(context.EndPoint);
+
+            if (newsender.Channel.Type == ChannelType.PointToPoint)
+            {
+                newsender.CreateSenderMethod = pointtopointchannel.CreateSenderMethodFactory(newsender);
+
+                newsender.DestroySenderMethod = pointtopointchannel.DestroySenderMethodFactory(newsender);
+
+                newsender.SendMethod = pointtopointchannel.SendMethodFactory(newsender);
+
+                newsender.Sender = newsender.CreateSenderMethod();
+
+                Logger.Log($"Opening {newsender.Channel.GetPath()} {newsender.Channel.ToString()} channel ({newsender.Endpoints.Count}): {string.Join(",", newsender.Endpoints.Select(x => x.Name))}");
+            }
+
+            if (newsender.Channel.Type == ChannelType.PublishSubscribe)
+            {
+                newsender.CreateSenderMethod = publishsubscribechannel.CreateSenderMethodFactory(newsender);
+
+                newsender.DestroySenderMethod = publishsubscribechannel.DestroySenderMethodFactory(newsender);
+
+                newsender.SendMethod = publishsubscribechannel.SendMethodFactory(newsender);
+
+                newsender.Sender = newsender.CreateSenderMethod();
+
+                Logger.Log($"Opening {newsender.Channel.GetPath()} {newsender.Channel.ToString()} channel ({newsender.Endpoints.Count}): {string.Join(",", newsender.Endpoints.Select(x => x.Name))}");
+            }
+
+            Configuration.Runtime.SendersMetadata.Add(newsender);
+
+            return newsender;
         }
     }
 }
