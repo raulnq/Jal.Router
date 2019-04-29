@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
@@ -27,21 +26,22 @@ namespace Jal.Router.Impl.Management
             {
                 var task = _factory.Create<IMonitoringTask>(type.Type);
 
-                Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(async () =>
                 {
-                    Thread.Sleep(type.Interval);
+                    await Task.Delay(type.Interval).ConfigureAwait(false);
 
                     while (true)
                     {
                         try
                         {
-                            task.Run(DateTime.UtcNow);
+                            await task.Run(DateTime.UtcNow).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
                             _logger.Log($"Monitor exception {ex}");
                         }
-                        Thread.Sleep(type.Interval);
+
+                        await Task.Delay(type.Interval).ConfigureAwait(false);
                     }
                 });
             }

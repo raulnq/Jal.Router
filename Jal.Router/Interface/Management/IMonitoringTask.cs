@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Management
 {
     public interface IMonitoringTask
     {
-        void Run(DateTime datetime);
+        Task Run(DateTime datetime);
     }
 }

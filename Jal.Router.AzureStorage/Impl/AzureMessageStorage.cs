@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Microsoft.WindowsAzure.Storage;
@@ -28,7 +29,7 @@ namespace Jal.Router.AzureStorage.Impl
         }
 
 
-        public string Read(string id)
+        public async Task<string> Read(string id)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 using (var memorystream = new System.IO.MemoryStream())
                 {
-                    blob.DownloadToStreamAsync(memorystream).GetAwaiter().GetResult();
+                    await blob.DownloadToStreamAsync(memorystream);
 
                     string result = Encoding.UTF8.GetString(memorystream.ToArray());
 

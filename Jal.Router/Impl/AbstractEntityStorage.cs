@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -7,24 +8,24 @@ namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractEntityStorage : IEntityStorage
     {
-        public virtual MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public virtual Task<MessageEntity> CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
-            return null;
+            return Task.FromResult(default(MessageEntity));
         }
 
-        public virtual SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual Task<SagaEntity> CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
-            return null;
+            return Task.FromResult(default(SagaEntity));
         }
 
-        public virtual void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual Task UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
-            
+            return Task.CompletedTask;
         }
 
-        public virtual SagaEntity GetSagaEntity(string entityid)
+        public virtual Task<SagaEntity> GetSagaEntity(string entityid)
         {
-            return null;
+            return Task.FromResult(default(SagaEntity));
         }
 
         public virtual SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")

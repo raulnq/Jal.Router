@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -12,7 +13,7 @@ namespace Jal.Router.Impl.StartupTask
         {
         }
 
-        public void Run()
+        public async Task Run()
         {
             var errors = new StringBuilder();
 
@@ -22,63 +23,61 @@ namespace Jal.Router.Impl.StartupTask
 
             foreach (var channel in Configuration.Runtime.PointToPointChannels)
             {
-                if (channel.ConnectionStringValueFinderType != null)
+                if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {
                     var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                    var provider = channel.ConnectionStringProvider as Func<IValueFinder, string>;
+                    channel.ConnectionString = channel.ConnectionStringProvider(finder);
+                }
 
-                    channel.ConnectionString = provider?.Invoke(finder);
+                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
+                {
+                    var error = $"Empty connection string, point to point channel {channel.Path}";
 
-                    if (string.IsNullOrWhiteSpace(channel.ConnectionString))
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                if (string.IsNullOrWhiteSpace(channel.Path))
+                {
+                    var error = $"Empty path, point to point channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                try
+                {
+                    var created = await manager.CreateIfNotExist(channel).ConfigureAwait(false);
+
+                    if (created)
                     {
-                        var error = $"Empty connection string, point to point channel {channel.Path}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
+                        Logger.Log($"Created {channel.Path} point to point channel");
                     }
-
-                    if (string.IsNullOrWhiteSpace(channel.Path))
+                    else
                     {
-                        var error = $"Empty path, point to point channel {channel.Path}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
+                        Logger.Log($"Point to point channel {channel.Path} already exists");
                     }
+                }
+                catch (Exception ex)
+                {
+                    var error = $"Exception {channel.Path} point to point channel: {ex}";
 
-                    try
-                    {
-                        var created = manager.CreateIfNotExist(channel);
+                    errors.AppendLine(error);
 
-                        if (created)
-                        {
-                            Logger.Log($"Created {channel.Path} point to point channel");
-                        }
-                        else
-                        {
-                            Logger.Log($"Point to point channel {channel.Path} already exists");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        var error = $"Exception {channel.Path} point to point channel: {ex}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-                    }
+                    Logger.Log(error);
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
-                throw new Exception(errors.ToString());
+                throw new ApplicationException(errors.ToString());
             }
 
             Logger.Log("Point to point channels created");

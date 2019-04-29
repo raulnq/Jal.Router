@@ -32,6 +32,7 @@ using LightInject;
 using Microsoft.ServiceBus.Messaging;
 using Component = Castle.MicroKernel.Registration.Component;
 using Jal.Router.Impl.ValueFinder;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Sample.FullNetFramework
 {
@@ -43,14 +44,16 @@ namespace Jal.Router.Sample.FullNetFramework
         }
         public interface IMessageHandler
         {
-            void Handle(Message message);
+            Task Handle(Message message);
         }
 
         public class MessageHandler : IMessageHandler
         {
-            public void Handle(Message message)
+            public Task Handle(Message message)
             {
                 Console.WriteLine("Hello world!!");
+
+                return Task.CompletedTask;
             }
         }
 

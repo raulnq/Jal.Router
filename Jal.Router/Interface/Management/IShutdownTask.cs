@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace Jal.Router.Interface.Management
 {
     public interface IShutdownTask
     {
-        void Run();
+        Task Run();
     }
 }

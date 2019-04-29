@@ -1,13 +1,14 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Model;
 
 namespace Jal.Router.Interface.Inbound
 {
     public interface IMessageAdapter
     {
-        MessageContext ReadMetadataAndContent(object message, Type contenttype, bool useclaimcheck, Identity identityconfiguration=null);
+        Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route);
 
-        MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null);
+        Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint endpoint);
 
         MessageContext ReadMetadata(object message);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jal.Router.Interface;
+using System;
 
 namespace Jal.Router.Model
 {
@@ -28,24 +29,23 @@ namespace Jal.Router.Model
             }
             if (Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
             {
-                return "request reply to subscription";
+                return "request reply to subscription to publish subscribe";
             }
-            if (Type == ChannelType.PublishSubscribe)//TODO SubscriptionToPublishSubscribe on listen - PublishSubscriber on publish
+            if (Type == ChannelType.PublishSubscribe)
             {
                 return "publish subscribe";
+            }
+            if (Type == ChannelType.SubscriptionToPublishSubscribe)
+            {
+                return "subscription to publish subscribe";
             }
 
             return string.Empty;
         }
 
-        public string GetPath(string prefix="")
+        public string GetPath()
         {
             var description = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(prefix))
-            {
-                description = $"{description}/{prefix}";
-            }
 
             if (!string.IsNullOrWhiteSpace(ToPath))
             {
@@ -59,7 +59,7 @@ namespace Jal.Router.Model
 
             if (!string.IsNullOrWhiteSpace(ToReplyPath))
             {
-                description = $"{description} - /{ToReplyPath}";
+                description = $"{description}/{ToReplyPath}";
             }
 
             if (!string.IsNullOrWhiteSpace(ToReplySubscription))
@@ -72,7 +72,7 @@ namespace Jal.Router.Model
 
         public Type ConnectionStringValueFinderType { get; set; }
 
-        public object ToConnectionStringProvider { get; set; }
+        public Func<IValueFinder, string> ToConnectionStringProvider { get; set; }
 
         public string ToConnectionString { get; set; }
 
@@ -88,7 +88,7 @@ namespace Jal.Router.Model
 
         public Type ReplyConnectionStringValueFinderType { get; set; }
 
-        public object ToReplyConnectionStringProvider { get; set; }
+        public Func<IValueFinder, string> ToReplyConnectionStringProvider { get; set; }
 
         public string ToReplyConnectionString { get; set; }
     }

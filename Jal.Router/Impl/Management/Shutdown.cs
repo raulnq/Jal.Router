@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -19,7 +20,7 @@ namespace Jal.Router.Impl.Management
             _logger = logger;
         }
 
-        public void Stop()
+        public async Task Stop()
         {
             foreach (var type in _configuration.ShutdownTaskTypes)
             {
@@ -27,7 +28,7 @@ namespace Jal.Router.Impl.Management
                 {
                     var task = _factory.Create<IShutdownTask>(type);
 
-                    task.Run();
+                    await task.Run().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

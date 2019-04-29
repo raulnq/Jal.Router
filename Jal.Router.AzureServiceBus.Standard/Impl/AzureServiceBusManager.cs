@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
@@ -15,26 +16,38 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusManager : IChannelManager
     {
+        public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
+
+        public const string MessageLockDurationInSeconds = "messagelockdurationinseconds";
+
+        public const string DuplicateMessageDetectionInMinutes = "duplicatemessagedetectioninminutes";
+
+        public const string SessionEnabled = "sessionenabled";
+
+        public const string PartitioningEnabled = "partitioningenabled";
+
+        public const string ExpressMessageEnabled = "expressmessageenabled";
+
         public AzureServiceBusManager()
         {
             LoggerCallbackHandler.UseDefaultLogging = false;
         }
 
-        public bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
+        public async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
+                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
                     try
                     {
-                       topic.Subscriptions.GetByName(channel.Subscription);
+                       await topic.Subscriptions.GetByNameAsync(channel.Subscription).ConfigureAwait(false);
 
                        return false;
                     }
@@ -46,26 +59,26 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                             var lockduration = 300;
 
-                            if (channel.Properties.ContainsKey("defaultmessagettlindays"))
+                            if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
                             {
-                                messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                                messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
                             }
 
-                            if (channel.Properties.ContainsKey("messagelockdurationinseconds"))
+                            if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
                             {
-                                lockduration = Convert.ToInt32(channel.Properties["messagelockdurationinseconds"]);
+                                lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
                             }
 
                             var descriptor = topic.Subscriptions.Define(channel.Subscription)
                                 .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl))
                                 .WithMessageLockDurationInSeconds(lockduration);
 
-                            if (channel.Properties.ContainsKey("sessionenabled"))
+                            if (channel.Properties.ContainsKey(SessionEnabled))
                             {
                                 descriptor = descriptor.WithSession();
                             }
 
-                            descriptor.Create();
+                            await descriptor.CreateAsync().ConfigureAwait(false);
 
                             var subs = new Microsoft.Azure.ServiceBus.SubscriptionClient(configuration.ConnectionString, channel.Path, channel.Subscription);
 
@@ -73,11 +86,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                             if (rule!=null)
                             {
-                                subs.RemoveRuleAsync("$Default").GetAwaiter().GetResult();
+                                await subs.RemoveRuleAsync("$Default").ConfigureAwait(false);
 
                                 var ruledescriptor = new RuleDescription(rule.Name, new SqlFilter(rule.Filter));
 
-                                subs.AddRuleAsync(ruledescriptor).GetAwaiter().GetResult();
+                                await subs.AddRuleAsync(ruledescriptor).ConfigureAwait(false);
                             }
 
                             return true;
@@ -93,17 +106,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public bool CreateIfNotExist(PublishSubscribeChannel channel)
+        public async Task<bool> CreateIfNotExist(PublishSubscribeChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    serviceBusNamespace.Topics.GetByName(channel.Path);
+                    await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
                     return false;
                 }
@@ -113,32 +126,32 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var messagettl = 14;
 
-                        if (channel.Properties.ContainsKey("defaultmessagettlindays"))
+                        if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
                         {
-                            messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                            messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
                         } 
 
                         var descriptor = serviceBusNamespace.Topics.Define(channel.Path)
                             .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl));
 
-                        if (channel.Properties.ContainsKey("duplicatemessagedetectioninminutes"))
+                        if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
                         {
-                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties["duplicatemessagedetectioninminutes"]);
+                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
 
                             descriptor = descriptor.WithDuplicateMessageDetection(TimeSpan.FromMinutes(duplicatemessagedetectioninminutes));
                         }
 
-                        if (channel.Properties.ContainsKey("partitioningenabled"))
+                        if (channel.Properties.ContainsKey(PartitioningEnabled))
                         {
                             descriptor = descriptor.WithPartitioning();
                         }
 
-                        if (channel.Properties.ContainsKey("expressmessageenabled"))
+                        if (channel.Properties.ContainsKey(ExpressMessageEnabled))
                         {
                             descriptor = descriptor.WithExpressMessage();
                         }
 
-                        descriptor.Create();
+                        await descriptor.CreateAsync().ConfigureAwait(false);
 
                         return true;
 
@@ -149,27 +162,29 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel)
+        public async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
-                    
-                    var info = new PublishSubscribeChannelInfo(channel.Path)
-                    {
-                        MessageCount = topic.ActiveMessageCount,
-                        DeadLetterMessageCount = topic.DeadLetterMessageCount,
-                        ScheduledMessageCount = topic.ScheduledMessageCount,
-                        SizeInBytes = topic.CurrentSizeInBytes
-                    };
+                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
-                    return info;
+                    var statistics = new PublishSubscribeChannelStatistics(channel.Path);
+
+                    statistics.Properties.Add("DeadLetterMessageCount", topic.DeadLetterMessageCount.ToString());
+
+                    statistics.Properties.Add("ActiveMessageCount", topic.ActiveMessageCount.ToString());
+
+                    statistics.Properties.Add("ScheduledMessageCount", topic.ScheduledMessageCount.ToString());
+
+                    statistics.Properties.Add("CurrentSizeInBytes", topic.CurrentSizeInBytes.ToString());
+
+                    return statistics;
                 }
                 catch (Exception)
                 {
@@ -181,28 +196,29 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         }
 
-        public SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel)
+        public async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    var topic = serviceBusNamespace.Topics.GetByName(channel.Path);
+                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
-                    var subs = topic.Subscriptions.GetByName(channel.Subscription);
-                    
-                    var info = new SubscriptionToPublishSubscribeChannelInfo(channel.Subscription, channel.Path)
-                    {
-                        DeadLetterMessageCount = subs.DeadLetterMessageCount,
-                        MessageCount = subs.ActiveMessageCount,
-                        ScheduledMessageCount = subs.ScheduledMessageCount
-                    };
+                    var subs = await topic.Subscriptions.GetByNameAsync(channel.Subscription).ConfigureAwait(false);
 
-                    return info;
+                    var statistics = new SubscriptionToPublishSubscribeChannelStatistics(channel.Subscription, channel.Path);
+
+                    statistics.Properties.Add("DeadLetterMessageCount", subs.DeadLetterMessageCount.ToString());
+
+                    statistics.Properties.Add("ActiveMessageCount", subs.ActiveMessageCount.ToString());
+
+                    statistics.Properties.Add("ScheduledMessageCount", subs.ScheduledMessageCount.ToString());
+
+                    return statistics;
                 }
                 catch (Exception)
                 {
@@ -213,27 +229,29 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public PointToPointChannelInfo GetInfo(PointToPointChannel channel)
+        public async Task<PointToPointChannelStatistics> Get(PointToPointChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    var queue = serviceBusNamespace.Queues.GetByName(channel.Path);
+                    var queue = await serviceBusNamespace.Queues.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
-                    var info = new PointToPointChannelInfo(channel.Path)
-                    {
-                        DeadLetterMessageCount = queue.DeadLetterMessageCount,
-                        MessageCount = queue.ActiveMessageCount,
-                        ScheduledMessageCount = queue.ScheduledMessageCount,
-                        SizeInBytes = queue.CurrentSizeInBytes
-                    };
+                    var statistics = new PointToPointChannelStatistics(channel.Path);
 
-                    return info;
+                    statistics.Properties.Add("DeadLetterMessageCount", queue.DeadLetterMessageCount.ToString());
+
+                    statistics.Properties.Add("ActiveMessageCount", queue.ActiveMessageCount.ToString());
+
+                    statistics.Properties.Add("ScheduledMessageCount", queue.ScheduledMessageCount.ToString());
+
+                    statistics.Properties.Add("CurrentSizeInBytes", queue.CurrentSizeInBytes.ToString());
+
+                    return statistics;
                 }
                 catch (Exception)
                 {
@@ -244,17 +262,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public bool CreateIfNotExist(PointToPointChannel channel)
+        public async Task<bool> CreateIfNotExist(PointToPointChannel channel)
         {
             var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
 
-            var serviceBusNamespace = GetServiceBusNamespace(configuration);
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
             if (serviceBusNamespace != null)
             {
                 try
                 {
-                    serviceBusNamespace.Queues.GetByName(channel.Path);
+                    await serviceBusNamespace.Queues.GetByNameAsync(channel.Path).ConfigureAwait(false);
                     
                     return false;
                 }
@@ -266,55 +284,53 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                         var lockduration = 300;
 
-                        if(channel.Properties.ContainsKey("defaultmessagettlindays"))
+                        if(channel.Properties.ContainsKey(DefaultMessageTtlInDays))
                         {
-                            messagettl = Convert.ToInt32(channel.Properties["defaultmessagettlindays"]);
+                            messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
                         }
 
-                        if (channel.Properties.ContainsKey("messagelockdurationinseconds"))
+                        if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
                         {
-                            lockduration = Convert.ToInt32(channel.Properties["messagelockdurationinseconds"]);
+                            lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
                         }
 
                         var descriptor = serviceBusNamespace.Queues.Define(channel.Path)
                             .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl))
                             .WithMessageLockDurationInSeconds(lockduration);
 
-                        if (channel.Properties.ContainsKey("duplicatemessagedetectioninminutes"))
+                        if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
                         {
-                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties["duplicatemessagedetectioninminutes"]);
+                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
 
                             descriptor = descriptor.WithDuplicateMessageDetection(TimeSpan.FromMinutes(duplicatemessagedetectioninminutes));
                         }
 
-                        if (channel.Properties.ContainsKey("sessionenabled"))
+                        if (channel.Properties.ContainsKey(SessionEnabled))
                         {
                             descriptor = descriptor.WithSession();
                         }
 
-                        if (channel.Properties.ContainsKey("partitioningenabled"))
+                        if (channel.Properties.ContainsKey(PartitioningEnabled))
                         {
                             descriptor = descriptor.WithPartitioning();
                         }
 
-                        if (channel.Properties.ContainsKey("expressmessageenabled"))
+                        if (channel.Properties.ContainsKey(ExpressMessageEnabled))
                         {
                             descriptor = descriptor.WithExpressMessage();
                         }
 
-
-                        descriptor.Create();
+                        await descriptor.CreateAsync().ConfigureAwait(false);
 
                         return true;
                     }
-
                 }
             }
 
             return false;
         }
 
-        private IServiceBusNamespace GetServiceBusNamespace(AzureServiceBusConfiguration configuration)
+        private async Task<IServiceBusNamespace> GetServiceBusNamespace(AzureServiceBusConfiguration configuration)
         {
             try
             {
@@ -322,7 +338,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 var serviceBusManager = ServiceBusManager.Authenticate(credentials, configuration.SubscriptionId);
 
-                return serviceBusManager.Namespaces.GetByResourceGroup(configuration.ResourceGroupName, configuration.ResourceName);
+                return await serviceBusManager.Namespaces.GetByResourceGroupAsync(configuration.ResourceGroupName, 
+                    configuration.ResourceName).ConfigureAwait(false);
             }
             catch (Exception)
             {

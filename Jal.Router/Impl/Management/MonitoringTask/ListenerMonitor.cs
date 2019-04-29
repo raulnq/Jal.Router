@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -12,21 +13,27 @@ namespace Jal.Router.Impl.MonitoringTask
         {
         }
 
-        public void Run(DateTime datetime)
+        public async Task Run(DateTime datetime)
         {
+            Logger.Log($"Checking listeners");
+
             foreach (var metadata in Configuration.Runtime.ListenersMetadata)
             {
-                if (!metadata.IsActiveMethod(metadata.Listener))
+                if (metadata.Listener!=null && !metadata.Listener.IsActive())
                 {
-                    metadata.Listener = metadata.CreateListenerMethod();
+                    await metadata.Listener.Close().ConfigureAwait(false);
 
-                    metadata.ListenMethod(metadata.Listener);
+                    Logger.Log($"Shutdown {metadata.Signature()}");
 
-                    Logger.Log($"Listening {metadata.Group?.ToString()} {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}");
+                    metadata.Listener.Open(metadata);
+
+                    metadata.Listener.Listen();
+
+                    Logger.Log($"Listening {metadata.Signature()}");
                 }
             }
 
-            Logger.Log($"Checking listeners");
+            Logger.Log($"Listeners checked");
         }
     }
 }

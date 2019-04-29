@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
@@ -331,7 +332,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override SagaEntity GetSagaEntity(string entityId)
+        public override async Task<SagaEntity> GetSagaEntity(string entityId)
         {
             try
             {
@@ -347,7 +348,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
-                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
+                    var result = await table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).ConfigureAwait(false);
 
                     var record = result.Result as SagaRecord;
 
@@ -395,7 +396,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public override async Task<SagaEntity> CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
             try
             {
@@ -428,7 +429,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 WriteSaga(sagaentity, record);
 
-                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
+                var result = await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
 
                 return sagaentity;
             }
@@ -457,7 +458,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public override async Task<MessageEntity> CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
             try
             {
@@ -501,7 +502,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 WriteMessage(messageentity, record);
 
-                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
+                var result = await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
 
                 return messageentity;
             }
@@ -569,7 +570,7 @@ namespace Jal.Router.AzureStorage.Impl
             return rv;
         }
 
-        public override void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public override async Task UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
         {
             try
             {
@@ -623,7 +624,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                         WriteSaga(sagaentity, record);
 
-                        table.ExecuteAsync(TableOperation.Replace(record)).GetAwaiter().GetResult();
+                        await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                     }
                     else
                     {

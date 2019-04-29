@@ -1,19 +1,20 @@
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Patterns
 {
     public interface IMessageHandler<in TMessage>
     {
-        void Handle(TMessage message);
+        Task Handle(TMessage message);
 
-        void HandleWithContext(TMessage message, MessageContext context);
+        Task HandleWithContext(TMessage message, MessageContext context);
 
         bool IsSuccessfulWithContext(TMessage message, MessageContext context);
 
         bool IsSuccessful(TMessage message);
 
-        void CompensateWithContext(TMessage message, MessageContext context);
+        Task CompensateWithContext(TMessage message, MessageContext context);
 
-        void Compensate(TMessage message);
+        Task Compensate(TMessage message);
     }
 }

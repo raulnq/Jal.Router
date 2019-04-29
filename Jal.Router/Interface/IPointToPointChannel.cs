@@ -1,23 +1,11 @@
 using System;
 using Jal.Router.Model.Outbound;
-using Jal.Router.Model.Inbound;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
-    public interface IPointToPointChannel
+    public interface IPointToPointChannel : IListenerChannel, ISenderChannel
     {
-        Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata);
 
-        Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata);
-
-        Func<object[], object, string> SendMethodFactory(SenderMetadata metadata);
-
-        Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata);
-
-        Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata);
-
-        Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata);
-
-        Action<object[]> ListenerMethodFactory(ListenerMetadata metadata);
     }
 }

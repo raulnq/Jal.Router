@@ -1,6 +1,8 @@
-﻿using Jal.Router.Interface.Inbound;
+﻿using Jal.Router.Interface;
+using Jal.Router.Interface.Inbound;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jal.Router.Model.Outbound
 {
@@ -10,20 +12,19 @@ namespace Jal.Router.Model.Outbound
 
         public List<EndPoint> Endpoints { get; }
 
-        public Func<object[]> CreateSenderMethod { get; set; }
+        public IReaderChannel Reader { get; set; }
 
-        public Action<object[]> DestroySenderMethod { get; set; }
-
-        public Func<object[], object, string> SendMethod { get; set; }
-
-        public Func<MessageContext, IMessageAdapter, MessageContext> ReceiveOnMethod { get; set; }
-
-        public object[] Sender { get; set; }
+        public ISenderChannel Sender { get; set; }
 
         public SenderMetadata(Channel channel)
         {
             Channel = channel;
             Endpoints = new List<EndPoint>();
+        }
+
+        public string Signature()
+        {
+            return $"{Channel.GetPath()} {Channel.ToString()} channel ({Endpoints.Count}): {string.Join(",", Endpoints.Select(x => x.Name))}";
         }
     }
 }

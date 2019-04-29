@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
@@ -13,7 +14,7 @@ namespace Jal.Router.Impl.StartupTask
         {
         }
 
-        public void Run()
+        public Task Run()
         {
             if (Configuration.LoggerTypes.ContainsKey(typeof(Beat)))
             {
@@ -27,6 +28,8 @@ namespace Jal.Router.Impl.StartupTask
 
                 Array.ForEach(loggers, x => x.Log(message, startuptime));
             }
+
+            return Task.CompletedTask;
         }
     }
 }

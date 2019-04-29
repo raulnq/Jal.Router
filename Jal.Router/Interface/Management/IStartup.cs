@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace Jal.Router.Interface.Management
 {
     public interface IStartup
     {
-        void Start();
+        Task Start();
     }
 }

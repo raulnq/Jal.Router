@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
@@ -8,7 +9,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class MiddleMessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
+    public class MiddleMessageHandler : AbstractMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly IMessageRouter _router;
         
@@ -19,17 +20,17 @@ namespace Jal.Router.Impl.Inbound
             _router = router;
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             context.Data.SagaContext.Status = DefaultStatus;
 
-            var sagaentity = GetSagaEntity(context.Data);
+            var sagaentity = await GetSagaEntity(context.Data).ConfigureAwait(false);
 
             if (sagaentity != null)
             {
                 context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
 
-                CreateMessageEntity(context.Data, MessageEntityType.Inbound, sagaentity);
+                await CreateMessageEntity(context.Data, MessageEntityType.Inbound, sagaentity).ConfigureAwait(false);
 
                 var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
 
@@ -37,13 +38,13 @@ namespace Jal.Router.Impl.Inbound
 
                 if (data != null)
                 {
-                    _router.Route(context.Data, data);
+                    await _router.Route(context.Data, data).ConfigureAwait(false);
 
                     sagaentity.Updated = context.Data.DateTimeUtc;
 
                     sagaentity.Data = serializer.Serialize(data);
 
-                    UpdateSagaEntity(context.Data, sagaentity);
+                    await UpdateSagaEntity(context.Data, sagaentity).ConfigureAwait(false);
                 }
                 else
                 {

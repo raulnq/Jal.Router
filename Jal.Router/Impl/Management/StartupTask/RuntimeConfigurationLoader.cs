@@ -3,6 +3,7 @@ using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl.StartupTask
 {
@@ -19,7 +20,7 @@ namespace Jal.Router.Impl.StartupTask
             _router = router;
         }
 
-        public void Run()
+        public Task Run()
         {
             Logger.Log("Loading runtime configuration");
 
@@ -41,15 +42,15 @@ namespace Jal.Router.Impl.StartupTask
 
                 foreach (var route in source.GetRoutes())
                 {
-                    route.RuntimeHandler = (message, channel) => {
+                    route.RuntimeHandler = async (message, channel) => {
 
-                        var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
 
                         context.Channel = channel;
 
                         context.Route = route;
 
-                        _router.Route<MessageHandler>(context);
+                        await _router.Route<MessageHandler>(context);
                     };
 
                     Configuration.Runtime.Routes.Add(route);
@@ -62,9 +63,9 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     foreach (var route in saga.InitialRoutes)
                     {
-                        route.RuntimeHandler = (message, channel) => {
+                        route.RuntimeHandler = async (message, channel) => {
 
-                            var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
 
                             context.Channel = channel;
 
@@ -72,7 +73,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             context.Saga = saga;
 
-                            _router.Route<InitialMessageHandler>(context);
+                            await _router.Route<InitialMessageHandler>(context);
                         };
 
                         Configuration.Runtime.Routes.Add(route);
@@ -81,21 +82,21 @@ namespace Jal.Router.Impl.StartupTask
 
                 if (saga.FinalRoutes != null)
                 {
-                    foreach (var routes in saga.FinalRoutes)
+                    foreach (var route in saga.FinalRoutes)
                     {
-                        Configuration.Runtime.Routes.Add(routes);
+                        Configuration.Runtime.Routes.Add(route);
 
-                        routes.RuntimeHandler = (message, channel) => {
+                        route.RuntimeHandler = async (message, channel) => {
 
-                            var context = adapter.ReadMetadataAndContent(message, routes.ContentType, routes.UseClaimCheck, routes.IdentityConfiguration);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
 
                             context.Channel = channel;
 
-                            context.Route = routes;
+                            context.Route = route;
 
                             context.Saga = saga;
 
-                            _router.Route<FinalMessageHandler>(context);
+                            await _router.Route<FinalMessageHandler>(context);
                         };
                     }
                 }
@@ -104,9 +105,9 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     foreach (var route in saga.Routes)
                     {
-                        route.RuntimeHandler = (message, channel) => {
+                        route.RuntimeHandler = async (message, channel) => {
 
-                            var context = adapter.ReadMetadataAndContent(message, route.ContentType, route.UseClaimCheck, route.IdentityConfiguration);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
 
                             context.Channel = channel;
 
@@ -114,7 +115,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             context.Saga = saga;
 
-                            _router.Route<MiddleMessageHandler>(context);
+                            await _router.Route<MiddleMessageHandler>(context);
                         };
 
                         Configuration.Runtime.Routes.Add(route);
@@ -123,6 +124,8 @@ namespace Jal.Router.Impl.StartupTask
             }
 
             Logger.Log("Runtime configuration loaded");
+
+            return Task.CompletedTask;
         }
     }
 }

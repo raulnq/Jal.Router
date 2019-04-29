@@ -2,7 +2,7 @@
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IOnEndPointOptionBuilder : IToEndPointBuilder
+    public interface IOnEndPointOptionBuilder : IToEndPointBuilder, IToReplyEndPointBuilder
     {
         IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Model;
 
@@ -6,6 +7,6 @@ namespace Jal.Router.Interface.Inbound
 {
     public interface IRouter
     {
-        void Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddleware<MessageContext>;
+        Task Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddlewareAsync<MessageContext>;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Model.Management;
@@ -35,7 +36,7 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Action<object, Channel> RuntimeHandler { get; set; }
+        public Func<object, Channel, Task> RuntimeHandler { get; set; }
 
         public Identity IdentityConfiguration { get; }
 

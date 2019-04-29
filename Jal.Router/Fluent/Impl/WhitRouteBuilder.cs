@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Model;
 
@@ -13,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method)
         {
             if (method == null)
             {
@@ -27,7 +28,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method)
         {
             if (method == null)
             {
@@ -51,7 +52,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method)
         {
             if (method == null)
             {
@@ -65,14 +66,14 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, TData> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, TData, Task> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Action<TContent, THandler, object> wrapper = (b, h, d) => method(b, h,(TData)d); 
+            Func<TContent, THandler, object, Task> wrapper = (b, h, d) => method(b, h,(TData)d); 
 
             var routemethod = new RouteMethod<TContent, THandler>(wrapper);
 
@@ -81,7 +82,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method)
         {
             if (method == null)
             {
@@ -95,14 +96,14 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, TData, Task> method)
         {
             if (method == null)
             {
                 throw new ArgumentNullException(nameof(method));
             }
 
-            Action<TContent, THandler, MessageContext, object> wrapper = (b, h, i, d) => method(b, h, i,(TData)d);
+            Func<TContent, THandler, MessageContext, object, Task> wrapper = (b, h, i, d) => method(b, h, i,(TData)d);
 
             var routemethod = new RouteMethod<TContent, THandler>(wrapper);
 
@@ -111,7 +112,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler> method, string status)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method, string status)
         {
             if (method == null)
             {
@@ -128,7 +129,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, TData> method, string status)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, TData, Task> method, string status)
         {
             if (method == null)
             {
@@ -138,7 +139,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(status));
             }
-            Action<TContent, THandler, object> wrapper = (b, h, d) => method(b, h, (TData)d);
+            Func<TContent, THandler, object, Task> wrapper = (b, h, d) => method(b, h, (TData)d);
 
             var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
 
@@ -147,7 +148,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext> method, string status)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method, string status)
         {
             if (method == null)
             {
@@ -164,7 +165,7 @@ namespace Jal.Router.Fluent.Impl
             return new WhenRouteBuilder<TContent, THandler>(routemethod);
         }
 
-        public IWhenMethodBuilder<TContent, THandler> With(Action<TContent, THandler, MessageContext, TData> method, string status)
+        public IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, TData, Task> method, string status)
         {
             if (method == null)
             {
@@ -174,7 +175,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(status));
             }
-            Action<TContent, THandler, MessageContext, object> wrapper = (b, h, i, d) => method(b, h, i, (TData)d);
+            Func<TContent, THandler, MessageContext, object, Task> wrapper = (b, h, i, d) => method(b, h, i, (TData)d);
 
             var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
 

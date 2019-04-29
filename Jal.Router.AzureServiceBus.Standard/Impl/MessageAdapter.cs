@@ -106,7 +106,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override string GetContent(object message)
+        protected override string ReadContent(object message)
         {
             var sbmessage = message as Message;
 
@@ -151,7 +151,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override object Write(MessageContext context)
+        protected override object WriteMetadataAndContent(MessageContext context)
         {
             var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.Content)) { ContentType = "application/json" };
 

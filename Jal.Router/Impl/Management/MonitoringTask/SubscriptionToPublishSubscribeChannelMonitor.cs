@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
@@ -14,19 +15,19 @@ namespace Jal.Router.Impl.MonitoringTask
         {
         }
 
-        public void Run(DateTime datetime)
+        public async Task Run(DateTime datetime)
         {
-            if (Configuration.LoggerTypes.ContainsKey(typeof(SubscriptionToPublishSubscribeChannelInfo)))
+            if (Configuration.LoggerTypes.ContainsKey(typeof(SubscriptionToPublishSubscribeChannelStatistics)))
             {
-                var loggertypes = Configuration.LoggerTypes[typeof(SubscriptionToPublishSubscribeChannelInfo)];
+                var loggertypes = Configuration.LoggerTypes[typeof(SubscriptionToPublishSubscribeChannelStatistics)];
 
-                var loggers = loggertypes.Select(x => Factory.Create<ILogger<SubscriptionToPublishSubscribeChannelInfo>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => Factory.Create<ILogger<SubscriptionToPublishSubscribeChannelStatistics>>(x)).ToArray();
 
                 var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
 
                 foreach (var subscription in Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
                 {
-                    var message = manager.GetInfo(subscription);
+                    var message = await manager.Get(subscription).ConfigureAwait(false);
 
                     if (message != null)
                     {

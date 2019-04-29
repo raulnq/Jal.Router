@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -13,7 +14,7 @@ namespace Jal.Router.Impl.StartupTask
         {
         }
 
-        public void Run()
+        public Task Run()
         {
             Logger.Log("Initializing routes");
 
@@ -23,9 +24,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 var finder = Factory.Create<IValueFinder>(group.Channel.ConnectionStringValueFinderType);
 
-                var provider = group.Channel.ToConnectionStringProvider as Func<IValueFinder, string>;
-
-                group.Channel.ToConnectionString = provider?.Invoke(finder);
+                group.Channel.ToConnectionString = group.Channel.ToConnectionStringProvider?.Invoke(finder);
 
                 if (string.IsNullOrWhiteSpace(group.Channel.ToConnectionString))
                 {
@@ -55,9 +54,7 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                        var provider = channel.ToConnectionStringProvider as Func<IValueFinder, string>;
-
-                        channel.ToConnectionString = provider?.Invoke(finder);
+                        channel.ToConnectionString = channel.ToConnectionStringProvider?.Invoke(finder);
 
                         if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
                         {
@@ -92,10 +89,12 @@ namespace Jal.Router.Impl.StartupTask
 
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
-                throw new Exception(errors.ToString());
+                throw new ApplicationException(errors.ToString());
             }
 
             Logger.Log("Routes initialized");
+
+            return Task.CompletedTask;
         }
     }
 }

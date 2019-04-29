@@ -6,6 +6,7 @@
         PointToPoint,
         PublishSubscribe,
         RequestReplyToPointToPoint,
-        RequestReplyToSubscriptionToPublishSubscribe
+        RequestReplyToSubscriptionToPublishSubscribe,
+        SubscriptionToPublishSubscribe
     }
 }

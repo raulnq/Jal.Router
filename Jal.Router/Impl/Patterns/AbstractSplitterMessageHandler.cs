@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Patterns
@@ -12,9 +13,9 @@ namespace Jal.Router.Impl.Patterns
             
         }
 
-        public abstract void Send(TSplittedMessage message, MessageContext context, int messages);
+        public abstract Task Send(TSplittedMessage message, MessageContext context, int messages);
 
-        public override void HandleWithContext(TMessage message, MessageContext context)
+        public override async Task HandleWithContext(TMessage message, MessageContext context)
         {
             try
             {
@@ -29,7 +30,7 @@ namespace Jal.Router.Impl.Patterns
 
                     foreach (var m in messages)
                     {
-                        Send(m, context, counter);
+                        await Send(m, context, counter).ConfigureAwait(false);
                     }
                 }
                 else

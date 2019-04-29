@@ -53,7 +53,7 @@ namespace Jal.Router.Impl.Outbound
 
                     interceptor.OnSuccess(message, options);
 
-                    return (TResult)message.Response;
+                    return (TResult) message.Response;
                 }
                 else
                 {
@@ -87,7 +87,6 @@ namespace Jal.Router.Impl.Outbound
                 ContentType = content.GetType(),
                 DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                ResultType = typeof(TResult),
                 Tracks = options.Tracks
             };
 

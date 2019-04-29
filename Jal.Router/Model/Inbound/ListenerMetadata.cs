@@ -1,5 +1,6 @@
-using System;
+using Jal.Router.Interface;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Jal.Router.Model.Inbound
 {
@@ -9,22 +10,19 @@ namespace Jal.Router.Model.Inbound
 
         public Group Group { get; set; }
 
-        public Func<object[]> CreateListenerMethod { get; set; }
-
-        public Action<object[]> DestroyListenerMethod { get; set; }
-
-        public Action<object[]> ListenMethod { get; set; }
-
-        public Func<object[], bool> IsActiveMethod { get; set; }
+        public IListenerChannel Listener { get; set; }
 
         public List<Route> Routes { get;  }
-
-        public object[] Listener { get; set; }
 
         public ListenerMetadata(Channel channel)
         {
             Channel = channel;
             Routes = new List<Route>();
+        }
+
+        public string Signature()
+        {
+            return $"{Group?.ToString()} {Channel.GetPath()} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
         }
     }
 }

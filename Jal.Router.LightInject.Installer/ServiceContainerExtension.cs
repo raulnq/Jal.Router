@@ -150,11 +150,13 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRouterInterceptor, NullRouterInterceptor>(typeof (NullRouterInterceptor).FullName,new PerContainerLifetime());
 
-            container.Register<IPointToPointChannel, NullPointToPointChannel>(typeof (NullPointToPointChannel).FullName,new PerContainerLifetime());
+            container.Register<IPointToPointChannel, NullPointToPointChannel>(typeof (NullPointToPointChannel).FullName);
 
-            container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof (NullPublishSubscribeChannel).FullName, new PerContainerLifetime());
+            container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof (NullPublishSubscribeChannel).FullName);
 
-            container.Register<IRequestReplyChannel, NullRequestReplyChannel>(typeof (NullRequestReplyChannel).FullName,new PerContainerLifetime());
+            container.Register<IRequestReplyChannelFromPointToPointChannel, NullRequestReplyChannelFromPointToPointChannel>(typeof (NullRequestReplyChannelFromPointToPointChannel).FullName);
+
+            container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(typeof(NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel).FullName);
 
             container.Register<IChannelManager, NullChannelManager>(typeof (NullChannelManager).FullName,new PerContainerLifetime());
 
@@ -162,17 +164,23 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ILogger<Beat>, BeatLogger>(typeof (BeatLogger).FullName,new PerContainerLifetime());
 
+            container.Register<ILogger<PointToPointChannelStatistics>, PointToPointChannelStatisticsLogger>(typeof(PointToPointChannelStatisticsLogger).FullName, new PerContainerLifetime());
+
+            container.Register<ILogger<PublishSubscribeChannelStatistics>, PublishSubscribeChannelStatisticsLogger>(typeof(PublishSubscribeChannelStatisticsLogger).FullName, new PerContainerLifetime());
+
+            container.Register<ILogger<SubscriptionToPublishSubscribeChannelStatistics>, SubscriptionToPublishSubscribeChannelStatisticsLogger>(typeof(SubscriptionToPublishSubscribeChannelStatisticsLogger).FullName, new PerContainerLifetime());
+
             container.Register<IEntityStorage, NullStorage>(typeof (NullStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, InitialMessageHandler>(typeof (InitialMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, InitialMessageHandler>(typeof (InitialMessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, MiddleMessageHandler>(typeof (MiddleMessageHandler).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, FinalMessageHandler>(typeof (FinalMessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, FinalMessageHandler>(typeof (FinalMessageHandler).FullName,new PerContainerLifetime());
 
             container.Register<IMiddleware<MessageContext>, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
 

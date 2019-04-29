@@ -12,9 +12,9 @@ namespace Jal.Router.ApplicationInsights.Extensions
                 .AddOutboundMiddleware<BusLogger>()
                 .AddInboundMiddleware<RouterLogger>()
                 .AddLogger<BeatLogger, Beat>()
-                .AddLogger<PointToPointChannelInfoLogger, PointToPointChannelInfo>()
-                .AddLogger<PublishSubscribeChannelInfoLogger, PublishSubscribeChannelInfo>()
-                .AddLogger<SubscriptionToPublishSubscribeChannelInfoLogger, SubscriptionToPublishSubscribeChannelInfo>();
+                .AddLogger<PointToPointChannelStatisticsLogger, PointToPointChannelStatistics>()
+                .AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>()
+                .AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
         }
     }
 }

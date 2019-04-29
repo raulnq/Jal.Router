@@ -13,13 +13,13 @@ namespace Jal.Router.ApplicationInsights.Installer
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Register(Component.For<ILogger<PointToPointChannelInfo>>().ImplementedBy<PointToPointChannelInfoLogger>().Named(typeof(PointToPointChannelInfoLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For<ILogger<PointToPointChannelStatistics>>().ImplementedBy<PointToPointChannelStatisticsLogger>().Named(typeof(PointToPointChannelStatisticsLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For<ILogger<Beat>>().ImplementedBy<BeatLogger>().Named(typeof(BeatLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<ILogger<SubscriptionToPublishSubscribeChannelInfo>>().ImplementedBy<SubscriptionToPublishSubscribeChannelInfoLogger>().Named(typeof(SubscriptionToPublishSubscribeChannelInfoLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For<ILogger<SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<SubscriptionToPublishSubscribeChannelStatisticsLogger>().Named(typeof(SubscriptionToPublishSubscribeChannelStatisticsLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<ILogger<PublishSubscribeChannelInfo>>().ImplementedBy<PublishSubscribeChannelInfoLogger>().Named(typeof(PublishSubscribeChannelInfoLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For<ILogger<PublishSubscribeChannelStatistics>>().ImplementedBy<PublishSubscribeChannelStatisticsLogger>().Named(typeof(PublishSubscribeChannelStatisticsLogger).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<RouterLogger>().Named(typeof(RouterLogger).FullName).LifestyleSingleton());
 

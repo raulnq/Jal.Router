@@ -89,7 +89,7 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterEndPoint("torequestqueue")
                 .ForMessage<RequestToSend>()
-                .To(x => x.AddPointToPointChannel<AppSettingValueFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
+                .To<Message>(x => x.AddPointToPointChannel<AppSettingValueFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
                 .AndWaitReplyFromSubscriptionToPublishSubscribeChannel<AppSettingValueFinder>("responsetopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", 10));
 
             RegisterEndPoint("toresponsetopic")

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
@@ -15,16 +16,73 @@ namespace Jal.Router.Impl.StartupTask
 
         }
 
-        public void Run()
+        public Task Run()
         {
             Logger.Log("Loading senders");
 
-            var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
+            Create();
 
-            var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+            Open();
 
-            var requestreplychannel = Factory.Create<IRequestReplyChannel>(Configuration.RequestReplyChannelType);
+            Logger.Log("Senders loaded");
 
+            return Task.CompletedTask;
+        }
+
+        private void Open()
+        {
+            foreach (var sendermetadata in Configuration.Runtime.SendersMetadata)
+            {
+                var senderchannel = default(ISenderChannel);
+
+                var readerchannel = default(IReaderChannel);
+
+                if (sendermetadata.Channel.Type == ChannelType.PointToPoint)
+                {
+                    senderchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
+                }
+
+                if (sendermetadata.Channel.Type == ChannelType.PublishSubscribe)
+                {
+                    senderchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+                }
+
+                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToPointToPoint)
+                {
+                    var requestresplychannel = Factory.Create<IRequestReplyChannelFromPointToPointChannel>(Configuration.RequestReplyChannelFromPointToPointChannelType);
+
+                    readerchannel = requestresplychannel;
+
+                    senderchannel = requestresplychannel;
+                }
+
+                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+                {
+                    var requestresplychannel = Factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(Configuration.RequestReplyFromSubscriptionToPublishSubscribeChannelType);
+
+                    readerchannel = requestresplychannel;
+
+                    senderchannel = requestresplychannel;
+                }
+
+                if(senderchannel!=null)
+                {
+                    senderchannel.Open(sendermetadata);
+
+                    sendermetadata.Sender = senderchannel;
+
+                    if(readerchannel!=null)
+                    {
+                        sendermetadata.Reader = readerchannel;
+                    }
+
+                    Logger.Log($"Opening {sendermetadata.Signature()}");
+                }
+            }
+        }
+
+        private void Create()
+        {
             foreach (var item in Configuration.Runtime.EndPoints)
             {
                 foreach (var channel in item.Channels)
@@ -45,67 +103,6 @@ namespace Jal.Router.Impl.StartupTask
                     }
                 }
             }
-
-            foreach (var sendermetadata in Configuration.Runtime.SendersMetadata)
-            {
-                if (sendermetadata.Channel.Type==ChannelType.PointToPoint)
-                {
-                    sendermetadata.CreateSenderMethod = pointtopointchannel.CreateSenderMethodFactory(sendermetadata);
-
-                    sendermetadata.DestroySenderMethod = pointtopointchannel.DestroySenderMethodFactory(sendermetadata);
-
-                    sendermetadata.SendMethod = pointtopointchannel.SendMethodFactory(sendermetadata);
-
-                    sendermetadata.Sender = sendermetadata.CreateSenderMethod();
-
-                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x=>x.Name))}");
-                }
-
-                if (sendermetadata.Channel.Type == ChannelType.PublishSubscribe)
-                {
-                    sendermetadata.CreateSenderMethod = publishsubscribechannel.CreateSenderMethodFactory(sendermetadata);
-
-                    sendermetadata.DestroySenderMethod = publishsubscribechannel.DestroySenderMethodFactory(sendermetadata);
-
-                    sendermetadata.SendMethod = publishsubscribechannel.SendMethodFactory(sendermetadata);
-
-                    sendermetadata.Sender = sendermetadata.CreateSenderMethod();
-
-                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
-                }
-
-                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToPointToPoint)
-                {
-                    sendermetadata.CreateSenderMethod = requestreplychannel.CreateSenderMethodFactory(sendermetadata);
-
-                    sendermetadata.DestroySenderMethod = requestreplychannel.DestroySenderMethodFactory(sendermetadata);
-
-                    sendermetadata.SendMethod = requestreplychannel.SendMethodFactory(sendermetadata);
-
-                    sendermetadata.ReceiveOnMethod = requestreplychannel.ReceiveOnPointToPointChannelMethodFactory(sendermetadata);
-
-                    sendermetadata.Sender = sendermetadata.CreateSenderMethod();
-
-                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
-                }
-
-                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
-                {
-                    sendermetadata.CreateSenderMethod = requestreplychannel.CreateSenderMethodFactory(sendermetadata);
-
-                    sendermetadata.DestroySenderMethod = requestreplychannel.DestroySenderMethodFactory(sendermetadata);
-
-                    sendermetadata.SendMethod = requestreplychannel.SendMethodFactory(sendermetadata);
-
-                    sendermetadata.ReceiveOnMethod = requestreplychannel.ReceiveOnPublishSubscribeChannelMethodFactory(sendermetadata);
-
-                    sendermetadata.Sender = sendermetadata.CreateSenderMethod();
-
-                    Logger.Log($"Opening {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel ({sendermetadata.Endpoints.Count}): {string.Join(",", sendermetadata.Endpoints.Select(x => x.Name))}");
-                }
-            }
-
-            Logger.Log("Senders loaded");
         }
     }
 }

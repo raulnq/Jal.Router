@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface.Patterns;
 using Jal.Router.Model;
 
@@ -6,24 +7,24 @@ namespace Jal.Router.Impl.Patterns
 {
     public abstract class AbstractMessageHandlerWithData<TMessage, TData> : AbstractMessageHandler<TMessage>, IMessageHandlerWithData<TMessage, TData>
     {
-        public virtual void HandleWithData(TMessage message, TData data)
+        public virtual Task HandleWithData(TMessage message, TData data)
         {
-
+            return Task.CompletedTask;
         }
 
-        public virtual void HandleWithContextAndData(TMessage message, MessageContext context, TData data)
+        public virtual Task HandleWithContextAndData(TMessage message, MessageContext context, TData data)
         {
-
+            return Task.CompletedTask;
         }
 
-        public virtual void CompensateWithContextAndData(TMessage message, MessageContext context, TData data)
+        public virtual Task CompensateWithContextAndData(TMessage message, MessageContext context, TData data)
         {
-
+            return Task.CompletedTask;
         }
 
-        public virtual void CompensateWithData(TMessage message, TData data)
+        public virtual Task CompensateWithData(TMessage message, TData data)
         {
-
+            return Task.CompletedTask;
         }
 
         public virtual void OnEntry(TMessage message, MessageContext context, TData data)

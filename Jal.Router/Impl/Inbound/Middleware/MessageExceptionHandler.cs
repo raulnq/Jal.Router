@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
@@ -10,7 +11,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound.Middleware
 {
-    public class MessageExceptionHandler : IMiddleware<MessageContext>
+    public class MessageExceptionHandler : IMiddlewareAsync<MessageContext>
     {
         private readonly IComponentFactory _factory;
 
@@ -135,7 +136,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
             return route.RetryExceptionTypes.Count>0 && route.RetryPolicyProvider != null;
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             IRetryPolicy policy = null;
 
@@ -161,7 +162,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
                     }
                 }
 
-                next(context);
+                await next(context).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

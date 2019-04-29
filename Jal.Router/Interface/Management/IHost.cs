@@ -1,4 +1,6 @@
-﻿namespace Jal.Router.Interface.Management
+﻿using System.Threading.Tasks;
+
+namespace Jal.Router.Interface.Management
 {
     public interface IHost
     {
@@ -6,9 +8,9 @@
 
         void Run();
 
-        void Startup();
+        Task Startup();
 
-        void Shutdown();
+        Task Shutdown();
 
         IConfiguration Configuration { get; }
     }

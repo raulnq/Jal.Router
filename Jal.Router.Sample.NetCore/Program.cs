@@ -21,6 +21,7 @@ using Jal.ChainOfResponsability.Model;
 using Jal.Router.Impl.Inbound.RetryPolicy;
 using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.ValueFinder;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -58,12 +59,13 @@ namespace Jal.Router.Sample.NetCore
             
             var host = container.GetInstance<IHost>();
             host.Configuration
-                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1 })
+                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1, TimeoutInSeconds = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
-                //.AddMonitoringTask<HeartBeatLogger>(1000)
+                .AddMonitoringTask<HeartBeatLogger>(15)
                 //.AddMonitoringTask<ListenerMonitor>(30)
-                .AddMonitoringTask<ListenerRestartMonitor>(60)
-                .EnableEntityStorage()
+                //.AddMonitoringTask<ListenerRestartMonitor>(60)
+                //.AddMonitoringTask<PointToPointChannelMonitor>(60)
+                //.EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
 
             //var facade = container.GetInstance<IEntityStorageFacade>();
@@ -287,7 +289,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("toreplyendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
+            .To<Message>(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
 
             RegisterEndPoint("replyendpoint")
             .ForMessage<Message>()
@@ -467,19 +469,21 @@ namespace Jal.Router.Sample.NetCore
 
     public class EndHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
             data.Status = "end";
 
             data.Name = message.Name;
+
+            return Task.CompletedTask;
         }
     }
 
     public class ContinueHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
@@ -490,12 +494,14 @@ namespace Jal.Router.Sample.NetCore
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_end", OperationId = context.IdentityContext.OperationId };
 
             context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
+
+            return Task.CompletedTask;
         }
     }
 
     public class StartHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             data.Status = "initial";
 
@@ -508,12 +514,14 @@ namespace Jal.Router.Sample.NetCore
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
 
             context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+
+            return Task.CompletedTask;
         }
     }
 
     public class AlternativeStartHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             data.Status = "initial";
 
@@ -526,6 +534,8 @@ namespace Jal.Router.Sample.NetCore
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
 
             context.Send(data, new Message() { Name = message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+
+            return Task.CompletedTask;
         }
     }
 
@@ -541,80 +551,95 @@ namespace Jal.Router.Sample.NetCore
 
     public class FromPublishHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
+            return Task.CompletedTask;
         }
     }
 
     
     public class ToReplyHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
             var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
+
+            return Task.CompletedTask;
         }
     }
 
     public class FromReplyHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
             context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
+
+            return Task.CompletedTask;
         }
     }
 
     
     public class ToPublishHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
             context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
+
+            return Task.CompletedTask;
         }
     }
 
     public class TopicListenByOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueToRead : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + message.Name);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueToReadGroup : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.GroupId);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueToSend : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
@@ -623,13 +648,13 @@ namespace Jal.Router.Sample.NetCore
                 context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
             }
 
-            
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByOneHandlerWithException : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
             throw new ApplicationException("Error");
@@ -638,31 +663,34 @@ namespace Jal.Router.Sample.NetCore
 
     public class HandlingTwoQueuesInOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByTwoAHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByTwoBHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenSessionSenderHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -671,6 +699,7 @@ namespace Jal.Router.Sample.NetCore
                 context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
                 context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
             }
+            return Task.CompletedTask;
         }
     }
 

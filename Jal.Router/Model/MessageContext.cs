@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Outbound;
 
@@ -27,7 +28,6 @@ namespace Jal.Router.Model
         public Saga Saga { get; set; }
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
         public Type ContentType { get; set; }
-        public Type ResultType { get; set; }
         public string Content { get; set; }
         public string ContentId { get; set; }
         public List<Track> Tracks { get; set; }
@@ -137,11 +137,11 @@ namespace Jal.Router.Model
             return Saga != null;
         }
 
-        public void Update(object data)
+        public async Task Update(object data)
         {
             if (_storage != null && _serializer != null)
             {
-                var sagaentity = _storage.GetSagaEntity(SagaContext.Id);
+                var sagaentity = await _storage.GetSagaEntity(SagaContext.Id).ConfigureAwait(false);
 
                 if (sagaentity != null)
                 {
@@ -151,7 +151,7 @@ namespace Jal.Router.Model
 
                     sagaentity.Status = SagaContext.Status;
 
-                    _storage.UpdateSagaEntity(this, sagaentity);
+                    await _storage.UpdateSagaEntity(this, sagaentity).ConfigureAwait(false);
                 }
             }
         }
@@ -176,9 +176,9 @@ namespace Jal.Router.Model
             _bus.Send(content, options);
         }
 
-        public void Send<TContent, TData>(TData data, TContent content, Options options)
+        public async Task Send<TContent, TData>(TData data, TContent content, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             _bus.Send(content, options);
         }
@@ -193,9 +193,9 @@ namespace Jal.Router.Model
             _bus.Send(content, endpoint, origin, options);
         }
 
-        public void Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
+        public async Task Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             _bus.Send(content, origin, options);
         }
@@ -205,9 +205,9 @@ namespace Jal.Router.Model
             _bus.Publish(content, options);
         }
 
-        public void Publish<TContent, TData>(TData data, TContent content, Options options)
+        public async Task Publish<TContent, TData>(TData data, TContent content, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             _bus.Publish(content, options);
         }
@@ -222,9 +222,9 @@ namespace Jal.Router.Model
             _bus.Publish(content, endpoint, origin, options);
         }
 
-        public void Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
+        public async Task Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             _bus.Publish(content, origin, options);
         }
@@ -239,16 +239,16 @@ namespace Jal.Router.Model
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }
 
-        public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Options options)
+        public async Task<TResult> Reply<TContent, TResult, TData>(TData data, TContent content, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             return _bus.Reply<TContent, TResult>(content, options);
         }
 
-        public TResult Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
+        public async Task<TResult> Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
         {
-            Update(data);
+            await Update(data).ConfigureAwait(false);
 
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }

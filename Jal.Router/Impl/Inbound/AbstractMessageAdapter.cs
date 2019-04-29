@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -84,34 +85,51 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null)
+        private Task<MessageContext> ReadContentFromRoute(object message, MessageContext context, Route route)
+        {
+            return ReadContent(message, context, route.ContentType, route.UseClaimCheck);
+        }
+
+        private Task<MessageContext> ReadContentFromEndpoint(object message, MessageContext context, EndPoint endpoint)
+        {
+            return ReadContent(message, context, endpoint.ReplyType, endpoint.UseClaimCheck);
+        }
+
+        private async Task<MessageContext> ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck)
         {
             context.ContentType = contenttype;
-
-            if (identityconfiguration?.Builder != null)
-            {
-                context.IdentityContext = identityconfiguration?.Builder(context);
-            }
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
             {
                 var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
 
-                context.Content = storage.Read(context.ContentId);
+                context.Content = await storage.Read(context.ContentId);
             }
             else
             {
-                context.Content = GetContent(message);
+                context.Content = ReadContent(message);
             }
 
             return context;
         }
 
-        public MessageContext ReadMetadataAndContent(object message, Type contenttype, bool useclaimcheck, Identity identityconfiguration=null)
+        public Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint enpdoint)
         {
             var context = ReadMetadata(message);
 
-            return ReadContent(message, context, contenttype, useclaimcheck, identityconfiguration);
+            return ReadContentFromEndpoint(message, context, enpdoint);
+        }
+
+        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
+        {
+            var context = ReadMetadata(message);
+
+            if (route.IdentityConfiguration.Builder != null)
+            {
+                context.IdentityContext = route.IdentityConfiguration.Builder(context);
+            }
+
+            return ReadContentFromRoute(message, context, route);
         }
 
         public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
@@ -129,17 +147,17 @@ namespace Jal.Router.Impl.Inbound
                 context.Content = string.Empty;
             }
 
-            var message = Write(context);
+            var message = WriteMetadataAndContent(context);
 
             context.Content = content;
 
             return message;
         }
 
-        protected abstract object Write(MessageContext context);
+        protected abstract object WriteMetadataAndContent(MessageContext context);
 
         public abstract MessageContext ReadMetadata(object message);
 
-        protected abstract string GetContent(object message);
+        protected abstract string ReadContent(object message);
     }
 }

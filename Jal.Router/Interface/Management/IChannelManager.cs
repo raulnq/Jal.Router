@@ -1,19 +1,20 @@
 using Jal.Router.Model.Management;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Management
 {
     public interface IChannelManager
     {
-        bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel);
+        Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel);
 
-        bool CreateIfNotExist(PublishSubscribeChannel channel);
+        Task<bool> CreateIfNotExist(PublishSubscribeChannel channel);
 
-        bool CreateIfNotExist(PointToPointChannel channel);
+        Task<bool> CreateIfNotExist(PointToPointChannel channel);
 
-        PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel);
+        Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel);
 
-        PointToPointChannelInfo GetInfo(PointToPointChannel channel);
+        Task<PointToPointChannelStatistics> Get(PointToPointChannel channel);
 
-        SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel);
+        Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannel channel);
     }
 }

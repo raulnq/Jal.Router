@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
@@ -14,19 +15,19 @@ namespace Jal.Router.Impl.MonitoringTask
 
         }
 
-        public void Run(DateTime datetime)
+        public async Task Run(DateTime datetime)
         {
-            if (Configuration.LoggerTypes.ContainsKey(typeof (PointToPointChannelInfo)))
+            if (Configuration.LoggerTypes.ContainsKey(typeof (PointToPointChannelStatistics)))
             {
-                var loggertypes = Configuration.LoggerTypes[typeof (PointToPointChannelInfo)];
+                var loggertypes = Configuration.LoggerTypes[typeof (PointToPointChannelStatistics)];
 
-                var loggers = loggertypes.Select(x => Factory.Create<ILogger<PointToPointChannelInfo>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => Factory.Create<ILogger<PointToPointChannelStatistics>>(x)).ToArray();
 
                 var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
 
                 foreach (var channel in Configuration.Runtime.PointToPointChannels)
                 {
-                    var message = manager.GetInfo(channel);
+                    var message = await manager.Get(channel).ConfigureAwait(false);
 
                     if (message != null)
                     {

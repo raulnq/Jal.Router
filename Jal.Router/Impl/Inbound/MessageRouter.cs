@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -26,7 +27,7 @@ namespace Jal.Router.Impl.Inbound
             _configuration = configuration;
         }
 
-        public void Route(MessageContext context)
+        public Task Route(MessageContext context)
         {
             try
             {
@@ -34,7 +35,9 @@ namespace Jal.Router.Impl.Inbound
 
                 var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType);
 
-                genericroutemethod?.Invoke(this, new object[] { context, context.Route });
+                var task = genericroutemethod?.Invoke(this, new object[] { context, context.Route });
+
+                return task as Task;
             }
             catch (TargetInvocationException ex)
             {
@@ -43,7 +46,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Route(MessageContext context, object data)
+        public Task Route(MessageContext context, object data)
         {
             try
             {
@@ -51,7 +54,9 @@ namespace Jal.Router.Impl.Inbound
 
                 var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType, context.Saga.DataType);
 
-                genericroutemethod?.Invoke(this, new [] { context, context.Route, data });
+                var task = genericroutemethod?.Invoke(this, new [] { context, context.Route, data });
+
+                return task as Task;
             }
             catch (TargetInvocationException ex)
             {
@@ -60,7 +65,7 @@ namespace Jal.Router.Impl.Inbound
             }
         }
 
-        public void Execute<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
+        public Task Execute<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
         {
             if (route.RouteMethods != null)
             {
@@ -74,13 +79,15 @@ namespace Jal.Router.Impl.Inbound
                 {
                     if (_selector.Select(context, content, method, handler))
                     {
-                        _executor.Execute(context, content, method, handler);
+                        return _executor.Execute(context, content, method, handler);
                     }
                 }
             }
+
+            return Task.CompletedTask;
         }
 
-        public void Execute<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
+        public Task Execute<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
 
@@ -101,10 +108,12 @@ namespace Jal.Router.Impl.Inbound
                             context.SagaContext.Status = method.Status;
                         }
 
-                        _executor.Execute(context, content, method, consumer, data);
+                        return _executor.Execute(context, content, method, consumer, data);
                     }
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

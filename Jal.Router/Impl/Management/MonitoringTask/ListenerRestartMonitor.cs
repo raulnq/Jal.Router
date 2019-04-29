@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -13,58 +14,27 @@ namespace Jal.Router.Impl.MonitoringTask
 
         }
 
-        public void Run(DateTime datetime)
+        public async Task Run(DateTime datetime)
         {
-            var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
-
-            var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
-
-            foreach (var listenermetadata in Configuration.Runtime.ListenersMetadata)
-            {
-                if (listenermetadata.DestroyListenerMethod != null)
-                {
-                    listenermetadata.DestroyListenerMethod(listenermetadata.Listener);
-
-                    Logger.Log($"Shutdown {listenermetadata.Channel.GetPath()} {listenermetadata.Channel.ToString()} channel");
-                }
-            }
+            Logger.Log($"Restarting listeners");
 
             foreach (var metadata in Configuration.Runtime.ListenersMetadata)
             {
-                if (metadata.Channel.Type == Model.ChannelType.PointToPoint)
+                if (metadata.Listener != null)
                 {
-                    metadata.CreateListenerMethod = pointtopointchannel.CreateListenerMethodFactory(metadata);
+                    await metadata.Listener.Close().ConfigureAwait(false);
 
-                    metadata.DestroyListenerMethod = pointtopointchannel.DestroyListenerMethodFactory(metadata);
+                    Logger.Log($"Shutdown {metadata.Signature()}");
 
-                    metadata.ListenMethod = pointtopointchannel.ListenerMethodFactory(metadata);
+                    metadata.Listener.Open(metadata);
 
-                    metadata.IsActiveMethod = pointtopointchannel.IsActiveMethodFactory(metadata);
+                    metadata.Listener.Listen();
 
-                    metadata.Listener = metadata.CreateListenerMethod();
-
-                    metadata.ListenMethod(metadata.Listener);
-
-                    Logger.Log($"Listening {metadata.Group?.ToString()} {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}");
-                }
-
-                if (metadata.Channel.Type == Model.ChannelType.PublishSubscribe)
-                {
-                    metadata.CreateListenerMethod = publishsubscribechannel.CreateListenerMethodFactory(metadata);
-
-                    metadata.DestroyListenerMethod = publishsubscribechannel.DestroyListenerMethodFactory(metadata);
-
-                    metadata.ListenMethod = publishsubscribechannel.ListenerMethodFactory(metadata);
-
-                    metadata.IsActiveMethod = publishsubscribechannel.IsActiveMethodFactory(metadata);
-
-                    metadata.Listener = metadata.CreateListenerMethod();
-
-                    metadata.ListenMethod(metadata.Listener);
-
-                    Logger.Log($"Listening {metadata.Group?.ToString()} {metadata.Channel.GetPath()} {metadata.Channel.ToString()} channel ({metadata.Routes.Count}): {string.Join(",", metadata.Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}");
+                    Logger.Log($"Listening {metadata.Signature()}");
                 }
             }
+
+            Logger.Log($"Listeners restarted");
         }
     }
 }

@@ -24,7 +24,9 @@ namespace Jal.Router.Interface.Management
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
-        Type RequestReplyChannelType { get; }
+        Type RequestReplyChannelFromPointToPointChannelType { get; }
+        Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; }
+
         Type PublishSubscribeChannelType { get; }
         Type StorageType { get;  }
         Type MessageAdapterType { get; }
@@ -40,7 +42,9 @@ namespace Jal.Router.Interface.Management
         IConfiguration SetChannelProviderName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
-        IConfiguration UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel;
+        IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel;
+        IConfiguration UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
+
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         IConfiguration UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
@@ -13,118 +14,138 @@ using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-
     public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
     {
+        private QueueClient _client;
 
-        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
-        {
-            return () => new object[] { new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath) };
-        }
+        private ListenerMetadata _listenermetadata;
 
-        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        private SenderMetadata _sendermetadata;
+
+        public void Open(SenderMetadata metadata)
         {
-            return sender =>
+            _sendermetadata = metadata;
+
+            _client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
+
+            if(_parameter.TimeoutInSeconds>0)
             {
-                var client = sender[0] as QueueClient;
-                
-                client.CloseAsync().GetAwaiter().GetResult();
-            };
+                _client.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(_parameter.TimeoutInSeconds);
+            }
+            
         }
 
-        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
+        public string Send(object message)
         {
-            return listener => {
-                var client = listener[0] as QueueClient;
-                return !client.IsClosedOrClosing;
-            };
-        }
+            var sbmessage = message as Message;
 
-        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
-        {
-            return (sender, message) =>
+            if (sbmessage != null)
             {
-                var client = sender[0] as QueueClient;
+                _client.SendAsync(sbmessage).GetAwaiter().GetResult();
 
-                var sbmessage = message as Message;
+                return sbmessage.MessageId;
+            }
 
-                if (sbmessage != null)
-                {
-                    client.SendAsync(sbmessage).GetAwaiter().GetResult();
-
-                    return sbmessage.MessageId;
-                }
-
-                return string.Empty;
-            };
+            return string.Empty;
         }
 
-     
-
-        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        public void Open(ListenerMetadata metadata)
         {
-            return () =>
-            {
+            _listenermetadata = metadata;
 
-                var client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
-                
-                return new object[] { client };
-            };
+            _client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
         }
 
-        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        public bool IsActive()
         {
-            return listener =>
-            {
-                var client = listener[0] as QueueClient;
-
-                client.CloseAsync().GetAwaiter().GetResult();
-            };
+            return !_client.IsClosedOrClosing;
         }
 
-        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        public Task Close()
         {
-            var options = CreateOptions(metadata);
+            return _client.CloseAsync();
+        }
 
-            var sessionoptions = CreateSessionOptions(metadata);
+        public void Listen()
+        {
+            var options = CreateOptions(_listenermetadata);
+
+            var sessionoptions = CreateSessionOptions(_listenermetadata);
 
             var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
 
-            Action<Message, MessageContext> handler = (message, context) =>
+            if (_listenermetadata.Group != null)
             {
-                foreach (var runtimehandler in metadata.Routes.Select(x => x.RuntimeHandler))
-                {
-                    var clone = message.Clone();
+                _client.RegisterSessionHandler(async (ms, message, token) => {
 
-                    runtimehandler(clone, metadata.Channel);
-                }
-            };
+                    var context = adapter.ReadMetadata(message);
 
-            return (listener) =>
-            {
-                var client = listener[0] as QueueClient;
+                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
 
-                if(metadata.Group!=null)
-                {
-                    client.RegisterSessionHandler(async (ms, message, token) => {
-
-                        var context=adapter.ReadMetadata(message);
-
-                        await OnMessageAsync(metadata, context, () => handler(message, context), () => ms.CompleteAsync(message.SystemProperties.LockToken), ()=> ms.CloseAsync());
-
-                    }, sessionoptions);
-                }
-                else
-                {
-                    client.RegisterMessageHandler(async (message, token) =>
+                    try
                     {
-                        var context = adapter.ReadMetadata(message);
+                        var handlers = new List<Task>();
 
-                        await OnMessageAsync(metadata, context, () => handler(message, context), () => client.CompleteAsync(message.SystemProperties.LockToken));
+                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
+                        {
+                            var clone = message.Clone();
 
-                    }, options);
-                }
-            };
+                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
+                        }
+
+                        await Task.WhenAll(handlers.ToArray());
+
+                        await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+
+                        if (_listenermetadata.Group.Until(context))
+                        {
+                            await ms.CloseAsync().ConfigureAwait(false);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
+                    }
+                    finally
+                    {
+                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                    }
+
+                }, sessionoptions);
+            }
+            else
+            {
+                _client.RegisterMessageHandler(async (message, token) =>
+                {
+                    var context = adapter.ReadMetadata(message);
+
+                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+
+                    try
+                    {
+                        var handlers = new List<Task>();
+
+                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
+                        {
+                            var clone = message.Clone();
+
+                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
+                        }
+
+                        await Task.WhenAll(handlers.ToArray());
+
+                        await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
+                    }
+                    finally
+                    {
+                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                    }
+                }, options);
+            }
         }
 
         private SessionHandlerOptions CreateSessionOptions(ListenerMetadata metadata)

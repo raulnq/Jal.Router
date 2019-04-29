@@ -17,11 +17,13 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer
 
             serviceRegistry.Register<IMessageSerializer, JsonMessageSerializer>(typeof(JsonMessageSerializer).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IPointToPointChannel, AzureServiceBusQueue>(typeof(AzureServiceBusQueue).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IPointToPointChannel, AzureServiceBusQueue>(typeof(AzureServiceBusQueue).FullName);
 
-            serviceRegistry.Register<IRequestReplyChannel, AzureServiceBusRequestReply>(typeof(AzureServiceBusRequestReply).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IRequestReplyChannelFromPointToPointChannel, AzureServiceBusRequestReplyFromPointToPointChannel>(typeof(AzureServiceBusRequestReplyFromPointToPointChannel).FullName);
 
-            serviceRegistry.Register<IPublishSubscribeChannel, AzureServiceBusTopic>(typeof(AzureServiceBusTopic).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>(typeof(AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName);
+
+            serviceRegistry.Register<IPublishSubscribeChannel, AzureServiceBusTopic>(typeof(AzureServiceBusTopic).FullName);
         }
     }
 }

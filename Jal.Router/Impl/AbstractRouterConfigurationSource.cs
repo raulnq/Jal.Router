@@ -106,12 +106,8 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
-            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
-            {
-                ConnectionStringValueFinderType = typeof(TValueFinder),
-                ConnectionStringProvider = connectionstringprovider,
-                Properties = properties
-            };
+
+            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path, properties, typeof(TValueFinder), connectionstringprovider);
 
             if(rule!=null)
             {
@@ -136,15 +132,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path)
-            {
-                ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = provider,
-                Properties = properties
-            };
-
+            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path, connectionstring, properties);
 
             if (rule != null)
             {
@@ -165,12 +153,8 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
-            var channel = new PointToPointChannel(path)
-            {
-                ConnectionStringValueFinderType = typeof (TValueFinder),
-                ConnectionStringProvider = connectionstringprovider,
-                Properties = properties
-            };
+
+            var channel = new PointToPointChannel(path, properties, typeof(TValueFinder), connectionstringprovider);
 
             _pointtopointchannels.Add(channel);
         }
@@ -186,14 +170,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var channel = new PointToPointChannel(path)
-            {
-                ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = provider,
-                Properties = properties
-            };
+            var channel = new PointToPointChannel(path, connectionstring, properties);
 
             _pointtopointchannels.Add(channel);
         }
@@ -209,12 +186,8 @@ namespace Jal.Router.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
-            var channel = new PublishSubscribeChannel(path)
-            {
-                ConnectionStringValueFinderType = typeof(TValueFinder),
-                ConnectionStringProvider = connectionstringprovider,
-                Properties = properties
-            };
+
+            var channel = new PublishSubscribeChannel(path, properties, typeof(TValueFinder), connectionstringprovider);
 
             _publishsubscribechannels.Add(channel);
         }
@@ -230,14 +203,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var channel = new PublishSubscribeChannel(path)
-            {
-                ConnectionStringValueFinderType = typeof(NullValueFinder),
-                ConnectionStringProvider = provider,
-                Properties = properties
-            };
+            var channel = new PublishSubscribeChannel(path, connectionstring, properties);
 
             _publishsubscribechannels.Add(channel);
         }

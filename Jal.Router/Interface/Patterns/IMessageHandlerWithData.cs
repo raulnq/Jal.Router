@@ -1,15 +1,16 @@
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Patterns
 {
     public interface IMessageHandlerWithData<in TMessage, in TData> : IMessageHandler<TMessage>
     {
-        void HandleWithData(TMessage message, TData data);
+        Task HandleWithData(TMessage message, TData data);
 
-        void HandleWithContextAndData(TMessage message, MessageContext context, TData data);
+        Task HandleWithContextAndData(TMessage message, MessageContext context, TData data);
 
-        void CompensateWithContextAndData(TMessage message, MessageContext context, TData data);
+        Task CompensateWithContextAndData(TMessage message, MessageContext context, TData data);
 
-        void CompensateWithData(TMessage message, TData data);
+        Task CompensateWithData(TMessage message, TData data);
     }
 }

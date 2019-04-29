@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder
+    public class EndPointBuilder : IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
         private readonly EndPoint _endpoint;
 
@@ -21,7 +21,31 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IAndWaitReplyFromEndPointBuilder AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public void AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        {
+            var channel = new Channel(ChannelType.PointToPoint)
+            {
+                ConnectionStringValueFinderType = typeof(TValueFinder)
+            };
+
+            if (connectionstringprovider == null)
+            {
+                throw new ArgumentNullException(nameof(connectionstringprovider));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            channel.ToConnectionStringProvider = connectionstringprovider;
+
+            channel.ToPath = path;
+
+            _endpoint.Channels.Add(channel);
+        }
+
+        IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) //where TValueFinder : IValueFinder
         {
             var channel = new Channel(ChannelType.PointToPoint)
             {
@@ -47,7 +71,7 @@ namespace Jal.Router.Fluent.Impl
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public IAndWaitReplyFromEndPointBuilder AddPublishSubscribeChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public void AddPublishSubscribeChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
             var channel = new Channel(ChannelType.PublishSubscribe)
             {
@@ -69,8 +93,6 @@ namespace Jal.Router.Fluent.Impl
             channel.ToPath = path;
 
             _endpoint.Channels.Add(channel);
-
-            return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
         public void To(Action<IToChannelBuilder> channelbuilder)
@@ -102,6 +124,18 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.UseClaimCheck = true;
 
             return this;
+        }
+
+        public void To<TReply>(Action<IToReplyChannelBuilder> channelbuilder)
+        {
+            if (channelbuilder == null)
+            {
+                throw new ArgumentNullException(nameof(channelbuilder));
+            }
+
+            _endpoint.ReplyType = typeof(TReply);
+
+            channelbuilder(this);
         }
     }
 }

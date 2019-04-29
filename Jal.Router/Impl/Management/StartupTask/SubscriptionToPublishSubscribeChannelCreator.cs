@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -14,7 +15,7 @@ namespace Jal.Router.Impl.StartupTask
         {
         }
 
-        public void Run()
+        public async Task Run()
         {
             var errors = new StringBuilder();
 
@@ -24,79 +25,77 @@ namespace Jal.Router.Impl.StartupTask
 
             foreach (var channel in Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
             {
-                if(channel.ConnectionStringValueFinderType != null)
+                if(channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {
                     var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                    var provider = channel.ConnectionStringProvider as Func<IValueFinder, string>;
+                    channel.ConnectionString = channel.ConnectionStringProvider(finder);
+                }
 
-                    channel.ConnectionString = provider?.Invoke(finder);
+                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
+                {
+                    var error = $"Empty connection string, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
 
-                    if (string.IsNullOrWhiteSpace(channel.ConnectionString))
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                if (string.IsNullOrWhiteSpace(channel.Path))
+                {
+                    var error = $"Empty path, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                if (string.IsNullOrWhiteSpace(channel.Subscription))
+                {
+                    var error = $"Empty subscription, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                if (channel.Rules.Count == 0)
+                {
+                    var error = $"Missing rules, subscription {channel.Subscription}  to publish subscribe channel {channel.Path}";
+
+                    errors.AppendLine(error);
+
+                    Logger.Log(error);
+
+                    break;
+                }
+
+                try
+                {
+                    var created = await manager.CreateIfNotExist(channel).ConfigureAwait(false);
+
+                    if (created)
                     {
-                        var error = $"Empty connection string, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
+                        Logger.Log($"Created subscription {channel.Subscription} to publish subscribe channel {channel.Path}");
                     }
-
-                    if (string.IsNullOrWhiteSpace(channel.Path))
+                    else
                     {
-                        var error = $"Empty path, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
+                        Logger.Log($"Subscription {channel.Subscription} to publish subscribe channel {channel.Path} already exists");
                     }
+                }
+                catch (Exception ex)
+                {
+                    var error = $"Exception subscription {channel.Subscription} to publish subscribe channel {channel.Path}: {ex}";
 
-                    if (string.IsNullOrWhiteSpace(channel.Subscription))
-                    {
-                        var error = $"Empty subscription, subscription {channel.Subscription} to publish subscribe channel {channel.Path}";
+                    errors.AppendLine(error);
 
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
-                    }
-
-                    if (channel.Rules.Count == 0)
-                    {
-                        var error = $"Missing rules, subscription {channel.Subscription}  to publish subscribe channel {channel.Path}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-
-                        return;
-                    }
-
-                    try
-                    {
-                        var created = manager.CreateIfNotExist(channel);
-
-                        if (created)
-                        {
-                            Logger.Log($"Created subscription {channel.Subscription} to publish subscribe channel {channel.Path}");
-                        }
-                        else
-                        {
-                            Logger.Log($"Subscription {channel.Subscription} to publish subscribe channel {channel.Path} already exists");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        var error = $"Exception subscription {channel.Subscription} to publish subscribe channel {channel.Path}: {ex}";
-
-                        errors.AppendLine(error);
-
-                        Logger.Log(error);
-                    }
+                    Logger.Log(error);
                 }
             }
 

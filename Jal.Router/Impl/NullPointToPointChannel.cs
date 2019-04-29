@@ -3,34 +3,20 @@ using Jal.Router.Interface;
 using Jal.Router.Model.Outbound;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
     public class NullPointToPointChannel : IPointToPointChannel
     {
-        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
-        {
-            return () => new object[] { };
-        }
-
-        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
-        {
-            return o => { };
-        }
-
-        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
-        {
-            return o => { };
-        }
-
         public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
         {
             return () => new object[] { };
         }
 
-        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        public Func<object[], Task> DestroySenderMethodFactory(SenderMetadata metadata)
         {
-            return o => { };
+            return o => { return Task.CompletedTask; };
         }
 
         public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
@@ -38,9 +24,34 @@ namespace Jal.Router.Impl
             return (o, m) => string.Empty;
         }
 
-        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
+        public void Open(ListenerMetadata metadata)
         {
-            return o => { return true; };
+
+        }
+
+        public bool IsActive()
+        {
+            return false;
+        }
+
+        public Task Close()
+        {
+            return Task.CompletedTask;
+        }
+
+        public void Listen()
+        {
+
+        }
+
+        public void Open(SenderMetadata metadata)
+        {
+
+        }
+
+        public string Send(object message)
+        {
+            return string.Empty;
         }
     }
 }

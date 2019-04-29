@@ -1,5 +1,6 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl.Inbound
 {
@@ -15,15 +16,15 @@ namespace Jal.Router.Impl.Inbound
             _configuration = configuration;
         }
 
-        public void Run()
+        public async Task Run()
         {
-            foreach (var sendermetadata in _configuration.Runtime.SendersMetadata)
+            foreach (var metadata in _configuration.Runtime.SendersMetadata)
             {
-                if (sendermetadata.DestroySenderMethod != null)
+                if (metadata.Sender != null)
                 {
-                    sendermetadata.DestroySenderMethod(sendermetadata.Sender);
+                    await metadata.Sender.Close().ConfigureAwait(false);
 
-                    _logger.Log($"Shutdown {sendermetadata.Channel.GetPath()} {sendermetadata.Channel.ToString()} channel");
+                    _logger.Log($"Shutdown {metadata.Signature()}");
                 }
             }
         }

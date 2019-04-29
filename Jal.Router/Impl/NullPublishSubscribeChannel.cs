@@ -3,44 +3,40 @@ using Jal.Router.Interface;
 using Jal.Router.Model.Outbound;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
     public class NullPublishSubscribeChannel : IPublishSubscribeChannel
     {
-        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
+        public void Open(ListenerMetadata metadata)
         {
-            return () => new object[] { };
+
         }
 
-        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        public bool IsActive()
         {
-            return o => { };
+            return false;
         }
 
-        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        public Task Close()
         {
-            return (o, m) => string.Empty;
+            return Task.CompletedTask;
         }
 
-        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        public void Listen()
         {
-            return () => new object[] { };
+
         }
 
-        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        public void Open(SenderMetadata metadata)
         {
-            return o => { };
+
         }
 
-        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        public string Send(object message)
         {
-            return o => { };
-        }
-
-        public Func<object[], bool> IsActiveMethodFactory(ListenerMetadata metadata)
-        {
-            return o => { return true; };
+            return string.Empty;
         }
     }
 }

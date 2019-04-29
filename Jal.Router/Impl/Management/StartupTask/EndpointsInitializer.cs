@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -14,7 +15,7 @@ namespace Jal.Router.Impl.StartupTask
         {
         }
 
-        public void Run()
+        public Task Run()
         {
             Logger.Log("Initializing endpoints");
 
@@ -30,9 +31,9 @@ namespace Jal.Router.Impl.StartupTask
                         {
                             var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
 
-                            if (channel.ToConnectionStringProvider is Func<IValueFinder, string> provider)
+                            if (channel.ToConnectionStringProvider!=null)
                             {
-                                channel.ToConnectionString = provider(finder);
+                                channel.ToConnectionString = channel.ToConnectionStringProvider(finder);
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
@@ -58,9 +59,9 @@ namespace Jal.Router.Impl.StartupTask
                         {
                             var finder = Factory.Create<IValueFinder>(channel.ReplyConnectionStringValueFinderType);
 
-                            if (channel.ToReplyConnectionStringProvider is Func<IValueFinder, string> provider)
+                            if (channel.ToReplyConnectionStringProvider!=null)
                             {
-                                channel.ToReplyConnectionString = provider(finder);
+                                channel.ToReplyConnectionString = channel.ToReplyConnectionStringProvider(finder);
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
@@ -95,10 +96,12 @@ namespace Jal.Router.Impl.StartupTask
 
             if (!string.IsNullOrWhiteSpace(errors.ToString()))
             {
-                throw new Exception(errors.ToString());
+                throw new ApplicationException(errors.ToString());
             }
 
             Logger.Log("Endpoints initialized");
+
+            return Task.CompletedTask;
         }
     }
 }

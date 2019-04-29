@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
@@ -17,38 +18,36 @@ namespace Jal.Router.Impl
             Factory = factory;
         }
 
-        protected SagaEntity GetSagaEntity(MessageContext messagecontext)
+        protected Task<SagaEntity> GetSagaEntity(MessageContext messagecontext)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
-            var sagaentity = storage.GetSagaEntity(messagecontext.SagaContext.Id);
-
-            return sagaentity;
+            return storage.GetSagaEntity(messagecontext.SagaContext.Id);
         }
 
-        protected SagaEntity CreateSagaEntity(MessageContext context)
+        protected async Task<SagaEntity> CreateSagaEntity(MessageContext context)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
             var sagaentity = MessageContextToSagaEntity(context);
 
-            storage.CreateSagaEntity(context, sagaentity);
+            await storage.CreateSagaEntity(context, sagaentity).ConfigureAwait(false);
 
             context.SagaContext.Id = sagaentity.Id;
 
             return sagaentity;
         }
 
-        protected void UpdateSagaEntity(MessageContext messagecontext, SagaEntity sagaentity)
+        protected Task UpdateSagaEntity(MessageContext messagecontext, SagaEntity sagaentity)
         {
             var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
 
             sagaentity.Status = messagecontext.SagaContext.Status;
 
-            storage.UpdateSagaEntity(messagecontext, sagaentity);
+            return storage.UpdateSagaEntity(messagecontext, sagaentity);
         }
 
-        protected MessageEntity CreateMessageEntity(MessageContext messagecontext, MessageEntityType type = MessageEntityType.Inbound, SagaEntity sagaentity = null)
+        protected async Task<MessageEntity> CreateMessageEntity(MessageContext messagecontext, MessageEntityType type = MessageEntityType.Inbound, SagaEntity sagaentity = null)
         {
             if (Configuration.Storage.Enabled)
             {
@@ -58,7 +57,7 @@ namespace Jal.Router.Impl
 
                     var messageentity = MessageContextToMessageEntity(messagecontext, type, sagaentity);
 
-                    storage.CreateMessageEntity(messagecontext, messageentity);
+                    await storage.CreateMessageEntity(messagecontext, messageentity).ConfigureAwait(false);
 
                     return messageentity;
                 }

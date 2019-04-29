@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Fluent.Interfaces;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound.Middleware;
@@ -29,7 +30,7 @@ namespace Jal.Router.Impl.Inbound
 
             _logger = logger;
         }
-        public void Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddleware<MessageContext>
+        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddlewareAsync<MessageContext>
         {
             var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
 
@@ -49,19 +50,19 @@ namespace Jal.Router.Impl.Inbound
 
                 try
                 {
-                    var chain = _pipeline.For<MessageContext>().Use<MessageExceptionHandler>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<MessageExceptionHandler>();
 
                     foreach (var type in _configuration.InboundMiddlewareTypes)
                     {
-                        chain.Use(type);
+                        chain.UseAsync(type);
                     }
 
                     foreach (var type in context.Route.MiddlewareTypes)
                     {
-                        chain.Use(type);
+                        chain.UseAsync(type);
                     }
 
-                    chain.Use<TMiddleware>().Run(context);
+                    await chain.UseAsync<TMiddleware>().RunAsync(context).ConfigureAwait(false);
 
                     interceptor.OnSuccess(context);
                 }
@@ -81,8 +82,6 @@ namespace Jal.Router.Impl.Inbound
             }
             else
             {
-                
-
                 _logger.Log($"Message {context.IdentityContext.Id} skipped by route {name}");
             }
         }

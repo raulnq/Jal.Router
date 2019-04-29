@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -45,9 +46,9 @@ namespace Jal.Router.Impl.Management
             _watchers = new List<IShutdownWatcher>();
         }
 
-        public void Startup()
+        public Task Startup()
         {
-            _startup.Start();
+            return _startup.Start();
         }
 
         private void Watch()
@@ -75,9 +76,9 @@ namespace Jal.Router.Impl.Management
             _monitor.Start();
         }
 
-        public void Shutdown()
+        public Task Shutdown()
         {
-            _shutdown.Stop();
+            return _shutdown.Stop();
         }
 
         private void Stop()
@@ -89,7 +90,7 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("The host is not running");
             }
 
-            Shutdown();
+            Shutdown().GetAwaiter().GetResult();
 
             _state = StateStopped;
         }
@@ -124,7 +125,7 @@ namespace Jal.Router.Impl.Management
                 throw new InvalidOperationException("Run has already been called");
             }
 
-            Startup();
+            Startup().GetAwaiter().GetResult();
 
             Monitor();
 

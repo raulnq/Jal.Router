@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface.Patterns;
 using Jal.Router.Model;
 
@@ -6,14 +7,14 @@ namespace Jal.Router.Impl.Patterns
 {
     public abstract class AbstractMessageHandler<TMessage> : IMessageHandler<TMessage>
     {
-        public virtual void Handle(TMessage message)
+        public virtual Task Handle(TMessage message)
         {
-            
+            return Task.CompletedTask;
         }
 
-        public virtual void HandleWithContext(TMessage message, MessageContext context)
+        public virtual Task HandleWithContext(TMessage message, MessageContext context)
         {
-
+            return Task.CompletedTask;
         }
 
         public virtual bool IsSuccessfulWithContext(TMessage message, MessageContext context)
@@ -26,14 +27,14 @@ namespace Jal.Router.Impl.Patterns
             return true;
         }
 
-        public virtual void CompensateWithContext(TMessage message, MessageContext context)
+        public virtual Task CompensateWithContext(TMessage message, MessageContext context)
         {
-            
+            return Task.CompletedTask;
         }
 
-        public virtual void Compensate(TMessage message)
+        public virtual Task Compensate(TMessage message)
         {
-
+            return Task.CompletedTask;
         }
 
         public virtual void OnEntry(TMessage message, MessageContext context)

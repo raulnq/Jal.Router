@@ -1,13 +1,14 @@
 using System;
 using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound.Middleware
 {
-    public class BasicAuthenticationHandler : IMiddleware<MessageContext>
+    public class BasicAuthenticationHandler : IMiddlewareAsync<MessageContext>
     {
         private readonly string _key;
 
@@ -19,13 +20,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
             _secret = secret;
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             if (!IsValid(context.Data))
             {
                 throw new SecurityException("Unauthorized");
             }
-            next(context);
+            return next(context);
         }
 
         private bool IsValid(MessageContext context)

@@ -14,7 +14,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
 
         public int AutoRenewTimeoutInMinutes { get; set; }
 
-        public int Timeout { get; set; }
+        public int TimeoutInSeconds { get; set; }
 
         public AzureServiceBusParameter()
         {
@@ -27,6 +27,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
             MessageGroupTimeoutInSeconds = 30;
 
             AutoRenewGroupTimeoutInSeconds = 30;
+
+            TimeoutInSeconds = 0;
         }
     }
 }

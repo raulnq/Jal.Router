@@ -28,7 +28,8 @@ namespace Jal.Router.Impl.Management
         public IList<TaskMetadata> MonitoringTaskTypes { get; }
         public Type ChannelManagerType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
-        public Type RequestReplyChannelType { get; private set; }
+        public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
+        public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
@@ -83,9 +84,15 @@ namespace Jal.Router.Impl.Management
             return this;
         }
 
-        public IConfiguration UseRequestReplyChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannel
+        public IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel
         {
-            RequestReplyChannelType = typeof(TRequestReplyChannel);
+            RequestReplyChannelFromPointToPointChannelType = typeof(TRequestReplyChannel);
+            return this;
+        }
+
+        public IConfiguration UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
+        {
+            RequestReplyFromSubscriptionToPublishSubscribeChannelType = typeof(TRequestReplyChannel);
             return this;
         }
 
@@ -214,7 +221,8 @@ namespace Jal.Router.Impl.Management
             UseChannelManager<NullChannelManager>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
-            UseRequestReplyChannel<NullRequestReplyChannel>();
+            UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
+            UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
             UseMessageSerializer<NullMessageSerializer>();
             UseMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
@@ -226,7 +234,10 @@ namespace Jal.Router.Impl.Management
             Parameters = new Dictionary<string, object>();
             OutboundMiddlewareTypes = new List<Type>();
             ShutdownWatcherTypes = new List<Type>();
-            AddLogger<BeatLogger, Beat>(); 
+            AddLogger<BeatLogger, Beat>();
+            AddLogger<PointToPointChannelStatisticsLogger, PointToPointChannelStatistics>();
+            AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
+            AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
             AddStartupTask<StartupBeatLogger>();
             AddStartupTask<RuntimeConfigurationLoader>();
             AddStartupTask<EndpointsInitializer>();

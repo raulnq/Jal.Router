@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
@@ -19,7 +20,7 @@ namespace Jal.Router.Impl.Management
         }
 
 
-        public void Start()
+        public async Task Start()
         {
             foreach (var type in _configuration.StartupTaskTypes)
             {
@@ -27,7 +28,7 @@ namespace Jal.Router.Impl.Management
                 {
                     var task = _factory.Create<IStartupTask>(type);
 
-                    task.Run();
+                    await task.Run().ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

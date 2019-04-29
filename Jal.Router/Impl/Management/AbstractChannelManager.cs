@@ -1,38 +1,39 @@
 ﻿using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl.Management
 {
     public abstract class AbstractChannelManager : IChannelManager
     {
-        public virtual bool CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
+        public virtual Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual bool CreateIfNotExist(PublishSubscribeChannel channel)
+        public virtual Task<bool> CreateIfNotExist(PublishSubscribeChannel channel)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual bool CreateIfNotExist(PointToPointChannel channel)
+        public virtual Task<bool> CreateIfNotExist(PointToPointChannel channel)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        public virtual PublishSubscribeChannelInfo GetInfo(PublishSubscribeChannel channel)
+        public virtual Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel)
         {
-            return null;
+            return Task.FromResult(default(PublishSubscribeChannelStatistics));
         }
 
-        public virtual PointToPointChannelInfo GetInfo(PointToPointChannel channel)
+        public virtual Task<PointToPointChannelStatistics> Get(PointToPointChannel channel)
         {
-            return null;
+            return Task.FromResult(default(PointToPointChannelStatistics));
         }
 
-        public virtual SubscriptionToPublishSubscribeChannelInfo GetInfo(SubscriptionToPublishSubscribeChannel channel)
+        public virtual Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannel channel)
         {
-            return null;
+            return Task.FromResult(default(SubscriptionToPublishSubscribeChannelStatistics));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
@@ -8,7 +9,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound.Middleware
 {
-    public class MessageHandler : AbstractMessageHandler, IMiddleware<MessageContext>
+    public class MessageHandler : AbstractMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly IMessageRouter _router;
 
@@ -17,13 +18,13 @@ namespace Jal.Router.Impl.Inbound.Middleware
             _router = router;
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route);
 
-            CreateMessageEntity(context.Data);
+            await CreateMessageEntity(context.Data).ConfigureAwait(false);
 
-            _router.Route(context.Data);
+            await _router.Route(context.Data).ConfigureAwait(false);
         }
     }
 }

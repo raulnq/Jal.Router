@@ -55,7 +55,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _group.Channel = new Channel(ChannelType.PublishSubscribe)
+            _group.Channel = new Channel(ChannelType.SubscriptionToPublishSubscribe)
             {
                 ToPath = path,
 
