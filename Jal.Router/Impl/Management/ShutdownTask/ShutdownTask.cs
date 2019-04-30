@@ -9,25 +9,22 @@ namespace Jal.Router.Impl.Management
 {
     public class ShutdownTask : IShutdownTask
     {
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
-        private readonly IConfiguration _configuration;
-
-        public ShutdownTask(IComponentFactory factory, IConfiguration configuration)
+        public ShutdownTask(IComponentFactoryGateway factory)
         {
             _factory = factory;
-            _configuration = configuration;
         }
 
         public Task Run()
         {
-            if (_configuration.LoggerTypes.ContainsKey(typeof(Beat)))
+            if (_factory.Configuration.LoggerTypes.ContainsKey(typeof(Beat)))
             {
-                var loggertypes = _configuration.LoggerTypes[typeof(Beat)];
+                var loggertypes = _factory.Configuration.LoggerTypes[typeof(Beat)];
 
-                var loggers = loggertypes.Select(x => _factory.Create<ILogger<Beat>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => _factory.CreateLogger<Beat>(x)).ToArray();
 
-                var message = new Beat() { Name = _configuration.ApplicationName, Action="Stopped" };
+                var message = new Beat() { Name = _factory.Configuration.ApplicationName, Action="Stopped" };
 
                 var datetime = DateTime.UtcNow;
 

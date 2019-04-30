@@ -21,6 +21,8 @@ using Jal.Router.Interface.Outbound;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Model;
 using Jal.ChainOfResponsability.LightInject.Installer;
+using Jal.Router.Newtonsoft.LightInject.Installer;
+using Jal.Router.Newtonsoft.Extensions;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -103,6 +105,8 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             _parameter.Container.RegisterFrom<AzureServiceBusCompositionRoot>();
 
+            _parameter.Container.RegisterFrom<NewtonsoftCompositionRoot>();
+
             if (_parameter.Log != null)
             {
                 _parameter.Container.Register(x => _parameter.Log, new PerContainerLifetime());
@@ -159,6 +163,8 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             {
                 host.Configuration.UseApplicationInsights();
             }
+
+            host.Configuration.UseNewtonsoft();
 
             if (_parameter.RouterInterceptorType != null)
             {

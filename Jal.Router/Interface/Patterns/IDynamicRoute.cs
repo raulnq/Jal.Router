@@ -1,4 +1,5 @@
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Patterns
 {
@@ -6,7 +7,7 @@ namespace Jal.Router.Interface.Patterns
     {
         bool IsValid(MessageContext context, TData data);
 
-        void Send(MessageContext context, TData data);
+        Task Send(MessageContext context, TData data);
 
         string Id { get; }
 

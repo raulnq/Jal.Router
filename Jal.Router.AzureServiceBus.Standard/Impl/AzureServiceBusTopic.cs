@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
@@ -16,108 +13,108 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusTopic : AbstractChannel, IPublishSubscribeChannel
     {
-        private SubscriptionClient _client;
+        private SubscriptionClient _subscriptionclient;
 
         private TopicClient _topicclient;
 
-        private ListenerMetadata _metadata;
+        private ListenerMetadata _listenermetadata;
 
         private SenderMetadata _sendermetadata;
 
         public void Open(ListenerMetadata metadata)
         {
-            _metadata = metadata;
+            _listenermetadata = metadata;
 
-            _client = new SubscriptionClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath, metadata.Channel.ToSubscription);
+            _subscriptionclient = new SubscriptionClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath, metadata.Channel.ToSubscription);
         }
 
         public bool IsActive()
         {
-            return !_client.IsClosedOrClosing;
+            return _subscriptionclient != null ? !_subscriptionclient.IsClosedOrClosing : _topicclient.IsClosedOrClosing;
         }
 
         public Task Close()
         {
-            return _client != null ?_client.CloseAsync() : _topicclient.CloseAsync();
+            return _subscriptionclient != null ?_subscriptionclient.CloseAsync() : _topicclient.CloseAsync();
         }
 
         public void Listen()
         {
-            var options = CreateOptions(_metadata);
+            var options = CreateOptions(_listenermetadata);
 
-            var sessionoptions = CreateSessionOptions(_metadata);
+            var sessionoptions = CreateSessionOptions(_listenermetadata);
 
-            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+            var adapter = Factory.CreateMessageAdapter();
 
-            if (_metadata.Group != null)
+            if (_listenermetadata.Group != null)
             {
-                _client.RegisterSessionHandler(async (ms, message, token) => {
+                _subscriptionclient.RegisterSessionHandler(async (ms, message, token) => {
 
                     var context = adapter.ReadMetadata(message);
 
-                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()}");
+                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
 
                     try
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in _metadata.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, _metadata.Channel));
+                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (_metadata.Group.Until(context))
+                        if (_listenermetadata.Group.Until(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()} {ex}");
+                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()}");
+                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
                     }
 
                 }, sessionoptions);
             }
             else
             {
-                _client.RegisterMessageHandler(async (message, token) =>
+                _subscriptionclient.RegisterMessageHandler(async (message, token) =>
                 {
                     var context = adapter.ReadMetadata(message);
 
-                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()}");
+                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
 
                     try
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in _metadata.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, _metadata.Channel));
+                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
 
-                        await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+                        await _subscriptionclient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()} {ex}");
+                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_metadata.Channel.ToString()} channel {_metadata.Channel.GetPath()}");
+                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
                     }
 
                 }, options);
@@ -189,13 +186,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             }
         }
 
-        public string Send(object message)
+        public async Task<string> Send(object message)
         {
             var sbmessage = message as Message;
 
             if (sbmessage != null)
             {
-                _topicclient.SendAsync(sbmessage).GetAwaiter().GetResult();
+                await _topicclient.SendAsync(sbmessage).ConfigureAwait(false);
 
                 return sbmessage.MessageId;
             }
@@ -205,8 +202,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly AzureServiceBusParameter _parameter;
 
-        public AzureServiceBusTopic(IComponentFactory factory, IConfiguration configuration, ILogger logger, IParameterProvider provider)
-            : base(factory, configuration, logger)
+        public AzureServiceBusTopic(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider)
+            : base(factory, logger)
         {
             _parameter = provider.Get<AzureServiceBusParameter>();
         }

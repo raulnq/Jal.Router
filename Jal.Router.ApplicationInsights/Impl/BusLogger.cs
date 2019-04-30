@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface.Management;
@@ -9,7 +10,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Jal.Router.ApplicationInsights.Impl
 {
-    public class BusLogger : AbstractApplicationInsightsLogger, IMiddleware<MessageContext>
+    public class BusLogger : AbstractApplicationInsightsLogger, IMiddlewareAsync<MessageContext>
     {
 
         public BusLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
@@ -17,7 +18,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -47,7 +48,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             try
             {
-                next(context);
+                await next(context);
 
                 telemetry.Success = true;
 

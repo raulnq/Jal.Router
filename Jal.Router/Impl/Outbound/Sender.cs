@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -11,37 +12,39 @@ namespace Jal.Router.Impl.Outbound
 {
     public class Sender : ISender
     {
-        public Sender(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        public Sender(IComponentFactoryGateway factory, IConfiguration configuration, ILogger logger)
         {
-            Factory = factory;
-            Configuration = configuration;
-            Logger = logger;
+            _factory = factory;
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        protected readonly IComponentFactory Factory;
+        private readonly IComponentFactoryGateway _factory;
 
-        protected readonly IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
 
-        protected readonly ILogger Logger;
+        private readonly ILogger _logger;
 
-        public object Send(Channel channel, MessageContext context)
+        public async Task<object> Send(Channel channel, MessageContext context)
         {
             var id = string.Empty;
 
             try
             {
-                var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+                var adapter = _factory.CreateMessageAdapter();
 
-                var message = adapter.WriteMetadataAndContent(context, context.EndPoint.UseClaimCheck);
+                var message = await adapter.WriteMetadataAndContent(context, context.EndPoint).ConfigureAwait(false);
 
-                var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                var metadata = _configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                 if (metadata == null)
                 {
                     metadata = DynamicEndpointLoader(channel, context);
+
+                    _configuration.Runtime.SendersMetadata.Add(metadata);
                 }
 
-                id = metadata.Sender.Send(message);
+                id = await metadata.Sender.Send(message).ConfigureAwait(false);
 
                 if (metadata.Reader != null)
                 {
@@ -49,34 +52,36 @@ namespace Jal.Router.Impl.Outbound
 
                     try
                     {
-                        outputcontext = metadata.Reader.Read(context, adapter);
+                        outputcontext = await metadata.Reader.Read(context, adapter).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()} {ex}");
+                        _logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()} {ex}");
 
                         throw;
                     }
                     finally
                     {
-                        Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}");
+                        _logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}");
                     }
 
                     if (outputcontext != null)
                     {
-                        return adapter.Deserialize(outputcontext.Content, outputcontext.ContentType);
+                        var serializer = _factory.CreateMessageSerializer();
+
+                        return serializer.Deserialize(outputcontext.Content, outputcontext.ContentType);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {id} failed to sent to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}  {ex}");
+                _logger.Log($"Message {id} failed to sent to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}  {ex}");
 
                 throw;
             }
             finally
             {
-                Logger.Log($"Message {id} sent to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}");
+                _logger.Log($"Message {id} sent to {channel.ToString()} channel {context.EndPoint.Name}/{channel.GetPath()}");
             }
 
             return null;
@@ -84,35 +89,22 @@ namespace Jal.Router.Impl.Outbound
 
         private SenderMetadata DynamicEndpointLoader(Channel channel, MessageContext context)
         {
-            var newsender = new SenderMetadata(channel);
+            var sender = new SenderMetadata(channel);
 
-            newsender.Endpoints.Add(context.EndPoint);
+            sender.Endpoints.Add(context.EndPoint);
 
-            if (newsender.Channel.Type == ChannelType.PointToPoint)
+            var senderchannel = _factory.CreateSenderChannel(sender.Channel.Type);
+
+            if(senderchannel!=null)
             {
-                var pointtopointchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
+                senderchannel.Open(sender);
 
-                pointtopointchannel.Open(newsender);
+                sender.Sender = senderchannel;
 
-                newsender.Sender = pointtopointchannel;
-
-                Logger.Log($"Opening {newsender.Channel.GetPath()} {newsender.Channel.ToString()} channel ({newsender.Endpoints.Count}): {string.Join(",", newsender.Endpoints.Select(x => x.Name))}");
+                _logger.Log($"Opening {sender.Signature()}");
             }
 
-            if (newsender.Channel.Type == ChannelType.PublishSubscribe)
-            {
-                var publishsubscribechannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
-
-                publishsubscribechannel.Open(newsender);
-
-                newsender.Sender = publishsubscribechannel;
-
-                Logger.Log($"Opening {newsender.Channel.GetPath()} {newsender.Channel.ToString()} channel ({newsender.Endpoints.Count}): {string.Join(",", newsender.Endpoints.Select(x => x.Name))}");
-            }
-
-            Configuration.Runtime.SendersMetadata.Add(newsender);
-
-            return newsender;
+            return sender;
         }
     }
 }

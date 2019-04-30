@@ -130,13 +130,13 @@ namespace Jal.Router.Impl.Management
             return this;
         }
 
-        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
+        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
         {
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
             return this;
         }
 
-        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
+        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
         {
             OutboundMiddlewareTypes.Add(typeof(TMiddleware));
             return this;

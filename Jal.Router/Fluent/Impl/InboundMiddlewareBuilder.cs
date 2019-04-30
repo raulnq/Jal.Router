@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public void Add<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>
+        public void Add<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
         {
             _route.MiddlewareTypes.Add(typeof(TMiddleware));
         }

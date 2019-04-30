@@ -19,9 +19,9 @@ namespace Jal.Router.ApplicationInsights.LightInject.Installer
 
             serviceRegistry.Register<ILogger<PublishSubscribeChannelStatistics>, PublishSubscribeChannelStatisticsLogger>(typeof(PublishSubscribeChannelStatisticsLogger).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IMiddleware<MessageContext>, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IMiddlewareAsync<MessageContext>, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IMiddleware<MessageContext>, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IMiddlewareAsync<MessageContext>, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
         }
     }
 }

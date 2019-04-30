@@ -16,6 +16,8 @@
     <ProjectReference Include="..\Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj" />
     <ProjectReference Include="..\Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj" />
     <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Newtonsoft.LightInject.Installer\Jal.Router.Newtonsoft.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Newtonsoft\Jal.Router.Newtonsoft.csproj" />
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
   </ItemGroup>
 

@@ -9,13 +9,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
-    public class FinalMessageHandler : AbstractMessageHandler, IMiddlewareAsync<MessageContext>
+    public class FinalMessageHandler : AbstractInboundMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly IMessageRouter _router;
 
         private const string DefaultStatus = "ENDED";
 
-        public FinalMessageHandler(IComponentFactory factory, IMessageRouter router, IConfiguration configuration) : base(configuration, factory)
+        public FinalMessageHandler(IComponentFactoryGateway factory, IMessageRouter router, IConfiguration configuration) : base(configuration, factory)
         {
             _router = router;
         }
@@ -30,9 +30,9 @@ namespace Jal.Router.Impl.Inbound
             {
                 context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route, context.Data.Saga, context.Data.SagaContext);
 
-                await CreateMessageEntity(context.Data, MessageEntityType.Inbound, sagaentity).ConfigureAwait(false);
+                await CreateMessageEntityAndSave(context.Data, sagaentity).ConfigureAwait(false);
 
-                var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
+                var serializer = Factory.CreateMessageSerializer();
 
                 var data = serializer.Deserialize(sagaentity.Data, context.Data.Saga.DataType);
 

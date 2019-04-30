@@ -5,26 +5,21 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl.Inbound.Middleware;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
     public class Router : IRouter
     {
-        private readonly IComponentFactory _factory;
-
-        private readonly IConfiguration _configuration;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly IPipelineBuilder _pipeline;
 
         private readonly ILogger _logger;
 
-        public Router(IComponentFactory factory, IConfiguration configuration, IPipelineBuilder pipeline, ILogger logger)
+        public Router(IComponentFactoryGateway factory, IPipelineBuilder pipeline, ILogger logger)
         {
             _factory = factory;
-
-            _configuration = configuration;
 
             _pipeline = pipeline;
 
@@ -32,7 +27,7 @@ namespace Jal.Router.Impl.Inbound
         }
         public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddlewareAsync<MessageContext>
         {
-            var interceptor = _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
+            var interceptor = _factory.CreateRouterInterceptor();
 
             interceptor.OnEntry(context);
 
@@ -52,7 +47,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     var chain = _pipeline.ForAsync<MessageContext>().UseAsync<MessageExceptionHandler>();
 
-                    foreach (var type in _configuration.InboundMiddlewareTypes)
+                    foreach (var type in _factory.Configuration.InboundMiddlewareTypes)
                     {
                         chain.UseAsync(type);
                     }

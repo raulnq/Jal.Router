@@ -9,11 +9,11 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound.Middleware
 {
-    public class MessageHandler : AbstractMessageHandler, IMiddlewareAsync<MessageContext>
+    public class MessageHandler : AbstractInboundMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly IMessageRouter _router;
 
-        public MessageHandler(IMessageRouter router, IComponentFactory factory, IConfiguration configuration):base(configuration, factory)
+        public MessageHandler(IMessageRouter router, IComponentFactoryGateway factory, IConfiguration configuration):base(configuration, factory)
         {
             _router = router;
         }
@@ -22,7 +22,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
         {
             context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route);
 
-            await CreateMessageEntity(context.Data).ConfigureAwait(false);
+            await CreateMessageEntityAndSave(context.Data).ConfigureAwait(false);
 
             await _router.Route(context.Data).ConfigureAwait(false);
         }

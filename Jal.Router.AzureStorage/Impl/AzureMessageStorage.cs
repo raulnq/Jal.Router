@@ -39,7 +39,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 using (var memorystream = new System.IO.MemoryStream())
                 {
-                    await blob.DownloadToStreamAsync(memorystream);
+                    await blob.DownloadToStreamAsync(memorystream).ConfigureAwait(false);
 
                     string result = Encoding.UTF8.GetString(memorystream.ToArray());
 
@@ -52,7 +52,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public void Write(string id, string content)
+        public async Task Write(string id, string content)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 using (var memorystream = new System.IO.MemoryStream(Encoding.UTF8.GetBytes(content)))
                 {
-                    blob.UploadFromStreamAsync(memorystream).GetAwaiter().GetResult();
+                    await blob.UploadFromStreamAsync(memorystream).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

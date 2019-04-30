@@ -8,8 +8,8 @@ namespace Jal.Router.Impl.StartupTask
 {
     public class PointToPointChannelCreator : AbstractStartupTask, IStartupTask
     {
-        public PointToPointChannelCreator(IComponentFactory factory, IConfiguration configuration, ILogger logger) 
-            : base(factory, configuration, logger)
+        public PointToPointChannelCreator(IComponentFactoryGateway factory, ILogger logger) 
+            : base(factory, logger)
         {
         }
 
@@ -19,13 +19,13 @@ namespace Jal.Router.Impl.StartupTask
 
             Logger.Log("Creating point to point channels");
 
-            var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
+            var manager = Factory.CreateChannelManager();
 
-            foreach (var channel in Configuration.Runtime.PointToPointChannels)
+            foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
             {
                 if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {
-                    var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
+                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
                     channel.ConnectionString = channel.ConnectionStringProvider(finder);
                 }

@@ -1,7 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 
@@ -9,32 +9,34 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusRequestReplyFromPointToPointChannel : AbstractAzureServiceBusRequestReply, IRequestReplyChannelFromPointToPointChannel
     {
-        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            : base(factory, configuration, logger)
+        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactoryGateway factory, ILogger logger)
+            : base(factory, logger)
         {
 
         }
 
-        public MessageContext Read(MessageContext context, IMessageAdapter adapter)
+        public async Task<MessageContext> Read(MessageContext context, IMessageAdapter adapter)
         {
             var client = new SessionClient(_metadata.Channel.ToReplyConnectionString, _metadata.Channel.ToReplyPath);
 
-            var messagesession = client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).GetAwaiter().GetResult();
+            var messagesession = await client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).ConfigureAwait(false);
 
-            var message = _metadata.Channel.ToReplyTimeOut != 0 ? messagesession.ReceiveAsync(TimeSpan.FromSeconds(_metadata.Channel.ToReplyTimeOut)).GetAwaiter().GetResult() : messagesession.ReceiveAsync().GetAwaiter().GetResult();
+            var message = _metadata.Channel.ToReplyTimeOut != 0 ? 
+                await messagesession.ReceiveAsync(TimeSpan.FromSeconds(_metadata.Channel.ToReplyTimeOut)).ConfigureAwait(false) : 
+                await messagesession.ReceiveAsync().ConfigureAwait(false);
 
             MessageContext outputcontext = null;
 
             if (message != null)
             {
-                outputcontext = adapter.ReadMetadataAndContentFromEndpoint(message, context.EndPoint).GetAwaiter().GetResult();
+                outputcontext = await adapter.ReadMetadataAndContentFromEndpoint(message, context.EndPoint).ConfigureAwait(false);
 
-                messagesession.CompleteAsync(message.SystemProperties.LockToken).GetAwaiter().GetResult();
+                await messagesession.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
             }
 
-            messagesession.CloseAsync().GetAwaiter().GetResult();
+            await messagesession.CloseAsync().ConfigureAwait(false);
 
-            client.CloseAsync().GetAwaiter().GetResult();
+            await client.CloseAsync().ConfigureAwait(false);
 
             return outputcontext;
         }

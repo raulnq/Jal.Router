@@ -72,6 +72,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IParameterProvider, ParameterProvider>(new PerContainerLifetime());
 
+            container.Register<IComponentFactoryGateway, ComponentFactoryGateway>(new PerContainerLifetime());
+
             container.Register<IHost, Host>(new PerContainerLifetime());
 
             container.Register<ISender, Sender>(new PerContainerLifetime());
@@ -130,7 +132,7 @@ namespace Jal.Router.LightInject.Installer
             
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
-            container.Register<IEntityStorageFacade, EntityStorageFacade>(new PerContainerLifetime());
+            container.Register<IEntityStorageGateway, EntityStorageGateway>(new PerContainerLifetime());
 
             container.Register<IMonitoringTask, PointToPointChannelMonitor>(typeof (PointToPointChannelMonitor).FullName,new PerContainerLifetime());
 
@@ -172,7 +174,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEntityStorage, NullStorage>(typeof (NullStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, MessageHandler>(typeof (MessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.Inbound.Middleware.MessageHandler>(typeof (Impl.Inbound.Middleware.MessageHandler).FullName, new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, MessageExceptionHandler>(typeof (MessageExceptionHandler).FullName,new PerContainerLifetime());
 
@@ -182,13 +184,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, FinalMessageHandler>(typeof (FinalMessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, PointToPointHandler>(typeof (PointToPointHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.Outbound.Middleware.MessageHandler>(typeof (Impl.Outbound.Middleware.MessageHandler).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddleware<MessageContext>, PublishSubscribeHandler>(typeof (PublishSubscribeHandler).FullName, new PerContainerLifetime());
-
-            container.Register<IMiddleware<MessageContext>, RequestReplyHandler>(typeof (RequestReplyHandler).FullName,new PerContainerLifetime());
-
-            container.Register<IMiddleware<MessageContext>, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, DistributionHandler>(typeof(DistributionHandler).FullName, new PerContainerLifetime());
 
             container.Register<IValueFinder, AppSettingValueFinder>(typeof (AppSettingValueFinder).FullName, new PerContainerLifetime());
 

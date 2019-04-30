@@ -52,8 +52,8 @@ namespace Jal.Router.Interface.Management
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;
         IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
-        IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
-        IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddleware<MessageContext>;
+        IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
+        IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
         IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IConfiguration UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         IConfiguration UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;

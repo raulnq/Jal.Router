@@ -41,13 +41,13 @@ namespace Jal.Router.Tests.Impl
             _bus = bus;
         }
 
-        public Task Handle(Trigger message, MessageContext context)
+        public async Task Handle(Trigger message, MessageContext context)
         {
             var options = new Options() { EndPointName = "torequestqueue" };
 
             options.Identity.ReplyToRequestId = Guid.NewGuid().ToString();
 
-            var result = _bus.Reply<RequestToSend, ResponseToSend>(new RequestToSend() {Name = "Hi Raul"}, options);
+            var result = await _bus.Reply<RequestToSend, ResponseToSend>(new RequestToSend() {Name = "Hi Raul"}, options);
 
             if (result == null)
             {
@@ -57,8 +57,6 @@ namespace Jal.Router.Tests.Impl
             {
                 Console.WriteLine($"trigger {result.Name}");
             }
-
-            return Task.CompletedTask;
         }
     }
 
@@ -66,9 +64,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appa", context.IdentityContext);
-
-            return Task.CompletedTask;
+            return context.Send(new RequestToSend() { Name = "Hello world!!" }, "appa", context.IdentityContext);
         }
     }
 
@@ -76,9 +72,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(RequestToSend message, MessageContext context)
         {
-            context.Send(new ResponseToSend() { Name = message.Name }, "appb", context.IdentityContext);
-
-            return Task.CompletedTask;
+            return context.Send(new ResponseToSend() { Name = message.Name }, "appb", context.IdentityContext);
         }
     }
 
@@ -96,9 +90,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appc", context.IdentityContext);
-
-            return Task.CompletedTask;
+            return context.Send(new RequestToSend() { Name = "Hello world!!" }, "appc", context.IdentityContext);
         }
     }
 
@@ -106,9 +98,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(RequestToSend message, MessageContext context)
         {
-            context.Publish(new ResponseToSend() { Name = message.Name }, "appd", context.IdentityContext, context.Origin.Key);
-
-            return Task.CompletedTask;
+            return context.Publish(new ResponseToSend() { Name = message.Name }, "appd", context.IdentityContext, context.Origin.Key);
         }
     }
 
@@ -130,9 +120,7 @@ namespace Jal.Router.Tests.Impl
 
             var identity = new IdentityContext() { Id = $"{context.IdentityContext.Id}@child-1", OperationId= context.IdentityContext.Id };
 
-            context.Send(data, new ResponseToSend() { Name = message.Name }, "appx", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(data, new ResponseToSend() { Name = message.Name }, "appx", identity, context.SagaContext.Id);
         }
     }
 
@@ -144,9 +132,7 @@ namespace Jal.Router.Tests.Impl
 
             var identity = new IdentityContext() { Id = caller.Id };
 
-            context.Send(new ResponseToSend() { Name = message.Name }, "appf", identity, caller.SagaId);
-
-            return Task.CompletedTask;
+            return context.Send(new ResponseToSend() { Name = message.Name }, "appf", identity, caller.SagaId);
         }
     }
 
@@ -157,9 +143,7 @@ namespace Jal.Router.Tests.Impl
         {
             var identity = new IdentityContext() { Id = context.IdentityContext.Id, OperationId = context.IdentityContext.Id };
 
-            context.Send(new ResponseToSend() { Name = message.Name }, "apph", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(new ResponseToSend() { Name = message.Name }, "apph", identity, context.SagaContext.Id);
         }
     }
 
@@ -172,9 +156,7 @@ namespace Jal.Router.Tests.Impl
 
             var identity = new IdentityContext() { Id = $"{context.IdentityContext.Id}@child-2", OperationId = context.IdentityContext.Id };
 
-            context.Send(data, new ResponseToSend() { Name = message.Name }, "appz", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(data, new ResponseToSend() { Name = message.Name }, "appz", identity, context.SagaContext.Id);
         }
     }
 
@@ -195,9 +177,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(Trigger message, MessageContext context)
         {
-            context.Send<RequestToSend>(new RequestToSend() { Name = "Hello world!!" }, "appe",new IdentityContext() { Id = "parent" });
-
-            return Task.CompletedTask;
+            return context.Send<RequestToSend>(new RequestToSend() { Name = "Hello world!!" }, "appe",new IdentityContext() { Id = "parent" });
         }
     }
 
@@ -205,9 +185,7 @@ namespace Jal.Router.Tests.Impl
     {
         public Task Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appg", context.IdentityContext);
-
-            return Task.CompletedTask;
+            return context.Send(new RequestToSend() { Name = "Hello world!!" }, "appg", context.IdentityContext);
         }
     }
 
@@ -222,9 +200,8 @@ namespace Jal.Router.Tests.Impl
 
         public Task Handle(Trigger message, MessageContext context)
         {
-            context.Send(new RequestToSend() { Name = "Hello world!!" }, "appi", context.IdentityContext);
+            return context.Send(new RequestToSend() { Name = "Hello world!!" }, "appi", context.IdentityContext);
 
-            return Task.CompletedTask;
         }
     }
 
@@ -269,9 +246,7 @@ namespace Jal.Router.Tests.Impl
 
             options.Identity.RequestId = context.IdentityContext.ReplyToRequestId;
 
-            context.Publish(new ResponseToSend() { Name = message.Name }, options);
-
-            return Task.CompletedTask;
+            return context.Publish(new ResponseToSend() { Name = message.Name }, options);
         }
     }
 

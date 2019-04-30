@@ -9,20 +9,20 @@ namespace Jal.Router.Impl.StartupTask
 {
     public class StartupBeatLogger : AbstractStartupTask, IStartupTask
     {
-        public StartupBeatLogger(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            :base(factory, configuration, logger)
+        public StartupBeatLogger(IComponentFactoryGateway factory, ILogger logger)
+            :base(factory, logger)
         {
         }
 
         public Task Run()
         {
-            if (Configuration.LoggerTypes.ContainsKey(typeof(Beat)))
+            if (Factory.Configuration.LoggerTypes.ContainsKey(typeof(Beat)))
             {
-                var loggertypes = Configuration.LoggerTypes[typeof(Beat)];
+                var loggertypes = Factory.Configuration.LoggerTypes[typeof(Beat)];
 
-                var loggers = loggertypes.Select(x => Factory.Create<ILogger<Beat>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => Factory.CreateLogger<Beat>(x)).ToArray();
 
-                var message = new Beat() { Name = Configuration.ApplicationName, Action = "Started" };
+                var message = new Beat() { Name = Factory.Configuration.ApplicationName, Action = "Started" };
 
                 var startuptime = DateTime.UtcNow;
 

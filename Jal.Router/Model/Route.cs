@@ -26,7 +26,7 @@ namespace Jal.Router.Model
             Saga = saga;
         }
 
-        public List<Type> RetryExceptionTypes { get; set; }
+        public List<Type> RetryExceptionTypes { get; }
 
         public Type RetryValueFinderType { get; set; }
 

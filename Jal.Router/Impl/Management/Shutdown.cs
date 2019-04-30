@@ -7,26 +7,24 @@ namespace Jal.Router.Impl.Management
 {
     public class Shutdown : IShutdown
     {
-        private readonly IComponentFactory _factory;
-
-        private readonly IConfiguration _configuration;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly ILogger _logger;
 
-        public Shutdown(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        public Shutdown(IComponentFactoryGateway factory, ILogger logger)
         {
             _factory = factory;
-            _configuration = configuration;
+
             _logger = logger;
         }
 
         public async Task Stop()
         {
-            foreach (var type in _configuration.ShutdownTaskTypes)
+            foreach (var type in _factory.Configuration.ShutdownTaskTypes)
             {
                 try
                 {
-                    var task = _factory.Create<IShutdownTask>(type);
+                    var task = _factory.CreateShutdownTask(type);
 
                     await task.Run().ConfigureAwait(false);
                 }
@@ -36,7 +34,6 @@ namespace Jal.Router.Impl.Management
 
                     throw;
                 }
-
             }
         }
     }

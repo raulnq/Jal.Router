@@ -1,9 +1,10 @@
 ﻿using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface.Outbound
 {
     public interface ISender
     {
-        object Send(Channel channel, MessageContext context);
+        Task<object> Send(Channel channel, MessageContext context);
     }
 }

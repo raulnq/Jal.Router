@@ -5,7 +5,6 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
@@ -13,19 +12,16 @@ namespace Jal.Router.Impl.Inbound.Middleware
 {
     public class MessageExceptionHandler : IMiddlewareAsync<MessageContext>
     {
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly IBus _bus;
 
-        private readonly IConfiguration _configuration;
-
         private readonly ILogger _logger;
 
-        public MessageExceptionHandler(IComponentFactory factory, IBus bus, IConfiguration configuration, ILogger logger)
+        public MessageExceptionHandler(IComponentFactoryGateway factory, IBus bus, ILogger logger)
         {
             _factory = factory;
             _bus = bus;
-            _configuration = configuration;
             _logger = logger;
         }
 
@@ -42,9 +38,9 @@ namespace Jal.Router.Impl.Inbound.Middleware
                 SagaContext = context.SagaContext,
             };
 
-            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+            var serializer = _factory.CreateMessageSerializer();
 
-            var content = adapter.Deserialize(context.Content, context.ContentType);
+            var content = serializer.Deserialize(context.Content, context.ContentType);
 
             _bus.Send(content, context.Origin, options);
         }
@@ -98,9 +94,9 @@ namespace Jal.Router.Impl.Inbound.Middleware
                 }
             }
 
-            var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+            var serializer = _factory.CreateMessageSerializer();
 
-            var content = adapter.Deserialize(context.Content, context.ContentType);
+            var content = serializer.Deserialize(context.Content, context.ContentType);
 
             _bus.Send(content, context.Origin, options);
 
@@ -109,7 +105,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         private IRetryPolicy GetRetryPolicy(Route route)
         {
-            var finder = _factory.Create<IValueFinder>(route.RetryValueFinderType);
+            var finder = _factory.CreateValueFinder(route.RetryValueFinderType);
 
             return route.RetryPolicyProvider(finder);
         }

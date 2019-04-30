@@ -7,7 +7,7 @@ namespace Jal.Router.Interface
     {
         void Open(SenderMetadata metadata);
 
-        string Send(object message);
+        Task<string> Send(object message);
 
         Task Close();
     }

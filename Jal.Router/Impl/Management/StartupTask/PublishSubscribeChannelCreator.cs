@@ -8,8 +8,8 @@ namespace Jal.Router.Impl.StartupTask
 {
     public class PublishSubscribeChannelCreator : AbstractStartupTask, IStartupTask
     {
-        public PublishSubscribeChannelCreator(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            : base(factory, configuration, logger)
+        public PublishSubscribeChannelCreator(IComponentFactoryGateway factory, ILogger logger)
+            : base(factory, logger)
         {
         }
 
@@ -19,18 +19,17 @@ namespace Jal.Router.Impl.StartupTask
 
             Logger.Log("Creating publish subscribe channels");
 
-            var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
+            var manager = Factory.CreateChannelManager();
 
-            foreach (var channel in Configuration.Runtime.PublishSubscribeChannels)
+            foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannels)
             {
 
                 if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {
-                    var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
+                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
                     channel.ConnectionString = channel.ConnectionStringProvider(finder);
                 }
-
 
                 if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                 {

@@ -4,27 +4,23 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound
 {
     public class MessageRouter : IMessageRouter
     {
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly IHandlerMethodSelector _selector;
 
         private readonly IHandlerMethodExecutor _executor;
 
-        private readonly IConfiguration _configuration;
-
-        public MessageRouter(IComponentFactory factory, IHandlerMethodSelector selector, IHandlerMethodExecutor executor, IConfiguration configuration)
+        public MessageRouter(IComponentFactoryGateway factory, IHandlerMethodSelector selector, IHandlerMethodExecutor executor)
         {
             _factory = factory;
             _selector = selector;
             _executor = executor;
-            _configuration = configuration;
         }
 
         public Task Route(MessageContext context)
@@ -69,17 +65,17 @@ namespace Jal.Router.Impl.Inbound
         {
             if (route.RouteMethods != null)
             {
-                var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+                var serializer = _factory.CreateMessageSerializer();
 
-                var handler = _factory.Create<THandler>(route.ConsumerType);
+                var content = serializer.Deserialize<TContent>(context.Content);
 
-                var content = adapter.Deserialize<TContent>(context.Content);
+                var consumer = _factory.CreateComponent<THandler>(route.ConsumerType);
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (_selector.Select(context, content, method, handler))
+                    if (_selector.Select(context, content, method, consumer))
                     {
-                        return _executor.Execute(context, content, method, handler);
+                        return _executor.Execute(context, content, method, consumer);
                     }
                 }
             }
@@ -93,11 +89,11 @@ namespace Jal.Router.Impl.Inbound
 
             if (route.RouteMethods != null)
             {
-                var adapter = _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+                var serializer = _factory.CreateMessageSerializer();
 
-                var consumer = _factory.Create<THandler>(route.ConsumerType);
+                var consumer = _factory.CreateComponent<THandler>(route.ConsumerType);
 
-                var content = adapter.Deserialize<TContent>(context.Content);
+                var content = serializer.Deserialize<TContent>(context.Content);
 
                 foreach (var method in route.RouteMethods)
                 {

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
@@ -10,8 +9,8 @@ namespace Jal.Router.Impl.StartupTask
 
     public class SubscriptionToPublishSubscribeChannelCreator : AbstractStartupTask, IStartupTask
     {
-        public SubscriptionToPublishSubscribeChannelCreator(IComponentFactory factory, IConfiguration configuration, ILogger logger) 
-            : base(factory, configuration, logger)
+        public SubscriptionToPublishSubscribeChannelCreator(IComponentFactoryGateway factory, ILogger logger) 
+            : base(factory, logger)
         {
         }
 
@@ -21,13 +20,13 @@ namespace Jal.Router.Impl.StartupTask
 
             Logger.Log("Creating subscription to publish subscribe channels");
 
-            var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
+            var manager = Factory.CreateChannelManager();
 
-            foreach (var channel in Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
+            foreach (var channel in Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
             {
                 if(channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {
-                    var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
+                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
                     channel.ConnectionString = channel.ConnectionStringProvider(finder);
                 }

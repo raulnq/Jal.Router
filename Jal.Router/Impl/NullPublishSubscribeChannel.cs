@@ -34,9 +34,9 @@ namespace Jal.Router.Impl
 
         }
 
-        public string Send(object message)
+        public Task<string> Send(object message)
         {
-            return string.Empty;
+            return Task.FromResult(string.Empty);
         }
     }
 }

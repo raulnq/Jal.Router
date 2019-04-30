@@ -22,6 +22,8 @@ using Jal.Router.Impl.Inbound.RetryPolicy;
 using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.ValueFinder;
 using System.Threading.Tasks;
+using Jal.Router.Newtonsoft.Extensions;
+using Jal.Router.Newtonsoft.LightInject.Installer;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -35,6 +37,7 @@ namespace Jal.Router.Sample.NetCore
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
             container.RegisterFrom<AzureStorageCompositionRoot>();
+            container.RegisterFrom<NewtonsoftCompositionRoot>();
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -44,7 +47,7 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueListenByOneHandlerWithException>(typeof(QueueListenByOneHandlerWithException).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToPublishHandler>(typeof(ToPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
-            container.Register<IMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
@@ -62,6 +65,7 @@ namespace Jal.Router.Sample.NetCore
                 .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1, TimeoutInSeconds = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 .AddMonitoringTask<HeartBeatLogger>(15)
+                .UseNewtonsoft()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
@@ -493,9 +497,7 @@ namespace Jal.Router.Sample.NetCore
 
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_end", OperationId = context.IdentityContext.OperationId };
 
-            context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
         }
     }
 
@@ -513,9 +515,7 @@ namespace Jal.Router.Sample.NetCore
 
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
 
-            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
         }
     }
 
@@ -533,18 +533,18 @@ namespace Jal.Router.Sample.NetCore
 
             var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
 
-            context.Send(data, new Message() { Name = message.Name }, "continueendpoint", identity, context.SagaContext.Id);
-
-            return Task.CompletedTask;
+            return context.Send(data, new Message() { Name = message.Name }, "continueendpoint", identity, context.SagaContext.Id);
         }
     }
 
-    public class Middleware : IMiddleware<MessageContext>
+    public class Middleware : IMiddlewareAsync<MessageContext>
     {
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             Console.WriteLine("Start " + GetType().Name);
-            next(context);
+
+            await next(context);
+
             Console.WriteLine("End " + GetType().Name);
         }
     }
@@ -562,13 +562,11 @@ namespace Jal.Router.Sample.NetCore
     
     public class ToReplyHandler : AbstractMessageHandler<Message>
     {
-        public override Task HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
-
-            return Task.CompletedTask;
+            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
         }
     }
 
@@ -578,9 +576,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
-
-            return Task.CompletedTask;
+            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
         }
     }
 
@@ -591,9 +587,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
-
-            return Task.CompletedTask;
+            return context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
         }
     }
 
@@ -639,16 +633,14 @@ namespace Jal.Router.Sample.NetCore
 
     public class QueueToSend : AbstractMessageHandler<Message>
     {
-        public override Task HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
             for (int i = 0; i < 100; i++)
             {
-                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
+                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
             }
-
-            return Task.CompletedTask;
         }
     }
 
@@ -690,16 +682,15 @@ namespace Jal.Router.Sample.NetCore
 
     public class QueueListenSessionSenderHandlers : AbstractMessageHandler<Message>
     {
-        public override Task HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             for (int i = 0; i < 5; i++)
             {
-                context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"1-{i}", GroupId = i.ToString() },"X");
-                context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"2-{i}", GroupId = i.ToString() }, "X");
-                context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
-                context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"1-{i}", GroupId = i.ToString() },"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"2-{i}", GroupId = i.ToString() }, "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
             }
-            return Task.CompletedTask;
         }
     }
 

@@ -161,80 +161,80 @@ namespace Jal.Router.Model
             return Headers.ToDictionary(header => header.Key, header => header.Value);
         }
 
-        public void FireAndForget<TContent>(TContent content, Options options)
+        public Task FireAndForget<TContent>(TContent content, Options options)
         {
-            _bus.FireAndForget(content, options);
+            return _bus.FireAndForget(content, options);
         }
 
-        public void FireAndForget<TContent>(TContent content, Origin origin, Options options)
+        public Task FireAndForget<TContent>(TContent content, Origin origin, Options options)
         {
-            _bus.FireAndForget(content, Origin, options);
+            return _bus.FireAndForget(content, Origin, options);
         }
 
-        public void Send<TContent>(TContent content, Options options)
+        public Task Send<TContent>(TContent content, Options options)
         {
-            _bus.Send(content, options);
+            return _bus.Send(content, options);
         }
 
         public async Task Send<TContent, TData>(TData data, TContent content, Options options)
         {
             await Update(data).ConfigureAwait(false);
 
-            _bus.Send(content, options);
+            await _bus.Send(content, options).ConfigureAwait(false);
         }
 
-        public void Send<TContent>(TContent content, Origin origin, Options options)
+        public Task Send<TContent>(TContent content, Origin origin, Options options)
         {
-            _bus.Send(content, origin, options);
+            return _bus.Send(content, origin, options);
         }
 
-        public void Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
+        public Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            _bus.Send(content, endpoint, origin, options);
+            return _bus.Send(content, endpoint, origin, options);
         }
 
         public async Task Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
             await Update(data).ConfigureAwait(false);
 
-            _bus.Send(content, origin, options);
+            await _bus.Send(content, origin, options).ConfigureAwait(false);
         }
 
-        public void Publish<TContent>(TContent content, Options options)
+        public Task Publish<TContent>(TContent content, Options options)
         {
-            _bus.Publish(content, options);
+            return _bus.Publish(content, options);
         }
 
         public async Task Publish<TContent, TData>(TData data, TContent content, Options options)
         {
             await Update(data).ConfigureAwait(false);
 
-            _bus.Publish(content, options);
+            await _bus.Publish(content, options).ConfigureAwait(false);
         }
 
-        public void Publish<TContent>(TContent content, Origin origin, Options options)
+        public Task Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            _bus.Publish(content, origin, options);
+            return _bus.Publish(content, origin, options);
         }
 
-        public void Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
+        public Task Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            _bus.Publish(content, endpoint, origin, options);
+            return _bus.Publish(content, endpoint, origin, options);
         }
 
         public async Task Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
         {
             await Update(data).ConfigureAwait(false);
 
-            _bus.Publish(content, origin, options);
+            await _bus.Publish(content, origin, options).ConfigureAwait(false);
         }
 
-        public TResult Reply<TContent, TResult>(TContent content, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Options options)
         {
             return _bus.Reply<TContent, TResult>(content, options);
         }
 
-        public TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options)
         {
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }
@@ -243,14 +243,14 @@ namespace Jal.Router.Model
         {
             await Update(data).ConfigureAwait(false);
 
-            return _bus.Reply<TContent, TResult>(content, options);
+            return await _bus.Reply<TContent, TResult>(content, options).ConfigureAwait(false);
         }
 
         public async Task<TResult> Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
         {
             await Update(data).ConfigureAwait(false);
 
-            return _bus.Reply<TContent, TResult>(content, origin, options);
+            return await _bus.Reply<TContent, TResult>(content, origin, options).ConfigureAwait(false);
         }
     }
 }

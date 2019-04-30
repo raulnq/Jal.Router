@@ -9,23 +9,23 @@ namespace Jal.Router.Impl.MonitoringTask
 {
     public class PointToPointChannelMonitor : AbstractMonitoringTask, IMonitoringTask
     {
-        public PointToPointChannelMonitor(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            :base(factory, configuration, logger)
+        public PointToPointChannelMonitor(IComponentFactoryGateway factory, ILogger logger)
+            :base(factory, logger)
         {
 
         }
 
         public async Task Run(DateTime datetime)
         {
-            if (Configuration.LoggerTypes.ContainsKey(typeof (PointToPointChannelStatistics)))
+            if (Factory.Configuration.LoggerTypes.ContainsKey(typeof (PointToPointChannelStatistics)))
             {
-                var loggertypes = Configuration.LoggerTypes[typeof (PointToPointChannelStatistics)];
+                var loggertypes = Factory.Configuration.LoggerTypes[typeof (PointToPointChannelStatistics)];
 
-                var loggers = loggertypes.Select(x => Factory.Create<ILogger<PointToPointChannelStatistics>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => Factory.CreateLogger<PointToPointChannelStatistics>(x)).ToArray();
 
-                var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
+                var manager = Factory.CreateChannelManager();
 
-                foreach (var channel in Configuration.Runtime.PointToPointChannels)
+                foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
                 {
                     var message = await manager.Get(channel).ConfigureAwait(false);
 

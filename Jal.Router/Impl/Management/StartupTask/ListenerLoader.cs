@@ -9,8 +9,8 @@ namespace Jal.Router.Impl.StartupTask
 
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
-        public ListenerLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, ILogger logger)
-            :base(factory, configuration, logger)
+        public ListenerLoader(IComponentFactoryGateway factory,  IRouterConfigurationSource[] sources, ILogger logger)
+            :base(factory, logger)
         {
 
         }
@@ -32,19 +32,9 @@ namespace Jal.Router.Impl.StartupTask
 
         private void OpenAndListen()
         {
-            foreach (var metadata in Configuration.Runtime.ListenersMetadata)
+            foreach (var metadata in Factory.Configuration.Runtime.ListenersMetadata)
             {
-                var listenerchannel = default(IListenerChannel);
-
-                if (metadata.Channel.Type == Model.ChannelType.PointToPoint)
-                {
-                    listenerchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
-                }
-
-                if (metadata.Channel.Type == Model.ChannelType.SubscriptionToPublishSubscribe)
-                {
-                    listenerchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
-                }
+                var listenerchannel = Factory.CreateListenerChannel(metadata.Channel.Type);
 
                 if(listenerchannel!=null)
                 {
@@ -61,9 +51,9 @@ namespace Jal.Router.Impl.StartupTask
 
         private void AssignGroup()
         {
-            foreach (var group in Configuration.Runtime.Groups)
+            foreach (var group in Factory.Configuration.Runtime.Groups)
             {
-                var listener = Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == group.Channel.GetId());
+                var listener = Factory.Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == group.Channel.GetId());
 
                 if (listener != null)
                 {
@@ -74,11 +64,11 @@ namespace Jal.Router.Impl.StartupTask
 
         private void Create()
         {
-            foreach (var item in Configuration.Runtime.Routes)
+            foreach (var item in Factory.Configuration.Runtime.Routes)
             {
                 foreach (var channel in item.Channels)
                 {
-                    var listener = Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                    var listener = Factory.Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                     if (listener != null)
                     {
@@ -90,7 +80,7 @@ namespace Jal.Router.Impl.StartupTask
 
                         newlistener.Routes.Add(item);
 
-                        Configuration.Runtime.ListenersMetadata.Add(newlistener);
+                        Factory.Configuration.Runtime.ListenersMetadata.Add(newlistener);
                     }
                 }
             }

@@ -23,8 +23,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Installer
             container.Register(Component.For<IChannelManager>().ImplementedBy<AzureServiceBusManager>().Named(typeof(AzureServiceBusManager).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<MessageAdapter>().Named(typeof(MessageAdapter).FullName).LifestyleSingleton());
-
-            container.Register(Component.For<IMessageSerializer>().ImplementedBy<JsonMessageSerializer>().Named(typeof(JsonMessageSerializer).FullName).LifestyleSingleton());
         }
     }
 }

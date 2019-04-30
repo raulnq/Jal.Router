@@ -9,16 +9,14 @@ namespace Jal.Router.Impl
 {
     public class NullRequestReplyChannelFromPointToPointChannel : IRequestReplyChannelFromPointToPointChannel
     {
-
-
         public void Open(SenderMetadata metadata)
         {
 
         }
 
-        public string Send(object message)
+        public Task<string> Send(object message)
         {
-            return string.Empty;
+            return Task.FromResult(string.Empty);
         }
 
         public Task Close()
@@ -26,9 +24,9 @@ namespace Jal.Router.Impl
             return Task.CompletedTask;
         }
 
-        public MessageContext Read(MessageContext context, IMessageAdapter adapter)
+        public Task<MessageContext> Read(MessageContext context, IMessageAdapter adapter)
         {
-            return null;
+            return Task.FromResult(default(MessageContext));
         }
     }
 }

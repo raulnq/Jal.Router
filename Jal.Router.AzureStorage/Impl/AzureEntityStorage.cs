@@ -14,7 +14,7 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureEntityStorage : AbstractEntityStorage
     {
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly IConfiguration _configuration;
 
@@ -34,7 +34,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageDataReader;
 
-        public AzureEntityStorage(IComponentFactory factory, IConfiguration configuration, IParameterProvider provider)
+        public AzureEntityStorage(IComponentFactoryGateway factory, IConfiguration configuration, IParameterProvider provider)
         {
             _factory = factory;
 
@@ -66,7 +66,7 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        public override SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public override async Task<SagaEntity[]> GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
@@ -85,7 +85,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{saganame}";
 
-                var sagas = GetSagas(table, partitionkey, start, end);
+                var sagas = await GetSagas(table, partitionkey, start, end).ConfigureAwait(false);
 
                 list.AddRange(sagas);
 
@@ -95,7 +95,7 @@ namespace Jal.Router.AzureStorage.Impl
             return list.ToArray();
         }
 
-        private SagaEntity[] GetSagas(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        private async Task<SagaEntity[]> GetSagas(CloudTable table, string partitionkey, DateTime start, DateTime end)
         {
 
             var where = TableQuery.CombineFilters(
@@ -108,7 +108,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<SagaRecord>().Where(where);
 
-            var records = ExecuteQuery<SagaRecord>(table, query);
+            var records = await ExecuteQuery<SagaRecord>(table, query).ConfigureAwait(false);
 
             return records.Select(record =>
             {
@@ -146,13 +146,13 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public static IEnumerable<T> ExecuteQuery<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
+        public static async Task<IEnumerable<T>> ExecuteQuery<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
         {
             TableContinuationToken token = null;
             var retVal = new List<T>();
             do
             {
-                var results = table.ExecuteQuerySegmentedAsync(query, token).GetAwaiter().GetResult();
+                var results = await table.ExecuteQuerySegmentedAsync(query, token).ConfigureAwait(false);
                 retVal.AddRange(results.Results);
                 token = results.ContinuationToken;
             } while (token != null);
@@ -160,9 +160,9 @@ namespace Jal.Router.AzureStorage.Impl
             return retVal;
         }
 
-        public override MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
+        public override async Task<MessageEntity[]> GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
         {
-            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+            var serializer = _factory.CreateMessageSerializer();
 
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
@@ -177,7 +177,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQuery<MessageRecord>(table, query);
+            var records = await ExecuteQuery(table, query).ConfigureAwait(false);
 
             return records.Select(record =>
             {
@@ -230,7 +230,7 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "")
+        public override async Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "")
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
@@ -249,7 +249,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{routename}";
 
-                var messages = GetMessages(table, partitionkey, start, end);
+                var messages = await GetMessages(table, partitionkey, start, end).ConfigureAwait(false);
 
                 list.AddRange(messages);
 
@@ -259,9 +259,9 @@ namespace Jal.Router.AzureStorage.Impl
             return list.ToArray();
         }
 
-        private MessageEntity[] GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        private async Task<MessageEntity[]> GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
         {
-            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+            var serializer = _factory.CreateMessageSerializer();
 
             var where = TableQuery.CombineFilters(
                 TableQuery.CombineFilters(
@@ -273,7 +273,7 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQuery<MessageRecord>(table, query);
+            var records = await ExecuteQuery(table, query).ConfigureAwait(false);
 
             return records.Select(record => {
                 var entity = new MessageEntity()
@@ -462,7 +462,7 @@ namespace Jal.Router.AzureStorage.Impl
         {
             try
             {
-                var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+                var serializer = _factory.CreateMessageSerializer();
 
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
 
@@ -584,7 +584,7 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
-                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
+                    var result = await table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
                     var record = result.Result as SagaRecord;
 

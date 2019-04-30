@@ -28,19 +28,19 @@ namespace Jal.Router.Impl.Inbound
             return Task.FromResult(default(SagaEntity));
         }
 
-        public virtual SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public virtual Task<SagaEntity[]> GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
         {
-            return null;
+            return Task.FromResult(default(SagaEntity[]));
         }
 
-        public virtual MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
         {
-            return null;
+            return Task.FromResult(default(MessageEntity[]));
         }
 
-        public virtual MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, string messagestoragename = "")
         {
-            return null;
+            return Task.FromResult(default(MessageEntity[]));
         }
     }
 }

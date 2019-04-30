@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Jal.Router.Impl.Inbound;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
@@ -20,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     }
     public class MessageAdapter : AbstractMessageAdapter
     {
-        public MessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus) : base(factory, configuration, bus)
+        public MessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
         {
         }
 
@@ -30,9 +29,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (sbmessage != null)
             {
-                var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
+                var storage = Factory.CreateEntityStorage();
 
-                var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
+                var serializer = Factory.CreateMessageSerializer();
 
                 var context = new MessageContext(Bus, serializer, storage)
                 {
@@ -69,7 +68,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 if (sbmessage.UserProperties.ContainsKey(Tracks))
                 {
-                    context.Tracks = Deserialize(sbmessage.UserProperties[Tracks].ToString(), typeof(List<Track>)) as List<Track>;
+                    context.Tracks = serializer.Deserialize(sbmessage.UserProperties[Tracks].ToString(), typeof(List<Track>)) as List<Track>;
                 }
 
                 if (sbmessage.UserProperties.ContainsKey(SagaId))
@@ -182,7 +181,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (context.Tracks != null)
             {
-                var root = Serialize(context.Tracks);
+                var serializer = Factory.CreateMessageSerializer();
+
+                var root = serializer.Serialize(context.Tracks);
 
                 if (!string.IsNullOrWhiteSpace(root))
                 {

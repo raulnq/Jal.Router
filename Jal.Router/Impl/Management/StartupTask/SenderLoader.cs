@@ -10,8 +10,8 @@ namespace Jal.Router.Impl.StartupTask
     public class SenderLoader : AbstractStartupTask, IStartupTask
     {
 
-        public SenderLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, ILogger logger)
-            : base(factory, configuration, logger)
+        public SenderLoader(IComponentFactoryGateway factory, IRouterConfigurationSource[] sources, ILogger logger)
+            : base(factory, logger)
         {
 
         }
@@ -31,7 +31,7 @@ namespace Jal.Router.Impl.StartupTask
 
         private void Open()
         {
-            foreach (var sendermetadata in Configuration.Runtime.SendersMetadata)
+            foreach (var sendermetadata in Factory.Configuration.Runtime.SendersMetadata)
             {
                 var senderchannel = default(ISenderChannel);
 
@@ -39,17 +39,17 @@ namespace Jal.Router.Impl.StartupTask
 
                 if (sendermetadata.Channel.Type == ChannelType.PointToPoint)
                 {
-                    senderchannel = Factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
+                    senderchannel = Factory.CreatePointToPointChannel();
                 }
 
                 if (sendermetadata.Channel.Type == ChannelType.PublishSubscribe)
                 {
-                    senderchannel = Factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
+                    senderchannel = Factory.CreatePublishSubscribeChannel();
                 }
 
                 if (sendermetadata.Channel.Type == ChannelType.RequestReplyToPointToPoint)
                 {
-                    var requestresplychannel = Factory.Create<IRequestReplyChannelFromPointToPointChannel>(Configuration.RequestReplyChannelFromPointToPointChannelType);
+                    var requestresplychannel = Factory.CreateRequestReplyChannelFromPointToPointChannel();
 
                     readerchannel = requestresplychannel;
 
@@ -58,7 +58,7 @@ namespace Jal.Router.Impl.StartupTask
 
                 if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
                 {
-                    var requestresplychannel = Factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(Configuration.RequestReplyFromSubscriptionToPublishSubscribeChannelType);
+                    var requestresplychannel = Factory.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
 
                     readerchannel = requestresplychannel;
 
@@ -83,11 +83,11 @@ namespace Jal.Router.Impl.StartupTask
 
         private void Create()
         {
-            foreach (var item in Configuration.Runtime.EndPoints)
+            foreach (var item in Factory.Configuration.Runtime.EndPoints)
             {
                 foreach (var channel in item.Channels)
                 {
-                    var sender = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                    var sender = Factory.Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
 
                     if (sender != null)
                     {
@@ -99,7 +99,7 @@ namespace Jal.Router.Impl.StartupTask
 
                         newsender.Endpoints.Add(item);
 
-                        Configuration.Runtime.SendersMetadata.Add(newsender);
+                        Factory.Configuration.Runtime.SendersMetadata.Add(newsender);
                     }
                 }
             }

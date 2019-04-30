@@ -14,10 +14,10 @@ namespace Jal.Router.Interface
 
         Task<SagaEntity> GetSagaEntity(string id);
 
-        SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "");
+        Task<SagaEntity[]> GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "");
 
-        MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "");
+        Task<MessageEntity[]> GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "");
 
-        MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "");
+        Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "");
     }
 }

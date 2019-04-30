@@ -10,22 +10,22 @@ namespace Jal.Router.Impl.MonitoringTask
     public class SubscriptionToPublishSubscribeChannelMonitor : AbstractMonitoringTask, IMonitoringTask
     {
 
-        public SubscriptionToPublishSubscribeChannelMonitor(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            :base(factory, configuration, logger)
+        public SubscriptionToPublishSubscribeChannelMonitor(IComponentFactoryGateway factory, ILogger logger)
+            :base(factory, logger)
         {
         }
 
         public async Task Run(DateTime datetime)
         {
-            if (Configuration.LoggerTypes.ContainsKey(typeof(SubscriptionToPublishSubscribeChannelStatistics)))
+            if (Factory.Configuration.LoggerTypes.ContainsKey(typeof(SubscriptionToPublishSubscribeChannelStatistics)))
             {
-                var loggertypes = Configuration.LoggerTypes[typeof(SubscriptionToPublishSubscribeChannelStatistics)];
+                var loggertypes = Factory.Configuration.LoggerTypes[typeof(SubscriptionToPublishSubscribeChannelStatistics)];
 
-                var loggers = loggertypes.Select(x => Factory.Create<ILogger<SubscriptionToPublishSubscribeChannelStatistics>>(x)).ToArray();
+                var loggers = loggertypes.Select(x => Factory.CreateLogger<SubscriptionToPublishSubscribeChannelStatistics>(x)).ToArray();
 
-                var manager = Factory.Create<IChannelManager>(Configuration.ChannelManagerType);
+                var manager = Factory.CreateChannelManager();
 
-                foreach (var subscription in Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
+                foreach (var subscription in Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
                 {
                     var message = await manager.Get(subscription).ConfigureAwait(false);
 

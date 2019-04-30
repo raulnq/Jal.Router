@@ -10,9 +10,9 @@ namespace Jal.Router.Impl
             return Task.FromResult(string.Empty);
         }
 
-        public void Write(string id, string content)
+        public Task Write(string id, string content)
         {
-            
+            return Task.CompletedTask;
         }
     }
 }

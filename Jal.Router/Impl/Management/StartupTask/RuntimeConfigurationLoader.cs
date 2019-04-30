@@ -13,8 +13,8 @@ namespace Jal.Router.Impl.StartupTask
 
         private readonly IRouter _router;
 
-        public RuntimeConfigurationLoader(IComponentFactory factory, IConfiguration configuration, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
-            :base(factory, configuration, logger)
+        public RuntimeConfigurationLoader(IComponentFactoryGateway factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
+            :base(factory, logger)
         {
             _sources = sources;
             _router = router;
@@ -24,40 +24,36 @@ namespace Jal.Router.Impl.StartupTask
         {
             Logger.Log("Loading runtime configuration");
 
-            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+            var adapter = Factory.CreateMessageAdapter();
 
             foreach (var source in _sources)
             {
-                Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
+                Factory.Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
 
-                Configuration.Runtime.Groups.AddRange(source.GetGroups());
+                Factory.Configuration.Runtime.Groups.AddRange(source.GetGroups());
 
-                Configuration.Runtime.PointToPointChannels.AddRange(source.GetPointToPointChannels());
+                Factory.Configuration.Runtime.PointToPointChannels.AddRange(source.GetPointToPointChannels());
 
-                Configuration.Runtime.PublishSubscribeChannels.AddRange(source.GetPublishSubscribeChannels());
+                Factory.Configuration.Runtime.PublishSubscribeChannels.AddRange(source.GetPublishSubscribeChannels());
 
-                Configuration.Runtime.SubscriptionToPublishSubscribeChannels.AddRange(source.GetSubscriptionsToPublishSubscribeChannel());
+                Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels.AddRange(source.GetSubscriptionsToPublishSubscribeChannel());
 
-                Configuration.Runtime.Sagas.AddRange(source.GetSagas());
+                Factory.Configuration.Runtime.Sagas.AddRange(source.GetSagas());
 
                 foreach (var route in source.GetRoutes())
                 {
                     route.RuntimeHandler = async (message, channel) => {
 
-                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
+                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel).ConfigureAwait(false);
 
-                        context.Channel = channel;
-
-                        context.Route = route;
-
-                        await _router.Route<MessageHandler>(context);
+                        await _router.Route<MessageHandler>(context).ConfigureAwait(false);
                     };
 
-                    Configuration.Runtime.Routes.Add(route);
+                    Factory.Configuration.Runtime.Routes.Add(route);
                 }
             }
 
-            foreach (var saga in Configuration.Runtime.Sagas)
+            foreach (var saga in Factory.Configuration.Runtime.Sagas)
             {
                 if (saga.InitialRoutes != null)
                 {
@@ -65,18 +61,12 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            context.Channel = channel;
-
-                            context.Route = route;
-
-                            context.Saga = saga;
-
-                            await _router.Route<InitialMessageHandler>(context);
+                            await _router.Route<InitialMessageHandler>(context).ConfigureAwait(false); ;
                         };
 
-                        Configuration.Runtime.Routes.Add(route);
+                        Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }
 
@@ -84,19 +74,13 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     foreach (var route in saga.FinalRoutes)
                     {
-                        Configuration.Runtime.Routes.Add(route);
+                        Factory.Configuration.Runtime.Routes.Add(route);
 
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            context.Channel = channel;
-
-                            context.Route = route;
-
-                            context.Saga = saga;
-
-                            await _router.Route<FinalMessageHandler>(context);
+                            await _router.Route<FinalMessageHandler>(context).ConfigureAwait(false); ;
                         };
                     }
                 }
@@ -107,18 +91,12 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            context.Channel = channel;
-
-                            context.Route = route;
-
-                            context.Saga = saga;
-
-                            await _router.Route<MiddleMessageHandler>(context);
+                            await _router.Route<MiddleMessageHandler>(context).ConfigureAwait(false);
                         };
 
-                        Configuration.Runtime.Routes.Add(route);
+                        Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }
             }

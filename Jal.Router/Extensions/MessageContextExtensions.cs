@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Jal.Router.Model;
 
 namespace Jal.Router.Extensions
 {
     public static class MessageContextExtensions
     {
-        public static TResult Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
+        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
         {
             var options = context.CreateOptions(endpointname, identitycontext, headers);
 
@@ -15,7 +16,7 @@ namespace Jal.Router.Extensions
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static TResult Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
+        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
         {
             var options = context.CreateOptions(endpointname, identitycontext, sagaid, headers);
 
@@ -24,62 +25,62 @@ namespace Jal.Router.Extensions
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static void FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
+        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
         {
-            context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
+            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
         }
 
-        public static void FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext,  Dictionary<string, string> headers = null)
+        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext,  Dictionary<string, string> headers = null)
         {
-            context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, headers));
+            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, headers));
         }
 
-        public static void Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
         {
-            context.Send(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
+            return context.Send(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
         }
 
-        public static void Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid,  Dictionary<string,string> headers = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid,  Dictionary<string,string> headers = null)
         {
-            context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
+            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
         }
-        public static void Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
+        public static Task Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
         {
-            context.Send(data, content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
-        }
-
-        public static void Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
-        {
-            context.Send(content, context.CreateOptions(endpointname, identitycontext, headers));
+            return context.Send(data, content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
         }
 
-        public static void Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
         {
-            context.Send(data, content, context.CreateOptions(endpointname, identitycontext, headers));
+            return context.Send(content, context.CreateOptions(endpointname, identitycontext, headers));
         }
 
-        public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static Task Send<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
         {
-            context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
+            return context.Send(data, content, context.CreateOptions(endpointname, identitycontext, headers));
         }
 
-        public static void Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
         {
-            context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
+            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
         }
 
-        public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
         {
-            context.Publish(data, content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
-        }
-        public static void Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string key, Dictionary<string, string> headers = null)
-        {
-            context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, headers));
+            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
         }
 
-        public static void Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string key, Dictionary<string, string> headers = null)
+        public static Task Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, string key, Dictionary<string, string> headers = null)
         {
-            context.Publish(data, content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, headers));
+            return context.Publish(data, content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
+        }
+        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string key, Dictionary<string, string> headers = null)
+        {
+            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, headers));
+        }
+
+        public static Task Publish<TContent, TData>(this MessageContext context, TData data, TContent content, string endpointname, IdentityContext identitycontext, string key, Dictionary<string, string> headers = null)
+        {
+            return context.Publish(data, content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, headers));
         }
 
         public static Origin CreateOrigin(this MessageContext context, string key = null)

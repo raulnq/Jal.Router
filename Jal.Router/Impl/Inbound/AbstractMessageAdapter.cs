@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
@@ -10,9 +9,7 @@ namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractMessageAdapter : IMessageAdapter
     {
-        protected readonly IComponentFactory Factory;
-
-        protected readonly IConfiguration Configuration;
+        protected readonly IComponentFactoryGateway Factory;
 
         protected readonly IBus Bus;
 
@@ -36,53 +33,10 @@ namespace Jal.Router.Impl.Inbound
 
         public const string EnclosedType = "enclosedtype";
 
-        protected AbstractMessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus)
+        protected AbstractMessageAdapter(IComponentFactoryGateway factory, IBus bus)
         {
             Factory = factory;
-            Configuration = configuration;
             Bus = bus;
-        }
-
-        public object Deserialize(string content, Type type)
-        {
-            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
-            try
-            {
-                return serializer.Deserialize(content, type);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public TContent Deserialize<TContent>(string content)
-        {
-            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
-            try
-            {
-                return serializer.Deserialize<TContent>(content);
-            }
-            catch (Exception)
-            {
-                return default(TContent);
-            }
-        }
-
-        public string Serialize(object content)
-        {
-            var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
-            try
-            {
-                return serializer.Serialize(content);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
 
         private Task<MessageContext> ReadContentFromRoute(object message, MessageContext context, Route route)
@@ -101,9 +55,9 @@ namespace Jal.Router.Impl.Inbound
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
             {
-                var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
+                var storage = Factory.CreateMessageStorage();
 
-                context.Content = await storage.Read(context.ContentId);
+                context.Content = await storage.Read(context.ContentId).ConfigureAwait(false);
             }
             else
             {
@@ -120,7 +74,7 @@ namespace Jal.Router.Impl.Inbound
             return ReadContentFromEndpoint(message, context, enpdoint);
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
+        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route, Channel channel, Saga saga = null)
         {
             var context = ReadMetadata(message);
 
@@ -129,20 +83,26 @@ namespace Jal.Router.Impl.Inbound
                 context.IdentityContext = route.IdentityConfiguration.Builder(context);
             }
 
+            context.Route = route;
+
+            context.Channel = channel;
+
+            context.Saga = saga;
+
             return ReadContentFromRoute(message, context, route);
         }
 
-        public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
+        public async Task<object> WriteMetadataAndContent(MessageContext context, EndPoint enpdoint)
         {
             var content = context.Content;
 
-            if(useclaimcheck)
+            if(enpdoint.UseClaimCheck)
             {
-                var storage = Factory.Create<IMessageStorage>(Configuration.MessageStorageType);
+                var storage = Factory.CreateMessageStorage();
 
                 context.ContentId = Guid.NewGuid().ToString();
 
-                storage.Write(context.ContentId, context.Content);
+                await storage.Write(context.ContentId, context.Content).ConfigureAwait(false);
 
                 context.Content = string.Empty;
             }

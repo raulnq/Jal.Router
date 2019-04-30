@@ -99,7 +99,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMonitor>().ImplementedBy<Monitor>().LifestyleSingleton());
 
-            container.Register(Component.For<IEntityStorageFacade>().ImplementedBy<EntityStorageFacade>().LifestyleSingleton());
+            container.Register(Component.For<IEntityStorageGateway>().ImplementedBy<EntityStorageGateway>().LifestyleSingleton());
 
             container.Register(Component.For<IMonitoringTask>().ImplementedBy<PointToPointChannelMonitor>().LifestyleSingleton().Named(typeof(PointToPointChannelMonitor).FullName));
 
@@ -147,7 +147,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IEntityStorage)).ImplementedBy(typeof(NullStorage)).Named(typeof(NullStorage).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(MessageHandler)).Named(typeof(MessageHandler).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(Impl.Inbound.Middleware.MessageHandler)).Named(typeof(Impl.Inbound.Middleware.MessageHandler).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(MessageExceptionHandler)).Named(typeof(MessageExceptionHandler).FullName).LifestyleSingleton());
 
@@ -157,13 +157,11 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(FinalMessageHandler)).Named(typeof(FinalMessageHandler).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<DistributionHandler>().LifestyleSingleton().Named(typeof(DistributionHandler).FullName));
 
-            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<PointToPointHandler>().LifestyleSingleton().Named(typeof(PointToPointHandler).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.Outbound.Middleware.MessageHandler>().LifestyleSingleton().Named(typeof(Impl.Outbound.Middleware.MessageHandler).FullName));
 
-            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<PublishSubscribeHandler>().LifestyleSingleton().Named(typeof(PublishSubscribeHandler).FullName));
-
-            container.Register(Component.For<IMiddleware<MessageContext>>().ImplementedBy<RequestReplyHandler>().LifestyleSingleton().Named(typeof(RequestReplyHandler).FullName));
+            container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
 
             container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConnectionStringValueFinder)).Named(typeof(ConnectionStringValueFinder).FullName).LifestyleSingleton());
 

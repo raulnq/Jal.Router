@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
@@ -8,8 +7,8 @@ namespace Jal.Router.Impl.MonitoringTask
 {
     public class ListenerMonitor : AbstractMonitoringTask, IMonitoringTask
     {
-        public ListenerMonitor(IComponentFactory factory, IConfiguration configuration, ILogger logger)
-            : base(factory, configuration, logger)
+        public ListenerMonitor(IComponentFactoryGateway factory, ILogger logger)
+            : base(factory, logger)
         {
         }
 
@@ -17,7 +16,7 @@ namespace Jal.Router.Impl.MonitoringTask
         {
             Logger.Log($"Checking listeners");
 
-            foreach (var metadata in Configuration.Runtime.ListenersMetadata)
+            foreach (var metadata in Factory.Configuration.Runtime.ListenersMetadata)
             {
                 if (metadata.Listener!=null && !metadata.Listener.IsActive())
                 {

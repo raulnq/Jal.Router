@@ -1,34 +1,30 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Outbound.Middleware
 {
 
-    public class DistributionHandler : IMiddleware<MessageContext>
+    public class DistributionHandler : IMiddlewareAsync<MessageContext>
     {
         private readonly ILogger _logger;
 
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
-        private readonly IConfiguration _configuration;
-        public DistributionHandler(ILogger logger, IComponentFactory factory, IConfiguration configuration)
+        public DistributionHandler(ILogger logger, IComponentFactoryGateway factory)
         {
             _factory = factory;
 
-            _configuration = configuration;
-
             _logger = logger;
         }
- 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
-            var shuffler = _factory.Create<IChannelShuffler>(_configuration.ChannelShufflerType);
+            var shuffler = _factory.CreateChannelShuffler();
 
             var channels = shuffler.Shuffle(context.Data.EndPoint.Channels.ToArray());
 
@@ -46,7 +42,7 @@ namespace Jal.Router.Impl.Outbound.Middleware
                 {
                     count++;
 
-                    next(context);
+                    await next(context);
 
                     return;
                 }

@@ -7,7 +7,6 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model;
 using Jal.Router.Model.Inbound;
 using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
@@ -35,13 +34,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             
         }
 
-        public string Send(object message)
+        public async Task<string> Send(object message)
         {
             var sbmessage = message as Message;
 
             if (sbmessage != null)
             {
-                _client.SendAsync(sbmessage).GetAwaiter().GetResult();
+                await _client.SendAsync(sbmessage).ConfigureAwait(false);
 
                 return sbmessage.MessageId;
             }
@@ -72,7 +71,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var sessionoptions = CreateSessionOptions(_listenermetadata);
 
-            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+            var adapter = Factory.CreateMessageAdapter();
 
             if (_listenermetadata.Group != null)
             {
@@ -202,8 +201,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly AzureServiceBusParameter _parameter;
 
-        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, ILogger logger, IParameterProvider provider) 
-            : base(factory, configuration, logger)
+        public AzureServiceBusQueue(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider) 
+            : base(factory, logger)
         {
             _parameter = provider.Get<AzureServiceBusParameter>();
         }

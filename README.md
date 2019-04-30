@@ -15,11 +15,11 @@ Just another library to route in/out messages
 * Outbound messages should have information of the parent saga
 * Outgoing message error handling: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc)
 * Register error resource together with the main one
-* Async support
+* Async support (done)
 * Allows anonymous handlers
 * Incoming message forwarding
 * Incoming message error handling rework: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc)
-* Move the json serializer to its own package
+* Move the json serializer to its own package (done)
 * Allow customization at the moment to create resources (done)
 * Allow message consumption during scheduled periods of time
 * Second level retry logic

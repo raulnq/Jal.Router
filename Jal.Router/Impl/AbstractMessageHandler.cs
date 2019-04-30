@@ -10,52 +10,24 @@ namespace Jal.Router.Impl
     {
         protected readonly IConfiguration Configuration;
 
-        protected readonly IComponentFactory Factory;
+        protected readonly IComponentFactoryGateway Factory;
 
-        protected AbstractMessageHandler(IConfiguration configuration, IComponentFactory factory)
+        protected AbstractMessageHandler(IConfiguration configuration, IComponentFactoryGateway factory)
         {
             Configuration = configuration;
+
             Factory = factory;
         }
 
-        protected Task<SagaEntity> GetSagaEntity(MessageContext messagecontext)
-        {
-            var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-            return storage.GetSagaEntity(messagecontext.SagaContext.Id);
-        }
-
-        protected async Task<SagaEntity> CreateSagaEntity(MessageContext context)
-        {
-            var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-            var sagaentity = MessageContextToSagaEntity(context);
-
-            await storage.CreateSagaEntity(context, sagaentity).ConfigureAwait(false);
-
-            context.SagaContext.Id = sagaentity.Id;
-
-            return sagaentity;
-        }
-
-        protected Task UpdateSagaEntity(MessageContext messagecontext, SagaEntity sagaentity)
-        {
-            var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
-
-            sagaentity.Status = messagecontext.SagaContext.Status;
-
-            return storage.UpdateSagaEntity(messagecontext, sagaentity);
-        }
-
-        protected async Task<MessageEntity> CreateMessageEntity(MessageContext messagecontext, MessageEntityType type = MessageEntityType.Inbound, SagaEntity sagaentity = null)
+        protected async Task<MessageEntity> CreateMessageEntityAndSave(MessageContext messagecontext, SagaEntity sagaentity = null)
         {
             if (Configuration.Storage.Enabled)
             {
                 try
                 {
-                    var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
+                    var storage = Factory.CreateEntityStorage();
 
-                    var messageentity = MessageContextToMessageEntity(messagecontext, type, sagaentity);
+                    var messageentity = MessageContextToMessageEntity(messagecontext, sagaentity);
 
                     await storage.CreateMessageEntity(messagecontext, messageentity).ConfigureAwait(false);
 
@@ -73,21 +45,7 @@ namespace Jal.Router.Impl
             return null;
         }
 
-        private SagaEntity MessageContextToSagaEntity(MessageContext context)
-        {
-            return new SagaEntity
-            {
-                Created = context.DateTimeUtc,
-                Updated = context.DateTimeUtc,
-                Name = context.Saga.Name,
-                DataType = context.Saga.DataType.FullName,
-                Timeout = context.Saga.Timeout,
-                Status = context.SagaContext.Status,
-                Data = string.Empty
-            };
-        }
-
-        private MessageEntity MessageContextToMessageEntity(MessageContext context, MessageEntityType type, SagaEntity sagaentity)
+        protected virtual MessageEntity MessageContextToMessageEntity(MessageContext context, SagaEntity sagaentity)
         {
 
             var entity = new MessageEntity()
@@ -103,25 +61,12 @@ namespace Jal.Router.Impl
                 DateTimeUtc = context.DateTimeUtc,
                 Tracks = context.Tracks,
                 ContentId = context.ContentId,
-                Type = type,
             };
 
             if(sagaentity!=null)
             {
                 entity.Data = sagaentity.Data;
                 entity.SagaId = sagaentity.Id;
-            }
-
-            if(type== MessageEntityType.Inbound)
-            {
-                entity.ContentType = context.Route.ContentType.FullName;
-                entity.Name = context.Route.Name;
-            }
-
-            if (type == MessageEntityType.Outbound)
-            {
-                entity.ContentType = context.EndPoint.MessageType.FullName;
-                entity.Name = context.EndPoint.Name;
             }
 
             return entity;

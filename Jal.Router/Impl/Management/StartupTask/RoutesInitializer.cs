@@ -9,8 +9,8 @@ namespace Jal.Router.Impl.StartupTask
 {
     public class RoutesInitializer : AbstractStartupTask, IStartupTask
     {
-        public RoutesInitializer(IComponentFactory factory, ILogger logger, IConfiguration configuration)
-            :base(factory, configuration, logger)
+        public RoutesInitializer(IComponentFactoryGateway factory, ILogger logger)
+            :base(factory, logger)
         {
         }
 
@@ -20,9 +20,9 @@ namespace Jal.Router.Impl.StartupTask
 
             var errors = new StringBuilder();
 
-            foreach (var group in Configuration.Runtime.Groups)
+            foreach (var group in Factory.Configuration.Runtime.Groups)
             {
-                var finder = Factory.Create<IValueFinder>(group.Channel.ConnectionStringValueFinderType);
+                var finder = Factory.CreateValueFinder(group.Channel.ConnectionStringValueFinderType);
 
                 group.Channel.ToConnectionString = group.Channel.ToConnectionStringProvider?.Invoke(finder);
 
@@ -46,13 +46,13 @@ namespace Jal.Router.Impl.StartupTask
                 }
             }
 
-            foreach (var route in Configuration.Runtime.Routes)
+            foreach (var route in Factory.Configuration.Runtime.Routes)
             {
                 if (route.Channels.Any())
                 {
                     foreach (var channel in route.Channels)
                     {
-                        var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
+                        var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
                         channel.ToConnectionString = channel.ToConnectionStringProvider?.Invoke(finder);
 

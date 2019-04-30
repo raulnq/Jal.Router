@@ -1,14 +1,14 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Common.Logging;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Logger.Impl
 {
-    public class BusLogger : IMiddleware<MessageContext>
+    public class BusLogger : IMiddlewareAsync<MessageContext>
     {
         private readonly ILog _log;
 
@@ -17,7 +17,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -27,7 +27,7 @@ namespace Jal.Router.Logger.Impl
             {
                 _log.Info($"[Bus.cs, {context.Data.Channel.ToString()}, {context.Data.IdentityContext.Id}] Start Call. id: {context.Data.IdentityContext.Id} sagaid: {context.Data.SagaContext?.Id} endpoint: {context.Data.EndPoint.Name} path: {context.Data.Channel.GetPath()} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
 
-                next(context);
+                await next(context);
 
                 _log.Info($"[Bus.cs, {context.Data.Channel.ToString()}, {context.Data.IdentityContext.Id}] Message sent. id: {context.Data.IdentityContext.Id} sagaid: {context.Data.SagaContext?.Id} endpoint: {context.Data.EndPoint.Name} path: {context.Data.Channel.GetPath()} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key}  operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
             }

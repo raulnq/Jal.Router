@@ -23,7 +23,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
                 .UseChannelManager<AzureServiceBusManager>()
                 .UseMessageAdapter<MessageAdapter>()
-                .UseMessageSerializer<JsonMessageSerializer>()
                 .AddParameter(p);
         }
 

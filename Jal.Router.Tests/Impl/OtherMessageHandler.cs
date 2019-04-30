@@ -20,9 +20,8 @@ namespace Jal.Router.Tests.Impl
         {
             Console.WriteLine($"Other Sender {message.Name}");
 
-            _bus.Send(message, new Options() {EndPointName = "route1" });
+            return _bus.Send(message, new Options() {EndPointName = "route1" });
 
-            return Task.CompletedTask;
             //throw new ApplicationException();
         }
     }
@@ -41,9 +40,7 @@ namespace Jal.Router.Tests.Impl
             Console.WriteLine($"SagaInput1HandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInput1HandlerMessageHandler";
             //throw new Exception("error");
-            _bus.Publish(message, new Options() {EndPointName = "SagaInputTopicHandlerMessageHandler", SagaContext = context.SagaContext});
-
-            return Task.CompletedTask;
+            return _bus.Publish(message, new Options() {EndPointName = "SagaInputTopicHandlerMessageHandler", SagaContext = context.SagaContext});
         }
     }
 
@@ -60,9 +57,7 @@ namespace Jal.Router.Tests.Impl
         {
             Console.WriteLine($"SagaInputTopicHandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInputTopicHandlerMessageHandler";
-            _bus.Publish(message, new Options() {EndPointName = "SagaInputTopic2HandlerMessageHandler", SagaContext = context.SagaContext });
-
-            return Task.CompletedTask;
+            return _bus.Publish(message, new Options() {EndPointName = "SagaInputTopic2HandlerMessageHandler", SagaContext = context.SagaContext });
         }
     }
 

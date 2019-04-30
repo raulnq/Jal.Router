@@ -10,8 +10,8 @@ namespace Jal.Router.Impl.StartupTask
 
     public class EndpointsInitializer : AbstractStartupTask, IStartupTask
     {
-        public EndpointsInitializer(IComponentFactory factory, ILogger logger, IConfiguration configuration)
-            :base(factory, configuration, logger)
+        public EndpointsInitializer(IComponentFactoryGateway factory, ILogger logger)
+            :base(factory, logger)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Jal.Router.Impl.StartupTask
 
             var errors = new StringBuilder();
 
-            foreach (var endpoint in Configuration.Runtime.EndPoints)
+            foreach (var endpoint in Factory.Configuration.Runtime.EndPoints)
             {
                 if (endpoint.Channels.Any())
                 {
@@ -29,7 +29,7 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         if (channel.ConnectionStringValueFinderType != null)
                         {
-                            var finder = Factory.Create<IValueFinder>(channel.ConnectionStringValueFinderType);
+                            var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
                             if (channel.ToConnectionStringProvider!=null)
                             {
@@ -57,7 +57,7 @@ namespace Jal.Router.Impl.StartupTask
 
                         if (channel.ToReplyConnectionStringProvider != null)
                         {
-                            var finder = Factory.Create<IValueFinder>(channel.ReplyConnectionStringValueFinderType);
+                            var finder = Factory.CreateValueFinder(channel.ReplyConnectionStringValueFinderType);
 
                             if (channel.ToReplyConnectionStringProvider!=null)
                             {

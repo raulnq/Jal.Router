@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
+using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
@@ -28,14 +29,20 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public const string ExpressMessageEnabled = "expressmessageenabled";
 
-        public AzureServiceBusManager()
+        private readonly IComponentFactoryGateway _factory;
+
+        public AzureServiceBusManager(IComponentFactoryGateway factory)
         {
+            _factory = factory;
+
             LoggerCallbackHandler.UseDefaultLogging = false;
         }
 
         public async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -108,7 +115,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<bool> CreateIfNotExist(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -164,7 +173,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -198,7 +209,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -231,7 +244,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<PointToPointChannelStatistics> Get(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -264,7 +279,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<bool> CreateIfNotExist(PointToPointChannel channel)
         {
-            var configuration = JsonConvert.DeserializeObject<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 

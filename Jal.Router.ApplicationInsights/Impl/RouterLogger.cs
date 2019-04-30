@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface.Management;
@@ -10,7 +11,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 namespace Jal.Router.ApplicationInsights.Impl
 {
 
-    public class RouterLogger : AbstractApplicationInsightsLogger, IMiddleware<MessageContext>
+    public class RouterLogger : AbstractApplicationInsightsLogger, IMiddlewareAsync<MessageContext>
     {
 
         public RouterLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
@@ -19,7 +20,7 @@ namespace Jal.Router.ApplicationInsights.Impl
         }
 
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             var telemetry = new RequestTelemetry();
 
@@ -50,7 +51,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 PopulateContext(telemetry.Context, context.Data);
 
-                next(context);
+                await next(context);
 
                 telemetry.ResponseCode = "200";
 

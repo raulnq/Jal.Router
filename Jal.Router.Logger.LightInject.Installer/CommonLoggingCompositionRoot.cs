@@ -11,9 +11,9 @@ namespace Jal.Router.Logger.LightInject.Installer
     {
         public void Compose(IServiceRegistry serviceRegistry)
         {
-            serviceRegistry.Register<IMiddleware<MessageContext>, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IMiddlewareAsync<MessageContext>, BusLogger>(typeof(BusLogger).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IMiddleware<MessageContext>, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IMiddlewareAsync<MessageContext>, RouterLogger>(typeof(RouterLogger).FullName, new PerContainerLifetime());
 
             serviceRegistry.Register<ILogger<Beat>, BeatLogger>(typeof(BeatLogger).FullName, new PerContainerLifetime());
         }
