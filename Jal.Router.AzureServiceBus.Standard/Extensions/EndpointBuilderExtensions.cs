@@ -49,9 +49,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
         }
 
-        public static void AndWaitReplyFromSubscriptionToTopic<TReplayType>(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
+        public static void AndWaitReplyFromSubscriptionToTopic(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
         {
-            builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TReplayType>(path, subscription, connectionstring, timeout);
+            builder.AndWaitReplyFromSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring, timeout);
         }
 
         public static void AndWaitReplyFromSubscriptionToTopic<TValueFinder>(this IAndWaitReplyFromEndPointBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path, string subscription, int timeout = 60) where TValueFinder : IValueFinder

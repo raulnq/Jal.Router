@@ -57,11 +57,11 @@
     <Reference Include="Jal.Locator.LightInject, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jal.Locator.LightInject.1.1.1\lib\net45\Jal.Locator.LightInject.dll</HintPath>
     </Reference>
-    <Reference Include="Jal.Settings, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jal.Settings.1.1.1\lib\net45\Jal.Settings.dll</HintPath>
+    <Reference Include="Jal.Settings, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jal.Settings.1.1.3\lib\net45\Jal.Settings.dll</HintPath>
     </Reference>
-    <Reference Include="Jal.Settings.Installer, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jal.Settings.Installer.1.1.1\lib\net45\Jal.Settings.Installer.dll</HintPath>
+    <Reference Include="Jal.Settings.Installer, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jal.Settings.Installer.1.1.3\lib\net45\Jal.Settings.Installer.dll</HintPath>
     </Reference>
     <Reference Include="LightInject, Version=5.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LightInject.5.4.0\lib\net46\LightInject.dll</HintPath>

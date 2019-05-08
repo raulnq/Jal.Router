@@ -76,7 +76,7 @@ namespace Jal.Router.Extensions
             builder.AndWaitReplyFromPointToPointChannel<NullValueFinder>(path, provider, timeout);
 
         }
-        public static void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TReplayType>(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
+        public static void AndWaitReplyFromSubscriptionToPublishSubscribeChannel(this IAndWaitReplyFromEndPointBuilder builder, string path, string subscription, string connectionstring, int timeout = 60)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {

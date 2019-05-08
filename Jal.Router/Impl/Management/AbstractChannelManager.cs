@@ -21,6 +21,21 @@ namespace Jal.Router.Impl.Management
             return Task.FromResult(false);
         }
 
+        public Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannel channel)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> DeleteIfExist(PublishSubscribeChannel channel)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> DeleteIfExist(PointToPointChannel channel)
+        {
+            return Task.FromResult(false);
+        }
+
         public virtual Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel)
         {
             return Task.FromResult(default(PublishSubscribeChannelStatistics));

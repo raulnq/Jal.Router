@@ -11,6 +11,12 @@ namespace Jal.Router.Interface.Management
 
         Task<bool> CreateIfNotExist(PointToPointChannel channel);
 
+        Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannel channel);
+
+        Task<bool> DeleteIfExist(PublishSubscribeChannel channel);
+
+        Task<bool> DeleteIfExist(PointToPointChannel channel);
+
         Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel);
 
         Task<PointToPointChannelStatistics> Get(PointToPointChannel channel);

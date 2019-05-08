@@ -7,6 +7,7 @@
     <Description>Jal.Router integration with Newtonsoft.Json library</Description>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

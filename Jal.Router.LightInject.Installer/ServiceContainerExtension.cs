@@ -64,6 +64,12 @@ namespace Jal.Router.LightInject.Installer
 
         public static void RegisterRouter(this IServiceContainer container)
         {
+            container.Register<IShutdownTask, PointToPointChannelDestructor>(typeof(PointToPointChannelDestructor).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownTask, PublishSubscribeChannelDestructor>(typeof(PublishSubscribeChannelDestructor).FullName, new PerContainerLifetime());
+
+            container.Register<IShutdownTask, SubscriptionToPublishSubscribeChannelDestructor>(typeof(SubscriptionToPublishSubscribeChannelDestructor).FullName, new PerContainerLifetime());
+
             container.Register<IChannelShuffler, DefaultChannelShuffler>(typeof(DefaultChannelShuffler).FullName, new PerContainerLifetime());
 
             container.Register<IChannelShuffler, FisherYatesChannelShuffler>(typeof(FisherYatesChannelShuffler).FullName, new PerContainerLifetime());

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.7.4</Version>
+    <Version>1.7.5</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with Common Logging</Description>
     <Copyright />
@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
-    <PackageReference Include="Jal.ChainOfResponsability" Version="1.0.1" />
+    <PackageReference Include="Jal.ChainOfResponsability" Version="1.0.2" />
   </ItemGroup>
 
 

@@ -113,6 +113,40 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
+        public async Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannel channel)
+        {
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
+
+            if (serviceBusNamespace != null)
+            {
+                try
+                {
+                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
+
+                    try
+                    {
+                        await topic.Subscriptions.DeleteByNameAsync(channel.Subscription).ConfigureAwait(false);
+
+                        return true;
+                    }
+                    catch (CloudException)
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
         public async Task<bool> CreateIfNotExist(PublishSubscribeChannel channel)
         {
             var serializer = _factory.CreateMessageSerializer();
@@ -165,6 +199,31 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                         return true;
 
                     }
+                }
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteIfExist(PublishSubscribeChannel channel)
+        {
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
+
+            if (serviceBusNamespace != null)
+            {
+                try
+                {
+                    await serviceBusNamespace.Topics.DeleteByNameAsync(channel.Path).ConfigureAwait(false);
+
+                    return true;
+                }
+                catch (CloudException)
+                {
+                    return false;
                 }
             }
 
@@ -341,6 +400,31 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                         return true;
                     }
+                }
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteIfExist(PointToPointChannel channel)
+        {
+            var serializer = _factory.CreateMessageSerializer();
+
+            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+
+            var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
+
+            if (serviceBusNamespace != null)
+            {
+                try
+                {
+                    await serviceBusNamespace.Queues.DeleteByNameAsync(channel.Path).ConfigureAwait(false);
+
+                    return true;
+                }
+                catch (CloudException)
+                {
+                    return false;
                 }
             }
 
