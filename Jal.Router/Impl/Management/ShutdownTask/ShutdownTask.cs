@@ -5,7 +5,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model.Management;
 
-namespace Jal.Router.Impl.Management
+namespace Jal.Router.Impl.ShutdownTask
 {
     public class ShutdownTask : IShutdownTask
     {

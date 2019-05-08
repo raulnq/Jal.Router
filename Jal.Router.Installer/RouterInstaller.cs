@@ -12,6 +12,7 @@ using Jal.Router.Impl.MonitoringTask;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.Outbound.Middleware;
+using Jal.Router.Impl.ShutdownTask;
 using Jal.Router.Impl.StartupTask;
 using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;

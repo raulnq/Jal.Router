@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
-namespace Jal.Router.Impl.StartupTask
+namespace Jal.Router.Impl.ShutdownTask
 {
     public class PublishSubscribeChannelDestructor : IShutdownTask
     {

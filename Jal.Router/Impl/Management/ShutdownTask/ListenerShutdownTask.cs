@@ -2,7 +2,7 @@ using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl.ShutdownTask
 {
     public class ListenerShutdownTask : IShutdownTask
     {

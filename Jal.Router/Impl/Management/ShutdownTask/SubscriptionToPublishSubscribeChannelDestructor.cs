@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 
-namespace Jal.Router.Impl.StartupTask
+namespace Jal.Router.Impl.ShutdownTask
 {
     public class SubscriptionToPublishSubscribeChannelDestructor : IShutdownTask
     {
@@ -35,16 +35,16 @@ namespace Jal.Router.Impl.StartupTask
 
                     if (deleted)
                     {
-                        _logger.Log($"Deleted {channel.Path} subscription to publish subscribe channel");
+                        _logger.Log($"Deleted {channel.Subscription} subscription to publish subscribe channel");
                     }
                     else
                     {
-                        _logger.Log($"Subscription to publish subscribe channel {channel.Path} does not exist");
+                        _logger.Log($"Subscription to publish subscribe channel {channel.Subscription} does not exist");
                     }
                 }
                 catch (Exception ex)
                 {
-                    var error = $"Exception {channel.Path} subscription to publish subscribe channel: {ex}";
+                    var error = $"Exception {channel.Subscription} subscription to publish subscribe channel: {ex}";
 
                     errors.AppendLine(error);
 

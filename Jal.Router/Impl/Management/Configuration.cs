@@ -6,6 +6,7 @@ using Jal.Router.Impl.Management.ShutdownWatcher;
 using Jal.Router.Impl.Outbound;
 using Jal.Router.Impl.Outbound.ChannelShuffler;
 using Jal.Router.Impl.StartupTask;
+using Jal.Router.Impl.ShutdownTask;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
@@ -249,7 +250,7 @@ namespace Jal.Router.Impl.Management
             AddStartupTask<ListenerLoader>();
             AddShutdownTask<ListenerShutdownTask>();
             AddShutdownTask<SenderShutdownTask>();
-            AddShutdownTask<ShutdownTask>();
+            AddShutdownTask<Jal.Router.Impl.ShutdownTask.ShutdownTask>();
             AddShutdownWatcher<CtrlCShutdownWatcher>();
             Storage = new Storage();
             Identity = new Identity();
