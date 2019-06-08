@@ -25,3 +25,4 @@ Just another library to route in/out messages
 * Second level retry logic
 * Send a message directly to the pipeline.
 * Saga and handler 
+* Bug: the message inside of a saga is having the default status on the storage
