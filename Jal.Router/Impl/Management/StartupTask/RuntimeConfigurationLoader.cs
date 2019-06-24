@@ -46,7 +46,7 @@ namespace Jal.Router.Impl.StartupTask
 
                         var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel).ConfigureAwait(false);
 
-                        await _router.Route<MessageHandler>(context).ConfigureAwait(false);
+                        await _router.Route<ConsumerMiddleware>(context).ConfigureAwait(false);
                     };
 
                     Factory.Configuration.Runtime.Routes.Add(route);
@@ -63,7 +63,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            await _router.Route<InitialMessageHandler>(context).ConfigureAwait(false); ;
+                            await _router.Route<InitialConsumerMiddleware>(context).ConfigureAwait(false); ;
                         };
 
                         Factory.Configuration.Runtime.Routes.Add(route);
@@ -80,7 +80,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            await _router.Route<FinalMessageHandler>(context).ConfigureAwait(false); ;
+                            await _router.Route<FinalConsumerMiddleware>(context).ConfigureAwait(false); ;
                         };
                     }
                 }
@@ -93,7 +93,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
 
-                            await _router.Route<MiddleMessageHandler>(context).ConfigureAwait(false);
+                            await _router.Route<MiddleConsumerMiddleware>(context).ConfigureAwait(false);
                         };
 
                         Factory.Configuration.Runtime.Routes.Add(route);

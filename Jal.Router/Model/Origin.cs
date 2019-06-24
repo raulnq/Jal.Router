@@ -7,5 +7,17 @@ namespace Jal.Router.Model
         public string From { get; set; }//From
 
         public string Key { get; set; }//Origin
+
+        public Origin()
+        {
+
+        }
+
+        public Origin(string from, string key)
+        {
+            From = from;
+            Key = key;
+        }
+
     }
 }

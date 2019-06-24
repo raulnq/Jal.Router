@@ -29,11 +29,6 @@ namespace Jal.Router.ApplicationInsights.Impl
             }
         }
 
-        public void PopulateMetrics(IDictionary<string, double> metrics, MessageContext context)
-        {
-            metrics.Add("retrycount", context.RetryCount);
-        }
-
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
             properties.Add("identity_id", context.IdentityContext?.Id);
@@ -51,7 +46,6 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             properties.Add("version", context.Version);
             properties.Add("contentid", context.ContentId);
-            properties.Add("lastretry", context.LastRetry.ToString());
 
             properties.Add("route_name", context.Route?.Name);
             properties.Add("endpoint_name", context.EndPoint?.Name);

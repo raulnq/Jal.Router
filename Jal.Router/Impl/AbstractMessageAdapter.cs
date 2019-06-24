@@ -5,7 +5,7 @@ using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public abstract class AbstractMessageAdapter : IMessageAdapter
     {
@@ -28,8 +28,6 @@ namespace Jal.Router.Impl.Inbound
         public const string Version = "version";
 
         public const string Origin = "origin";
-
-        public const string RetryCount = "retrycount";
 
         public const string EnclosedType = "enclosedtype";
 
@@ -78,16 +76,7 @@ namespace Jal.Router.Impl.Inbound
         {
             var context = ReadMetadata(message);
 
-            if (route.IdentityConfiguration.Builder != null)
-            {
-                context.IdentityContext = route.IdentityConfiguration.Builder(context);
-            }
-
-            context.Route = route;
-
-            context.Channel = channel;
-
-            context.Saga = saga;
+            context.UpdateFromRoute(route, channel, saga);
 
             return ReadContentFromRoute(message, context, route);
         }

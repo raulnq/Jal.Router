@@ -7,5 +7,7 @@ namespace Jal.Router.Fluent.Interface
         IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action);
 
         IOnEndPointOptionBuilder AsClaimCheck();
+
+
     }
 }

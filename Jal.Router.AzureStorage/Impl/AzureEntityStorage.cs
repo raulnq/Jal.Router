@@ -24,7 +24,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Action<MessageRecord, byte[]>[] MessageContentWriter;
 
-        private readonly Action<MessageRecord, byte[]>[] MessageDataWriter;
+        private readonly Action<MessageRecord, byte[]>[] MessageSagaWriter;
 
         private readonly Action<SagaRecord, byte[]>[] SagaDataWriter;
 
@@ -32,7 +32,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageContentReader;
 
-        private readonly Func<MessageRecord, byte[]>[] MessageDataReader;
+        private readonly Func<MessageRecord, byte[]>[] MessageSagaReader;
 
         public AzureEntityStorage(IComponentFactoryGateway factory, IConfiguration configuration, IParameterProvider provider)
         {
@@ -44,11 +44,11 @@ namespace Jal.Router.AzureStorage.Impl
 
             MessageContentWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.Content0 = y, (x, y) => x.Content1 = y , (x, y) => x.Content2 = y , (x, y) => x.Content3 = y , (x, y) => x.Content4 = y };
 
-            MessageDataWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.Data0 = y, (x, y) => x.Data1 = y, (x, y) => x.Data2 = y, (x, y) => x.Data3 = y, (x, y) => x.Data4 = y };
+            MessageSagaWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.Saga0 = y, (x, y) => x.Saga1 = y, (x, y) => x.Saga2 = y, (x, y) => x.Saga3 = y, (x, y) => x.Saga4 = y };
 
             MessageContentReader = new Func<MessageRecord, byte[]>[] { (x) => x.Content0, (x) => x.Content1, (x) => x.Content2, (x) => x.Content3, (x) => x.Content4 };
 
-            MessageDataReader = new Func<MessageRecord, byte[]>[] { (x) => x.Data0, (x) => x.Data1, (x) => x.Data2, (x) => x.Data3, (x) => x.Data4 };
+            MessageSagaReader = new Func<MessageRecord, byte[]>[] { (x) => x.Saga0, (x) => x.Saga1, (x) => x.Saga2, (x) => x.Saga3, (x) => x.Saga4 };
 
             SagaDataWriter = new Action<SagaRecord, byte[]>[] { (x, y) => x.Data0 = y, (x, y) => x.Data1 = y, (x, y) => x.Data2 = y, (x, y) => x.Data3 = y, (x, y) => x.Data4 = y };
 
@@ -125,24 +125,87 @@ namespace Jal.Router.AzureStorage.Impl
                     Id = record.Id
                 };
 
-                ReadSaga(record, entity);
+                ReadSaga(record, entity, GetTypeFrom(entity.DataType));
 
                 return entity;
             }
             ).ToArray();
         }
 
-        private void ReadSaga(SagaRecord record, SagaEntity entity)
+        private Type GetTypeFrom(string valueType)
         {
+            var type = Type.GetType(valueType);
+            if (type != null)
+                return type;
+
+            try
+            {
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                //To speed things up, we check first in the already loaded assemblies.
+                foreach (var assembly in assemblies)
+                {
+                    type = assembly.GetType(valueType);
+                    if (type != null)
+                        break;
+                }
+                if (type != null)
+                    return type;
+
+                //var loadedAssemblies = assemblies.ToList();
+
+                //foreach (var loadedAssembly in assemblies)
+                //{
+                //    foreach (AssemblyName referencedAssemblyName in loadedAssembly.GetReferencedAssemblies())
+                //    {
+                //        var found = loadedAssemblies.All(x => x.GetName() != referencedAssemblyName);
+
+                //        if (!found)
+                //        {
+                //            try
+                //            {
+                //                var referencedAssembly = Assembly.Load(referencedAssemblyName);
+                //                type = referencedAssembly.GetType(valueType);
+                //                if (type != null)
+                //                    break;
+                //                loadedAssemblies.Add(referencedAssembly);
+                //            }
+                //            catch
+                //            {
+                //                //We will ignore this, because the Type might still be in one of the other Assemblies.
+                //            }
+                //        }
+                //    }
+                //}
+            }
+            catch (Exception exception)
+            {
+                //throw my custom exception    
+            }
+
+            if (type == null)
+            {
+                //throw my custom exception.
+            }
+
+            return type;
+        }
+
+        private void ReadSaga(SagaRecord record, SagaEntity entity, Type sagatype)
+        {
+            var serializer = _factory.CreateMessageSerializer();
+
             if (record.NumberOfDataArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfDataArrays, i => SagaDataReader[i].Invoke(record));
 
-                entity.Data = _parameter.TableStorageStringEncoding.GetString(bytearray);
+                var data = _parameter.TableStorageStringEncoding.GetString(bytearray);
+
+                entity.Data = serializer.Deserialize(data, sagatype);
             }
             else
             {
-                entity.Data = record.Data;
+                entity.Data = serializer.Deserialize(record.Data, sagatype);
             }
         }
 
@@ -186,16 +249,12 @@ namespace Jal.Router.AzureStorage.Impl
                     ContentType = record.ContentType,
                     Identity = string.IsNullOrWhiteSpace(record.Identity) ? null : serializer.Deserialize<IdentityContext>(record.Identity),
                     Version = record.Version,
-                    RetryCount = record.RetryCount,
-                    LastRetry = record.LastRetry,
                     Origin = string.IsNullOrWhiteSpace(record.Origin) ? null : serializer.Deserialize<Origin>(record.Origin),
-                    Saga = string.IsNullOrWhiteSpace(record.Saga) ? null : serializer.Deserialize<SagaContext>(record.Saga),
                     Headers = string.IsNullOrWhiteSpace(record.Headers) ? null : serializer.Deserialize<Dictionary<string, string>>(record.Headers),
                     DateTimeUtc = record.DateTimeUtc,
                     Name = record.Name,
                     ContentId = record.ContentId,
                     Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type) : MessageEntityType.Inbound,
-                    SagaId = record.SagaId,
                     Id = record.Id
                 };
 
@@ -207,15 +266,19 @@ namespace Jal.Router.AzureStorage.Impl
 
         private void ReadMessage(MessageRecord record, MessageEntity entity)
         {
-            if (record.NumberOfDataArrays > 0)
-            {
-                var bytearray = Combine(record.NumberOfDataArrays, i => MessageDataReader[i].Invoke(record));
+            var serializer = _factory.CreateMessageSerializer();
 
-                entity.Data = _parameter.TableStorageStringEncoding.GetString(bytearray);
+            if (record.NumberOfSagaArrays > 0)
+            {
+                var bytearray = Combine(record.NumberOfSagaArrays, i => MessageSagaReader[i].Invoke(record));
+
+                var saga = _parameter.TableStorageStringEncoding.GetString(bytearray);
+
+                entity.Saga = serializer.Deserialize<SagaContext>(saga);
             }
             else
             {
-                entity.Data = record.Data;
+                entity.Saga = serializer.Deserialize<SagaContext>(record.Saga);
             }
 
             if (record.NumberOfContentArrays > 0)
@@ -281,16 +344,12 @@ namespace Jal.Router.AzureStorage.Impl
                     ContentType = record.ContentType,
                     Identity = !string.IsNullOrWhiteSpace(record.Identity) ? serializer.Deserialize<IdentityContext>(record.Identity) : null,
                     Version = record.Version,
-                    RetryCount = record.RetryCount,
-                    LastRetry = record.LastRetry,
                     Origin = !string.IsNullOrWhiteSpace(record.Origin) ? serializer.Deserialize<Origin>(record.Origin) : null,
-                    Saga = !string.IsNullOrWhiteSpace(record.Saga) ? serializer.Deserialize<SagaContext>(record.Saga) : null,
                     Headers = !string.IsNullOrWhiteSpace(record.Headers) ? serializer.Deserialize<Dictionary<string, string>>(record.Headers) : null,
                     Tracks = !string.IsNullOrWhiteSpace(record.Tracks) ? serializer.Deserialize<List<Track>>(record.Tracks) : null,
                     DateTimeUtc = record.DateTimeUtc,
                     Name = record.Name,
                     ContentId = record.ContentId,
-                    SagaId = record.SagaId,
                     Id = record.Id,
                     Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type): MessageEntityType.Inbound
                 };
@@ -316,23 +375,27 @@ namespace Jal.Router.AzureStorage.Impl
                 record.NumberOfContentArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Content), bytescount, (i, buffer) => MessageContentWriter[i].Invoke(record, buffer));
             }
 
-            if(messageentity.Data!=null)
+            if(messageentity.Saga!=null)
             {
-                var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Data);
-                record.SizeOfData = databytescount;
-                if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
+                var serializer = _factory.CreateMessageSerializer();
+
+                var saga = serializer.Serialize(messageentity.Saga);
+
+                var sagabytescount = _parameter.TableStorageStringEncoding.GetByteCount(saga);
+                record.SizeOfSaga = sagabytescount;
+                if (sagabytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
                 {
-                    record.Data = messageentity.Data;
+                    record.Saga = saga;
                 }
                 else
                 {
-                    record.SizeOfDataArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
-                    record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Data), databytescount, (i, buffer) => MessageDataWriter[i].Invoke(record, buffer));
+                    record.SizeOfSagaArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
+                    record.NumberOfSagaArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(saga), sagabytescount, (i, buffer) => MessageSagaWriter[i].Invoke(record, buffer));
                 }
             }
         }
 
-        public override async Task<SagaEntity> GetSagaEntity(string entityId)
+        public override async Task<SagaEntity> GetSagaEntity(string entityId, Type sagatype)
         {
             try
             {
@@ -372,7 +435,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                         entity.Id = record.Id;
 
-                        ReadSaga(record, entity);
+                        ReadSaga(record, entity, sagatype);
 
                         return entity;
                     }
@@ -445,16 +508,20 @@ namespace Jal.Router.AzureStorage.Impl
 
         private void WriteSaga(SagaEntity sagaentity, SagaRecord record)
         {
-            var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(sagaentity.Data);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var data = serializer.Serialize(sagaentity.Data);
+
+            var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(data);
             record.SizeOfData = databytescount;
             if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
-                record.Data = sagaentity.Data;
+                record.Data = data;
             }
             else
             {
                 record.SizeOfDataArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
-                record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(sagaentity.Data), databytescount, (i, buffer) => SagaDataWriter[i].Invoke(record, buffer));
+                record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(data), databytescount, (i, buffer) => SagaDataWriter[i].Invoke(record, buffer));
             }
         }
 
@@ -468,9 +535,9 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var rowkey = $"{Guid.NewGuid()}";
 
-                if(!string.IsNullOrWhiteSpace(messageentity.SagaId))
+                if(!string.IsNullOrWhiteSpace(messageentity.Saga?.Id))
                 {
-                    partition = GetRowKey(messageentity.SagaId);
+                    partition = GetRowKey(messageentity.Saga.Id);
 
                     rowkey = $"{messageentity.Name}_{Guid.NewGuid()}";
                 }
@@ -486,8 +553,6 @@ namespace Jal.Router.AzureStorage.Impl
                     ContentType = messageentity.ContentType,
                     Identity = serializer.Serialize(messageentity.Identity),
                     Version = messageentity.Version,
-                    RetryCount = messageentity.RetryCount,
-                    LastRetry = messageentity.LastRetry,
                     Origin = serializer.Serialize(messageentity.Origin),
                     Headers = serializer.Serialize(messageentity.Headers),
                     DateTimeUtc = messageentity.DateTimeUtc,
@@ -495,9 +560,7 @@ namespace Jal.Router.AzureStorage.Impl
                     Tracks = serializer.Serialize(messageentity.Tracks),
                     ContentId = messageentity.ContentId,
                     Type = messageentity.Type.ToString(),
-                    Saga = serializer.Serialize(messageentity.Saga),
                     Id = messageentity.Id,
-                    SagaId=messageentity.SagaId
                 };
 
                 WriteMessage(messageentity, record);

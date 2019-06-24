@@ -7,60 +7,57 @@ using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Model
 {
+
     public class MessageContext
     {
         private readonly IBus _bus;
-
-        private readonly IMessageSerializer _serializer;
-
-        private readonly IEntityStorage _storage;
-        public Channel Channel { get; set; }
+        public Channel Channel { get; private set; }
         public object Response { get; set; }
-        public IDictionary<string, string> Headers { get; set; }
-        public string Version { get; set; }
-        public int RetryCount { get; set; }
-        public bool LastRetry { get; set; }
-        public Route Route { get; set; }
-        public EndPoint EndPoint { get; set; }
-        public Origin Origin { get; set; }
-        public DateTime DateTimeUtc { get; set; }
-        public SagaContext SagaContext { get; set; }
-        public Saga Saga { get; set; }
-        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+        public IDictionary<string, string> Headers { get; }
+        public string Version { get; }
+        public Route Route { get; private set; }
+        public EndPoint EndPoint { get; }
+        public Origin Origin { get; }
+        public DateTime DateTimeUtc { get; }
+        public SagaContext SagaContext { get; }
+        public SagaEntity SagaEntity { get; set; }
+        public Saga Saga { get; private set; }
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; }
         public Type ContentType { get; set; }
         public string Content { get; set; }
         public string ContentId { get; set; }
-        public List<Track> Tracks { get; set; }
-        public IdentityContext IdentityContext { get; set; }
-        public MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage)
+        public List<Track> Tracks { get; }
+        public IdentityContext IdentityContext { get; }
+        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Track> tracks, Origin origin, string version)
         {
             _bus = bus;
-            _serializer = serializer;
-            _storage = storage;
             Headers = new Dictionary<string, string>();
-            Version = "1";
-            LastRetry = true;
-            Origin = new Origin();
+            Version = version;
+            Origin = origin;
             SagaContext = new SagaContext();
-            Tracks = new List<Track>();
-            IdentityContext = new IdentityContext();
+            Tracks = tracks;
+            IdentityContext = identitycontext;
+            DateTimeUtc = datetimeutc;
         }
 
-        public MessageContext(EndPoint endpoint, Options options)
+        public string GetFullName()
+        {
+            return Saga == null ? Route.Name : Saga.Name + "/" + Route.Name;
+        }
+
+        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin)
         {
             Headers = new Dictionary<string, string>();
-            Version = "1";
-            LastRetry = true;
-            Origin = new Origin();
+            Origin = origin;
             EndPoint = endpoint;
-            IdentityContext = options.Identity;
+            IdentityContext = options.IdentityContext;
             Headers = options.Headers;
             Version = options.Version;
             ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
-            RetryCount = options.RetryCount;
             SagaContext = options.SagaContext;
-
+            Route = options.Route;
             Tracks = options.Tracks;
+            DateTimeUtc = datetimeutc;
 
         }
 
@@ -77,6 +74,20 @@ namespace Jal.Router.Model
             };
 
             Tracks.Add(tracking);
+        }
+
+        public void UpdateFromRoute(Route route, Channel channel, Saga saga)
+        {
+            Route = route;
+
+            Channel = channel;
+
+            Saga = saga;
+        }
+
+        public void UpdateFromEndpoint(Channel channel)
+        {
+            Channel = channel;
         }
 
         public Track[] GetTracksOfTheCurrentSaga()
@@ -137,25 +148,6 @@ namespace Jal.Router.Model
             return Saga != null;
         }
 
-        public async Task Update(object data)
-        {
-            if (_storage != null && _serializer != null)
-            {
-                var sagaentity = await _storage.GetSagaEntity(SagaContext.Id).ConfigureAwait(false);
-
-                if (sagaentity != null)
-                {
-                    sagaentity.Data = _serializer.Serialize(data);
-
-                    sagaentity.Updated = DateTimeUtc;
-
-                    sagaentity.Status = SagaContext.Status;
-
-                    await _storage.UpdateSagaEntity(this, sagaentity).ConfigureAwait(false);
-                }
-            }
-        }
-
         public Dictionary<string, string> CopyHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
@@ -171,16 +163,14 @@ namespace Jal.Router.Model
             return _bus.FireAndForget(content, Origin, options);
         }
 
+        public Task FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
+        {
+            return _bus.FireAndForget(content, endpoint, origin, options);
+        }
+
         public Task Send<TContent>(TContent content, Options options)
         {
             return _bus.Send(content, options);
-        }
-
-        public async Task Send<TContent, TData>(TData data, TContent content, Options options)
-        {
-            await Update(data).ConfigureAwait(false);
-
-            await _bus.Send(content, options).ConfigureAwait(false);
         }
 
         public Task Send<TContent>(TContent content, Origin origin, Options options)
@@ -193,23 +183,9 @@ namespace Jal.Router.Model
             return _bus.Send(content, endpoint, origin, options);
         }
 
-        public async Task Send<TContent, TData>(TData data, TContent content, Origin origin, Options options)
-        {
-            await Update(data).ConfigureAwait(false);
-
-            await _bus.Send(content, origin, options).ConfigureAwait(false);
-        }
-
         public Task Publish<TContent>(TContent content, Options options)
         {
             return _bus.Publish(content, options);
-        }
-
-        public async Task Publish<TContent, TData>(TData data, TContent content, Options options)
-        {
-            await Update(data).ConfigureAwait(false);
-
-            await _bus.Publish(content, options).ConfigureAwait(false);
         }
 
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
@@ -222,13 +198,6 @@ namespace Jal.Router.Model
             return _bus.Publish(content, endpoint, origin, options);
         }
 
-        public async Task Publish<TContent, TData>(TData data, TContent content, Origin origin, Options options)
-        {
-            await Update(data).ConfigureAwait(false);
-
-            await _bus.Publish(content, origin, options).ConfigureAwait(false);
-        }
-
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options)
         {
             return _bus.Reply<TContent, TResult>(content, options);
@@ -239,18 +208,9 @@ namespace Jal.Router.Model
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }
 
-        public async Task<TResult> Reply<TContent, TResult, TData>(TData data, TContent content, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            await Update(data).ConfigureAwait(false);
-
-            return await _bus.Reply<TContent, TResult>(content, options).ConfigureAwait(false);
-        }
-
-        public async Task<TResult> Reply<TContent, TResult, TData>(TData data, TContent content, Origin origin, Options options)
-        {
-            await Update(data).ConfigureAwait(false);
-
-            return await _bus.Reply<TContent, TResult>(content, origin, options).ConfigureAwait(false);
+            return _bus.Reply<TContent, TResult>(content, endpoint, origin, options);
         }
     }
 }

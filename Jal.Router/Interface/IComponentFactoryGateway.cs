@@ -8,6 +8,12 @@ namespace Jal.Router.Interface
 {
     public interface IComponentFactoryGateway
     {
+        IRouteErrorMessageHandler CreateRouteErrorMessageHandler(Type type);
+
+        IRouteEntryMessageHandler CreateRouteEntryMessageHandler(Type type);
+
+        IRouteExitMessageHandler CreateRouteExitMessageHandler(Type type);
+
         IConfiguration Configuration { get; }
         IBusInterceptor CreateBusInterceptor();
 

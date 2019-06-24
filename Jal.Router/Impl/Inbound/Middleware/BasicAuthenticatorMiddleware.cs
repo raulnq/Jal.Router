@@ -8,13 +8,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Inbound.Middleware
 {
-    public class BasicAuthenticationHandler : IMiddlewareAsync<MessageContext>
+    public class BasicAuthenticatorMiddleware : IMiddlewareAsync<MessageContext>
     {
         private readonly string _key;
 
         private readonly string _secret;
 
-        public BasicAuthenticationHandler(string key, string secret)
+        public BasicAuthenticatorMiddleware(string key, string secret)
         {
             _key = key;
             _secret = secret;

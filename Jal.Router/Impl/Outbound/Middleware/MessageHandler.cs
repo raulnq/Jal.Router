@@ -20,9 +20,16 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
-            await CreateMessageEntityAndSave(context.Data).ConfigureAwait(false);
-
-            context.Data.Response = await _sender.Send(context.Data.Channel, context.Data).ConfigureAwait(false);
+            
+            try
+            {
+                await _sender.Send(context.Data).ConfigureAwait(false);
+            }
+            finally
+            {
+                await CreateMessageEntityAndSave(context.Data).ConfigureAwait(false);
+            }
+            
         }
     }
 }

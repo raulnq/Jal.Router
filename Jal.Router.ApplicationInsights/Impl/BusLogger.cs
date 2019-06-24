@@ -43,9 +43,6 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             PopulateProperties(telemetry.Properties, context.Data);
 
-            PopulateMetrics(telemetry.Metrics, context.Data);
-
-
             try
             {
                 await next(context);
@@ -65,8 +62,6 @@ namespace Jal.Router.ApplicationInsights.Impl
                 PopulateContext(telemetryexception.Context, context.Data);
 
                 PopulateProperties(telemetryexception.Properties, context.Data);
-
-                PopulateMetrics(telemetryexception.Metrics, context.Data);
 
                 Client.TrackException(telemetryexception);
 

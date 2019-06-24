@@ -24,6 +24,10 @@ using Jal.Router.Impl.ValueFinder;
 using System.Threading.Tasks;
 using Jal.Router.Newtonsoft.Extensions;
 using Jal.Router.Newtonsoft.LightInject.Installer;
+using Jal.Router.Impl.Inbound.Middleware;
+using System.Collections.Generic;
+using Jal.Router.Impl.Inbound.RouteErrorMessageHandler;
+using Jal.Router.Impl.Inbound.RouteEntryMessageHandler;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -132,6 +136,10 @@ namespace Jal.Router.Sample.NetCore
 
         private readonly string _sessiontopic = "sessiontopic";
 
+        private readonly string _forwardqueue = "forwardqueue";
+
+        private readonly string _forwardqueueendpoint = "forwardqueueendpoint";
+
         private readonly string _sendersessionqueue = "sendersessionqueue";
 
         public RouterConfigurationSmokeTest()
@@ -231,6 +239,8 @@ namespace Jal.Router.Sample.NetCore
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_forwardqueue), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config);
 
@@ -395,6 +405,15 @@ namespace Jal.Router.Sample.NetCore
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             }).UseMiddleware(x => x.Add<Middleware>());
 
+            Func<MessageContext, Handler, Task> init = (c, r) => {
+                Console.WriteLine("HIiii");
+                return Task.CompletedTask;
+            };
+
+            RegisterEndPoint(_forwardqueueendpoint)
+            .ForMessage<Message>()
+            .To(x => x.AddPointToPointChannel(config.ConnectionString, _forwardqueue));
+
             RegisterHandler<IMessageHandler<Message>>(_queuelistenbyonehandlerwithexception + "_handler")
             .ToListen(x =>
             {
@@ -403,7 +422,16 @@ namespace Jal.Router.Sample.NetCore
             .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
-            }).OnErrorSendFailedMessageTo(_errorqueueendpoint);
+            }).OnError(e=>e.Use<ForwardRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", _errorqueueendpoint } }) )
+            .OnEntry(e=> {
+                e.Use<RouteEntryMessageHandler>(new Dictionary<string, object>() { { "init", init } });
+                e.Use<ForwardRouteEntryMessageHandler>(new Dictionary<string, object>() { { "endpoint", _forwardqueueendpoint } });
+            });
+
+            Func<MessageContext, Exception, ErrorHandler, Task > func = (c, e, r) => {
+                Console.WriteLine("HIiii");
+                return Task.CompletedTask;
+            }; 
 
             RegisterHandler<IMessageHandler<Message>>(_queuelistenbyonehandlerwithexceptionandretry + "_handler")
             .ToListen(x =>
@@ -414,9 +442,11 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
-            .OnEntry(x=>x.EnableEntityStorage(true))
-            .OnErrorSendFailedMessageTo(_errorqueueendpoint)
+            //.OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
+            .OnError(x=>x.Use<RetryRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", "retryendpoint" } , { "policy", new LinearRetryPolicy(5, 3) }, { "fallback", func } }).For<ApplicationException>())
+            //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
+            //.OnEntry(x=>x.EnableEntityStorage(true))
+            //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
             ; 
 
             RegisterEndPoint(_errorqueueendpoint)
@@ -495,9 +525,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_end", OperationId = context.IdentityContext.OperationId };
+            var identity = new IdentityContext(context.IdentityContext.Id + "_end", context.IdentityContext.OperationId);
 
-            return context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
+            return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
         }
     }
 
@@ -513,9 +543,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
+            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
 
-            return context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
         }
     }
 
@@ -531,9 +561,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
+            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
 
-            return context.Send(data, new Message() { Name = message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+            return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
         }
     }
 
@@ -686,10 +716,10 @@ namespace Jal.Router.Sample.NetCore
         {
             for (int i = 0; i < 5; i++)
             {
-                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"1-{i}", GroupId = i.ToString() },"X");
-                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"2-{i}", GroupId = i.ToString() }, "X");
-                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
-                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext($"1-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext($"2-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext($"3-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext($"4-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
             }
         }
     }

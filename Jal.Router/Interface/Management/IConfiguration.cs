@@ -11,7 +11,6 @@ namespace Jal.Router.Interface.Management
     public interface IConfiguration
     {
         Runtime Runtime { get; }
-        Identity Identity { get; }
         Storage Storage { get; }
         string ApplicationName { get; }
         string ChannelProviderName { get; }

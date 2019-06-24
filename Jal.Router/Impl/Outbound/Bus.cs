@@ -20,25 +20,30 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IPipelineBuilder _pipeline;
 
-        public Bus(IEndPointProvider provider, IComponentFactoryGateway factory, IConfiguration configuration, IPipelineBuilder pipeline)
+        private readonly IEntityStorage _storage;
+
+        public Bus(IEntityStorage storage, IEndPointProvider provider, IComponentFactoryGateway factory, IConfiguration configuration, IPipelineBuilder pipeline)
         {
             _provider = provider;
             _factory = factory;
             _configuration = configuration;
             _pipeline = pipeline;
+            _storage = storage;
         }
 
-        private async Task<TResult> Reply<TResult>(MessageContext message, Options options)
+        private async Task<TResult> Reply<TResult>(MessageContext message)
         {
             var interceptor = _factory.CreateBusInterceptor();
 
-            interceptor.OnEntry(message, options);
+            interceptor.OnEntry(message);
 
             try
             {
+                await Update(message);
+
                 if (message.EndPoint.Channels.Any())
                 {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<DistributionHandler>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
 
                     foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
@@ -52,7 +57,7 @@ namespace Jal.Router.Impl.Outbound
 
                     await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
 
-                    interceptor.OnSuccess(message, options);
+                    interceptor.OnSuccess(message);
 
                     return (TResult) message.Response;
                 }
@@ -63,36 +68,36 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
-                interceptor.OnError(message, options, ex);
+                interceptor.OnError(message, ex);
 
                 throw;
             }
             finally
             {
-                interceptor.OnExit(message, options);
+                interceptor.OnExit(message);
             }
         }
+
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             return Reply<TContent, TResult>(content, endpoint, endpoint.Origin, options);
         }
+
         public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options)
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
             {
-                Origin = origin,
                 ContentType = content.GetType(),
-                DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                Tracks = options.Tracks
             };
 
-            return Reply<TResult>(message, options);
+            return Reply<TResult>(message);
         }
+
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
@@ -109,46 +114,18 @@ namespace Jal.Router.Impl.Outbound
 
             return Reply<TContent, TResult>(content, endpoint, origin, options);
         }
-        private async Task Send(MessageContext message, Options options)
+
+        private async Task Update(MessageContext context)
         {
-            var interceptor = _factory.CreateBusInterceptor();
-
-            interceptor.OnEntry(message, options);
-
-            try
+            if(context.SagaContext.Data!= null && context.SagaEntity!=null && !string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
-                if (message.EndPoint.Channels.Any())
-                {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<DistributionHandler>();
+                context.SagaEntity.Data = context.SagaContext.Data;
 
-                    foreach (var type in _configuration.OutboundMiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
+                context.SagaEntity.Updated = context.DateTimeUtc;
 
-                    foreach (var type in message.EndPoint.MiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
+                context.SagaEntity.Status = context.SagaContext.Status;
 
-                    await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
-                }
-
-                interceptor.OnSuccess(message, options);
-            }
-            catch (Exception ex)
-            {
-                interceptor.OnError(message, options, ex);
-
-                throw;
-            }
-            finally
-            {
-                interceptor.OnExit(message, options);
+                await _storage.UpdateSagaEntity(context, context.SagaEntity).ConfigureAwait(false);
             }
         }
 
@@ -156,16 +133,13 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options)
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
             {
-                Origin = origin,
                 ContentType = content.GetType(),
-                DateTimeUtc = DateTime.UtcNow,
-                Content = serializer.Serialize(content),
-                Tracks = options.Tracks
+                Content = serializer.Serialize(content)
             };
 
-            return Send(message, options);
+            return Send(message);
         }
 
         public Task Send<TContent>(TContent content, Options options)
@@ -176,6 +150,7 @@ namespace Jal.Router.Impl.Outbound
 
             return Send(content, endpoint, origin, options);
         }
+
         public Task Send<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
@@ -192,6 +167,7 @@ namespace Jal.Router.Impl.Outbound
 
             return Send(content, endpoint, origin, options);
         } 
+
         public Task Publish<TContent>(TContent content, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
@@ -200,6 +176,7 @@ namespace Jal.Router.Impl.Outbound
 
             return Publish(content, endpoint, origin, options);
         }
+
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
@@ -216,33 +193,33 @@ namespace Jal.Router.Impl.Outbound
 
             return Publish(content, endpoint, origin, options);
         }
+
         public Task Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options)
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
             {
-                Origin = origin,
                 ContentType = content.GetType(),
-                DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                Tracks = options.Tracks
             };
 
-            return Publish(message, options);
+            return Publish(message);
         }
 
-        private async Task Publish(MessageContext message, Options options)
+        private async Task Publish(MessageContext message)
         {
             var interceptor = _factory.CreateBusInterceptor();
 
-            interceptor.OnEntry(message, options);
+            interceptor.OnEntry(message);
 
             try
             {
+                await Update(message);
+
                 if (message.EndPoint.Channels.Any())
                 {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<DistributionHandler>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
 
                     foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
@@ -261,18 +238,63 @@ namespace Jal.Router.Impl.Outbound
                     throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
                 }
 
-                interceptor.OnSuccess(message, options);
+                interceptor.OnSuccess(message);
 
             }
             catch (Exception ex)
             {
-                interceptor.OnError(message, options, ex);
+                interceptor.OnError(message, ex);
 
                 throw;
             }
             finally
             {
-                interceptor.OnExit(message, options);
+                interceptor.OnExit(message);
+            }
+        }
+
+        private async Task Send(MessageContext message)
+        {
+            var interceptor = _factory.CreateBusInterceptor();
+
+            interceptor.OnEntry(message);
+
+            try
+            {
+                await Update(message);
+
+                if (message.EndPoint.Channels.Any())
+                {
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
+
+                    foreach (var type in _configuration.OutboundMiddlewareTypes)
+                    {
+                        chain.UseAsync(type);
+                    }
+
+                    foreach (var type in message.EndPoint.MiddlewareTypes)
+                    {
+                        chain.UseAsync(type);
+                    }
+
+                    await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
+                }
+                else
+                {
+                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
+                }
+
+                interceptor.OnSuccess(message);
+            }
+            catch (Exception ex)
+            {
+                interceptor.OnError(message, ex);
+
+                throw;
+            }
+            finally
+            {
+                interceptor.OnExit(message);
             }
         }
 
@@ -280,18 +302,15 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options)
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
             {
-                Origin = origin,
                 ContentType = content.GetType(),
-                DateTimeUtc = DateTime.UtcNow,
                 Content = serializer.Serialize(content),
-                Tracks = options.Tracks
             };
 
             message.Origin.Key = string.Empty;
 
-            return Send(message, options);
+            return Send(message);
         }
 
         public Task FireAndForget<TContent>(TContent content, Options options)

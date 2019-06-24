@@ -12,7 +12,7 @@ namespace Jal.Router.Impl.Inbound.RetryPolicy
             _intervals = intervals;
         }
 
-        public bool CanRetry(int currentretrycount, TimeSpan nextretryinterval)
+        public bool CanRetry(int currentretrycount)
         {
             return currentretrycount < _intervals.Length;
         }

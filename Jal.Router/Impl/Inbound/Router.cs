@@ -31,8 +31,6 @@ namespace Jal.Router.Impl.Inbound
 
             interceptor.OnEntry(context);
 
-            var name = context.Saga == null ? context.Route.Name : context.Saga.Name + "/" + context.Route.Name;
-
             var when = true;
 
             if (context.Route.When != null)
@@ -45,7 +43,7 @@ namespace Jal.Router.Impl.Inbound
 
                 try
                 {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<MessageExceptionHandler>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<RouteMiddleware>();
 
                     foreach (var type in _factory.Configuration.InboundMiddlewareTypes)
                     {
@@ -71,13 +69,13 @@ namespace Jal.Router.Impl.Inbound
                 {
                     interceptor.OnExit(context);
 
-                    _logger.Log($"Message {context.IdentityContext.Id} handled by route {name}");
+                    _logger.Log($"Message {context.IdentityContext.Id} handled by route {context.GetFullName()}");
                 }
 
             }
             else
             {
-                _logger.Log($"Message {context.IdentityContext.Id} skipped by route {name}");
+                _logger.Log($"Message {context.IdentityContext.Id} skipped by route {context.GetFullName()}");
             }
         }
     }

@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Jal.Router.Model;
 
-namespace Jal.Router.Interface.Inbound
+namespace Jal.Router.Interface
 {
     public interface IMessageAdapter
     {

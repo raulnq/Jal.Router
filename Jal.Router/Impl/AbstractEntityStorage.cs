@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
             return Task.CompletedTask;
         }
 
-        public virtual Task<SagaEntity> GetSagaEntity(string entityid)
+        public virtual Task<SagaEntity> GetSagaEntity(string entityid, Type sagatype)
         {
             return Task.FromResult(default(SagaEntity));
         }

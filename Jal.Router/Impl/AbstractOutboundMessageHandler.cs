@@ -11,9 +11,9 @@ namespace Jal.Router.Impl
 
         }
 
-        protected override MessageEntity MessageContextToMessageEntity(MessageContext context, SagaEntity sagaentity)
+        protected override MessageEntity MessageContextToMessageEntity(MessageContext context)
         {
-            var entity =  base.MessageContextToMessageEntity(context, sagaentity);
+            var entity =  base.MessageContextToMessageEntity(context);
 
             entity.Type = MessageEntityType.Outbound;
 

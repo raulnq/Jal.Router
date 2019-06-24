@@ -9,13 +9,13 @@ using Jal.Router.Model;
 namespace Jal.Router.Impl.Outbound.Middleware
 {
 
-    public class DistributionHandler : IMiddlewareAsync<MessageContext>
+    public class BusMessageHandler : IMiddlewareAsync<MessageContext>
     {
         private readonly ILogger _logger;
 
         private readonly IComponentFactoryGateway _factory;
 
-        public DistributionHandler(ILogger logger, IComponentFactoryGateway factory)
+        public BusMessageHandler(ILogger logger, IComponentFactoryGateway factory)
         {
             _factory = factory;
 
@@ -36,7 +36,7 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
             foreach (var channel in channels)
             {
-                context.Data.Channel = channel;
+                context.Data.UpdateFromEndpoint(channel);
 
                 try
                 {

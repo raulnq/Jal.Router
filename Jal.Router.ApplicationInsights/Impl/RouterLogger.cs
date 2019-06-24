@@ -47,8 +47,6 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 PopulateProperties(telemetry.Properties, context.Data);
 
-                PopulateMetrics(telemetry.Metrics, context.Data);
-
                 PopulateContext(telemetry.Context, context.Data);
 
                 await next(context);
@@ -66,8 +64,6 @@ namespace Jal.Router.ApplicationInsights.Impl
                 var telemetryexception = new ExceptionTelemetry(exception);
 
                 PopulateProperties(telemetryexception.Properties, context.Data);
-
-                PopulateMetrics(telemetryexception.Metrics, context.Data);
 
                 PopulateContext(telemetryexception.Context, context.Data);
 

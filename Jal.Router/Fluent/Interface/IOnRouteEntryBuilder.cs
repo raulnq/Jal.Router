@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
     public interface IOnRouteEntryBuilder
     {
-        IOnRouteEntryBuilder BuildIdentityWith(Func<MessageContext, IdentityContext> builder);
-
-        IOnRouteEntryBuilder EnableEntityStorage(bool ignoreexceptions=true);
-        IOnRouteEntryBuilder DisableEntityStorage();
+        void Use<TMessageHandler>(IDictionary<string, object> parameters) where TMessageHandler : IRouteEntryMessageHandler;
     }
 }

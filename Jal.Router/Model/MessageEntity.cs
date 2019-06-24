@@ -6,14 +6,10 @@ namespace Jal.Router.Model
     public class MessageEntity
     {
         public string Id { get; set; }
-        public string SagaId { get; set; }
-        public string Data { get; set; }
         public DateTime DateTimeUtc { get; set; }
         public string Content { get; set; }
         public string ContentId { get; set; }
         public string Version { get; set; }
-        public int RetryCount { get; set; }
-        public bool LastRetry { get; set; }
         public Origin Origin { get; set; }
         public SagaContext Saga { get; set; }
         public IDictionary<string, string> Headers { get; set; }
@@ -28,7 +24,6 @@ namespace Jal.Router.Model
             Origin = new Origin();
             Saga = new SagaContext();
             Tracks = new List<Track>();
-            Identity = new IdentityContext();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Jal.Router.Interface
 
         Task UpdateSagaEntity(MessageContext context, SagaEntity sagaentity);
 
-        Task<SagaEntity> GetSagaEntity(string id);
+        Task<SagaEntity> GetSagaEntity(string id, Type sagatype);
 
         Task<SagaEntity[]> GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "");
 

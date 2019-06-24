@@ -5,6 +5,6 @@ namespace Jal.Router.Interface.Outbound
 {
     public interface ISender
     {
-        Task<object> Send(Channel channel, MessageContext context);
+        Task Send(MessageContext context);
     }
 }

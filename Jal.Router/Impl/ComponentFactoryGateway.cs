@@ -107,6 +107,21 @@ namespace Jal.Router.Impl
             return _factory.Create<IMonitoringTask>(type);
         }
 
+        public IRouteErrorMessageHandler CreateRouteErrorMessageHandler(Type type)
+        {
+            return _factory.Create<IRouteErrorMessageHandler>(type);
+        }
+
+        public IRouteEntryMessageHandler CreateRouteEntryMessageHandler(Type type)
+        {
+            return _factory.Create<IRouteEntryMessageHandler>(type);
+        }
+
+        public IRouteExitMessageHandler CreateRouteExitMessageHandler(Type type)
+        {
+            return _factory.Create<IRouteExitMessageHandler>(type);
+        }
+
         public ILogger<T> CreateLogger<T>(Type type)
         {
             return _factory.Create<ILogger<T>>(type);

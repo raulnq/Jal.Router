@@ -10,6 +10,9 @@ namespace Jal.Router.Model
             Name = name;
             Channels = new List<Channel>();
             MiddlewareTypes = new List<Type>();
+            ErrorHandlers = new List<ErrorHandler>();
+            EntryHandlers = new List<Handler>();
+            ExitHandlers = new List<Handler>();
         }
         public Origin Origin { get; set; }
 
@@ -22,5 +25,11 @@ namespace Jal.Router.Model
         public IList<Channel> Channels { get; }
         public IList<Type> MiddlewareTypes { get; }
         public bool UseClaimCheck { get; set; }
+
+        public IList<ErrorHandler> ErrorHandlers { get; }
+
+        public IList<Handler> EntryHandlers { get; }
+
+        public IList<Handler> ExitHandlers { get; }
     }
 }

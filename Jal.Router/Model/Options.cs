@@ -5,29 +5,30 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public Options()
+        public Options(string endpointname, Dictionary<string, string> headers, 
+            SagaContext sagacontext, List<Track> tracks, IdentityContext identitycontext, Route route, string version)
         {
-            Headers=new Dictionary<string, string>();
-            Version = "1";
-            RetryCount = 0;
-            SagaContext = new SagaContext();
-            Tracks = new List<Track>();
-            Identity = new IdentityContext();          
+            EndPointName = endpointname;
+            Headers= headers;
+            SagaContext = sagacontext;
+            Tracks = tracks;
+            IdentityContext = identitycontext;
+            Route = route;
         }
-        public IdentityContext Identity { get; set; }
+        public IdentityContext IdentityContext { get; }
 
-        public SagaContext SagaContext { get; set; }
+        public SagaContext SagaContext { get; }
 
-        public string EndPointName { get; set; }
+        public Route Route { get; }
 
-        public string Version { get; set; }
+        public string EndPointName { get; }
+
+        public string Version { get; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
 
-        public IDictionary<string,string> Headers { get; set; }
+        public IDictionary<string,string> Headers { get; }
 
-        public int RetryCount { get; set; }
-
-        public List<Track> Tracks { get; set; }
+        public List<Track> Tracks { get; }
     }
 }
