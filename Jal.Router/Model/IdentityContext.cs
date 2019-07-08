@@ -42,5 +42,10 @@
                 ReplyToRequestId = ReplyToRequestId
             };
         }
+
+        public IdentityContextEntity ToEntity()
+        {
+            return new IdentityContextEntity(Id, OperationId, ParentId, RequestId, GroupId, ReplyToRequestId);
+        }
     }
 }

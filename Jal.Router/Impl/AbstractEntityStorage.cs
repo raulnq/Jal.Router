@@ -8,32 +8,32 @@ namespace Jal.Router.Impl.Inbound
 {
     public abstract class AbstractEntityStorage : IEntityStorage
     {
-        public virtual Task<MessageEntity> CreateMessageEntity(MessageContext context, MessageEntity messageentity)
-        {
-            return Task.FromResult(default(MessageEntity));
-        }
-
-        public virtual Task<SagaEntity> CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
-        {
-            return Task.FromResult(default(SagaEntity));
-        }
-
-        public virtual Task UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual Task CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
             return Task.CompletedTask;
         }
 
-        public virtual Task<SagaEntity> GetSagaEntity(string entityid, Type sagatype)
+        public virtual Task CreateSagaData(MessageContext context, SagaData sagadata)
         {
-            return Task.FromResult(default(SagaEntity));
+            return Task.CompletedTask;
         }
 
-        public virtual Task<SagaEntity[]> GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public virtual Task UpdateSagaData(MessageContext context, SagaData sagadata)
         {
-            return Task.FromResult(default(SagaEntity[]));
+            return Task.CompletedTask;
         }
 
-        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
+        public virtual Task<SagaData> GetSagaData(string id, Type sagatype)
+        {
+            return Task.FromResult(default(SagaData));
+        }
+
+        public virtual Task<SagaData[]> GetSagaData(DateTime start, DateTime end, Type sagatype, string saganame, string sagastoragename = "")
+        {
+            return Task.FromResult(default(SagaData[]));
+        }
+
+        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, string messagestoragename = "")
         {
             return Task.FromResult(default(MessageEntity[]));
         }

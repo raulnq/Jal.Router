@@ -40,12 +40,12 @@ namespace Jal.Router.ApplicationInsights.Impl
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);
 
-            properties.Add("saga_id", context.SagaContext?.Id);
-            properties.Add("saga_status", context.SagaContext?.Status);
+            properties.Add("saga_id", context.SagaContext?.SagaData?.Id);
+            properties.Add("saga_status", context.SagaContext?.SagaData?.Status);
             properties.Add("saga_name", context.Saga?.Name);
 
             properties.Add("version", context.Version);
-            properties.Add("contentid", context.ContentId);
+            properties.Add("contentid", context.ContentContext.Id);
 
             properties.Add("route_name", context.Route?.Name);
             properties.Add("endpoint_name", context.EndPoint?.Name);

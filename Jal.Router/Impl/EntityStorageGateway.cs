@@ -14,18 +14,18 @@ namespace Jal.Router.Impl
             _factory = factory;
         }
 
-        public Task<SagaEntity[]> GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public Task<SagaData[]> GetSagas(DateTime start, DateTime end, Type sagatype, string saganame, string sagastoragename = "")
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetSagaEntities(start, end, saganame, sagastoragename);
+            return storage.GetSagaData(start, end, sagatype, saganame, sagastoragename);
         }
 
-        public Task<MessageEntity[]> GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "")
+        public Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, string messagestoragename = "")
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetMessageEntitiesBySagaEntity(sagaentity, messagestoragename);
+            return storage.GetMessageEntitiesBySagaData(sagadata, messagestoragename);
         }
 
         public Task<MessageEntity[]> GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "")

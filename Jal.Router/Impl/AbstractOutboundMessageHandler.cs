@@ -10,18 +10,5 @@ namespace Jal.Router.Impl
         {
 
         }
-
-        protected override MessageEntity MessageContextToMessageEntity(MessageContext context)
-        {
-            var entity =  base.MessageContextToMessageEntity(context);
-
-            entity.Type = MessageEntityType.Outbound;
-
-            entity.ContentType = context.EndPoint.MessageType.FullName;
-
-            entity.Name = context.EndPoint.Name;
-
-            return entity;
-        }
     }
 }

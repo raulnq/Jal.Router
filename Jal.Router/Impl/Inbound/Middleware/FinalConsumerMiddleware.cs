@@ -24,33 +24,30 @@ namespace Jal.Router.Impl.Inbound
         {
             var messagecontext = context.Data;
 
-            messagecontext.SagaContext.Status = DefaultStatus;
+            var storage = Factory.CreateEntityStorage();
 
-            messagecontext.SagaEntity = await GetSagaEntity(context.Data).ConfigureAwait(false);
+            messagecontext.SagaContext.UpdateSagaData(await storage.GetSagaData(messagecontext.SagaContext.Id, messagecontext.Saga.DataType).ConfigureAwait(false));
 
-            if (messagecontext.SagaEntity != null)
+            if (messagecontext.SagaContext.SagaData != null)
             {
-                context.Data.AddTrack(messagecontext.IdentityContext, messagecontext.Origin, messagecontext.Route, messagecontext.Saga, messagecontext.SagaContext);
+                messagecontext.SagaContext.SagaData.UpdateStatus(DefaultStatus);
 
-                messagecontext.SagaContext.Data = messagecontext.SagaEntity.Data;
+                context.Data.TrackingContext.Add();
 
-                if (context.Data.SagaContext.Data != null)
+                if (context.Data.SagaContext.SagaData.Data != null)
                 {
                     try
                     {
                         await _router.Consume(context.Data).ConfigureAwait(false);
 
-                        messagecontext.SagaEntity.Ended = messagecontext.DateTimeUtc;
-
-                        messagecontext.SagaEntity.Duration = (messagecontext.SagaEntity.Ended.Value - messagecontext.SagaEntity.Created).TotalMilliseconds;
-
+                        messagecontext.SagaContext.SagaData.UpdateEndedDateTime(messagecontext.DateTimeUtc);
                     }
                     finally
                     {
                         await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
                     }
 
-                    await UpdateSagaEntity(messagecontext).ConfigureAwait(false);
+                    await storage.UpdateSagaData(messagecontext, messagecontext.SagaContext.SagaData).ConfigureAwait(false);
                 }
                 else
                 {

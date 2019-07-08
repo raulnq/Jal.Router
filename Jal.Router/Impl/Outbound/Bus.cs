@@ -59,7 +59,7 @@ namespace Jal.Router.Impl.Outbound
 
                     interceptor.OnSuccess(message);
 
-                    return (TResult) message.Response;
+                    return (TResult) message.ContentContext.Response;
                 }
                 else
                 {
@@ -89,11 +89,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
-            {
-                ContentType = content.GetType(),
-                Content = serializer.Serialize(content),
-            };
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
             return Reply<TResult>(message);
         }
@@ -117,15 +113,11 @@ namespace Jal.Router.Impl.Outbound
 
         private async Task Update(MessageContext context)
         {
-            if(context.SagaContext.Data!= null && context.SagaEntity!=null && !string.IsNullOrWhiteSpace(context.SagaContext.Id))
+            if(context.SagaContext.SagaData!=null && context.SagaContext.SagaData.Data != null && !string.IsNullOrWhiteSpace(context.SagaContext.SagaData.Id))
             {
-                context.SagaEntity.Data = context.SagaContext.Data;
+                context.SagaContext.SagaData.UpdateUpdatedDateTime(context.DateTimeUtc);
 
-                context.SagaEntity.Updated = context.DateTimeUtc;
-
-                context.SagaEntity.Status = context.SagaContext.Status;
-
-                await _storage.UpdateSagaEntity(context, context.SagaEntity).ConfigureAwait(false);
+                await _storage.UpdateSagaData(context, context.SagaContext.SagaData).ConfigureAwait(false);
             }
         }
 
@@ -133,11 +125,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
-            {
-                ContentType = content.GetType(),
-                Content = serializer.Serialize(content)
-            };
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
             return Send(message);
         }
@@ -198,11 +186,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
-            {
-                ContentType = content.GetType(),
-                Content = serializer.Serialize(content),
-            };
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
             return Publish(message);
         }
@@ -302,11 +286,7 @@ namespace Jal.Router.Impl.Outbound
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin)
-            {
-                ContentType = content.GetType(),
-                Content = serializer.Serialize(content),
-            };
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
             message.Origin.Key = string.Empty;
 

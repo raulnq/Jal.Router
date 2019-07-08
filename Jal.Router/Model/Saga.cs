@@ -28,5 +28,10 @@ namespace Jal.Router.Model
         public List<Route> InitialRoutes { get; set; }
 
         public List<Route> FinalRoutes { get; set; }
+
+        public SagaEntity ToEntity()
+        {
+            return new SagaEntity(Name, DataType);
+        }
     }
 }

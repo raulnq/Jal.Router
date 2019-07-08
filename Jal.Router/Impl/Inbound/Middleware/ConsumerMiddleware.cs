@@ -20,15 +20,17 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
-            context.Data.AddTrack(context.Data.IdentityContext, context.Data.Origin, context.Data.Route);
+            var messagecontext = context.Data;
+
+            messagecontext.TrackingContext.Add();
 
             try
             {
-                await _router.Consume(context.Data).ConfigureAwait(false);
+                await _router.Consume(messagecontext).ConfigureAwait(false);
             }
             finally
             {
-                await CreateMessageEntityAndSave(context.Data).ConfigureAwait(false);
+                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
             }
         }
     }

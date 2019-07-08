@@ -19,7 +19,7 @@ namespace Jal.Router.Impl
             Factory = factory;
         }
 
-        protected async Task<MessageEntity> CreateMessageEntityAndSave(MessageContext messagecontext)
+        protected async Task CreateMessageEntityAndSave(MessageContext messagecontext)
         {
             if (Configuration.Storage.Enabled)
             {
@@ -27,11 +27,7 @@ namespace Jal.Router.Impl
                 {
                     var storage = Factory.CreateEntityStorage();
 
-                    var messageentity = MessageContextToMessageEntity(messagecontext);
-
-                    await storage.CreateMessageEntity(messagecontext, messageentity).ConfigureAwait(false);
-
-                    return messageentity;
+                    await storage.CreateMessageEntity(messagecontext, messagecontext.ToEntity()).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -41,27 +37,6 @@ namespace Jal.Router.Impl
                     }
                 }
             }
-
-            return null;
-        }
-
-        protected virtual MessageEntity MessageContextToMessageEntity(MessageContext context)
-        {
-
-            var entity = new MessageEntity()
-            {
-                Content = context.Content,
-                Identity = context.IdentityContext,
-                Version = context.Version,
-                Origin = context.Origin,
-                Saga = context.SagaContext,
-                Headers = context.Headers,
-                DateTimeUtc = context.DateTimeUtc,
-                Tracks = context.Tracks,
-                ContentId = context.ContentId,
-            };
-
-            return entity;
         }
     }
 }

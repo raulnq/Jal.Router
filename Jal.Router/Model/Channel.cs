@@ -91,5 +91,10 @@ namespace Jal.Router.Model
         public Func<IValueFinder, string> ToReplyConnectionStringProvider { get; set; }
 
         public string ToReplyConnectionString { get; set; }
+
+        public ChannelEntity ToEntity()
+        {
+            return new ChannelEntity(ToPath, ToSubscription, Type);
+        }
     }
 }

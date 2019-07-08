@@ -44,22 +44,22 @@ namespace Jal.Router.Impl
 
         private Task<MessageContext> ReadContentFromEndpoint(object message, MessageContext context, EndPoint endpoint)
         {
-            return ReadContent(message, context, endpoint.ReplyType, endpoint.UseClaimCheck);
+            return ReadContent(message, context, endpoint.ReplyContentType, endpoint.UseClaimCheck);
         }
 
         private async Task<MessageContext> ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck)
         {
-            context.ContentType = contenttype;
+            context.ContentContext.UpdateType(contenttype);
 
-            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentId))
+            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentContext.Id))
             {
                 var storage = Factory.CreateMessageStorage();
 
-                context.Content = await storage.Read(context.ContentId).ConfigureAwait(false);
+                context.ContentContext.UpdateData(await storage.Read(context.ContentContext.Id).ConfigureAwait(false));
             }
             else
             {
-                context.Content = ReadContent(message);
+                context.ContentContext.UpdateData(ReadContent(message));
             }
 
             return context;
@@ -72,33 +72,33 @@ namespace Jal.Router.Impl
             return ReadContentFromEndpoint(message, context, enpdoint);
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route, Channel channel, Saga saga = null)
+        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
         {
             var context = ReadMetadata(message);
 
-            context.UpdateFromRoute(route, channel, saga);
+            context.UpdateRoute(route);
 
             return ReadContentFromRoute(message, context, route);
         }
 
         public async Task<object> WriteMetadataAndContent(MessageContext context, EndPoint enpdoint)
         {
-            var content = context.Content;
+            var content = context.ContentContext.Data;
 
             if(enpdoint.UseClaimCheck)
             {
                 var storage = Factory.CreateMessageStorage();
 
-                context.ContentId = Guid.NewGuid().ToString();
+                context.ContentContext.CreateId();
 
-                await storage.Write(context.ContentId, context.Content).ConfigureAwait(false);
+                await storage.Write(context.ContentContext.Id, context.ContentContext.Data).ConfigureAwait(false);
 
-                context.Content = string.Empty;
+                context.ContentContext.CleanData();
             }
 
             var message = WriteMetadataAndContent(context);
 
-            context.Content = content;
+            context.ContentContext.UpdateData(content);
 
             return message;
         }

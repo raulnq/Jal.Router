@@ -6,8 +6,8 @@ namespace Jal.Router.Interface
 {
     public interface IEntityStorageGateway
     {
-        Task<SagaEntity[]> GetSagas(DateTime start, DateTime end, string saganame, string sagastoragename = "");
-        Task<MessageEntity[]> GetMessagesBySaga(SagaEntity sagaentity, string messagestoragename = "");
+        Task<SagaData[]> GetSagas(DateTime start, DateTime end, Type sagatype, string saganame, string sagastoragename = "");
+        Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, string messagestoragename = "");
         Task<MessageEntity[]> GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "");
     }
 }

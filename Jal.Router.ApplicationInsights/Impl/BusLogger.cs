@@ -34,7 +34,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 Target = context.Data.Channel.GetPath(),
 
-                Data = context.Data.Content,
+                Data = context.Data.ContentContext.Data,
 
                 Type = Configuration.ChannelProviderName,
             };

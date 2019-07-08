@@ -20,37 +20,19 @@ namespace Jal.Router.Impl.Inbound
             _router = router;
         }
 
-        private SagaEntity MessageContextToSagaEntity(MessageContext context)
-        {
-            return new SagaEntity
-            {
-                Created = context.DateTimeUtc,
-                Updated = context.DateTimeUtc,
-                Name = context.Saga.Name,
-                DataType = context.Saga.DataType.FullName,
-                Timeout = context.Saga.Timeout,
-                Status = context.SagaContext.Status,
-                Data = context.SagaContext.Data
-            };
-        }
-
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             var messagecontext = context.Data;
 
-            messagecontext.SagaContext.Status = DefaultStatus;
-
-            messagecontext.SagaContext.Data = Activator.CreateInstance(messagecontext.Saga.DataType);
-
             var storage = Factory.CreateEntityStorage();
 
-            messagecontext.SagaEntity = MessageContextToSagaEntity(messagecontext);
+            var sagadata = messagecontext.SagaContext.CreateSagaData(DefaultStatus);
 
-            await storage.CreateSagaEntity(messagecontext, messagecontext.SagaEntity).ConfigureAwait(false);
+            await storage.CreateSagaData(messagecontext, sagadata).ConfigureAwait(false);
 
-            messagecontext.SagaContext.Id = messagecontext.SagaEntity.Id;
+            messagecontext.SagaContext.UpdateSagaData(sagadata);
 
-            context.Data.AddTrack(messagecontext.IdentityContext, messagecontext.Origin, messagecontext.Route, messagecontext.Saga, messagecontext.SagaContext);
+            messagecontext.TrackingContext.Add();
 
             try
             {
@@ -61,7 +43,7 @@ namespace Jal.Router.Impl.Inbound
                 await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
             }
 
-            await UpdateSagaEntity(messagecontext).ConfigureAwait(false);
+            await storage.UpdateSagaData(messagecontext, sagadata).ConfigureAwait(false);
         }
     }
 }

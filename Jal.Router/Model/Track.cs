@@ -6,7 +6,7 @@ namespace Jal.Router.Model
         public string SagaId { get; set; }
         public string From { get; set; }
         public string Key { get; set; }
-        public string Route { get; set; }
-        public string Saga { get; set; }
+        public string RouteName { get; set; }
+        public string SagaName { get; set; }
     }
 }

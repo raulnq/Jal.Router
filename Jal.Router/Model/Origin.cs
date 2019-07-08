@@ -19,5 +19,10 @@ namespace Jal.Router.Model
             Key = key;
         }
 
+        public OriginEntity ToEntity()
+        {
+            return new OriginEntity(From, Key);
+        }
+
     }
 }

@@ -7,37 +7,39 @@ using Jal.Router.Interface.Outbound;
 
 namespace Jal.Router.Model
 {
-
     public class MessageContext
     {
         private readonly IBus _bus;
         public Channel Channel { get; private set; }
-        public object Response { get; set; }
         public IDictionary<string, string> Headers { get; }
+        public DateTime DateTimeUtc { get; }
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; }
         public string Version { get; }
         public Route Route { get; private set; }
         public EndPoint EndPoint { get; }
         public Origin Origin { get; }
-        public DateTime DateTimeUtc { get; }
-        public SagaContext SagaContext { get; }
-        public SagaEntity SagaEntity { get; set; }
         public Saga Saga { get; private set; }
-        public DateTime? ScheduledEnqueueDateTimeUtc { get; }
-        public Type ContentType { get; set; }
-        public string Content { get; set; }
-        public string ContentId { get; set; }
-        public List<Track> Tracks { get; }
+        public SagaContext SagaContext { get; private set; }
+        public ContentContext ContentContext { get; set; }
+        public TrackingContext TrackingContext { get; }
         public IdentityContext IdentityContext { get; }
-        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Track> tracks, Origin origin, string version)
+
+        public MessageContext()
+        {
+
+        }
+
+        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Track> tracks, Origin origin, string sagaid, string version)
         {
             _bus = bus;
             Headers = new Dictionary<string, string>();
             Version = version;
             Origin = origin;
-            SagaContext = new SagaContext();
-            Tracks = tracks;
+            SagaContext = new SagaContext(this, sagaid);
+            TrackingContext = new TrackingContext(this, tracks);
             IdentityContext = identitycontext;
             DateTimeUtc = datetimeutc;
+            ContentContext = new ContentContext();
         }
 
         public string GetFullName()
@@ -45,7 +47,7 @@ namespace Jal.Router.Model
             return Saga == null ? Route.Name : Saga.Name + "/" + Route.Name;
         }
 
-        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin)
+        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, ContentContext contentcontext)
         {
             Headers = new Dictionary<string, string>();
             Origin = origin;
@@ -56,91 +58,49 @@ namespace Jal.Router.Model
             ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
             SagaContext = options.SagaContext;
             Route = options.Route;
-            Tracks = options.Tracks;
+            TrackingContext = new TrackingContext(this, options.Tracks);
             DateTimeUtc = datetimeutc;
-
+            ContentContext = contentcontext;
         }
 
-        public void AddTrack(IdentityContext identity, Origin origin, Route route, Saga saga=null, SagaContext sagacontext=null)
-        {
-            var tracking = new Track()
-            {
-                Id = identity?.Id,
-                Key = origin?.Key,
-                From = origin?.From,
-                SagaId = sagacontext?.Id,
-                Route = route?.Name,
-                Saga = saga?.Name
-            };
-
-            Tracks.Add(tracking);
-        }
-
-        public void UpdateFromRoute(Route route, Channel channel, Saga saga)
+        public void UpdateRoute(Route route)
         {
             Route = route;
+        }
 
+        public void UpdateChannel(Channel channel)
+        {
             Channel = channel;
+        }
 
+        public void UpdateSaga(Saga saga)
+        {
             Saga = saga;
         }
 
-        public void UpdateFromEndpoint(Channel channel)
+        public void UpdateSagaContext(SagaContext sagacontext)
         {
-            Channel = channel;
+            SagaContext = sagacontext;
         }
 
-        public Track[] GetTracksOfTheCurrentSaga()
+        public MessageEntity ToEntity()
         {
-            if (!string.IsNullOrWhiteSpace(SagaContext.Id))
+            var name = string.Empty;
+
+            if (Route != null)
             {
-                return Tracks.Where(x => x.SagaId == SagaContext.Id).ToArray();
+                name = Route.Name;
+            }
+            else
+            {
+                name = EndPoint.Name;
             }
 
-            return new Track[] {};
-        }
+            var entity = new MessageEntity(Channel.ToEntity(), Headers, Version, DateTimeUtc, ScheduledEnqueueDateTimeUtc, Route.ToEntity(),
+                EndPoint.ToEntity(), Origin.ToEntity(), Saga.ToEntity(), ContentContext.ToEntity(), SagaContext.ToEntity(),
+                TrackingContext.ToEntity(), IdentityContext.ToEntity(), name);
 
-        public Track GetCurrentTrack()
-        {
-            if (Tracks.Count > 0)
-            {
-                return Tracks[Tracks.Count - 1];
-            }
-            return null;
-        }
-
-        public Track GetTrackOfTheCaller()
-        {
-            if (Tracks.Count > 1)
-            {
-                return Tracks[Tracks.Count - 2];
-            }
-            return null;
-        }
-
-        public Track GetTrackOfTheSagaCaller()
-        {
-            if (!string.IsNullOrWhiteSpace(SagaContext.Id))
-            {
-                var index = -1;
-
-                for (var i = 0; i < Tracks.Count; i++)
-                {
-                    if (Tracks[i].SagaId == SagaContext.Id)
-                    {
-                        index = i - 1;
-
-                        break;
-                    }
-                }
-
-                if (index >= 0)
-                {
-                    return Tracks[index];
-                }
-            }
-
-            return null;
+            return entity;
         }
 
         public bool IsSaga()

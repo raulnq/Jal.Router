@@ -46,6 +46,11 @@ namespace Jal.Router.Model
         public Func<MessageContext, bool> When { get; set; }
 
         public bool UseClaimCheck { get; set; }
+
+        public RouteEntity ToEntity()
+        {
+            return new RouteEntity(Name, ContentType);
+        }
     }
 
     public class Route<TContent, TConsumer> : Route

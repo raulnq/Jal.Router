@@ -44,14 +44,14 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
                 {
                     context.Headers[countname] = count.ToString();
 
-                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.Tracks, context.IdentityContext, context.Route, context.Version)
+                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, context.IdentityContext, context.Route, context.Version)
                     {
                         ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(count)),
                     };
 
                     var serializer = _factory.CreateMessageSerializer();
 
-                    var content = serializer.Deserialize(context.Content, context.ContentType);
+                    var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
                     _logger.Log($"Message {context.IdentityContext.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.GetFullName()}");
 

@@ -18,9 +18,9 @@ namespace Jal.Router.Model
 
         public string Name { get; set; }
 
-        public Type MessageType { get; set; }
+        public Type ContentType { get; set; }
 
-        public Type ReplyType { get; set; }
+        public Type ReplyContentType { get; set; }
 
         public IList<Channel> Channels { get; }
         public IList<Type> MiddlewareTypes { get; }
@@ -31,5 +31,10 @@ namespace Jal.Router.Model
         public IList<Handler> EntryHandlers { get; }
 
         public IList<Handler> ExitHandlers { get; }
+
+        public EndpointEntity ToEntity()
+        {
+            return new EndpointEntity(Name, ContentType);
+        }
     }
 }

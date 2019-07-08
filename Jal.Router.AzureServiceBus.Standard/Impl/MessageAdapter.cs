@@ -80,22 +80,19 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     version = sbmessage.UserProperties[Version].ToString();
                 }
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, tracks, new Origin(from, key), version);
-
-                if (sbmessage.UserProperties.ContainsKey(ContentId))
-                {
-                    context.ContentId = sbmessage.UserProperties[ContentId].ToString();
-                }
-
+                var sagaid = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(SagaId))
                 {
-                    context.SagaContext.Id = sbmessage.UserProperties[SagaId].ToString();
+                    sagaid = sbmessage.UserProperties[SagaId].ToString();
                 }
 
+                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, tracks, new Origin(from, key), sagaid, version);
 
-
-
+                if (sbmessage.UserProperties.ContainsKey(ContentId))
+                {
+                    context.ContentContext.UpdateId(sbmessage.UserProperties[ContentId].ToString());
+                }
 
                 if (sbmessage.UserProperties != null)
                 {
@@ -158,7 +155,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         protected override object WriteMetadataAndContent(MessageContext context)
         {
-            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.Content)) { ContentType = "application/json" };
+            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.ContentContext.Data)) { ContentType = "application/json" };
 
             foreach (var header in context.Headers)
             {
@@ -175,28 +172,21 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(Version, context.Version);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.SagaContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
                 brokeredmessage.UserProperties.Add(SagaId, context.SagaContext.Id);
             }
-            else
+
+            if (!string.IsNullOrWhiteSpace(context.ContentContext.Id))
             {
-                if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
-                {
-                    brokeredmessage.UserProperties.Add(SagaId, context.SagaContext.Id);
-                }
+                brokeredmessage.UserProperties.Add(ContentId, context.ContentContext.Id);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ContentId))
-            {
-                brokeredmessage.UserProperties.Add(ContentId, context.ContentId);
-            }
-
-            if (context.Tracks != null)
+            if (context.TrackingContext != null)
             {
                 var serializer = Factory.CreateMessageSerializer();
 
-                var root = serializer.Serialize(context.Tracks);
+                var root = serializer.Serialize(context.TrackingContext.Tracks);
 
                 if (!string.IsNullOrWhiteSpace(root))
                 {

@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Outbound
         {
             try
             {
-                return _endpoints.Single(x => x.Name == name && x.MessageType == contenttype);
+                return _endpoints.Single(x => x.Name == name && x.ContentType == contenttype);
             }
             catch (Exception ex)
             {

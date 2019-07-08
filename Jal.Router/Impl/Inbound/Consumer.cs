@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
         {
             try
             {
-                if(context.SagaContext.Data==null)
+                if(context.SagaContext.SagaData.Data==null)
                 {
                     var routemethod = typeof(Consumer).GetMethods().First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 2);
 
@@ -39,7 +39,7 @@ namespace Jal.Router.Impl.Inbound
 
                     var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType, context.Saga.DataType);
 
-                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.Data }) as Task;
+                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.SagaData.Data }) as Task;
 
                     await task;
                 }
@@ -61,7 +61,7 @@ namespace Jal.Router.Impl.Inbound
             {
                 var serializer = _factory.CreateMessageSerializer();
 
-                var content = serializer.Deserialize<TContent>(context.Content);
+                var content = serializer.Deserialize<TContent>(context.ContentContext.Data);
 
                 var consumer = _factory.CreateComponent<THandler>(route.ConsumerType);
 
@@ -87,7 +87,7 @@ namespace Jal.Router.Impl.Inbound
 
                 var consumer = _factory.CreateComponent<THandler>(route.ConsumerType);
 
-                var content = serializer.Deserialize<TContent>(context.Content);
+                var content = serializer.Deserialize<TContent>(context.ContentContext.Data);
 
                 foreach (var method in route.RouteMethods)
                 {
@@ -95,7 +95,7 @@ namespace Jal.Router.Impl.Inbound
                     {
                         if (!string.IsNullOrWhiteSpace(method.Status))
                         {
-                            context.SagaContext.Status = method.Status;
+                            context.SagaContext.SagaData.UpdateStatus(method.Status);
                         }
 
                         return Consume(context, content, method, consumer, data);

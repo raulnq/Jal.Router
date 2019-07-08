@@ -44,7 +44,9 @@ namespace Jal.Router.Impl.StartupTask
                 {
                     route.RuntimeHandler = async (message, channel) => {
 
-                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel).ConfigureAwait(false);
+                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+
+                        context.UpdateChannel(channel);
 
                         await _router.Route<ConsumerMiddleware>(context).ConfigureAwait(false);
                     };
@@ -61,7 +63,11 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+
+                            context.UpdateChannel(channel);
+
+                            context.UpdateSaga(saga);
 
                             await _router.Route<InitialConsumerMiddleware>(context).ConfigureAwait(false); ;
                         };
@@ -78,7 +84,11 @@ namespace Jal.Router.Impl.StartupTask
 
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+
+                            context.UpdateChannel(channel);
+
+                            context.UpdateSaga(saga);
 
                             await _router.Route<FinalConsumerMiddleware>(context).ConfigureAwait(false); ;
                         };
@@ -91,7 +101,11 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         route.RuntimeHandler = async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route, channel, saga).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+
+                            context.UpdateChannel(channel);
+
+                            context.UpdateSaga(saga);
 
                             await _router.Route<MiddleConsumerMiddleware>(context).ConfigureAwait(false);
                         };

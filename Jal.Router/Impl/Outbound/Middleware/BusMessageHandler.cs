@@ -36,7 +36,7 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
             foreach (var channel in channels)
             {
-                context.Data.UpdateFromEndpoint(channel);
+                context.Data.UpdateChannel(channel);
 
                 try
                 {

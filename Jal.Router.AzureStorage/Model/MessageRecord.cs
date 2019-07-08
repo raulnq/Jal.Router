@@ -23,8 +23,6 @@ namespace Jal.Router.AzureStorage.Model
             SizeOfContentArraysOnKilobytes = 0;
         }
 
-        public string Tracks { get; set; }
-        public string Saga { get; set; }
         public byte[] Saga0 { get; set; }
         public byte[] Saga1 { get; set; }
         public byte[] Saga2 { get; set; }
@@ -34,10 +32,6 @@ namespace Jal.Router.AzureStorage.Model
         public int SizeOfSagaArraysOnKilobytes { get; set; }
         public int SizeOfSaga { get; set; }
         public int SizeOfContent { get; set; }
-        public string ContentId { get; set; }
-        public DateTime DateTimeUtc { get; set; }
-        public string Type { get; set; }
-        public string Content { get; set; }
         public byte[] Content0 { get; set; }
         public byte[] Content1 { get; set; }
         public byte[] Content2 { get; set; }
@@ -45,12 +39,21 @@ namespace Jal.Router.AzureStorage.Model
         public byte[] Content4 { get; set; }
         public int NumberOfContentArrays { get; set; }
         public int SizeOfContentArraysOnKilobytes { get; set; }
-        public string Identity { get; set; }
-        public string Version { get; set; }
-        public string Origin { get; set; }
-        public string Headers { get; set; }
-        public string Name { get; set; }
         public string ContentType { get; set; }
         public string Id { get; set; }
+        public string Name { get; set; }
+        public string ChannelEntity { get; set; }
+        public string Headers { get; set; }
+        public string Version { get; set; }
+        public DateTime DateTimeUtc { get; set; }
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+        public string RouteEntity { get; set; }
+        public string EndpointEntity { get; set; }
+        public string OriginEntity { get; set; }
+        public string SagaEntity { get; set; }
+        public string ContentContextEntity { get; set; }
+        public string SagaContextEntity { get; set; }
+        public string TrackingContextEntity { get; set; }
+        public string IdentityContextEntity { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Jal.Router.Interface
 {
     public interface IMessageAdapter
     {
-        Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route, Channel channel, Saga saga = null);
+        Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route);
 
         Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint endpoint);
 

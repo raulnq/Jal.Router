@@ -69,7 +69,7 @@ namespace Jal.Router.Impl.Outbound
                     {
                         var serializer = _factory.CreateMessageSerializer();
 
-                        context.Response = serializer.Deserialize(outputcontext.Content, outputcontext.ContentType);
+                        context.ContentContext.UpdateResponse(serializer.Deserialize(outputcontext.ContentContext.Data, outputcontext.ContentContext.Type));
                     }
                 }
             }
