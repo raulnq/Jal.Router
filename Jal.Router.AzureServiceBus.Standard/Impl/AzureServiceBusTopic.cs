@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model.Inbound;
-using Jal.Router.Model.Outbound;
+using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
@@ -17,70 +16,74 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private TopicClient _topicclient;
 
-        private ListenerMetadata _listenermetadata;
-
-        private SenderMetadata _sendermetadata;
-
-        public void Open(ListenerMetadata metadata)
+        public void Open(ListenerContext listenercontext)
         {
-            _listenermetadata = metadata;
-
-            _subscriptionclient = new SubscriptionClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath, metadata.Channel.ToSubscription);
+            _subscriptionclient = new SubscriptionClient(listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath, listenercontext.Channel.ToSubscription);
         }
 
-        public bool IsActive()
+        public bool IsActive(ListenerContext listenercontext)
         {
-            return _subscriptionclient != null ? !_subscriptionclient.IsClosedOrClosing : _topicclient.IsClosedOrClosing;
+            return !_subscriptionclient.IsClosedOrClosing;
         }
 
-        public Task Close()
+        public bool IsActive(SenderContext sendercontext)
         {
-            return _subscriptionclient != null ?_subscriptionclient.CloseAsync() : _topicclient.CloseAsync();
+            return !_topicclient.IsClosedOrClosing;
         }
 
-        public void Listen()
+        public Task Close(ListenerContext listenercontext)
         {
-            var options = CreateOptions(_listenermetadata);
+            return _subscriptionclient.CloseAsync();
+        }
 
-            var sessionoptions = CreateSessionOptions(_listenermetadata);
+        public Task Close(SenderContext sendercontext)
+        {
+            return _topicclient.CloseAsync();
+        }
+
+        public void Listen(ListenerContext listenercontext)
+        {
+            var options = CreateOptions(listenercontext);
+
+            var sessionoptions = CreateSessionOptions(listenercontext);
 
             var adapter = Factory.CreateMessageAdapter();
 
-            if (_listenermetadata.Group != null)
+            if (listenercontext.Group != null)
             {
                 _subscriptionclient.RegisterSessionHandler(async (ms, message, token) => {
 
                     var context = adapter.ReadMetadata(message);
 
-                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                     try
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (_listenermetadata.Group.Until(context))
+                        if (listenercontext.Group.Until(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
                     }
 
                 }, sessionoptions);
@@ -91,17 +94,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     var context = adapter.ReadMetadata(message);
 
-                    Logger.Log($"Message {context.IdentityContext.Id} arrived to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                     try
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in _listenermetadata.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, _listenermetadata.Channel));
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
@@ -110,24 +113,24 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} failed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.IdentityContext.Id} completed to {_listenermetadata.Channel.ToString()} channel {_listenermetadata.Channel.GetPath()}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
                     }
 
                 }, options);
             }
         }
 
-        private SessionHandlerOptions CreateSessionOptions(ListenerMetadata metadata)
+        private SessionHandlerOptions CreateSessionOptions(ListenerContext listenercontext)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
                 var context = args.ExceptionReceivedContext;
 
-                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
 
                 return Task.CompletedTask;
             };
@@ -149,13 +152,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return options;
         }
 
-        private MessageHandlerOptions CreateOptions(ListenerMetadata metadata)
+        private MessageHandlerOptions CreateOptions(ListenerContext listenercontext)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
                 var context = args.ExceptionReceivedContext;
 
-                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
 
                 return Task.CompletedTask;
             };
@@ -174,11 +177,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return options;
         }
 
-        public void Open(SenderMetadata metadata)
+        public void Open(SenderContext sendercontext)
         {
-            _sendermetadata = metadata;
-
-            _topicclient = new TopicClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
+            _topicclient = new TopicClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
 
             if (_parameter.TimeoutInSeconds > 0)
             {
@@ -186,7 +187,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             }
         }
 
-        public async Task<string> Send(object message)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
             var sbmessage = message as Message;
 

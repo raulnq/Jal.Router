@@ -18,13 +18,13 @@ namespace Jal.Router.Impl.ShutdownTask
 
         public async Task Run()
         {
-            foreach (var metadata in _configuration.Runtime.SendersMetadata)
+            foreach (var sendercontext in _configuration.Runtime.SenderContexts)
             {
-                if (metadata.Sender != null)
+                if (sendercontext.SenderChannel != null)
                 {
-                    await metadata.Sender.Close().ConfigureAwait(false);
+                    await sendercontext.SenderChannel.Close(sendercontext).ConfigureAwait(false);
 
-                    _logger.Log($"Shutdown {metadata.Signature()}");
+                    _logger.Log($"Shutdown {sendercontext.Id}");
                 }
             }
         }

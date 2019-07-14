@@ -44,7 +44,7 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
                 {
                     context.Headers[countname] = count.ToString();
 
-                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, context.IdentityContext, context.Route, context.Version)
+                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version)
                     {
                         ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(count)),
                     };
@@ -53,7 +53,7 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
 
                     var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
-                    _logger.Log($"Message {context.IdentityContext.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.GetFullName()}");
+                    _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 
                     await context.Send(content, context.Origin, options);
 
@@ -61,13 +61,13 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
                 }
                 else
                 {
-                    _logger.Log($"Message {context.IdentityContext.Id}, no more retries by route {context.GetFullName()}");
+                    _logger.Log($"Message {context.Id}, no more retries by route {context.Name}");
 
                     if (metadata.Parameters.ContainsKey("fallback"))
                     {
                         var fallback = metadata.Parameters["fallback"] as Func<MessageContext, Exception, ErrorHandler, Task>;
 
-                        _logger.Log($"Message {context.IdentityContext.Id}, fallback executed by route {context.GetFullName()}");
+                        _logger.Log($"Message {context.Id}, fallback executed by route {context.Name}");
 
                         await fallback(context, ex, metadata);
 

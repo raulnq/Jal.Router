@@ -10,7 +10,7 @@ namespace Jal.Router.Interface.Management
 {
     public interface IConfiguration
     {
-        Runtime Runtime { get; }
+        RuntimeContext Runtime { get; }
         Storage Storage { get; }
         string ApplicationName { get; }
         string ChannelProviderName { get; }

@@ -12,9 +12,12 @@ namespace Jal.Router.Model
 
         public ChannelType Type { get; set; }
 
-        public string GetId()
+        public string Id
         {
-            return ToPath + ToSubscription + ToConnectionString;
+            get
+            {
+                return ToPath + ToSubscription + ToConnectionString;
+            }
         }
 
         public override string ToString()
@@ -43,31 +46,35 @@ namespace Jal.Router.Model
             return string.Empty;
         }
 
-        public string GetPath()
+        public string FullPath
         {
-            var description = string.Empty;
+            get
+                {
+                var description = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(ToPath))
-            {
-                description = $"{description}/{ToPath}";
+                if (!string.IsNullOrWhiteSpace(ToPath))
+                {
+                    description = $"{description}/{ToPath}";
+                }
+
+                if (!string.IsNullOrWhiteSpace(ToSubscription))
+                {
+                    description = $"{description}/{ToSubscription}";
+                }
+
+                if (!string.IsNullOrWhiteSpace(ToReplyPath))
+                {
+                    description = $"{description}/{ToReplyPath}";
+                }
+
+                if (!string.IsNullOrWhiteSpace(ToReplySubscription))
+                {
+                    description = $"{description}/{ToReplySubscription}";
+                }
+
+                return description;
             }
 
-            if (!string.IsNullOrWhiteSpace(ToSubscription))
-            {
-                description = $"{description}/{ToSubscription}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(ToReplyPath))
-            {
-                description = $"{description}/{ToReplyPath}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(ToReplySubscription))
-            {
-                description = $"{description}/{ToReplySubscription}";
-            }
-
-            return description;
         }
 
         public Type ConnectionStringValueFinderType { get; set; }

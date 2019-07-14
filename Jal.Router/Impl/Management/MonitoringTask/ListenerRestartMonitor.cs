@@ -17,19 +17,19 @@ namespace Jal.Router.Impl.MonitoringTask
         {
             Logger.Log($"Restarting listeners");
 
-            foreach (var metadata in Factory.Configuration.Runtime.ListenersMetadata)
+            foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                if (metadata.Listener != null)
+                if (listenercontext.ListenerChannel != null)
                 {
-                    await metadata.Listener.Close().ConfigureAwait(false);
+                    await listenercontext.ListenerChannel.Close(listenercontext).ConfigureAwait(false);
 
-                    Logger.Log($"Shutdown {metadata.Signature()}");
+                    Logger.Log($"Shutdown {listenercontext.Id}");
 
-                    metadata.Listener.Open(metadata);
+                    listenercontext.ListenerChannel.Open(listenercontext);
 
-                    metadata.Listener.Listen();
+                    listenercontext.ListenerChannel.Listen(listenercontext);
 
-                    Logger.Log($"Listening {metadata.Signature()}");
+                    Logger.Log($"Listening {listenercontext.Id}");
                 }
             }
 

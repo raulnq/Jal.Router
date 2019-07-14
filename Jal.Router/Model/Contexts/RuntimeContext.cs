@@ -1,12 +1,12 @@
-﻿using Jal.Router.Model.Inbound;
+﻿using Jal.Router.Model;
+using Jal.Router.Model.Management;
 using System.Collections.Generic;
-using Jal.Router.Model.Outbound;
 
-namespace Jal.Router.Model.Management
+namespace Jal.Router.Model
 {
-    public class Runtime
+    public class RuntimeContext
     {
-        public List<ListenerMetadata> ListenersMetadata { get; }
+        public List<ListenerContext> ListenerContexts { get; }
 
         public List<EndPoint> EndPoints { get; }
 
@@ -16,7 +16,7 @@ namespace Jal.Router.Model.Management
 
         public List<Route> Routes { get; }
 
-        public List<SenderMetadata> SendersMetadata { get; }
+        public List<SenderContext> SenderContexts { get; }
 
         public List<PointToPointChannel> PointToPointChannels { get; }
 
@@ -24,11 +24,11 @@ namespace Jal.Router.Model.Management
 
         public List<SubscriptionToPublishSubscribeChannel> SubscriptionToPublishSubscribeChannels { get; }
 
-        public Runtime()
+        public RuntimeContext()
         {
-            ListenersMetadata = new List<ListenerMetadata>();
+            ListenerContexts = new List<ListenerContext>();
 
-            SendersMetadata = new List<SenderMetadata>();
+            SenderContexts = new List<SenderContext>();
 
             EndPoints = new List<EndPoint>();
 

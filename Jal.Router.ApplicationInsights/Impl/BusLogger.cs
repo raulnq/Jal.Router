@@ -32,7 +32,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 Timestamp = context.Data.DateTimeUtc,
 
-                Target = context.Data.Channel.GetPath(),
+                Target = context.Data.Channel.FullPath,
 
                 Data = context.Data.ContentContext.Data,
 

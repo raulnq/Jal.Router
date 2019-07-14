@@ -19,7 +19,7 @@ namespace Jal.Router.Impl
 
         public const string ParentId = "parentid";
 
-        public const string Tracks = "tracking";
+        public const string Trackings = "tracking";
 
         public const string From = "from";
 

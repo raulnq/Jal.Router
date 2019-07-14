@@ -18,7 +18,7 @@ namespace Jal.Router.Impl.Management
 {
     public class Configuration : IConfiguration
     {
-        public Runtime Runtime { get; }
+        public RuntimeContext Runtime { get; }
         public string ChannelProviderName { get; private set; }
         public Storage Storage { get; set; }
         public string ApplicationName { get; private set; }
@@ -252,7 +252,7 @@ namespace Jal.Router.Impl.Management
             AddShutdownTask<Jal.Router.Impl.ShutdownTask.ShutdownTask>();
             AddShutdownWatcher<CtrlCShutdownWatcher>();
             Storage = new Storage();
-            Runtime = new Runtime();
+            Runtime = new RuntimeContext();
             ApplicationName = "Empty app name";
             ChannelProviderName = "Empty channel provider name";
         }

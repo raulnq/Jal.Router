@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.StartupTask
 {
@@ -31,23 +30,23 @@ namespace Jal.Router.Impl.StartupTask
 
         private void Open()
         {
-            foreach (var sendermetadata in Factory.Configuration.Runtime.SendersMetadata)
+            foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
             {
                 var senderchannel = default(ISenderChannel);
 
                 var readerchannel = default(IReaderChannel);
 
-                if (sendermetadata.Channel.Type == ChannelType.PointToPoint)
+                if (sendercontext.Channel.Type == ChannelType.PointToPoint)
                 {
                     senderchannel = Factory.CreatePointToPointChannel();
                 }
 
-                if (sendermetadata.Channel.Type == ChannelType.PublishSubscribe)
+                if (sendercontext.Channel.Type == ChannelType.PublishSubscribe)
                 {
                     senderchannel = Factory.CreatePublishSubscribeChannel();
                 }
 
-                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToPointToPoint)
+                if (sendercontext.Channel.Type == ChannelType.RequestReplyToPointToPoint)
                 {
                     var requestresplychannel = Factory.CreateRequestReplyChannelFromPointToPointChannel();
 
@@ -56,7 +55,7 @@ namespace Jal.Router.Impl.StartupTask
                     senderchannel = requestresplychannel;
                 }
 
-                if (sendermetadata.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+                if (sendercontext.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
                 {
                     var requestresplychannel = Factory.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
 
@@ -67,16 +66,16 @@ namespace Jal.Router.Impl.StartupTask
 
                 if(senderchannel!=null)
                 {
-                    senderchannel.Open(sendermetadata);
+                    senderchannel.Open(sendercontext);
 
-                    sendermetadata.Sender = senderchannel;
+                    sendercontext.UpdateSenderChannel(senderchannel);
 
                     if(readerchannel!=null)
                     {
-                        sendermetadata.Reader = readerchannel;
+                        sendercontext.UpdateReaderChannel(readerchannel);
                     }
 
-                    Logger.Log($"Opening {sendermetadata.Signature()}");
+                    Logger.Log($"Opening {sendercontext.Id}");
                 }
             }
         }
@@ -87,7 +86,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 foreach (var channel in item.Channels)
                 {
-                    var sender = Factory.Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                    var sender = Factory.Configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
 
                     if (sender != null)
                     {
@@ -95,11 +94,11 @@ namespace Jal.Router.Impl.StartupTask
                     }
                     else
                     {
-                        var newsender = new SenderMetadata(channel);
+                        var newsender = new SenderContext(channel);
 
                         newsender.Endpoints.Add(item);
 
-                        Factory.Configuration.Runtime.SendersMetadata.Add(newsender);
+                        Factory.Configuration.Runtime.SenderContexts.Add(newsender);
                     }
                 }
             }

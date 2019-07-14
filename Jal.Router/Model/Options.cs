@@ -6,29 +6,33 @@ namespace Jal.Router.Model
     public class Options
     {
         public Options(string endpointname, Dictionary<string, string> headers, 
-            SagaContext sagacontext, List<Track> tracks, IdentityContext identitycontext, Route route, string version)
+            SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, Saga saga, string version)
         {
             EndPointName = endpointname;
             Headers= headers;
             SagaContext = sagacontext;
-            Tracks = tracks;
+            TrackingContext = tracks;
             IdentityContext = identitycontext;
             Route = route;
+            Saga = saga;
+            Version = version;
         }
-        public IdentityContext IdentityContext { get; }
+        public IdentityContext IdentityContext { get; private set; }
 
-        public SagaContext SagaContext { get; }
+        public SagaContext SagaContext { get; private set; }
 
-        public Route Route { get; }
+        public Route Route { get; private set; }
 
-        public string EndPointName { get; }
+        public Saga Saga { get; private set; }
 
-        public string Version { get; }
+        public string EndPointName { get; private set; }
+
+        public string Version { get; private set; }
 
         public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
 
-        public IDictionary<string,string> Headers { get; }
+        public IDictionary<string,string> Headers { get; private set; }
 
-        public List<Track> Tracks { get; }
+        public TrackingContext TrackingContext { get; private set; }
     }
 }

@@ -2,9 +2,9 @@
 {
     public class SagaContextEntity
     {
-        public SagaData SagaData { get; }
+        public SagaData SagaData { get; private set; }
 
-        public SagaContextEntity()
+        private SagaContextEntity()
         {
 
         }

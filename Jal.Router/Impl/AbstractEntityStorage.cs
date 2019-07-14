@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -23,22 +24,22 @@ namespace Jal.Router.Impl.Inbound
             return Task.CompletedTask;
         }
 
-        public virtual Task<SagaData> GetSagaData(string id, Type sagatype)
+        public virtual Task<SagaData> GetSagaData(string id)
         {
             return Task.FromResult(default(SagaData));
         }
 
-        public virtual Task<SagaData[]> GetSagaData(DateTime start, DateTime end, Type sagatype, string saganame, string sagastoragename = "")
+        public virtual Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
         {
             return Task.FromResult(default(SagaData[]));
         }
 
-        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null)
         {
             return Task.FromResult(default(MessageEntity[]));
         }
 
-        public virtual Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, IDictionary<string, string> options = null)
         {
             return Task.FromResult(default(MessageEntity[]));
         }

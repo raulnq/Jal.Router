@@ -17,13 +17,13 @@ namespace Jal.Router.Model
 
             FinalRoutes = new List<Route>();
         }
-        public string Name { get; }
+        public string Name { get; private set; }
 
-        public Type DataType { get; }
+        public Type DataType { get; private set; }
 
         public int Timeout { get; set; }
 
-        public List<Route> Routes { get; }
+        public List<Route> Routes { get; private set; }
 
         public List<Route> InitialRoutes { get; set; }
 
@@ -31,7 +31,7 @@ namespace Jal.Router.Model
 
         public SagaEntity ToEntity()
         {
-            return new SagaEntity(Name, DataType);
+            return new SagaEntity(Name, DataType, Timeout);
         }
     }
 }

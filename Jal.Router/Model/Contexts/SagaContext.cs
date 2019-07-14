@@ -6,7 +6,7 @@ namespace Jal.Router.Model
     {
         public SagaData SagaData { get; private set; }
 
-        public MessageContext Context { get; }
+        public MessageContext Context { get; private set; }
 
         public string Id { get; private set; }
 
@@ -17,7 +17,7 @@ namespace Jal.Router.Model
             Context = context;
         }
 
-        public SagaContext()
+        private SagaContext()
         {
 
         }
@@ -30,14 +30,14 @@ namespace Jal.Router.Model
 
         public void UpdateId(string id)
         {
-            Id = Id;
+            Id = id;
         }
 
         public SagaData CreateSagaData(string status)
         {
             var data = Activator.CreateInstance(Context.Saga.DataType);
 
-            var entity = new SagaData(data, Context.Saga.DataType.FullName, Context.Saga.Name, Context.DateTimeUtc, Context.Saga.Timeout, status);
+            var entity = new SagaData(data, Context.Saga.DataType, Context.Saga.Name, Context.DateTimeUtc, Context.Saga.Timeout, status);
 
             return entity;
         }

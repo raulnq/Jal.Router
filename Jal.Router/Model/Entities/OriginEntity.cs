@@ -2,11 +2,11 @@
 {
     public class OriginEntity
     {
-        public string From { get; }//From
+        public string From { get; private set; }//From
 
-        public string Key { get;  }//Origin
+        public string Key { get; private set; }//Origin
 
-        public OriginEntity()
+        private OriginEntity()
         {
 
         }

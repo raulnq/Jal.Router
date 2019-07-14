@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 
@@ -15,14 +14,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         }
 
-        public async Task<MessageContext> Read(MessageContext context, IMessageAdapter adapter)
+        public async Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
         {
-            var client = new SessionClient(_metadata.Channel.ToReplyConnectionString, _metadata.Channel.ToReplyPath);
+            var client = new SessionClient(sendercontext.Channel.ToReplyConnectionString, sendercontext.Channel.ToReplyPath);
 
             var messagesession = await client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).ConfigureAwait(false);
 
-            var message = _metadata.Channel.ToReplyTimeOut != 0 ? 
-                await messagesession.ReceiveAsync(TimeSpan.FromSeconds(_metadata.Channel.ToReplyTimeOut)).ConfigureAwait(false) : 
+            var message = sendercontext.Channel.ToReplyTimeOut != 0 ? 
+                await messagesession.ReceiveAsync(TimeSpan.FromSeconds(sendercontext.Channel.ToReplyTimeOut)).ConfigureAwait(false) : 
                 await messagesession.ReceiveAsync().ConfigureAwait(false);
 
             MessageContext outputcontext = null;

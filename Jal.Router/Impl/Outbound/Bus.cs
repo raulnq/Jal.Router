@@ -20,15 +20,12 @@ namespace Jal.Router.Impl.Outbound
 
         private readonly IPipelineBuilder _pipeline;
 
-        private readonly IEntityStorage _storage;
-
-        public Bus(IEntityStorage storage, IEndPointProvider provider, IComponentFactoryGateway factory, IConfiguration configuration, IPipelineBuilder pipeline)
+        public Bus(IEndPointProvider provider, IComponentFactoryGateway factory, IConfiguration configuration, IPipelineBuilder pipeline)
         {
             _provider = provider;
             _factory = factory;
             _configuration = configuration;
             _pipeline = pipeline;
-            _storage = storage;
         }
 
         private async Task<TResult> Reply<TResult>(MessageContext message)
@@ -117,7 +114,9 @@ namespace Jal.Router.Impl.Outbound
             {
                 context.SagaContext.SagaData.UpdateUpdatedDateTime(context.DateTimeUtc);
 
-                await _storage.UpdateSagaData(context, context.SagaContext.SagaData).ConfigureAwait(false);
+                var storage = _factory.CreateEntityStorage();
+
+                await storage.UpdateSagaData(context, context.SagaContext.SagaData).ConfigureAwait(false);
             }
         }
 

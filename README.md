@@ -6,13 +6,13 @@ Just another library to route in/out messages
 * Multiple exception handling (done)
 * Multiple shoutdown watchers (done)
 * Store big messages and sagas (done)
-* Store data of the host
+* Store data of the host (done)
 * Message compression and encryption
 * Nuget reference cleanup
 * Outgoing message storage (done)
 * Documentation
 * Unit tests
-* Outgoing messages should have information of the parent saga
+* Outgoing messages should have information of the parent saga (done)
 * Outgoing message error handling: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc)
 * Register error resource together with the main one
 * Async support (done)

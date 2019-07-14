@@ -4,13 +4,13 @@ namespace Jal.Router.Model
 {
     public class ContentContextEntity
     {
-        public Type Type { get; }
+        public Type Type { get; private set; }
 
-        public string Data { get; }
+        public string Data { get; private set; }
 
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
-        public ContentContextEntity()
+        private ContentContextEntity()
         {
 
         }

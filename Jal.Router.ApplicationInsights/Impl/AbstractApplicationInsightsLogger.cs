@@ -31,7 +31,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
-            properties.Add("identity_id", context.IdentityContext?.Id);
+            properties.Add("identity_id", context?.Id);
             properties.Add("identity_replytorequestid", context.IdentityContext?.ReplyToRequestId);
             properties.Add("identity_requestid", context.IdentityContext?.RequestId);
             properties.Add("identity_operationid", context.IdentityContext?.OperationId);

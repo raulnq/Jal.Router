@@ -52,11 +52,11 @@ namespace Jal.Router.Impl.Outbound.Middleware
                     {
                         context.Index = index;
 
-                        _logger.Log($"Message {context.Data.IdentityContext.Id} failed to distribute ({count}), moving to the next channel");
+                        _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), moving to the next channel");
                     }
                     else
                     {
-                        _logger.Log($"Message {context.Data.IdentityContext.Id} failed to distribute ({count}), no more channels");
+                        _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), no more channels");
 
                         throw;
                     }

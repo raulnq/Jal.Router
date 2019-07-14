@@ -76,9 +76,9 @@ namespace Jal.Router.Sample.NetCore
                 //.EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
 
-            //var facade = container.GetInstance<IEntityStorageFacade>();
+            var facade = container.GetInstance<IEntityStorageGateway>();
 
-            //var messages = facade.GetMessages(new DateTime(2018, 12, 7), new DateTime(2018, 12, 9), "queueperformancetoread_handler");
+            var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
             host.RunAndBlock();
         }

@@ -52,11 +52,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     RequestId = sbmessage.SessionId
                 };
 
-                var tracks = default(List<Track>);
+                var trackings = new List<Tracking>();
 
-                if (sbmessage.UserProperties.ContainsKey(Tracks))
+                if (sbmessage.UserProperties.ContainsKey(Trackings))
                 {
-                    tracks = serializer.Deserialize(sbmessage.UserProperties[Tracks].ToString(), typeof(List<Track>)) as List<Track>;
+                    trackings = serializer.Deserialize(sbmessage.UserProperties[Trackings].ToString(), typeof(List<Tracking>)) as List<Tracking>;
                 }
 
                 var from = string.Empty;
@@ -87,7 +87,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     sagaid = sbmessage.UserProperties[SagaId].ToString();
                 }
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, tracks, new Origin(from, key), sagaid, version);
+                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version);
 
                 if (sbmessage.UserProperties.ContainsKey(ContentId))
                 {
@@ -97,7 +97,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 if (sbmessage.UserProperties != null)
                 {
                     foreach (var property in sbmessage.UserProperties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    &&  x.Key != SagaId && x.Key!=Tracks && x.Key!= ContentId && x.Key != ParentId && x.Key != OperationId))
+                    &&  x.Key != SagaId && x.Key!=Trackings && x.Key!= ContentId && x.Key != ParentId && x.Key != OperationId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -186,11 +186,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var serializer = Factory.CreateMessageSerializer();
 
-                var root = serializer.Serialize(context.TrackingContext.Tracks);
+                var root = serializer.Serialize(context.TrackingContext.Trackings);
 
                 if (!string.IsNullOrWhiteSpace(root))
                 {
-                    brokeredmessage.UserProperties.Add(Tracks, root);
+                    brokeredmessage.UserProperties.Add(Trackings, root);
                 }
             }
 

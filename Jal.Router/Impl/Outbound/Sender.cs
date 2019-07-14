@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Interface.Management;
 using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Outbound;
 
 namespace Jal.Router.Impl.Outbound
 {
@@ -35,34 +33,34 @@ namespace Jal.Router.Impl.Outbound
 
                 var message = await adapter.WriteMetadataAndContent(context, context.EndPoint).ConfigureAwait(false);
 
-                var metadata = _configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == context.Channel.GetId());
+                var sendercontext = _configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == context.Channel.Id);
 
-                if (metadata == null)
+                if (sendercontext == null)
                 {
-                    metadata = DynamicEndpointLoader(context.Channel, context);
+                    sendercontext = DynamicEndpointLoader(context.Channel, context);
 
-                    _configuration.Runtime.SendersMetadata.Add(metadata);
+                    _configuration.Runtime.SenderContexts.Add(sendercontext);
                 }
 
-                id = await metadata.Sender.Send(message).ConfigureAwait(false);
+                id = await sendercontext.SenderChannel.Send(sendercontext, message).ConfigureAwait(false);
 
-                if (metadata.Reader != null)
+                if (sendercontext.ReaderChannel != null)
                 {
                     MessageContext outputcontext = null;
 
                     try
                     {
-                        outputcontext = await metadata.Reader.Read(context, adapter).ConfigureAwait(false);
+                        outputcontext = await sendercontext.ReaderChannel.Read(sendercontext, context, adapter).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        _logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.GetPath()} {ex}");
+                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath} {ex}");
 
                         throw;
                     }
                     finally
                     {
-                        _logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.GetPath()}");
+                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
                     }
 
                     if (outputcontext != null)
@@ -75,19 +73,19 @@ namespace Jal.Router.Impl.Outbound
             }
             catch (Exception ex)
             {
-                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.GetPath()}  {ex}");
+                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}  {ex}");
 
                 throw;
             }
             finally
             {
-                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.GetPath()}");
+                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
             }
         }
 
-        private SenderMetadata DynamicEndpointLoader(Channel channel, MessageContext context)
+        private SenderContext DynamicEndpointLoader(Channel channel, MessageContext context)
         {
-            var sender = new SenderMetadata(channel);
+            var sender = new SenderContext(channel);
 
             sender.Endpoints.Add(context.EndPoint);
 
@@ -97,9 +95,9 @@ namespace Jal.Router.Impl.Outbound
             {
                 senderchannel.Open(sender);
 
-                sender.Sender = senderchannel;
+                sender.UpdateSenderChannel(senderchannel);
 
-                _logger.Log($"Opening {sender.Signature()}");
+                _logger.Log($"Opening {sender.Id}");
             }
 
             return sender;

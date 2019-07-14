@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound
         {
             try
             {
-                if(context.SagaContext.SagaData.Data==null)
+                if(context.SagaContext.SagaData?.Data==null)
                 {
                     var routemethod = typeof(Consumer).GetMethods().First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 2);
 

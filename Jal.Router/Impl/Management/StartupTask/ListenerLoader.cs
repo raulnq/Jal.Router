@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Interface.Management;
-using Jal.Router.Model.Inbound;
+using Jal.Router.Model;
 
 namespace Jal.Router.Impl.StartupTask
 {
@@ -21,7 +21,7 @@ namespace Jal.Router.Impl.StartupTask
 
             Create();
 
-            AssignGroup();
+            Update();
 
             OpenAndListen();
 
@@ -32,32 +32,32 @@ namespace Jal.Router.Impl.StartupTask
 
         private void OpenAndListen()
         {
-            foreach (var metadata in Factory.Configuration.Runtime.ListenersMetadata)
+            foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                var listenerchannel = Factory.CreateListenerChannel(metadata.Channel.Type);
+                var listenerchannel = Factory.CreateListenerChannel(listenercontext.Channel.Type);
 
                 if(listenerchannel!=null)
                 {
-                    metadata.Listener = listenerchannel;
+                    listenercontext.UpdateListenerChannel(listenerchannel);
 
-                    listenerchannel.Open(metadata);
+                    listenerchannel.Open(listenercontext);
 
-                    listenerchannel.Listen();
+                    listenerchannel.Listen(listenercontext);
 
-                    Logger.Log($"Listening {metadata.Signature()}");
+                    Logger.Log($"Listening {listenercontext.Id}");
                 }
             }
         }
 
-        private void AssignGroup()
+        private void Update()
         {
             foreach (var group in Factory.Configuration.Runtime.Groups)
             {
-                var listener = Factory.Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == group.Channel.GetId());
+                var listener = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == group.Channel.Id);
 
                 if (listener != null)
                 {
-                    listener.Group = group;
+                    listener.UpdateGroup(group);
                 }
             }
         }
@@ -68,7 +68,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 foreach (var channel in item.Channels)
                 {
-                    var listener = Factory.Configuration.Runtime.ListenersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                    var listener = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
 
                     if (listener != null)
                     {
@@ -76,11 +76,11 @@ namespace Jal.Router.Impl.StartupTask
                     }
                     else
                     {
-                        var newlistener = new ListenerMetadata(channel);
+                        var newlistener = new ListenerContext(channel);
 
                         newlistener.Routes.Add(item);
 
-                        Factory.Configuration.Runtime.ListenersMetadata.Add(newlistener);
+                        Factory.Configuration.Runtime.ListenerContexts.Add(newlistener);
                     }
                 }
             }

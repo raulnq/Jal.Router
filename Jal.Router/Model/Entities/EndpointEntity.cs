@@ -4,11 +4,11 @@ namespace Jal.Router.Model
 {
     public class EndpointEntity
     {
-        public string Name { get; }
+        public string Name { get; private set; }
 
-        public Type ContentType { get; }
+        public Type ContentType { get; private set; }
 
-        public EndpointEntity()
+        private EndpointEntity()
         {
 
         }

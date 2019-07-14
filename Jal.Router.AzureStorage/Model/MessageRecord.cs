@@ -22,24 +22,23 @@ namespace Jal.Router.AzureStorage.Model
             SizeOfSagaArraysOnKilobytes = 0;
             SizeOfContentArraysOnKilobytes = 0;
         }
-
-        public byte[] Saga0 { get; set; }
-        public byte[] Saga1 { get; set; }
-        public byte[] Saga2 { get; set; }
-        public byte[] Saga3 { get; set; }
-        public byte[] Saga4 { get; set; }
+        public string Host { get; set; }
+        public byte[] SagaContextEntity0 { get; set; }
+        public byte[] SagaContextEntity1 { get; set; }
+        public byte[] SagaContextEntity2 { get; set; }
+        public byte[] SagaContextEntity3 { get; set; }
+        public byte[] SagaContextEntity4 { get; set; }
         public int NumberOfSagaArrays { get; set; }
         public int SizeOfSagaArraysOnKilobytes { get; set; }
         public int SizeOfSaga { get; set; }
         public int SizeOfContent { get; set; }
-        public byte[] Content0 { get; set; }
-        public byte[] Content1 { get; set; }
-        public byte[] Content2 { get; set; }
-        public byte[] Content3 { get; set; }
-        public byte[] Content4 { get; set; }
+        public byte[] ContentContextEntity0 { get; set; }
+        public byte[] ContentContextEntity1 { get; set; }
+        public byte[] ContentContextEntity2 { get; set; }
+        public byte[] ContentContextEntity3 { get; set; }
+        public byte[] ContentContextEntity4 { get; set; }
         public int NumberOfContentArrays { get; set; }
         public int SizeOfContentArraysOnKilobytes { get; set; }
-        public string ContentType { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
         public string ChannelEntity { get; set; }

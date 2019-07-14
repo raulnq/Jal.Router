@@ -1,16 +1,16 @@
-﻿using Jal.Router.Model.Inbound;
+﻿using Jal.Router.Model;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
     public interface IListenerChannel
     {
-        void Open(ListenerMetadata metadata);
+        void Open(ListenerContext context);
 
-        bool IsActive();
+        bool IsActive(ListenerContext context);
 
-        Task Close();
+        Task Close(ListenerContext context);
 
-        void Listen();
+        void Listen(ListenerContext context);
     }
 }

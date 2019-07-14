@@ -1,14 +1,16 @@
-﻿using Jal.Router.Model.Outbound;
+﻿using Jal.Router.Model;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
     public interface ISenderChannel
     {
-        void Open(SenderMetadata metadata);
+        void Open(SenderContext context);
 
-        Task<string> Send(object message);
+        Task<string> Send(SenderContext context, object message);
 
-        Task Close();
+        bool IsActive(SenderContext context);
+
+        Task Close(SenderContext context);
     }
 }

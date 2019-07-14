@@ -69,13 +69,13 @@ namespace Jal.Router.Impl.Inbound
                 {
                     interceptor.OnExit(context);
 
-                    _logger.Log($"Message {context.IdentityContext.Id} handled by route {context.GetFullName()}");
+                    _logger.Log($"Message {context.Id} handled by route {context.Name}");
                 }
 
             }
             else
             {
-                _logger.Log($"Message {context.IdentityContext.Id} skipped by route {context.GetFullName()}");
+                _logger.Log($"Message {context.Id} skipped by route {context.Name}");
             }
         }
     }

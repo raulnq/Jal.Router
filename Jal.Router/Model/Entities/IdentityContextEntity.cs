@@ -2,14 +2,14 @@
 {
     public class IdentityContextEntity
     {
-        public string Id { get; }
-        public string OperationId { get; }
-        public string ParentId { get; }
-        public string ReplyToRequestId { get; }
-        public string RequestId { get; }
-        public string GroupId { get; }
+        public string Id { get; private set; }
+        public string OperationId { get; private set; }
+        public string ParentId { get; private set; }
+        public string ReplyToRequestId { get; private set; }
+        public string RequestId { get; private set; }
+        public string GroupId { get; private set; }
 
-        public IdentityContextEntity()
+        private IdentityContextEntity()
         {
 
         }

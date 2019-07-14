@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -14,25 +15,25 @@ namespace Jal.Router.Impl
             _factory = factory;
         }
 
-        public Task<SagaData[]> GetSagas(DateTime start, DateTime end, Type sagatype, string saganame, string sagastoragename = "")
+        public Task<SagaData[]> GetSagas(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetSagaData(start, end, sagatype, saganame, sagastoragename);
+            return storage.GetSagaData(start, end, saganame, options);
         }
 
-        public Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, string messagestoragename = "")
+        public Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, IDictionary<string, string> options = null)
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetMessageEntitiesBySagaData(sagadata, messagestoragename);
+            return storage.GetMessageEntitiesBySagaData(sagadata, options);
         }
 
-        public Task<MessageEntity[]> GetMessages(DateTime start, DateTime end, string routename, string messagestoragename = "")
+        public Task<MessageEntity[]> GetMessages(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null)
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetMessageEntities(start, end, routename, messagestoragename);
+            return storage.GetMessageEntities(start, end, routename, options);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
                 if(!handled)
                 {
-                    _logger.Log($"Message {messagecontext.IdentityContext.Id} with an exception not handled by route {messagecontext.GetFullName()}");
+                    _logger.Log($"Message {messagecontext.Id} with an exception not handled by route {messagecontext.Name}");
 
                     throw;
                 }

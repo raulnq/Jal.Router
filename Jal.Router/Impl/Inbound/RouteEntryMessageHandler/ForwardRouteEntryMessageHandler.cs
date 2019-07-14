@@ -23,13 +23,13 @@ namespace Jal.Router.Impl.Inbound.RouteEntryMessageHandler
             {
                 var endpointname = metadata.Parameters["endpoint"] as string;
 
-                var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, context.IdentityContext, context.Route, context.Version);
+                var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
 
                 var serializer = _factory.CreateMessageSerializer();
 
                 var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
-                _logger.Log($"Message {context.IdentityContext.Id}, forwarding the message to the endpoint {endpointname} by route {context.GetFullName()}");
+                _logger.Log($"Message {context.Id}, forwarding the message to the endpoint {endpointname} by route {context.Name}");
 
                 await context.Send(content, context.Origin, options);
             }

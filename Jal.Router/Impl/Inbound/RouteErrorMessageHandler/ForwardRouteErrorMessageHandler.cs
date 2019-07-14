@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
             {
                 var endpointname = metadata.Parameters["endpoint"] as string;
 
-                var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, context.IdentityContext, context.Route, context.Version);
+                var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
 
                 if (ex != null)
                 {
@@ -51,7 +51,7 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
 
                 var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
-                _logger.Log($"Message {context.IdentityContext.Id}, sending the message to the error endpoint {endpointname} by route {context.GetFullName()}");
+                _logger.Log($"Message {context.Id}, sending the message to the error endpoint {endpointname} by route {context.Name}");
 
                 await context.Send(content, context.Origin, options);
 

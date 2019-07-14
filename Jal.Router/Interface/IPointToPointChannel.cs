@@ -1,5 +1,5 @@
 using System;
-using Jal.Router.Model.Outbound;
+using Jal.Router.Model;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Interface

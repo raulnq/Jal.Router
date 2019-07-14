@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model.Outbound;
+using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
@@ -14,18 +14,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         }
 
-        protected SenderMetadata _metadata;
-
         private QueueClient _client;
 
-        public void Open(SenderMetadata metadata)
+        public void Open(SenderContext sendercontext)
         {
-            _client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
-
-            _metadata = metadata;
+            _client = new QueueClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
         }
 
-        public async Task<string> Send(object message)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
             var sbmessage = message as Message;
 
@@ -39,7 +35,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return string.Empty;
         }
 
-        public Task Close()
+        public bool IsActive(SenderContext sendercontext)
+        {
+            return !_client.IsClosedOrClosing;
+        }
+
+        public Task Close(SenderContext sendercontext)
         {
             return _client.CloseAsync();
         }

@@ -1,7 +1,4 @@
-﻿using System;
-using Jal.Router.Interface;
-using Jal.Router.Model.Outbound;
-using Jal.Router.Model.Inbound;
+﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System.Threading.Tasks;
 
@@ -9,34 +6,44 @@ namespace Jal.Router.Impl
 {
     public class NullPointToPointChannel : IPointToPointChannel
     {
-        public void Open(ListenerMetadata metadata)
+        public void Open(ListenerContext listenercontext)
         {
 
         }
 
-        public bool IsActive()
+        public bool IsActive(ListenerContext listenercontext)
         {
             return false;
         }
 
-        public Task Close()
+        public Task Close(ListenerContext listenercontext)
         {
             return Task.CompletedTask;
         }
 
-        public void Listen()
+        public void Listen(ListenerContext listenercontext)
         {
 
         }
 
-        public void Open(SenderMetadata metadata)
+        public void Open(SenderContext sendercontext)
         {
 
         }
 
-        public Task<string> Send(object message)
+        public Task<string> Send(SenderContext sendercontext, object message)
         {
             return Task.FromResult(string.Empty);
+        }
+
+        public bool IsActive(SenderContext sendercontext)
+        {
+            return false;
+        }
+
+        public Task Close(SenderContext sendercontext)
+        {
+            return Task.CompletedTask;
         }
     }
 }

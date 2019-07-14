@@ -23,7 +23,7 @@ namespace Jal.Router.Impl.Inbound.RouteEntryMessageHandler
             {
                 var fallback = metadata.Parameters["init"] as Func<MessageContext, Handler, Task>;
 
-                _logger.Log($"Message {context.IdentityContext.Id}, initiator executed by route {context.GetFullName()}");
+                _logger.Log($"Message {context.Id}, initiator executed by route {context.Name}");
 
                 await fallback(context, metadata);
             }

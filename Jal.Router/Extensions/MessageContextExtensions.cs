@@ -77,7 +77,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(endpointname);
             }
 
-            var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, context.IdentityContext.Clone(), context.Route, version);
+            var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext.Clone(), context.Route, context.Saga, version);
 
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
@@ -122,7 +122,7 @@ namespace Jal.Router.Extensions
                 identitycontext.ReplyToRequestId = context.IdentityContext.ReplyToRequestId;
             }
 
-            var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext.Tracks, identitycontext, context.Route, version);
+            var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version);
 
             if (headers != null)
             {

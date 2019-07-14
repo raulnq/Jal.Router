@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound
 
             var storage = Factory.CreateEntityStorage();
 
-            messagecontext.SagaContext.UpdateSagaData(await storage.GetSagaData(messagecontext.SagaContext.Id, messagecontext.Saga.DataType).ConfigureAwait(false));
+            messagecontext.SagaContext.UpdateSagaData(await storage.GetSagaData(messagecontext.SagaContext.Id).ConfigureAwait(false));
 
             if (messagecontext.SagaContext.SagaData != null)
             {

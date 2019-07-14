@@ -2,14 +2,13 @@
 {
     public class IdentityContext
     {
-        public string Id { get; }
-        public string OperationId { get; }
-        public string ParentId { get; }
+        public string Id { get; private set; }
+        public string OperationId { get; private set; }
+        public string ParentId { get; private set; }
         public string ReplyToRequestId { get; set; }
-        public string RequestId { get; set; }
-        public string GroupId { get; }
-
-        public  IdentityContext()
+        public string RequestId { get; set;  }
+        public string GroupId { get; private set; }
+        private  IdentityContext()
         {
 
         }

@@ -2,13 +2,13 @@
 {
     public class ChannelEntity
     {
-        public string Path { get; }
+        public string Path { get; private set; }
 
-        public string Subscription { get; }
+        public string Subscription { get; private set; }
 
-        public ChannelType Type { get; }
+        public ChannelType Type { get; private set; }
 
-        public ChannelEntity()
+        private ChannelEntity()
         {
 
         }
