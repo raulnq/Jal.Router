@@ -11,13 +11,13 @@ namespace Jal.Router.Impl.Inbound
 {
     public class FinalConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _router;
+        private readonly IConsumer _consumer;
 
         private const string DefaultStatus = "ENDED";
 
-        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer router, IConfiguration configuration) : base(configuration, factory)
+        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration) : base(configuration, factory)
         {
-            _router = router;
+            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -38,7 +38,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     try
                     {
-                        await _router.Consume(context.Data).ConfigureAwait(false);
+                        await _consumer.Consume(context.Data).ConfigureAwait(false);
 
                         messagecontext.SagaContext.SagaData.UpdateEndedDateTime(messagecontext.DateTimeUtc);
                     }

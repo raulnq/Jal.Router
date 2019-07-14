@@ -9,11 +9,11 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Outbound.Middleware
 {
-    public class MessageHandler : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
+    public class SenderMiddleware : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly ISender _sender;
 
-        public MessageHandler(ISender sender, IComponentFactoryGateway factory, IConfiguration configuration) : base(configuration, factory)
+        public SenderMiddleware(ISender sender, IComponentFactoryGateway factory, IConfiguration configuration) : base(configuration, factory)
         {
             _sender = sender;
         }

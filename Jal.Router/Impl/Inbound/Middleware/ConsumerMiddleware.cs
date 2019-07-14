@@ -11,11 +11,11 @@ namespace Jal.Router.Impl.Inbound.Middleware
 {
     public class ConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _router;
+        private readonly IConsumer _consumer;
 
-        public ConsumerMiddleware(IConsumer router, IComponentFactoryGateway factory, IConfiguration configuration):base(configuration, factory)
+        public ConsumerMiddleware(IConsumer consumer, IComponentFactoryGateway factory, IConfiguration configuration):base(configuration, factory)
         {
-            _router = router;
+            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -26,7 +26,7 @@ namespace Jal.Router.Impl.Inbound.Middleware
 
             try
             {
-                await _router.Consume(messagecontext).ConfigureAwait(false);
+                await _consumer.Consume(messagecontext).ConfigureAwait(false);
             }
             finally
             {

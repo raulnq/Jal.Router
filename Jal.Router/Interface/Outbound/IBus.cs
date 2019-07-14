@@ -6,11 +6,11 @@ namespace Jal.Router.Interface.Outbound
 
     public interface IBus
     {
-        Task<TResult> Reply<TContent, TResult>(TContent content, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class;
 
-        Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class;
 
-        Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult : class;
 
         Task Send<TContent>(TContent content, Options options);
 

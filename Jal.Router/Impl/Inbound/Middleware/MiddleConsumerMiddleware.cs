@@ -11,13 +11,13 @@ namespace Jal.Router.Impl.Inbound
 {
     public class MiddleConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _router;
+        private readonly IConsumer _consumer;
         
         private const string DefaultStatus = "IN PROCESS";
 
-        public MiddleConsumerMiddleware(IComponentFactoryGateway factory, IConsumer router, IConfiguration configuration) : base(configuration, factory)
+        public MiddleConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration) : base(configuration, factory)
         {
-            _router = router;
+            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -38,7 +38,7 @@ namespace Jal.Router.Impl.Inbound
                 {
                     try
                     {
-                        await _router.Consume(messagecontext).ConfigureAwait(false);
+                        await _consumer.Consume(messagecontext).ConfigureAwait(false);
 
                         messagecontext.SagaContext.SagaData.UpdateUpdatedDateTime(messagecontext.DateTimeUtc);
                     }

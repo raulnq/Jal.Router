@@ -170,9 +170,9 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(FinalConsumerMiddleware)).Named(typeof(FinalConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusMessageHandler>().LifestyleSingleton().Named(typeof(BusMessageHandler).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusMiddleware>().LifestyleSingleton().Named(typeof(BusMiddleware).FullName));
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.Outbound.Middleware.MessageHandler>().LifestyleSingleton().Named(typeof(Impl.Outbound.Middleware.MessageHandler).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.Outbound.Middleware.SenderMiddleware>().LifestyleSingleton().Named(typeof(Impl.Outbound.Middleware.SenderMiddleware).FullName));
 
             container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
 

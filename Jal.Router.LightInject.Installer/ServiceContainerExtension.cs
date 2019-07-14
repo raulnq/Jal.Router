@@ -198,9 +198,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.Outbound.Middleware.MessageHandler>(typeof (Impl.Outbound.Middleware.MessageHandler).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.Outbound.Middleware.SenderMiddleware>(typeof (Impl.Outbound.Middleware.SenderMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, BusMessageHandler>(typeof(BusMessageHandler).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
 
             container.Register<IValueFinder, AppSettingValueFinder>(typeof (AppSettingValueFinder).FullName, new PerContainerLifetime());
 

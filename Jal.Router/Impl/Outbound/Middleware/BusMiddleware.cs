@@ -9,13 +9,13 @@ using Jal.Router.Model;
 namespace Jal.Router.Impl.Outbound.Middleware
 {
 
-    public class BusMessageHandler : IMiddlewareAsync<MessageContext>
+    public class BusMiddleware : IMiddlewareAsync<MessageContext>
     {
         private readonly ILogger _logger;
 
         private readonly IComponentFactoryGateway _factory;
 
-        public BusMessageHandler(ILogger logger, IComponentFactoryGateway factory)
+        public BusMiddleware(ILogger logger, IComponentFactoryGateway factory)
         {
             _factory = factory;
 

@@ -28,70 +28,25 @@ namespace Jal.Router.Impl.Outbound
             _pipeline = pipeline;
         }
 
-        private async Task<TResult> Reply<TResult>(MessageContext message)
-        {
-            var interceptor = _factory.CreateBusInterceptor();
-
-            interceptor.OnEntry(message);
-
-            try
-            {
-                await Update(message);
-
-                if (message.EndPoint.Channels.Any())
-                {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
-
-                    foreach (var type in _configuration.OutboundMiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    foreach (var type in message.EndPoint.MiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
-
-                    interceptor.OnSuccess(message);
-
-                    return (TResult) message.ContentContext.Response;
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
-                }
-            }
-            catch (Exception ex)
-            {
-                interceptor.OnError(message, ex);
-
-                throw;
-            }
-            finally
-            {
-                interceptor.OnExit(message);
-            }
-        }
-
-        public Task<TResult> Reply<TContent, TResult>(TContent content, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
             return Reply<TContent, TResult>(content, endpoint, endpoint.Origin, options);
         }
 
-        public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options)
+        public async Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult: class
         {
             var serializer = _factory.CreateMessageSerializer();
 
             var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
-            return Reply<TResult>(message);
+            await Send(message);
+
+            return message.ContentContext.Response as TResult;
         }
 
-        public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
@@ -187,53 +142,7 @@ namespace Jal.Router.Impl.Outbound
 
             var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
 
-            return Publish(message);
-        }
-
-        private async Task Publish(MessageContext message)
-        {
-            var interceptor = _factory.CreateBusInterceptor();
-
-            interceptor.OnEntry(message);
-
-            try
-            {
-                await Update(message);
-
-                if (message.EndPoint.Channels.Any())
-                {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
-
-                    foreach (var type in _configuration.OutboundMiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    foreach (var type in message.EndPoint.MiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
-                }
-
-                interceptor.OnSuccess(message);
-
-            }
-            catch (Exception ex)
-            {
-                interceptor.OnError(message, ex);
-
-                throw;
-            }
-            finally
-            {
-                interceptor.OnExit(message);
-            }
+            return Send(message);
         }
 
         private async Task Send(MessageContext message)
@@ -248,7 +157,7 @@ namespace Jal.Router.Impl.Outbound
 
                 if (message.EndPoint.Channels.Any())
                 {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMessageHandler>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
 
                     foreach (var type in _configuration.OutboundMiddlewareTypes)
                     {
@@ -260,7 +169,7 @@ namespace Jal.Router.Impl.Outbound
                         chain.UseAsync(type);
                     }
 
-                    await chain.UseAsync<MessageHandler>().RunAsync(message).ConfigureAwait(false);
+                    await chain.UseAsync<SenderMiddleware>().RunAsync(message).ConfigureAwait(false);
                 }
                 else
                 {
@@ -268,6 +177,7 @@ namespace Jal.Router.Impl.Outbound
                 }
 
                 interceptor.OnSuccess(message);
+
             }
             catch (Exception ex)
             {
