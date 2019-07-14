@@ -30,7 +30,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 Factory.Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
 
-                Factory.Configuration.Runtime.Groups.AddRange(source.GetGroups());
+                Factory.Configuration.Runtime.Partitions.AddRange(source.GetPartitions());
 
                 Factory.Configuration.Runtime.PointToPointChannels.AddRange(source.GetPointToPointChannels());
 

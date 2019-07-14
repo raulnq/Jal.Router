@@ -66,7 +66,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var adapter = Factory.CreateMessageAdapter();
 
-            if (listenercontext.Group != null)
+            if (listenercontext.Partition != null)
             {
                 _client.RegisterSessionHandler(async (ms, message, token) => {
 
@@ -89,7 +89,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (listenercontext.Group.Until(context))
+                        if (listenercontext.Partition.Until(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
@@ -153,17 +153,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var options = new SessionHandlerOptions(handler) { AutoComplete = false };
 
-            if (_parameter.MaxConcurrentGroups > 0)
+            if (_parameter.MaxConcurrentPartitions > 0)
             {
-                options.MaxConcurrentSessions = _parameter.MaxConcurrentGroups;
+                options.MaxConcurrentSessions = _parameter.MaxConcurrentPartitions;
             }
-            if (_parameter.AutoRenewGroupTimeoutInSeconds > 0)
+            if (_parameter.AutoRenewPartitionTimeoutInSeconds > 0)
             {
-                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewGroupTimeoutInSeconds);
+                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewPartitionTimeoutInSeconds);
             }
-            if (_parameter.MessageGroupTimeoutInSeconds > 0)
+            if (_parameter.MessagePartitionTimeoutInSeconds > 0)
             {
-                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessageGroupTimeoutInSeconds);
+                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessagePartitionTimeoutInSeconds);
             }
             return options;
         }

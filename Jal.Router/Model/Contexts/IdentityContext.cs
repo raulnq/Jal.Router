@@ -7,7 +7,7 @@
         public string ParentId { get; private set; }
         public string ReplyToRequestId { get; set; }
         public string RequestId { get; set;  }
-        public string GroupId { get; private set; }
+        public string PartitionId { get; private set; }
         private  IdentityContext()
         {
 
@@ -28,14 +28,14 @@
             ParentId = parentid;
         }
 
-        public IdentityContext(string id, string operationid, string parentid, string groupid):this(id, operationid, parentid)
+        public IdentityContext(string id, string operationid, string parentid, string partitionid):this(id, operationid, parentid)
         {
-            GroupId = groupid;
+            PartitionId = partitionid;
         }
 
         public IdentityContext Clone()
         {
-            return new IdentityContext(Id, OperationId, ParentId, GroupId)
+            return new IdentityContext(Id, OperationId, ParentId, PartitionId)
             {
                 RequestId = RequestId,
                 ReplyToRequestId = ReplyToRequestId
@@ -44,7 +44,7 @@
 
         public IdentityContextEntity ToEntity()
         {
-            return new IdentityContextEntity(Id, OperationId, ParentId, RequestId, GroupId, ReplyToRequestId);
+            return new IdentityContextEntity(Id, OperationId, ParentId, RequestId, PartitionId, ReplyToRequestId);
         }
     }
 }

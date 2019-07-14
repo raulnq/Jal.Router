@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
+    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
         private readonly EndPoint _endpoint;
 
@@ -14,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
             _endpoint = endpoint;
         }
 
-        public IOnEndPointOptionBuilder ForMessage<TMessage>()
+        public IToEndPointBuilder ForMessage<TMessage>()
         {
             _endpoint.ContentType = typeof (TMessage);
 
@@ -95,7 +95,7 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.Channels.Add(channel);
         }
 
-        public void To(Action<IToChannelBuilder> channelbuilder)
+        public IOnEndPointOptionBuilder To(Action<IToChannelBuilder> channelbuilder)
         {
             if (channelbuilder==null)
             {
@@ -103,6 +103,8 @@ namespace Jal.Router.Fluent.Impl
             }
 
             channelbuilder(this);
+
+            return this;
         }
 
         public IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action)
@@ -119,14 +121,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnEndPointOptionBuilder AsClaimCheck()
-        {
-            _endpoint.UseClaimCheck = true;
-
-            return this;
-        }
-
-        public void To<TReply>(Action<IToReplyChannelBuilder> channelbuilder)
+        public IOnEndPointOptionBuilder To<TReply>(Action<IToReplyChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {
@@ -136,6 +131,62 @@ namespace Jal.Router.Fluent.Impl
             _endpoint.ReplyContentType = typeof(TReply);
 
             channelbuilder(this);
+
+            return this;
+        }
+
+        public IOnEndPointOptionBuilder OnError(Action<IOnEndPointErrorBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnEndPointErrorBuilder(_endpoint);
+
+            action(builder);
+
+            return this;
+        }
+
+        public IOnEndPointOptionBuilder OnEntry(Action<IOnEndPointEntryBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnEndPointEntryBuilder(_endpoint);
+
+            action(builder);
+
+            return this;
+        }
+
+        public IOnEndPointOptionBuilder OnExit(Action<IOnEndPointExitBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnEndPointExitBuilder(_endpoint);
+
+            action(builder);
+
+            return this;
+        }
+
+        public void With(Action<IOnEndPointWithBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnEndPointWithBuilder(_endpoint);
+
+            action(builder);
         }
     }
 }

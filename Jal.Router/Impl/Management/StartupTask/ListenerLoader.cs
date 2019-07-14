@@ -51,13 +51,13 @@ namespace Jal.Router.Impl.StartupTask
 
         private void Update()
         {
-            foreach (var group in Factory.Configuration.Runtime.Groups)
+            foreach (var partition in Factory.Configuration.Runtime.Partitions)
             {
-                var listener = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == group.Channel.Id);
+                var listener = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == partition.Channel.Id);
 
                 if (listener != null)
                 {
-                    listener.UpdateGroup(group);
+                    listener.UpdatePartition(partition);
                 }
             }
         }

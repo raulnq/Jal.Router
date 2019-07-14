@@ -24,6 +24,8 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
+            var messagecontext = context.Data;
+
             var shuffler = _factory.CreateChannelShuffler();
 
             var channels = shuffler.Shuffle(context.Data.EndPoint.Channels.ToArray());
@@ -34,34 +36,72 @@ namespace Jal.Router.Impl.Outbound.Middleware
 
             var index = context.Index;
 
-            foreach (var channel in channels)
+            foreach (var item in messagecontext.EndPoint.EntryHandlers)
             {
-                context.Data.UpdateChannel(channel);
+                var handler = _factory.CreateBusEntryMessageHandler(item.Type);
 
-                try
+                await handler.Handle(messagecontext, item).ConfigureAwait(false);
+            }
+            try
+            {
+                foreach (var channel in channels)
                 {
-                    count++;
+                    context.Data.UpdateChannel(channel);
 
-                    await next(context);
-
-                    return;
-                }
-                catch (Exception)
-                {
-                    if (count < numberofchannels)
+                    try
                     {
-                        context.Index = index;
+                        count++;
 
-                        _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), moving to the next channel");
+                        await next(context);
+
+                        return;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), no more channels");
+                        if (count < numberofchannels)
+                        {
+                            context.Index = index;
 
-                        throw;
+                            _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), moving to the next channel");
+                        }
+                        else
+                        {
+                            var errormetadata = messagecontext.EndPoint.ErrorHandlers.Where(x => x.ExceptionTypes.Count == 0 || x.ExceptionTypes.Contains(ex.GetType()));
+
+                            var handled = false;
+
+                            foreach (var item in errormetadata)
+                            {
+                                var handler = _factory.CreateBusErrorMessageHandler(item.Type);
+
+                                handled = await handler.OnException(messagecontext, ex, item).ConfigureAwait(false);
+
+                                if (handled)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (!handled)
+                            {
+                                _logger.Log($"Message {context.Data.Id} failed to distribute ({count}), no more channels");
+
+                                throw;
+                            }
+                        }
                     }
                 }
             }
+            finally
+            {
+                foreach (var item in messagecontext.EndPoint.ExitHandlers)
+                {
+                    var handler = _factory.CreateBusExitMessageHandler(item.Type);
+
+                    await handler.Handle(messagecontext, item).ConfigureAwait(false);
+                }
+            }
+            
         }
     }
 }

@@ -14,7 +14,14 @@ namespace Jal.Router.Interface
 
         IRouteExitMessageHandler CreateRouteExitMessageHandler(Type type);
 
+        IBusErrorMessageHandler CreateBusErrorMessageHandler(Type type);
+
+        IBusEntryMessageHandler CreateBusEntryMessageHandler(Type type);
+
+        IBusExitMessageHandler CreateBusExitMessageHandler(Type type);
+
         IConfiguration Configuration { get; }
+
         IBusInterceptor CreateBusInterceptor();
 
         IRouterInterceptor CreateRouterInterceptor();

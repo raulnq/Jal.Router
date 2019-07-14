@@ -5,16 +5,16 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class GroupForChannelBuilder : IGroupForChannelBuilder, IGroupUntilBuilder
+    public class PartitionForChannelBuilder : IPartitionForChannelBuilder, IPartitionUntilBuilder
     {
-        private Group _group;
+        private Partition _partition;
 
-        public GroupForChannelBuilder(Group group)
+        public PartitionForChannelBuilder(Partition partition)
         {
-            _group = group;
+            _partition = partition;
         }
 
-        public IGroupUntilBuilder ForPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public IPartitionUntilBuilder ForPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -26,7 +26,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            _group.Channel = new Channel(ChannelType.PointToPoint)
+            _partition.Channel = new Channel(ChannelType.PointToPoint)
             {
                 ToPath = path,
 
@@ -35,12 +35,12 @@ namespace Jal.Router.Fluent.Impl
                 ConnectionStringValueFinderType = typeof(TValueFinder)
             };
 
-            _group.Until = x => false;
+            _partition.Until = x => false;
 
             return this;
         }
 
-        public IGroupUntilBuilder ForSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -55,7 +55,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _group.Channel = new Channel(ChannelType.SubscriptionToPublishSubscribe)
+            _partition.Channel = new Channel(ChannelType.SubscriptionToPublishSubscribe)
             {
                 ToPath = path,
 
@@ -66,7 +66,7 @@ namespace Jal.Router.Fluent.Impl
                 ToSubscription = subscription
             };
 
-            _group.Until = x => false;
+            _partition.Until = x => false;
 
             return this;
         }
@@ -78,7 +78,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _group.Until = condition;
+            _partition.Until = condition;
         }
     }
 }

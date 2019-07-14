@@ -61,12 +61,12 @@ namespace Jal.Router.Sample.NetCore
 
             container.Register<IMessageHandler<Message>, QueueToRead>(typeof(QueueToRead).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
-            container.Register<IMessageHandler<Message>, QueueToReadGroup>(typeof(QueueToReadGroup).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, QueueToReadPartition>(typeof(QueueToReadPartition).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenSessionSenderHandlers>(typeof(QueueListenSessionSenderHandlers).FullName, new PerContainerLifetime());
             
             var host = container.GetInstance<IHost>();
             host.Configuration
-                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1, TimeoutInSeconds = 60 })
+                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 .AddMonitoringTask<HeartBeatLogger>(15)
                 .UseNewtonsoft()
@@ -155,9 +155,9 @@ namespace Jal.Router.Sample.NetCore
                 TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
             };
 
-            RegisterGroup("xx").ForQueue(_sessionqueue, config.ConnectionString).Until(x => false);
+            RegisterPartition("xx").ForQueue(_sessionqueue, config.ConnectionString).Until(x => false);
 
-            RegisterGroup("yy").ForSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).Until(x => false);
+            RegisterPartition("yy").ForSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).Until(x => false);
 
 
             RegisterHandler<IMessageHandler<Message>>(_sendersessionqueue + "_handler")
@@ -175,7 +175,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_sessionqueue, config.ConnectionString);
             })
-            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            .ForMessage<Message>().Use<QueueToReadPartition>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -185,7 +185,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString);
             })
-            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            .ForMessage<Message>().Use<QueueToReadPartition>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -447,7 +447,7 @@ namespace Jal.Router.Sample.NetCore
             //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
             //.OnEntry(x=>x.EnableEntityStorage(true))
             //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
-            ; 
+            ;
 
             RegisterEndPoint(_errorqueueendpoint)
                 .ForMessage<Message>()
@@ -651,11 +651,11 @@ namespace Jal.Router.Sample.NetCore
         }
     }
 
-    public class QueueToReadGroup : AbstractMessageHandler<Message>
+    public class QueueToReadPartition : AbstractMessageHandler<Message>
     {
         public override Task HandleWithContext(Message message, MessageContext context)
         {
-            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.GroupId);
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.PartitionId);
 
             return Task.CompletedTask;
         }

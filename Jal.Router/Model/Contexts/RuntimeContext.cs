@@ -10,7 +10,7 @@ namespace Jal.Router.Model
 
         public List<EndPoint> EndPoints { get; }
 
-        public List<Group> Groups { get; }
+        public List<Partition> Partitions { get; }
 
         public List<Saga> Sagas { get; }
 
@@ -42,7 +42,7 @@ namespace Jal.Router.Model
 
             SubscriptionToPublishSubscribeChannels = new List<SubscriptionToPublishSubscribeChannel>();
 
-            Groups = new List<Group>();
+            Partitions = new List<Partition>();
         }
     }
 }

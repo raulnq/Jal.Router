@@ -5,9 +5,9 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {
-    public static class GroupForChannelBuilderExtensions
+    public static class PartitionForChannelBuilderExtensions
     {
-        public static IGroupUntilBuilder ForPointToPointChannel(this IGroupForChannelBuilder builder, string path, string connectionstring)
+        public static IPartitionUntilBuilder ForPointToPointChannel(this IPartitionForChannelBuilder builder, string path, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -24,7 +24,7 @@ namespace Jal.Router.Extensions
             return builder.ForPointToPointChannel<NullValueFinder>(path, provider);
         }
 
-        public static IGroupUntilBuilder ForSubscriptionToPublishSubscribeChannel(this IGroupForChannelBuilder builder, string path, string subscription, string connectionstring)
+        public static IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(this IPartitionForChannelBuilder builder, string path, string subscription, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {

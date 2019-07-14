@@ -3,7 +3,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IGroupUntilBuilder
+    public interface IPartitionUntilBuilder
     {
         void Until(Func<MessageContext, bool> condition);
     }

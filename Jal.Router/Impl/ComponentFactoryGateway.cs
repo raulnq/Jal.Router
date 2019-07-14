@@ -122,6 +122,21 @@ namespace Jal.Router.Impl
             return _factory.Create<IRouteExitMessageHandler>(type);
         }
 
+        public IBusErrorMessageHandler CreateBusErrorMessageHandler(Type type)
+        {
+            return _factory.Create<IBusErrorMessageHandler>(type);
+        }
+
+        public IBusEntryMessageHandler CreateBusEntryMessageHandler(Type type)
+        {
+            return _factory.Create<IBusEntryMessageHandler>(type);
+        }
+
+        public IBusExitMessageHandler CreateBusExitMessageHandler(Type type)
+        {
+            return _factory.Create<IBusExitMessageHandler>(type);
+        }
+
         public ILogger<T> CreateLogger<T>(Type type)
         {
             return _factory.Create<ILogger<T>>(type);

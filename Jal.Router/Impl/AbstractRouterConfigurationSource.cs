@@ -12,7 +12,7 @@ namespace Jal.Router.Impl
     {
         private readonly List<Route> _routes = new List<Route>();
 
-        private readonly List<Group> _group = new List<Group>();
+        private readonly List<Partition> _partition = new List<Partition>();
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
@@ -31,9 +31,9 @@ namespace Jal.Router.Impl
             return _routes.ToArray();
         }
 
-        public Group[] GetGroups()
+        public Partition[] GetPartitions()
         {
-            return _group.ToArray();
+            return _partition.ToArray();
         }
 
         public Saga[] GetSagas()
@@ -247,18 +247,18 @@ namespace Jal.Router.Impl
             _origin.Key = key;
         }
 
-        public IGroupForChannelBuilder RegisterGroup(string name)
+        public IPartitionForChannelBuilder RegisterPartition(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var group = new Group(name);
+            var partition = new Partition(name);
 
-            _group.Add(group);
+            _partition.Add(partition);
 
-            return new GroupForChannelBuilder(group);
+            return new PartitionForChannelBuilder(partition);
         }
 
         public INameEndPointBuilder RegisterEndPoint(string name)

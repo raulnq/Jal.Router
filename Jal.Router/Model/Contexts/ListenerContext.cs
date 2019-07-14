@@ -8,7 +8,7 @@ namespace Jal.Router.Model
     {
         public Channel Channel { get; private set; }
 
-        public Group Group { get; private set; }
+        public Partition Partition { get; private set; }
 
         public IListenerChannel ListenerChannel { get; private set; }
 
@@ -24,13 +24,13 @@ namespace Jal.Router.Model
         {
             get
             {
-                return $"{Group?.ToString()} {Channel.FullPath} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
+                return $"{Partition?.ToString()} {Channel.FullPath} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
             }
         }
 
-        public void UpdateGroup(Group group)
+        public void UpdatePartition(Partition partition)
         {
-            Group = group;
+            Partition = partition;
         }
 
         public void UpdateListenerChannel(IListenerChannel listener)

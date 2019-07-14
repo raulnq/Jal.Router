@@ -20,15 +20,15 @@ namespace Jal.Router.Impl.StartupTask
 
             var errors = new StringBuilder();
 
-            foreach (var group in Factory.Configuration.Runtime.Groups)
+            foreach (var partition in Factory.Configuration.Runtime.Partitions)
             {
-                var finder = Factory.CreateValueFinder(group.Channel.ConnectionStringValueFinderType);
+                var finder = Factory.CreateValueFinder(partition.Channel.ConnectionStringValueFinderType);
 
-                group.Channel.ToConnectionString = group.Channel.ToConnectionStringProvider?.Invoke(finder);
+                partition.Channel.ToConnectionString = partition.Channel.ToConnectionStringProvider?.Invoke(finder);
 
-                if (string.IsNullOrWhiteSpace(group.Channel.ToConnectionString))
+                if (string.IsNullOrWhiteSpace(partition.Channel.ToConnectionString))
                 {
-                    var error = $"Empty connection string, Group {group.Name}";
+                    var error = $"Empty connection string, partition {partition.Name}";
 
                     errors.AppendLine(error);
 
@@ -36,9 +36,9 @@ namespace Jal.Router.Impl.StartupTask
                 }
 
 
-                if (string.IsNullOrWhiteSpace(group.Channel.ToPath))
+                if (string.IsNullOrWhiteSpace(partition.Channel.ToPath))
                 {
-                    var error = $"Empty path, Group {group.Name}";
+                    var error = $"Empty path, partition {partition.Name}";
 
                     errors.AppendLine(error);
 

@@ -219,9 +219,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.SessionId = context.IdentityContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.GroupId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.PartitionId))
             {
-                brokeredmessage.SessionId = context.IdentityContext.GroupId;
+                brokeredmessage.SessionId = context.IdentityContext.PartitionId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
