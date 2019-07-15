@@ -16,14 +16,16 @@ namespace Jal.Router.Model
         }
         public Origin Origin { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public Type ContentType { get; set; }
 
         public Type ReplyContentType { get; set; }
 
         public IList<Channel> Channels { get; }
+
         public IList<Type> MiddlewareTypes { get; }
+
         public bool UseClaimCheck { get; set; }
 
         public IList<ErrorHandler> ErrorHandlers { get; }

@@ -23,15 +23,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
-            _channel.ToReplyPath = path;
-
-            _channel.ToReplyConnectionStringProvider = connectionstringprovider;
-
-            _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
-
-            _channel.Type = ChannelType.RequestReplyToPointToPoint;
-
-            _channel.ToReplyTimeOut = timeout;
+            _channel.UpdateReplyFromPointToPointChannel(path, timeout, typeof(TValueFinder), connectionstringprovider);
         }
 
         public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription,
@@ -50,17 +42,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channel.ToReplyPath = path;
-
-            _channel.ToReplyConnectionStringProvider = connectionstringprovider;
-
-            _channel.ReplyConnectionStringValueFinderType = typeof(TValueFinder);
-
-            _channel.ToReplySubscription = subscription;
-
-            _channel.Type = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
-
-            _channel.ToReplyTimeOut = timeout;
+            _channel.UpdateReplyFromSubscriptionToPublishSubscribeChannel(path, timeout, subscription, typeof(TValueFinder), connectionstringprovider);
         }
     }
 }

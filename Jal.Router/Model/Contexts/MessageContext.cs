@@ -158,17 +158,17 @@ namespace Jal.Router.Model
             return _bus.Publish(content, endpoint, origin, options);
         }
 
-        public Task<TResult> Reply<TContent, TResult>(TContent content, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
         {
             return _bus.Reply<TContent, TResult>(content, options);
         }
 
-        public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
         {
             return _bus.Reply<TContent, TResult>(content, origin, options);
         }
 
-        public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options)
+        public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult : class
         {
             return _bus.Reply<TContent, TResult>(content, endpoint, origin, options);
         }

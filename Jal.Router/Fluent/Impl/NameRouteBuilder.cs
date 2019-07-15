@@ -52,14 +52,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            _channels.Add(new Channel(ChannelType.PointToPoint)
-            {
-                ToPath = path,
-
-                ToConnectionStringProvider = connectionstringprovider,
-
-                ConnectionStringValueFinderType = typeof(TValueFinder)
-            });
+            _channels.Add(new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path));
         }
 
         public void AddSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
@@ -77,16 +70,8 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe)
-            {
-                ToPath = path,
-
-                ToConnectionStringProvider = connectionstringprovider,
-
-                ConnectionStringValueFinderType = typeof(TValueFinder),
-
-                ToSubscription = subscription
-            });
+            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe, typeof(TValueFinder), 
+                connectionstringprovider, path, subscription));
         }
 
         public INameRouteBuilder<THandler> ToListen(Action<IListenerChannelBuilder> channelbuilder)

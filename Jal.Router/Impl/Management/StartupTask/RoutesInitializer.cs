@@ -24,7 +24,7 @@ namespace Jal.Router.Impl.StartupTask
             {
                 var finder = Factory.CreateValueFinder(partition.Channel.ConnectionStringValueFinderType);
 
-                partition.Channel.ToConnectionString = partition.Channel.ToConnectionStringProvider?.Invoke(finder);
+                partition.Channel.UpdateToConnectionString(partition.Channel.ToConnectionStringProvider?.Invoke(finder));
 
                 if (string.IsNullOrWhiteSpace(partition.Channel.ToConnectionString))
                 {
@@ -54,7 +54,7 @@ namespace Jal.Router.Impl.StartupTask
                     {
                         var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
-                        channel.ToConnectionString = channel.ToConnectionStringProvider?.Invoke(finder);
+                        channel.UpdateToConnectionString(channel.ToConnectionStringProvider?.Invoke(finder));
 
                         if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
                         {

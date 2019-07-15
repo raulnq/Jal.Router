@@ -7,7 +7,7 @@ namespace Jal.Router.Extensions
 {
     public static class MessageContextExtensions
     {
-        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null)
+        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null) where TResult : class
         {
             var options = context.CreateOptions(endpointname, identitycontext, headers);
 
@@ -16,7 +16,7 @@ namespace Jal.Router.Extensions
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null)
+        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid, Dictionary<string, string> headers = null) where TResult : class
         {
             var options = context.CreateOptions(endpointname, identitycontext, sagaid, headers);
 

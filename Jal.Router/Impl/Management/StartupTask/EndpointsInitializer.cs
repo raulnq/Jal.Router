@@ -33,7 +33,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             if (channel.ToConnectionStringProvider!=null)
                             {
-                                channel.ToConnectionString = channel.ToConnectionStringProvider(finder);
+                                channel.UpdateToConnectionString(channel.ToConnectionStringProvider(finder));
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
@@ -61,7 +61,7 @@ namespace Jal.Router.Impl.StartupTask
 
                             if (channel.ToReplyConnectionStringProvider!=null)
                             {
-                                channel.ToReplyConnectionString = channel.ToReplyConnectionStringProvider(finder);
+                                channel.UpdateToReplyConnectionString(channel.ToReplyConnectionStringProvider(finder));
                             }
 
                             if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))

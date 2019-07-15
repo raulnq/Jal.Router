@@ -23,10 +23,7 @@ namespace Jal.Router.Fluent.Impl
 
         public void AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
-            var channel = new Channel(ChannelType.PointToPoint)
-            {
-                ConnectionStringValueFinderType = typeof(TValueFinder)
-            };
+            
 
             if (connectionstringprovider == null)
             {
@@ -38,19 +35,14 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            channel.ToConnectionStringProvider = connectionstringprovider;
-
-            channel.ToPath = path;
+            var channel = new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path);
 
             _endpoint.Channels.Add(channel);
         }
 
         IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) //where TValueFinder : IValueFinder
         {
-            var channel = new Channel(ChannelType.PointToPoint)
-            {
-                ConnectionStringValueFinderType = typeof(TValueFinder)
-            };
+            
 
             if (connectionstringprovider == null)
             {
@@ -61,10 +53,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(path));
             }
-
-            channel.ToConnectionStringProvider = connectionstringprovider;
-
-            channel.ToPath = path;
+            var channel = new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path);
 
             _endpoint.Channels.Add(channel);
 
@@ -73,10 +62,7 @@ namespace Jal.Router.Fluent.Impl
 
         public void AddPublishSubscribeChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
-            var channel = new Channel(ChannelType.PublishSubscribe)
-            {
-                ConnectionStringValueFinderType = typeof(TValueFinder)
-            };
+            
 
             if (connectionstringprovider == null)
             {
@@ -88,9 +74,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            channel.ToConnectionStringProvider = connectionstringprovider;
-
-            channel.ToPath = path;
+            var channel = new Channel(ChannelType.PublishSubscribe, typeof(TValueFinder), connectionstringprovider, path);
 
             _endpoint.Channels.Add(channel);
         }
