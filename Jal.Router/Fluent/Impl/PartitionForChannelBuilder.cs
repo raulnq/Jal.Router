@@ -26,9 +26,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            _partition.Channel = new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path);
-
-            _partition.Until = x => false;
+            _partition.UpdateChannel(new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path));
 
             return this;
         }
@@ -48,10 +46,8 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _partition.Channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, typeof(TValueFinder), 
-                connectionstringprovider, path, subscription);
-
-            _partition.Until = x => false;
+            _partition.UpdateChannel(new Channel(ChannelType.SubscriptionToPublishSubscribe, typeof(TValueFinder), 
+                connectionstringprovider, path, subscription));
 
             return this;
         }
@@ -63,7 +59,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _partition.Until = condition;
+            _partition.UpdateUntil(condition);
         }
     }
 }

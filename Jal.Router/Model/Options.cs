@@ -17,6 +17,15 @@ namespace Jal.Router.Model
             Saga = saga;
             Version = version;
         }
+
+        public Options(string endpointname, Dictionary<string, string> headers,
+    SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, 
+    Saga saga, string version, DateTime scheduledenqueuedatetimeutc)
+            :this(endpointname, headers, sagacontext, tracks, identitycontext, route, saga, version)
+        {
+            ScheduledEnqueueDateTimeUtc = scheduledenqueuedatetimeutc;
+        }
+
         public IdentityContext IdentityContext { get; private set; }
 
         public SagaContext SagaContext { get; private set; }
@@ -29,7 +38,7 @@ namespace Jal.Router.Model
 
         public string Version { get; private set; }
 
-        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; private set; }
 
         public IDictionary<string,string> Headers { get; private set; }
 

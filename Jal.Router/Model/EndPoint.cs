@@ -14,19 +14,19 @@ namespace Jal.Router.Model
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
         }
-        public Origin Origin { get; set; }
+        public Origin Origin { get; private set; }
 
         public string Name { get; private set; }
 
-        public Type ContentType { get; set; }
+        public Type ContentType { get; private set; }
 
-        public Type ReplyContentType { get; set; }
+        public Type ReplyContentType { get; private set; }
 
         public IList<Channel> Channels { get; }
 
         public IList<Type> MiddlewareTypes { get; }
 
-        public bool UseClaimCheck { get; set; }
+        public bool UseClaimCheck { get; private set; }
 
         public IList<ErrorHandler> ErrorHandlers { get; }
 
@@ -37,6 +37,25 @@ namespace Jal.Router.Model
         public EndpointEntity ToEntity()
         {
             return new EndpointEntity(Name, ContentType);
+        }
+
+        public void UpdateOrigin(Origin origin)
+        {
+            Origin = origin;
+        }
+
+        public void UpdateContentType(Type contenttype)
+        {
+            ContentType = contenttype;
+        }
+        public void UpdateReplyContentType(Type contenttype)
+        {
+            ReplyContentType = contenttype;
+        }
+
+        public void UpdateUseClaimCheck(bool useclaimcheck)
+        {
+            UseClaimCheck = useclaimcheck;
         }
     }
 }

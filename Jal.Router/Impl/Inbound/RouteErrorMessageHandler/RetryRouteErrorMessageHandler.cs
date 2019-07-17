@@ -44,10 +44,7 @@ namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
                 {
                     context.Headers[countname] = count.ToString();
 
-                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version)
-                    {
-                        ScheduledEnqueueDateTimeUtc = DateTime.UtcNow.Add(policy.NextRetryInterval(count)),
-                    };
+                    var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version, DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
 
                     var serializer = _factory.CreateMessageSerializer();
 

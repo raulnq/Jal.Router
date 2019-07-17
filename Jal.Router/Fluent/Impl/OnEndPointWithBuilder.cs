@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
 
         public void AsClaimCheck()
         {
-            _endpoint.UseClaimCheck = true;
+            _endpoint.UpdateUseClaimCheck(true);
         }
     }
 }

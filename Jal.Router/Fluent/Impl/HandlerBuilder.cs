@@ -24,7 +24,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(action));
             }
 
-            _route.ConsumerType = typeof (TConcreteConsumer);
+            _route.UpdateConsumerType(typeof (TConcreteConsumer));
 
             var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler>(_route);
 
@@ -52,7 +52,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.When = condition;
+            _route.UpdateWhen(condition);
 
             return this;
         }
@@ -131,7 +131,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(action));
             }
 
-            _route.ConsumerType = typeof(TConcreteConsumer);
+            _route.UpdateConsumerType(typeof(TConcreteConsumer));
 
             var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler, TData>(_route);
 
@@ -147,7 +147,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.When = condition;
+            _route.UpdateWhen(condition);
 
             return this;
         }

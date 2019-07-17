@@ -16,7 +16,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IToEndPointBuilder ForMessage<TMessage>()
         {
-            _endpoint.ContentType = typeof (TMessage);
+            _endpoint.UpdateContentType(typeof (TMessage));
 
             return this;
         }
@@ -112,7 +112,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(channelbuilder));
             }
 
-            _endpoint.ReplyContentType = typeof(TReply);
+            _endpoint.UpdateReplyContentType(typeof(TReply));
 
             channelbuilder(this);
 

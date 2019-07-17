@@ -122,7 +122,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(status));
             }
-            var routemethod = new RouteMethod<TContent, THandler>(method) {Status = status};
+            var routemethod = new RouteMethod<TContent, THandler>(method, status);
 
             _route.RouteMethods.Add(routemethod);
 
@@ -141,7 +141,7 @@ namespace Jal.Router.Fluent.Impl
             }
             Func<TContent, THandler, object, Task> wrapper = (b, h, d) => method(b, h, (TData)d);
 
-            var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
+            var routemethod = new RouteMethod<TContent, THandler>(wrapper, status);
 
             _route.RouteMethods.Add(routemethod);
 
@@ -158,7 +158,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(status));
             }
-            var routemethod = new RouteMethod<TContent, THandler>(method) { Status = status };
+            var routemethod = new RouteMethod<TContent, THandler>(method, status);
 
             _route.RouteMethods.Add(routemethod);
 
@@ -177,7 +177,7 @@ namespace Jal.Router.Fluent.Impl
             }
             Func<TContent, THandler, MessageContext, object, Task> wrapper = (b, h, i, d) => method(b, h, i, (TData)d);
 
-            var routemethod = new RouteMethod<TContent, THandler>(wrapper) { Status = status };
+            var routemethod = new RouteMethod<TContent, THandler>(wrapper, status);
 
             _route.RouteMethods.Add(routemethod);
 

@@ -19,7 +19,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(seconds));
             }
-            _saga.Timeout = seconds;
+            _saga.UpdateTimeout(seconds);
         }
     }
 }

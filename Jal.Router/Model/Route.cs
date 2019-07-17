@@ -31,25 +31,40 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Func<object, Channel, Task> RuntimeHandler { get; set; }
+        public Func<object, Channel, Task> RuntimeHandler { get; private set; }
 
         public List<Channel> Channels { get; }
 
         public Type ConsumerInterfaceType { get; }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public Type ContentType { get; }
 
         public List<Type> MiddlewareTypes { get; }
 
-        public Func<MessageContext, bool> When { get; set; }
+        public Func<MessageContext, bool> When { get; private set; }
 
-        public bool UseClaimCheck { get; set; }
+        public bool UseClaimCheck { get; private set; }
 
         public RouteEntity ToEntity()
         {
             return new RouteEntity(Name, ContentType);
+        }
+
+        public void UpdateUseClaimCheck(bool useclaimcheck)
+        {
+            UseClaimCheck = useclaimcheck;
+        }
+
+        public void UpdateRuntimeHandler(Func<object, Channel, Task> runtimehandler)
+        {
+            RuntimeHandler = runtimehandler;
+        }
+
+        public void UpdateWhen(Func<MessageContext, bool> when)
+        {
+            When = when;
         }
     }
 
@@ -57,7 +72,12 @@ namespace Jal.Router.Model
     {
         public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
 
-        public Type ConsumerType { get; set; }
+        public Type ConsumerType { get; private set; }
+
+        public void UpdateConsumerType(Type consumertype)
+        {
+            ConsumerType = consumertype;
+        }
 
         public Route(string name) : base(name, typeof(TContent), typeof(TConsumer))
         {
