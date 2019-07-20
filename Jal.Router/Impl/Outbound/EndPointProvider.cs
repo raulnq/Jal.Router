@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl
 {
     public class EndPointProvider : IEndPointProvider
     {
@@ -26,7 +25,7 @@ namespace Jal.Router.Impl.Outbound
         {
             try
             {
-                return _endpoints.Single(x => x.Name == name && x.MessageType == contenttype);
+                return _endpoints.Single(x => x.Name == name && x.ContentType == contenttype);
             }
             catch (Exception ex)
             {

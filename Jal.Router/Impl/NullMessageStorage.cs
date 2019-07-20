@@ -1,17 +1,18 @@
 ﻿using Jal.Router.Interface;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
     public class NullMessageStorage : IMessageStorage
     {
-        public string Read(string id)
+        public Task<string> Read(string id)
         {
-            return string.Empty;
+            return Task.FromResult(string.Empty);
         }
 
-        public void Write(string id, string content)
+        public Task Write(string id, string content)
         {
-            
+            return Task.CompletedTask;
         }
     }
 }

@@ -6,15 +6,15 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
     {
         public int MaxConcurrentCalls { get; set; }
 
-        public int MaxConcurrentGroups { get; set; }
+        public int MaxConcurrentPartitions { get; set; }
 
-        public int MessageGroupTimeoutInSeconds { get; set; }
+        public int MessagePartitionTimeoutInSeconds { get; set; }
 
-        public int AutoRenewGroupTimeoutInSeconds { get; set; }
+        public int AutoRenewPartitionTimeoutInSeconds { get; set; }
 
         public int AutoRenewTimeoutInMinutes { get; set; }
 
-        public int Timeout { get; set; }
+        public int TimeoutInSeconds { get; set; }
 
         public AzureServiceBusParameter()
         {
@@ -22,11 +22,13 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
 
             AutoRenewTimeoutInMinutes = 60;
 
-            MaxConcurrentGroups = 1;
+            MaxConcurrentPartitions = 1;
 
-            MessageGroupTimeoutInSeconds = 30;
+            MessagePartitionTimeoutInSeconds = 30;
 
-            AutoRenewGroupTimeoutInSeconds = 30;
+            AutoRenewPartitionTimeoutInSeconds = 30;
+
+            TimeoutInSeconds = 0;
         }
     }
 }

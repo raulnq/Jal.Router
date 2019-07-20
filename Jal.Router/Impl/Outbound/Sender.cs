@@ -1,82 +1,104 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl
 {
     public class Sender : ISender
     {
-        public Sender(IComponentFactory factory, IConfiguration configuration, ILogger logger)
+        public Sender(IComponentFactoryGateway factory, IConfiguration configuration, ILogger logger)
         {
-            Factory = factory;
-            Configuration = configuration;
-            Logger = logger;
+            _factory = factory;
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        protected readonly IComponentFactory Factory;
+        private readonly IComponentFactoryGateway _factory;
 
-        protected readonly IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
 
-        protected readonly ILogger Logger;
+        private readonly ILogger _logger;
 
-        public object Send(Channel channel, MessageContext context)
+        public async Task Send(MessageContext context)
         {
             var id = string.Empty;
 
             try
             {
-                var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+                var adapter = _factory.CreateMessageAdapter();
 
-                var message = adapter.WriteMetadataAndContent(context, context.EndPoint.UseClaimCheck);
+                var message = await adapter.WriteMetadataAndContent(context, context.EndPoint).ConfigureAwait(false);
 
-                var metadata = Configuration.Runtime.SendersMetadata.FirstOrDefault(x => x.Channel.GetId() == channel.GetId());
+                var sendercontext = _configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == context.Channel.Id);
 
-                if (metadata != null)
+                if (sendercontext == null)
                 {
-                    id = metadata.SendMethod(metadata.Sender, message);
+                    sendercontext = DynamicEndpointLoader(context.Channel, context);
 
-                    if (metadata.ReceiveOnMethod != null)
+                    _configuration.Runtime.SenderContexts.Add(sendercontext);
+                }
+
+                id = await sendercontext.SenderChannel.Send(sendercontext, message).ConfigureAwait(false);
+
+                if (sendercontext.ReaderChannel != null)
+                {
+                    MessageContext outputcontext = null;
+
+                    try
                     {
-                        MessageContext outputcontext = null;
+                        outputcontext = await sendercontext.ReaderChannel.Read(sendercontext, context, adapter).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath} {ex}");
 
-                        try
-                        {
-                            outputcontext = metadata.ReceiveOnMethod(context, adapter);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} failed to arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)} {ex}");
+                        throw;
+                    }
+                    finally
+                    {
+                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+                    }
 
-                            throw;
-                        }
-                        finally
-                        {
-                            Logger.Log($"Message {outputcontext?.IdentityContext.Id} arrived to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
-                        }
+                    if (outputcontext != null)
+                    {
+                        var serializer = _factory.CreateMessageSerializer();
 
-                        if (outputcontext != null)
-                        {
-                            return adapter.Deserialize(outputcontext.Content, outputcontext.ContentType);
-                        }
+                        context.ContentContext.UpdateResponse(serializer.Deserialize(outputcontext.ContentContext.Data, outputcontext.ContentContext.Type));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log($"Message {id} failed to sent to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}  {ex}");
+                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}  {ex}");
 
                 throw;
             }
             finally
             {
-                Logger.Log($"Message {id} sent to {channel.ToString()} channel {channel.GetPath(context.EndPoint.Name)}");
+                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+            }
+        }
+
+        private SenderContext DynamicEndpointLoader(Channel channel, MessageContext context)
+        {
+            var sender = new SenderContext(channel);
+
+            sender.Endpoints.Add(context.EndPoint);
+
+            var senderchannel = _factory.CreateSenderChannel(sender.Channel.Type);
+
+            if(senderchannel!=null)
+            {
+                senderchannel.Open(sender);
+
+                sender.UpdateSenderChannel(senderchannel);
+
+                _logger.Log($"Opening {sender.Id}");
             }
 
-            return null;
+            return sender;
         }
     }
 }

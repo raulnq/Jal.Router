@@ -1,15 +1,6 @@
-﻿using System;
-using Jal.Router.AzureServiceBus.Standard.Extensions;
-using Jal.Router.AzureServiceBus.Standard.Impl;
-using Jal.Router.AzureStorage.Impl;
+﻿using Jal.Router.AzureServiceBus.Standard.Extensions;
 using Jal.Router.Impl;
-using Jal.Router.Impl.Inbound;
-using Jal.Router.Model;
 using Jal.Router.Tests.Model;
-using Microsoft.ServiceBus.Messaging;
-using Jal.Router.Extensions;
-using Jal.Router.Impl.Inbound.RetryPolicy;
-using Jal.Router.Impl.ValueFinder;
 
 namespace Jal.Router.Tests.Impl
 {
@@ -89,7 +80,7 @@ namespace Jal.Router.Tests.Impl
         {
             RegisterEndPoint("torequestqueue")
                 .ForMessage<RequestToSend>()
-                .To(x => x.AddPointToPointChannel<AppSettingValueFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
+                .To<Message>(x => x.AddPointToPointChannel<AppSettingValueFinder>(z => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", "requestqueue")
                 .AndWaitReplyFromSubscriptionToPublishSubscribeChannel<AppSettingValueFinder>("responsetopic", "subscription", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=", 10));
 
             RegisterEndPoint("toresponsetopic")
@@ -235,7 +226,8 @@ namespace Jal.Router.Tests.Impl
                 })
                 //.OnExceptionRetryFailedMessageTo<ApplicationException>("appgretry")
                 //.Use<AppSettingValueFinder>(y => new LinearRetryPolicy(3, 3))
-                .OnErrorSendFailedMessageTo("appgretryerror");
+                //.OnErrorSendFailedMessageTo("appgretryerror")
+                ;
 
             RegisterHandler<IRequestResponseHandler<Trigger>>("triggerflowe")
                 .ToListen(x => x.AddQueue<AppSettingValueFinder>("triggerqueueflowe", y => "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo="))

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model.Management;
+using Jal.Router.Model;
 using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
@@ -165,7 +165,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
+                r = new SubscriptionToPublishSubscribeChannelRule("$Default", filter, true);
             }
 
             var dictionary = new Dictionary<string, string>();
@@ -193,7 +193,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new SubscriptionToPublishSubscribeChannelRule() { Filter = filter, IsDefault = true, Name = "$Default" };
+                r = new SubscriptionToPublishSubscribeChannelRule(filter, "$Default", true);
             }
 
             var dictionary = new Dictionary<string, string>();
@@ -216,7 +216,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, string subscription, string topic, AzureServiceBusConfiguration servicebusconfiguration, string filter = null)
         {
-            RegisterSubscriptionToTopic(configuration, new AzureServiceBusSubscriptionToTopic(subscription, topic), servicebusconfiguration);
+            RegisterSubscriptionToTopic(configuration, new AzureServiceBusSubscriptionToTopic(subscription, topic), servicebusconfiguration, filter);
         }
     }
 }

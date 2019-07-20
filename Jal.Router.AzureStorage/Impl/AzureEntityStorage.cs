@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
-using Jal.Router.Impl.Inbound;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -13,7 +13,7 @@ namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureEntityStorage : AbstractEntityStorage
     {
-        private readonly IComponentFactory _factory;
+        private readonly IComponentFactoryGateway _factory;
 
         private readonly IConfiguration _configuration;
 
@@ -23,7 +23,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Action<MessageRecord, byte[]>[] MessageContentWriter;
 
-        private readonly Action<MessageRecord, byte[]>[] MessageDataWriter;
+        private readonly Action<MessageRecord, byte[]>[] MessageSagaWriter;
 
         private readonly Action<SagaRecord, byte[]>[] SagaDataWriter;
 
@@ -31,9 +31,9 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageContentReader;
 
-        private readonly Func<MessageRecord, byte[]>[] MessageDataReader;
+        private readonly Func<MessageRecord, byte[]>[] MessageSagaReader;
 
-        public AzureEntityStorage(IComponentFactory factory, IConfiguration configuration, IParameterProvider provider)
+        public AzureEntityStorage(IComponentFactoryGateway factory, IConfiguration configuration, IParameterProvider provider)
         {
             _factory = factory;
 
@@ -41,13 +41,13 @@ namespace Jal.Router.AzureStorage.Impl
 
             _parameter = provider.Get<AzureStorageParameter>();
 
-            MessageContentWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.Content0 = y, (x, y) => x.Content1 = y , (x, y) => x.Content2 = y , (x, y) => x.Content3 = y , (x, y) => x.Content4 = y };
+            MessageContentWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.ContentContextEntity0 = y, (x, y) => x.ContentContextEntity1 = y , (x, y) => x.ContentContextEntity2 = y , (x, y) => x.ContentContextEntity3 = y , (x, y) => x.ContentContextEntity4 = y };
 
-            MessageDataWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.Data0 = y, (x, y) => x.Data1 = y, (x, y) => x.Data2 = y, (x, y) => x.Data3 = y, (x, y) => x.Data4 = y };
+            MessageSagaWriter = new Action<MessageRecord, byte[]>[] { (x, y) => x.SagaContextEntity0 = y, (x, y) => x.SagaContextEntity1 = y, (x, y) => x.SagaContextEntity2 = y, (x, y) => x.SagaContextEntity3 = y, (x, y) => x.SagaContextEntity4 = y };
 
-            MessageContentReader = new Func<MessageRecord, byte[]>[] { (x) => x.Content0, (x) => x.Content1, (x) => x.Content2, (x) => x.Content3, (x) => x.Content4 };
+            MessageContentReader = new Func<MessageRecord, byte[]>[] { (x) => x.ContentContextEntity0, (x) => x.ContentContextEntity1, (x) => x.ContentContextEntity2, (x) => x.ContentContextEntity3, (x) => x.ContentContextEntity4 };
 
-            MessageDataReader = new Func<MessageRecord, byte[]>[] { (x) => x.Data0, (x) => x.Data1, (x) => x.Data2, (x) => x.Data3, (x) => x.Data4 };
+            MessageSagaReader = new Func<MessageRecord, byte[]>[] { (x) => x.SagaContextEntity0, (x) => x.SagaContextEntity1, (x) => x.SagaContextEntity2, (x) => x.SagaContextEntity3, (x) => x.SagaContextEntity4 };
 
             SagaDataWriter = new Action<SagaRecord, byte[]>[] { (x, y) => x.Data0 = y, (x, y) => x.Data1 = y, (x, y) => x.Data2 = y, (x, y) => x.Data3 = y, (x, y) => x.Data4 = y };
 
@@ -65,26 +65,26 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        public override SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public override async Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
-            if (!string.IsNullOrWhiteSpace(sagastoragename))
+            if (options!=null && options.ContainsKey("sagastoragename") && !string.IsNullOrWhiteSpace(options["sagastoragename"]))
             {
-                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{sagastoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{options["sagastoragename"]}");
             }
 
             var diff = (end - start).TotalDays;
 
             var currentdate = new DateTime(start.Year, start.Month, start.Day);
 
-            var list = new List<SagaEntity>();
+            var list = new List<SagaData>();
 
             for (var i = 0; i <= diff; i++)
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{saganame}";
 
-                var sagas = GetSagas(table, partitionkey, start, end);
+                var sagas = await GetSagaData(table, partitionkey, start, end, options).ConfigureAwait(false);
 
                 list.AddRange(sagas);
 
@@ -94,7 +94,7 @@ namespace Jal.Router.AzureStorage.Impl
             return list.ToArray();
         }
 
-        private SagaEntity[] GetSagas(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        private async Task<SagaData[]> GetSagaData(CloudTable table, string partitionkey, DateTime start, DateTime end, IDictionary<string, string> options = null)
         {
 
             var where = TableQuery.CombineFilters(
@@ -107,51 +107,48 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<SagaRecord>().Where(where);
 
-            var records = ExecuteQuery<SagaRecord>(table, query);
+            var records = await ExecuteQuery<SagaRecord>(table, query).ConfigureAwait(false);
+
+            var serializer = _factory.CreateMessageSerializer();
 
             return records.Select(record =>
             {
-                var entity = new SagaEntity()
-                {
-                    DataType = record.DataType,
-                    Name = record.Name,
-                    Created = record.Created,
-                    Updated = record.Updated,
-                    Ended = record.Ended,
-                    Timeout = record.Timeout,
-                    Status = record.Status,
-                    Duration = record.Duration,
-                    Id = record.Id
-                };
+                var sagatype = serializer.Deserialize<Type>(record.DataType);
 
-                ReadSaga(record, entity);
+                var data = ReadSaga(record, sagatype);
+
+                var entity = new SagaData(record.Id, data, sagatype, record.Name, record.Created, record.Timeout, record.Status, record.Updated, record.Ended, record.Duration);
 
                 return entity;
             }
             ).ToArray();
         }
 
-        private void ReadSaga(SagaRecord record, SagaEntity entity)
+        private object ReadSaga(SagaRecord record, Type sagatype)
         {
+            var serializer = _factory.CreateMessageSerializer();
+
             if (record.NumberOfDataArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfDataArrays, i => SagaDataReader[i].Invoke(record));
 
-                entity.Data = _parameter.TableStorageStringEncoding.GetString(bytearray);
+                var data = _parameter.TableStorageStringEncoding.GetString(bytearray);
+
+                return serializer.Deserialize(data, sagatype);
             }
             else
             {
-                entity.Data = record.Data;
+                return serializer.Deserialize(record.Data, sagatype);
             }
         }
 
-        public static IEnumerable<T> ExecuteQuery<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
+        public static async Task<IEnumerable<T>> ExecuteQuery<T>(CloudTable table, TableQuery<T> query) where T : ITableEntity, new()
         {
             TableContinuationToken token = null;
             var retVal = new List<T>();
             do
             {
-                var results = table.ExecuteQuerySegmentedAsync(query, token).GetAwaiter().GetResult();
+                var results = await table.ExecuteQuerySegmentedAsync(query, token).ConfigureAwait(false);
                 retVal.AddRange(results.Results);
                 token = results.ContinuationToken;
             } while (token != null);
@@ -159,83 +156,74 @@ namespace Jal.Router.AzureStorage.Impl
             return retVal;
         }
 
-        public override MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
+        public override async Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null)
         {
-            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+            var serializer = _factory.CreateMessageSerializer();
 
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
-            if (!string.IsNullOrWhiteSpace(messagestoragename))
+            if (options != null && options.ContainsKey("messagestoragename") && !string.IsNullOrWhiteSpace(options["messagestoragename"]))
             {
-                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{messagestoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{options["messagestoragename"]}");
             }
 
-            var key = GetRowKey(sagaentity.Id);
+            var key = GetRowKey(sagadata.Id);
 
             var where = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, key);
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQuery<MessageRecord>(table, query);
+            var records = await ExecuteQuery(table, query).ConfigureAwait(false);
 
             return records.Select(record =>
             {
-                var entity = new MessageEntity()
-                {
-                    ContentType = record.ContentType,
-                    Identity = string.IsNullOrWhiteSpace(record.Identity) ? null : serializer.Deserialize<IdentityContext>(record.Identity),
-                    Version = record.Version,
-                    RetryCount = record.RetryCount,
-                    LastRetry = record.LastRetry,
-                    Origin = string.IsNullOrWhiteSpace(record.Origin) ? null : serializer.Deserialize<Origin>(record.Origin),
-                    Saga = string.IsNullOrWhiteSpace(record.Saga) ? null : serializer.Deserialize<SagaContext>(record.Saga),
-                    Headers = string.IsNullOrWhiteSpace(record.Headers) ? null : serializer.Deserialize<Dictionary<string, string>>(record.Headers),
-                    DateTimeUtc = record.DateTimeUtc,
-                    Name = record.Name,
-                    ContentId = record.ContentId,
-                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type) : MessageEntityType.Inbound,
-                    SagaId = record.SagaId,
-                    Id = record.Id
-                };
-
-                ReadMessage(record, entity);
-
-                return entity;
+                return RecordToEntity(record, serializer);
             }).ToArray();
         }
 
-        private void ReadMessage(MessageRecord record, MessageEntity entity)
+        private ContentContextEntity ReadContentContextEntity(MessageRecord record)
         {
-            if (record.NumberOfDataArrays > 0)
-            {
-                var bytearray = Combine(record.NumberOfDataArrays, i => MessageDataReader[i].Invoke(record));
-
-                entity.Data = _parameter.TableStorageStringEncoding.GetString(bytearray);
-            }
-            else
-            {
-                entity.Data = record.Data;
-            }
+            var serializer = _factory.CreateMessageSerializer();
 
             if (record.NumberOfContentArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfContentArrays, i => MessageContentReader[i].Invoke(record));
 
-                entity.Content = _parameter.TableStorageStringEncoding.GetString(bytearray);
+                var content = _parameter.TableStorageStringEncoding.GetString(bytearray);
+
+                return serializer.Deserialize<ContentContextEntity>(content);
             }
             else
             {
-                entity.Content = record.Content;
+                return serializer.Deserialize<ContentContextEntity>(record.ContentContextEntity);
             }
         }
 
-        public override MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "")
+        private SagaContextEntity ReadSagaContextEntity(MessageRecord record)
+        {
+            var serializer = _factory.CreateMessageSerializer();
+
+            if (record.NumberOfSagaArrays > 0)
+            {
+                var bytearray = Combine(record.NumberOfSagaArrays, i => MessageSagaReader[i].Invoke(record));
+
+                var saga = _parameter.TableStorageStringEncoding.GetString(bytearray);
+
+                return serializer.Deserialize<SagaContextEntity>(saga);
+            }
+            else
+            {
+                return serializer.Deserialize<SagaContextEntity>(record.SagaContextEntity);
+            }
+        }
+
+        public override async Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null)
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
-            if (!string.IsNullOrWhiteSpace(messagestoragename))
+            if (options != null && options.ContainsKey("messagestoragename") && !string.IsNullOrWhiteSpace(options["messagestoragename"]))
             {
-                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{messagestoragename}");
+                table = GetCloudTable(_parameter.TableStorageConnectionString, $"{options["messagestoragename"]}");
             }
 
             var diff = (int)(end - start).TotalDays;
@@ -248,7 +236,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{routename}";
 
-                var messages = GetMessages(table, partitionkey, start, end);
+                var messages = await GetMessages(table, partitionkey, start, end).ConfigureAwait(false);
 
                 list.AddRange(messages);
 
@@ -258,9 +246,9 @@ namespace Jal.Router.AzureStorage.Impl
             return list.ToArray();
         }
 
-        private MessageEntity[] GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        private async Task<MessageEntity[]> GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
         {
-            var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+            var serializer = _factory.CreateMessageSerializer();
 
             var where = TableQuery.CombineFilters(
                 TableQuery.CombineFilters(
@@ -272,70 +260,70 @@ namespace Jal.Router.AzureStorage.Impl
 
             var query = new TableQuery<MessageRecord>().Where(where);
 
-            var records = ExecuteQuery<MessageRecord>(table, query);
+            var records = await ExecuteQuery(table, query).ConfigureAwait(false);
 
-            return records.Select(record => {
-                var entity = new MessageEntity()
-                {
-                    ContentType = record.ContentType,
-                    Identity = !string.IsNullOrWhiteSpace(record.Identity) ? serializer.Deserialize<IdentityContext>(record.Identity) : null,
-                    Version = record.Version,
-                    RetryCount = record.RetryCount,
-                    LastRetry = record.LastRetry,
-                    Origin = !string.IsNullOrWhiteSpace(record.Origin) ? serializer.Deserialize<Origin>(record.Origin) : null,
-                    Saga = !string.IsNullOrWhiteSpace(record.Saga) ? serializer.Deserialize<SagaContext>(record.Saga) : null,
-                    Headers = !string.IsNullOrWhiteSpace(record.Headers) ? serializer.Deserialize<Dictionary<string, string>>(record.Headers) : null,
-                    Tracks = !string.IsNullOrWhiteSpace(record.Tracks) ? serializer.Deserialize<List<Track>>(record.Tracks) : null,
-                    DateTimeUtc = record.DateTimeUtc,
-                    Name = record.Name,
-                    ContentId = record.ContentId,
-                    SagaId = record.SagaId,
-                    Id = record.Id,
-                    Type = !string.IsNullOrWhiteSpace(record.Type) ? (MessageEntityType)Enum.Parse(typeof(MessageEntityType), record.Type): MessageEntityType.Inbound
-                };
-
-                ReadMessage(record, entity);
-
-                return entity;
-
+            return records.Select(record =>
+            {
+                return RecordToEntity(record, serializer);
             }).ToArray();
+        }
+
+        private MessageEntity RecordToEntity(MessageRecord record, IMessageSerializer serializer)
+        {
+            var identity = !string.IsNullOrWhiteSpace(record.IdentityContextEntity) ? serializer.Deserialize<IdentityContextEntity>(record.IdentityContextEntity) : null;
+            var channel = !string.IsNullOrWhiteSpace(record.ChannelEntity) ? serializer.Deserialize<ChannelEntity>(record.ChannelEntity) : null;
+            var headers = !string.IsNullOrWhiteSpace(record.Headers) ? serializer.Deserialize<Dictionary<string, string>>(record.Headers) : null;
+            var router = !string.IsNullOrWhiteSpace(record.RouteEntity) ? serializer.Deserialize<RouteEntity>(record.RouteEntity) : null;
+            var endpoint = !string.IsNullOrWhiteSpace(record.EndpointEntity) ? serializer.Deserialize<EndpointEntity>(record.EndpointEntity) : null;
+            var origin = !string.IsNullOrWhiteSpace(record.OriginEntity) ? serializer.Deserialize<OriginEntity>(record.OriginEntity) : null;
+            var saga = !string.IsNullOrWhiteSpace(record.SagaEntity) ? serializer.Deserialize<SagaEntity>(record.SagaEntity) : null;
+            var tracking = !string.IsNullOrWhiteSpace(record.TrackingContextEntity) ? serializer.Deserialize<TrackingContextEntity>(record.TrackingContextEntity) : null;
+            var contentcontext = ReadContentContextEntity(record);
+            var sagacontext = ReadSagaContextEntity(record);
+            var entity = new MessageEntity(record.Id, record.Host, channel, headers, record.Version, record.DateTimeUtc, record.ScheduledEnqueueDateTimeUtc, router, endpoint,
+                origin, saga, contentcontext, sagacontext, tracking, identity, record.Name);
+            return entity;
         }
 
         private void WriteMessage(MessageEntity messageentity, MessageRecord record)
         {
-            var bytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Content);
+            var serializer = _factory.CreateMessageSerializer();
+            var content = serializer.Serialize(messageentity.ContentContextEntity);
+            var bytescount = _parameter.TableStorageStringEncoding.GetByteCount(content);
             record.SizeOfContent = bytescount;
             if (bytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
-                record.Content = messageentity.Content;
+                record.ContentContextEntity = content;
             }
             else
             {
                 record.SizeOfContentArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
-                record.NumberOfContentArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Content), bytescount, (i, buffer) => MessageContentWriter[i].Invoke(record, buffer));
+                record.NumberOfContentArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(content), bytescount, (i, buffer) => MessageContentWriter[i].Invoke(record, buffer));
             }
 
-            if(messageentity.Data!=null)
+            if(messageentity.SagaContextEntity != null)
             {
-                var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(messageentity.Data);
-                record.SizeOfData = databytescount;
-                if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
+                var saga = serializer.Serialize(messageentity.SagaContextEntity);
+
+                var sagabytescount = _parameter.TableStorageStringEncoding.GetByteCount(saga);
+                record.SizeOfSaga = sagabytescount;
+                if (sagabytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
                 {
-                    record.Data = messageentity.Data;
+                    record.SagaContextEntity = saga;
                 }
                 else
                 {
-                    record.SizeOfDataArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
-                    record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(messageentity.Data), databytescount, (i, buffer) => MessageDataWriter[i].Invoke(record, buffer));
+                    record.SizeOfSagaArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
+                    record.NumberOfSagaArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(saga), sagabytescount, (i, buffer) => MessageSagaWriter[i].Invoke(record, buffer));
                 }
             }
         }
 
-        public override SagaEntity GetSagaEntity(string entityId)
+        public override async Task<SagaData> GetSagaData(string entityId)
         {
             try
             {
-                var entity = new SagaEntity();
+                
 
                 var tablenamesufix = GetTableNameSufix(entityId);
 
@@ -347,31 +335,19 @@ namespace Jal.Router.AzureStorage.Impl
                 {
                     var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
-                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
+                    var result = await table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).ConfigureAwait(false);
 
                     var record = result.Result as SagaRecord;
 
+                    var serializer = _factory.CreateMessageSerializer();
+
                     if (record != null)
                     {
-                        entity.DataType = record.DataType;
+                        var sagatype = serializer.Deserialize<Type>(record.DataType);
 
-                        entity.Name = record.Name;
+                        var data = ReadSaga(record, sagatype);
 
-                        entity.Created = record.Created;
-
-                        entity.Updated = record.Updated;
-
-                        entity.Ended = record.Ended;
-
-                        entity.Timeout = record.Timeout;
-
-                        entity.Status = record.Status;
-
-                        entity.Duration = record.Duration;
-
-                        entity.Id = record.Id;
-
-                        ReadSaga(record, entity);
+                        var entity = new SagaData(record.Id, data,  sagatype, record.Name, record.Created, record.Timeout, record.Status, record.Updated, record.Ended, record.Duration);
 
                         return entity;
                     }
@@ -395,123 +371,124 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public override async Task CreateSagaData(MessageContext context, SagaData sagadata)
         {
             try
             {
                 var rowkey = Guid.NewGuid().ToString();
 
-                var partition = $"{sagaentity.Created.ToString("yyyyMMdd")}_{sagaentity.Name}";
+                var partition = $"{sagadata.Created.ToString("yyyyMMdd")}_{sagadata.Name}";
 
                 var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
+                var serializer = _factory.CreateMessageSerializer();
+
                 var record = new SagaRecord(partition, rowkey)
                 {
-                    Created = sagaentity.Created,
+                    Created = sagadata.Created,
 
-                    Updated = sagaentity.Updated,
+                    Updated = sagadata.Updated,
 
-                    Name = sagaentity.Name,
+                    Name = sagadata.Name,
 
-                    DataType = sagaentity.DataType,
+                    DataType = serializer.Serialize(sagadata.DataType),
 
-                    Timeout = sagaentity.Timeout,
+                    Timeout = sagadata.Timeout,
 
-                    Status = sagaentity.Status,
+                    Status = sagadata.Status,
 
                     Id = id
                 };
 
-                sagaentity.Id = id;
+                sagadata.UpdateId(id);
 
-                WriteSaga(sagaentity, record);
+                WriteSaga(sagadata, record);
 
-                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
-
-                return sagaentity;
+                await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
             }
             catch (StorageException s)
             {
-                throw new ApplicationException($"Error during the saga record creation for saga {sagaentity.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record creation for saga {sagaentity.Name} and route {context.Route.Name}", ex);
+                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name} and route {context.Route.Name}", ex);
             }
         }
 
-        private void WriteSaga(SagaEntity sagaentity, SagaRecord record)
+        private void WriteSaga(SagaData sagadata, SagaRecord record)
         {
-            var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(sagaentity.Data);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var data = serializer.Serialize(sagadata.Data);
+
+            var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(data);
             record.SizeOfData = databytescount;
             if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
-                record.Data = sagaentity.Data;
+                record.Data = data;
             }
             else
             {
                 record.SizeOfDataArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
-                record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(sagaentity.Data), databytescount, (i, buffer) => SagaDataWriter[i].Invoke(record, buffer));
+                record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(data), databytescount, (i, buffer) => SagaDataWriter[i].Invoke(record, buffer));
             }
         }
 
-        public override MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public override async Task CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
             try
             {
-                var serializer = _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+                var serializer = _factory.CreateMessageSerializer();
 
                 var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
 
                 var rowkey = $"{Guid.NewGuid()}";
 
-                if(!string.IsNullOrWhiteSpace(messageentity.SagaId))
+                if(!string.IsNullOrWhiteSpace(messageentity.SagaContextEntity?.SagaData?.Id))
                 {
-                    partition = GetRowKey(messageentity.SagaId);
+                    partition = GetRowKey(messageentity.SagaContextEntity.SagaData.Id);
 
                     rowkey = $"{messageentity.Name}_{Guid.NewGuid()}";
                 }
 
                 var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
 
-                messageentity.Id = id;
+                messageentity.UpdateId(id);
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
-                    ContentType = messageentity.ContentType,
-                    Identity = serializer.Serialize(messageentity.Identity),
+                    Host = messageentity.Host,
+                    IdentityContextEntity = messageentity.IdentityContextEntity!=null?serializer.Serialize(messageentity.IdentityContextEntity):null,
                     Version = messageentity.Version,
-                    RetryCount = messageentity.RetryCount,
-                    LastRetry = messageentity.LastRetry,
-                    Origin = serializer.Serialize(messageentity.Origin),
-                    Headers = serializer.Serialize(messageentity.Headers),
+                    OriginEntity = messageentity.OriginEntity!=null?serializer.Serialize(messageentity.OriginEntity):null,
+                    Headers = messageentity.Headers!=null?serializer.Serialize(messageentity.Headers):null,
                     DateTimeUtc = messageentity.DateTimeUtc,
                     Name = messageentity.Name,
-                    Tracks = serializer.Serialize(messageentity.Tracks),
-                    ContentId = messageentity.ContentId,
-                    Type = messageentity.Type.ToString(),
-                    Saga = serializer.Serialize(messageentity.Saga),
+                    TrackingContextEntity = messageentity.TrackingContextEntity!=null?serializer.Serialize(messageentity.TrackingContextEntity):null,
+                    ChannelEntity = messageentity.ChannelEntity!=null?serializer.Serialize(messageentity.ChannelEntity):null,
                     Id = messageentity.Id,
-                    SagaId=messageentity.SagaId
+                    ScheduledEnqueueDateTimeUtc = messageentity.ScheduledEnqueueDateTimeUtc,
+                    EndpointEntity = messageentity.EndpointEntity!=null?serializer.Serialize(messageentity.EndpointEntity):null,
+                    RouteEntity = messageentity.RouteEntity!=null?serializer.Serialize(messageentity.RouteEntity):null,
+                    SagaEntity = messageentity.SagaEntity!=null?serializer.Serialize(messageentity.SagaEntity):null
                 };
 
                 WriteMessage(messageentity, record);
 
-                var result = table.ExecuteAsync(TableOperation.Insert(record)).GetAwaiter().GetResult();
-
-                return messageentity;
+                await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
             }
             catch(StorageException s)
             {
-                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentType} and route/endpoint {messageentity.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentContextEntity.Type} and route/endpoint {messageentity.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentType} and route {messageentity.Name}", ex);
+                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentContextEntity.Type} and route {messageentity.Name}", ex);
             }
         }
 
@@ -569,38 +546,38 @@ namespace Jal.Router.AzureStorage.Impl
             return rv;
         }
 
-        public override void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public override async Task UpdateSagaData(MessageContext context, SagaData sagadata)
         {
             try
             {
-                var tablenamesufix = GetTableNameSufix(sagaentity.Id);
+                var tablenamesufix = GetTableNameSufix(sagadata.Id);
 
-                var partitionkey = GetPartitionKey(sagaentity.Id);
+                var partitionkey = GetPartitionKey(sagadata.Id);
 
-                var rowkey = GetRowKey(sagaentity.Id);
+                var rowkey = GetRowKey(sagadata.Id);
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
                     var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{tablenamesufix}");
 
-                    var result = table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey)).GetAwaiter().GetResult();
+                    var result = await table.ExecuteAsync(TableOperation.Retrieve<SagaRecord>(partitionkey, rowkey));
 
                     var record = result.Result as SagaRecord;
 
-                    if (record != null)
+                    if (record != null && record.Ended==null)
                     {
-                        record.Updated = sagaentity.Updated;
+                        record.Updated = sagadata.Updated;
 
-                        if (!string.IsNullOrWhiteSpace(sagaentity.Status))
+                        if (!string.IsNullOrWhiteSpace(sagadata.Status))
                         {
-                            record.Status = sagaentity.Status;
+                            record.Status = sagadata.Status;
                         }
 
-                        record.Duration = sagaentity.Duration;
+                        record.Duration = sagadata.Duration;
 
-                        if (sagaentity.Ended != null)
+                        if (sagadata.Ended != null)
                         {
-                            record.Ended = sagaentity.Ended;
+                            record.Ended = sagadata.Ended;
                         }
 
                         record.ETag = "*";
@@ -621,27 +598,27 @@ namespace Jal.Router.AzureStorage.Impl
 
                         record.SizeOfDataArraysOnKilobytes = 0;
 
-                        WriteSaga(sagaentity, record);
+                        WriteSaga(sagadata, record);
 
-                        table.ExecuteAsync(TableOperation.Replace(record)).GetAwaiter().GetResult();
+                        await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga id {sagaentity.Id}");
+                        throw new ApplicationException($"Record not found for saga id {sagadata.Id}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga id format {sagaentity.Id}");
+                    throw new ApplicationException($"Invalid saga id format {sagadata.Id}");
                 }
             }
             catch (StorageException s)
             {
-                throw new ApplicationException($"Error during the saga update for saga {sagaentity.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga update for saga {sagaentity.Name} and route {context.Route.Name}", ex);
+                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name} and route {context.Route.Name}", ex);
             }
         }
 

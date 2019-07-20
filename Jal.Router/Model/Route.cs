@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Model.Management;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
@@ -15,9 +13,9 @@ namespace Jal.Router.Model
             MiddlewareTypes = new List<Type>();
             Name = name;
             Channels = new List<Channel>();
-            IdentityConfiguration = new Identity();
-            StorageConfiguration = new Storage();
-            RetryExceptionTypes = new List<Type>();
+            ErrorHandlers = new List<ErrorHandler>();
+            EntryHandlers = new List<Handler>();
+            ExitHandlers = new List<Handler>();
         }
 
         public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype) : this(name, contenttype, consumerinterfacetype)
@@ -25,46 +23,61 @@ namespace Jal.Router.Model
             Saga = saga;
         }
 
-        public List<Type> RetryExceptionTypes { get; set; }
+        public IList<ErrorHandler> ErrorHandlers { get; }
 
-        public Type RetryValueFinderType { get; set; }
+        public IList<Handler> EntryHandlers { get; }
 
-        public string OnRetryEndPoint { get; set; }
-
-        public Func<IValueFinder, IRetryPolicy> RetryPolicyProvider { get; set; }
+        public IList<Handler> ExitHandlers { get; }
 
         public Saga Saga { get; }
 
-        public Action<object, Channel> RuntimeHandler { get; set; }
-
-        public Identity IdentityConfiguration { get; }
-
-        public Storage StorageConfiguration { get; }
+        public Func<object, Channel, Task> RuntimeHandler { get; private set; }
 
         public List<Channel> Channels { get; }
 
         public Type ConsumerInterfaceType { get; }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public Type ContentType { get; }
 
-        public string OnErrorEndPoint { get; set; }
-
         public List<Type> MiddlewareTypes { get; }
 
-        public string ForwardEndPoint { get; set; }
+        public Func<MessageContext, bool> When { get; private set; }
 
-        public Func<MessageContext, bool> When { get; set; }
+        public bool UseClaimCheck { get; private set; }
 
-        public bool UseClaimCheck { get; set; }
+        public RouteEntity ToEntity()
+        {
+            return new RouteEntity(Name, ContentType);
+        }
+
+        public void UpdateUseClaimCheck(bool useclaimcheck)
+        {
+            UseClaimCheck = useclaimcheck;
+        }
+
+        public void UpdateRuntimeHandler(Func<object, Channel, Task> runtimehandler)
+        {
+            RuntimeHandler = runtimehandler;
+        }
+
+        public void UpdateWhen(Func<MessageContext, bool> when)
+        {
+            When = when;
+        }
     }
 
     public class Route<TContent, TConsumer> : Route
     {
         public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
 
-        public Type ConsumerType { get; set; }
+        public Type ConsumerType { get; private set; }
+
+        public void UpdateConsumerType(Type consumertype)
+        {
+            ConsumerType = consumertype;
+        }
 
         public Route(string name) : base(name, typeof(TContent), typeof(TConsumer))
         {

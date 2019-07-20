@@ -5,29 +5,43 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public Options()
+        public Options(string endpointname, Dictionary<string, string> headers, 
+            SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, Saga saga, string version)
         {
-            Headers=new Dictionary<string, string>();
-            Version = "1";
-            RetryCount = 0;
-            SagaContext = new SagaContext();
-            Tracks = new List<Track>();
-            Identity = new IdentityContext();          
+            EndPointName = endpointname;
+            Headers= headers;
+            SagaContext = sagacontext;
+            TrackingContext = tracks;
+            IdentityContext = identitycontext;
+            Route = route;
+            Saga = saga;
+            Version = version;
         }
-        public IdentityContext Identity { get; set; }
 
-        public SagaContext SagaContext { get; set; }
+        public Options(string endpointname, Dictionary<string, string> headers,
+    SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, 
+    Saga saga, string version, DateTime scheduledenqueuedatetimeutc)
+            :this(endpointname, headers, sagacontext, tracks, identitycontext, route, saga, version)
+        {
+            ScheduledEnqueueDateTimeUtc = scheduledenqueuedatetimeutc;
+        }
 
-        public string EndPointName { get; set; }
+        public IdentityContext IdentityContext { get; private set; }
 
-        public string Version { get; set; }
+        public SagaContext SagaContext { get; private set; }
 
-        public DateTime? ScheduledEnqueueDateTimeUtc { get; set; }
+        public Route Route { get; private set; }
 
-        public IDictionary<string,string> Headers { get; set; }
+        public Saga Saga { get; private set; }
 
-        public int RetryCount { get; set; }
+        public string EndPointName { get; private set; }
 
-        public List<Track> Tracks { get; set; }
+        public string Version { get; private set; }
+
+        public DateTime? ScheduledEnqueueDateTimeUtc { get; private set; }
+
+        public IDictionary<string,string> Headers { get; private set; }
+
+        public TrackingContext TrackingContext { get; private set; }
     }
 }

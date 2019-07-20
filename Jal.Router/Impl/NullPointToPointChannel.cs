@@ -1,41 +1,49 @@
-﻿using System;
-using Jal.Router.Interface;
-using Jal.Router.Model.Outbound;
-using Jal.Router.Model.Inbound;
+﻿using Jal.Router.Interface;
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
     public class NullPointToPointChannel : IPointToPointChannel
     {
-        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        public void Open(ListenerContext listenercontext)
         {
-            return () => new object[] { };
+
         }
 
-        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        public bool IsActive(ListenerContext listenercontext)
         {
-            return o => { };
+            return false;
         }
 
-        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        public Task Close(ListenerContext listenercontext)
         {
-            return o => { };
+            return Task.CompletedTask;
         }
 
-        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
+        public void Listen(ListenerContext listenercontext)
         {
-            return () => new object[] { };
+
         }
 
-        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        public void Open(SenderContext sendercontext)
         {
-            return o => { };
+
         }
 
-        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        public Task<string> Send(SenderContext sendercontext, object message)
         {
-            return (o, m) => string.Empty;
+            return Task.FromResult(string.Empty);
+        }
+
+        public bool IsActive(SenderContext sendercontext)
+        {
+            return false;
+        }
+
+        public Task Close(SenderContext sendercontext)
+        {
+            return Task.CompletedTask;
         }
     }
 }

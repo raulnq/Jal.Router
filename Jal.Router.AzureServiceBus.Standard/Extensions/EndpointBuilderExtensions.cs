@@ -8,22 +8,32 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
     public static class EndpointBuilderExtensions
     {
-        public static IAndWaitReplyFromEndPointBuilder AddTopic(this IToChannelBuilder builder, string connectionstring, string path)
+        public static void AddTopic(this IToChannelBuilder builder, string connectionstring, string path)
         {
-            return builder.AddPublishSubscribeChannel(connectionstring, path);
+            builder.AddPublishSubscribeChannel(connectionstring, path);
         }
 
-        public static IAndWaitReplyFromEndPointBuilder AddTopic<TValueFinder>(this IToChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public static void AddTopic<TValueFinder>(this IToChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
-            return builder.AddPublishSubscribeChannel<TValueFinder>(connectionstringprovider, path);
+            builder.AddPublishSubscribeChannel<TValueFinder>(connectionstringprovider, path);
         }
 
-        public static IAndWaitReplyFromEndPointBuilder AddQueue(this IToChannelBuilder builder, string connectionstring, string path)
+        public static void AddQueue(this IToChannelBuilder builder, string connectionstring, string path)
+        {
+            builder.AddPointToPointChannel(connectionstring, path);
+        }
+
+        public static void AddQueue<TValueFinder>(this IToChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        {
+            builder.AddPointToPointChannel<TValueFinder>(connectionstringprovider, path);
+        }
+
+        public static IAndWaitReplyFromEndPointBuilder AddQueue(this IToReplyChannelBuilder builder, string connectionstring, string path)
         {
             return builder.AddPointToPointChannel(connectionstring, path);
         }
 
-        public static IAndWaitReplyFromEndPointBuilder AddQueue<TValueFinder>(this IToChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public static IAndWaitReplyFromEndPointBuilder AddQueue<TValueFinder>(this IToReplyChannelBuilder builder, Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
         {
             return builder.AddPointToPointChannel<TValueFinder>(connectionstringprovider, path);
         }

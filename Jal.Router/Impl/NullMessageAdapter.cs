@@ -1,46 +1,31 @@
 using System;
-using Jal.Router.Interface.Inbound;
+using System.Threading.Tasks;
+using Jal.Router.Interface;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl
 {
 
     public class NullMessageAdapter : IMessageAdapter
     {
-        public MessageContext ReadMetadataAndContent(object message, Type type, bool useclaimcheck, Identity identityconfiguration)
+        public Task<object> WriteMetadataAndContent(MessageContext context, EndPoint endpoint)
         {
-            return new MessageContext(new EndPoint(string.Empty), new Options());
-        }
-
-        public object WriteMetadataAndContent(MessageContext context, bool useclaimcheck)
-        {
-            return null;
-        }
-
-        public object Deserialize(string content, Type type)
-        {
-            return null;
-        }
-
-        public TContent Deserialize<TContent>(string content)
-        {
-            return default(TContent);
-        }
-
-        public string Serialize(object content)
-        {
-            return string.Empty;
-        }
-
-        public MessageContext ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck, Identity identityconfiguration = null)
-        {
-            return context;
+            return Task.FromResult(default(object));
         }
 
         public MessageContext ReadMetadata(object message)
         {
-            return new MessageContext(new EndPoint(string.Empty), new Options());
+            return new MessageContext();
+        }
+
+        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
+        {
+            return Task.FromResult(new MessageContext());
+        }
+
+        public Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint endpoint)
+        {
+            return Task.FromResult(new MessageContext());
         }
     }
 }

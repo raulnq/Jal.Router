@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Jal.Router.Model;
 
 namespace Jal.Router.Interface
 {
     public interface IEntityStorage
     {
-        MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity);
+        Task CreateMessageEntity(MessageContext context, MessageEntity messageentity);
 
-        SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity);
+        Task CreateSagaData(MessageContext context, SagaData sagadata);
 
-        void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity);
+        Task UpdateSagaData(MessageContext context, SagaData sagadata);
 
-        SagaEntity GetSagaEntity(string id);
+        Task<SagaData> GetSagaData(string id);
 
-        SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "");
+        Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string,string> options=null);
 
-        MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "");
+        Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null);
 
-        MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routename, string messagestoragename = "");
+        Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null);
     }
 }

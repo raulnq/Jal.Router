@@ -1,7 +1,6 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -31,13 +30,13 @@ namespace Jal.Router.AzureStorage.Impl
             return container;
         }
 
-        public void Run()
+        public async Task Run()
         {
             if(!string.IsNullOrEmpty(_parameter.BlobStorageConnectionString))
             {
                 var container = GetContainer(_parameter.BlobStorageConnectionString, _parameter.ContainerName);
 
-                var result = container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                var result = await container.CreateIfNotExistsAsync().ConfigureAwait(false);
 
                 if (result)
                 {

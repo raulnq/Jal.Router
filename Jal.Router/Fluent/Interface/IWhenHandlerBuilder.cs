@@ -3,8 +3,8 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IWhenHandlerBuilder: IOnRetryBuilder
+    public interface IWhenHandlerBuilder: IOnRouteOptionBuilder
     {
-        IOnRetryBuilder When(Func<MessageContext, bool> condition);
+        IOnRouteOptionBuilder When(Func<MessageContext, bool> condition);
     }
 }

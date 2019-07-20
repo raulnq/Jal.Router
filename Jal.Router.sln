@@ -26,8 +26,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.Installer", "Jal.Router.AzureStorage.Installer\Jal.Router.AzureStorage.Installer.csproj", "{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Sample.FullNetFramework", "Jal.Router.Sample.FullNetFramework\Jal.Router.Sample.FullNetFramework.csproj", "{92950960-1D7E-403C-A5ED-080CC37F9F7D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureStorage.LightInject.Installer", "Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj", "{30C19278-D519-4C95-BF1F-8BC59EDE44EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.ApplicationInsights", "Jal.Router.ApplicationInsights\Jal.Router.ApplicationInsights.csproj", "{96ABC8C4-06F2-4799-9946-E6C51EA51182}"
@@ -45,6 +43,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.AzureServiceBus.Standard.Installer", "Jal.Router.AzureServiceBus.Standard.Installer\Jal.Router.AzureServiceBus.Standard.Installer.csproj", "{A8474B47-C697-4EC1-9B9B-B1525BBEF420}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Azure.Standard.LightInject.Installer.All", "Jal.Router.Azure.Standard.LightInject.Installer.All\Jal.Router.Azure.Standard.LightInject.Installer.All.csproj", "{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Newtonsoft", "Jal.Router.Newtonsoft\Jal.Router.Newtonsoft.csproj", "{C777539D-5DD8-481D-A323-65530DB08269}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Newtonsoft.LightInject.Installer", "Jal.Router.Newtonsoft.LightInject.Installer\Jal.Router.Newtonsoft.LightInject.Installer.csproj", "{8E96ABFF-01C4-45B2-9CFB-661835912212}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Newtonsoft.Installer", "Jal.Router.Newtonsoft.Installer\Jal.Router.Newtonsoft.Installer.csproj", "{37F01B5C-4FF8-4A24-9DDD-6F05D5DB2531}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,10 +92,6 @@ Global
 		{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23C53DC5-42C4-4F21-8F0A-C4AC0536F596}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92950960-1D7E-403C-A5ED-080CC37F9F7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92950960-1D7E-403C-A5ED-080CC37F9F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92950960-1D7E-403C-A5ED-080CC37F9F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92950960-1D7E-403C-A5ED-080CC37F9F7D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C19278-D519-4C95-BF1F-8BC59EDE44EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -128,6 +128,18 @@ Global
 		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C19D5ACA-9642-4269-B5B2-D917C94C5B2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C777539D-5DD8-481D-A323-65530DB08269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C777539D-5DD8-481D-A323-65530DB08269}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C777539D-5DD8-481D-A323-65530DB08269}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C777539D-5DD8-481D-A323-65530DB08269}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E96ABFF-01C4-45B2-9CFB-661835912212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E96ABFF-01C4-45B2-9CFB-661835912212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E96ABFF-01C4-45B2-9CFB-661835912212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E96ABFF-01C4-45B2-9CFB-661835912212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F01B5C-4FF8-4A24-9DDD-6F05D5DB2531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F01B5C-4FF8-4A24-9DDD-6F05D5DB2531}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F01B5C-4FF8-4A24-9DDD-6F05D5DB2531}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F01B5C-4FF8-4A24-9DDD-6F05D5DB2531}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

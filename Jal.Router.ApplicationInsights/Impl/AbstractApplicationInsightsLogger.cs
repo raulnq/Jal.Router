@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -29,29 +29,24 @@ namespace Jal.Router.ApplicationInsights.Impl
             }
         }
 
-        public void PopulateMetrics(IDictionary<string, double> metrics, MessageContext context)
-        {
-            metrics.Add("retrycount", context.RetryCount);
-        }
-
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
-            properties.Add("identity_id", context.IdentityContext?.Id);
+            properties.Add("identity_id", context?.Id);
             properties.Add("identity_replytorequestid", context.IdentityContext?.ReplyToRequestId);
             properties.Add("identity_requestid", context.IdentityContext?.RequestId);
             properties.Add("identity_operationid", context.IdentityContext?.OperationId);
             properties.Add("identity_parentid", context.IdentityContext?.ParentId);
+            properties.Add("identity_partitionid", context.IdentityContext?.PartitionId);
 
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);
 
-            properties.Add("saga_id", context.SagaContext?.Id);
-            properties.Add("saga_status", context.SagaContext?.Status);
+            properties.Add("saga_id", context.SagaContext?.SagaData?.Id);
+            properties.Add("saga_status", context.SagaContext?.SagaData?.Status);
             properties.Add("saga_name", context.Saga?.Name);
 
             properties.Add("version", context.Version);
-            properties.Add("contentid", context.ContentId);
-            properties.Add("lastretry", context.LastRetry.ToString());
+            properties.Add("contentid", context.ContentContext.Id);
 
             properties.Add("route_name", context.Route?.Name);
             properties.Add("endpoint_name", context.EndPoint?.Name);

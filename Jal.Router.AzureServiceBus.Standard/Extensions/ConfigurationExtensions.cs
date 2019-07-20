@@ -1,6 +1,6 @@
 using Jal.Router.AzureServiceBus.Standard.Impl;
 using Jal.Router.AzureServiceBus.Standard.Model;
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
@@ -19,10 +19,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 .SetChannelProviderName("Azure Service Bus")
                 .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
                 .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
-                .UseRequestReplyChannel<AzureServiceBusRequestReply>()
-                .UseChannelManager<AzureServiceBusManager>()
+                .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
+                .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
+                .UseChannelResource<AzureServiceBusChannelResource>()
                 .UseMessageAdapter<MessageAdapter>()
-                .UseMessageSerializer<JsonMessageSerializer>()
                 .AddParameter(p);
         }
 

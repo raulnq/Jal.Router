@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Configuration;
-using Jal.Router.Interface;
 
-namespace Jal.Router.Impl.ValueFinder
+namespace Jal.Router.Impl
 {
-    public class ConfigurationValueFinder : IValueFinder
+    public class ConfigurationValueFinder : Jal.Router.Interface.IValueFinder
     {
         private readonly IConfiguration _configuration;
 

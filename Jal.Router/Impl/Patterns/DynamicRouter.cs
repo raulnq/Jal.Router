@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Jal.Router.Interface.Patterns;
 using Jal.Router.Model;
 
@@ -13,12 +14,11 @@ namespace Jal.Router.Impl.Patterns
             _dynamicroutes = dynamicroutes;
         }
 
-        public void Send(MessageContext context, TData data, string id="")
+        public Task Send(MessageContext context, TData data, string id="")
         {
             var order = 0;
 
             var current = _dynamicroutes.FirstOrDefault(x => x.Id== id);
-
 
             if (current != null)
             {
@@ -52,7 +52,14 @@ namespace Jal.Router.Impl.Patterns
                 }
             }
 
-            route?.Send(context, data);
+            if(route!=null)
+            {
+                return route.Send(context, data);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

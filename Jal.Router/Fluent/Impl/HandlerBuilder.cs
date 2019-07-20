@@ -1,14 +1,11 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl.ValueFinder;
-using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
 
-    public class HandlerBuilder<TContent, THandler> : IHandlerBuilder<TContent, THandler>, IWhenHandlerBuilder, IOnRetryUsingBuilder
+    public class HandlerBuilder<TContent, THandler> : IHandlerBuilder<TContent, THandler>, IWhenHandlerBuilder, IOnRouteOptionBuilder
     {
         private readonly Route<TContent, THandler> _route;
 
@@ -24,7 +21,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(action));
             }
 
-            _route.ConsumerType = typeof (TConcreteConsumer);
+            _route.UpdateConsumerType(typeof (TConcreteConsumer));
 
             var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler>(_route);
 
@@ -33,78 +30,55 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRetryBuilder When(Func<MessageContext, bool> condition)
+        public void With(Action<IOnRouteWithBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnRouteWithBuilder(_route);
+
+            action(builder);
+        }
+
+        public IOnRouteOptionBuilder When(Func<MessageContext, bool> condition)
         {
             if (condition == null)
             {
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.When = condition;
+            _route.UpdateWhen(condition);
 
             return this;
         }
 
 
-        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo(string endpointname, Action<IForExceptionBuilder> action)
+        public IOnRouteOptionBuilder OnError(Action<IOnRouteErrorBuilder> action)
         {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
             if (action==null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new ForExceptionBuilder(_route.RetryExceptionTypes);
+            var builder = new OnRouteErrorBuilder(_route);
 
             action(builder);
 
-            _route.OnRetryEndPoint = endpointname;
-
             return this;
         }
 
-        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
+        public IOnRouteOptionBuilder OnExit(Action<IOnRouteExitBuilder> action)
         {
-            _route.RetryValueFinderType = typeof(TValueFinder);
-
-            if (policycreator == null)
+            if (action == null)
             {
-                throw new ArgumentNullException(nameof(policycreator));
+                throw new ArgumentNullException(nameof(action));
             }
 
-            _route.RetryPolicyProvider = policycreator;
+            var builder = new OnRouteExitBuilder(_route);
 
-            return this;
-        }
-
-        public IOnRouteOptionBuilder With(IRetryPolicy policy)
-        {
-            _route.RetryValueFinderType = typeof(NullValueFinder);
-
-            if (policy == null)
-            {
-                throw new ArgumentNullException(nameof(policy));
-            }
-
-            Func<IValueFinder, IRetryPolicy> creator = x => policy;
-
-            _route.RetryPolicyProvider = creator;
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
-            _route.OnErrorEndPoint = endpointname;
+            action(builder);
 
             return this;
         }
@@ -119,25 +93,6 @@ namespace Jal.Router.Fluent.Impl
             var builder = new InboundMiddlewareBuilder(_route);
 
             action(builder);
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder ForwardMessageTo(string endpointname)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
-            _route.ForwardEndPoint = endpointname;
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder AsClaimCheck()
-        {
-            _route.UseClaimCheck = true;
 
             return this;
         }
@@ -157,7 +112,7 @@ namespace Jal.Router.Fluent.Impl
         }
     }
 
-    public class HandlerBuilder<TContent, THandler, TData> : IHandlerBuilder<TContent, THandler, TData>, IWhenHandlerBuilder, IOnRetryUsingBuilder
+    public class HandlerBuilder<TContent, THandler, TData> : IHandlerBuilder<TContent, THandler, TData>, IWhenHandlerBuilder, IOnRouteOptionBuilder
     {
         private readonly Route<TContent, THandler> _route;
 
@@ -173,7 +128,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(action));
             }
 
-            _route.ConsumerType = typeof(TConcreteConsumer);
+            _route.UpdateConsumerType(typeof(TConcreteConsumer));
 
             var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler, TData>(_route);
 
@@ -182,84 +137,28 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRetryBuilder When(Func<MessageContext, bool> condition)
+        public IOnRouteOptionBuilder When(Func<MessageContext, bool> condition)
         {
             if (condition == null)
             {
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.When = condition;
+            _route.UpdateWhen(condition);
 
             return this;
         }
 
-        public IOnRouteOptionBuilder AsClaimCheck()
+        public IOnRouteOptionBuilder OnError(Action<IOnRouteErrorBuilder> action)
         {
-            _route.UseClaimCheck = true;
-
-            return this;
-        }
-
-        public IOnRetryUsingBuilder OnExceptionRetryFailedMessageTo(string endpointname, Action<IForExceptionBuilder> action)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new ForExceptionBuilder(_route.RetryExceptionTypes);
+            var builder = new OnRouteErrorBuilder(_route);
 
             action(builder);
-
-            _route.OnRetryEndPoint = endpointname;
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder With<TValueFinder>(Func<IValueFinder, IRetryPolicy> policycreator) where TValueFinder : IValueFinder
-        {
-            _route.RetryValueFinderType = typeof(TValueFinder);
-
-            if (policycreator == null)
-            {
-                throw new ArgumentNullException(nameof(policycreator));
-            }
-
-            _route.RetryPolicyProvider = policycreator;
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder With(IRetryPolicy policy)
-        {
-            _route.RetryValueFinderType = typeof(NullValueFinder);
-
-            if (policy == null)
-            {
-                throw new ArgumentNullException(nameof(policy));
-            }
-
-            Func<IValueFinder, IRetryPolicy> creator = x => policy;
-
-            _route.RetryPolicyProvider = creator;
-
-            return this;
-        }
-
-        public IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
-            _route.OnErrorEndPoint = endpointname;
 
             return this;
         }
@@ -278,18 +177,6 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder ForwardMessageTo(string endpointname)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(nameof(endpointname));
-            }
-
-            _route.ForwardEndPoint = endpointname;
-
-            return this;
-        }
-
         public IOnRouteOptionBuilder OnEntry(Action<IOnRouteEntryBuilder> action)
         {
             if (action == null)
@@ -298,6 +185,32 @@ namespace Jal.Router.Fluent.Impl
             }
 
             var builder = new OnRouteEntryBuilder(_route);
+
+            action(builder);
+
+            return this;
+        }
+
+        public void With(Action<IOnRouteWithBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnRouteWithBuilder(_route);
+
+            action(builder);
+        }
+
+        public IOnRouteOptionBuilder OnExit(Action<IOnRouteExitBuilder> action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var builder = new OnRouteExitBuilder(_route);
 
             action(builder);
 

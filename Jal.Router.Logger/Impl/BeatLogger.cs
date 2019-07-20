@@ -1,7 +1,7 @@
 using System;
 using Common.Logging;
 using Jal.Router.Interface;
-using Jal.Router.Model.Management;
+using Jal.Router.Model;
 
 namespace Jal.Router.Logger.Impl
 {

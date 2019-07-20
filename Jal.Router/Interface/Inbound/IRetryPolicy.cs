@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 
-namespace Jal.Router.Interface.Inbound
+namespace Jal.Router.Interface
 {
     public interface IRetryPolicy
     {
         TimeSpan NextRetryInterval(int currentretrycount);
 
-        bool CanRetry(int currentretrycount, TimeSpan nextretryinterval);
+        bool CanRetry(int currentretrycount);
     }
 }

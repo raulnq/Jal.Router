@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl.Patterns
@@ -11,14 +12,14 @@ namespace Jal.Router.Impl.Patterns
 
         public abstract TAggregatedMessage CreateAggregatedMessage(TMessage message, MessageContext context, TData data);
 
-        public abstract void Publish(TAggregatedMessage message, MessageContext context, TData data);
+        public abstract Task Publish(TAggregatedMessage message, MessageContext context, TData data);
 
         public virtual void OnNoCompleted(TMessage message, MessageContext context, TData data)
         {
             
         }
 
-        public override void HandleWithContextAndData(TMessage message, MessageContext context, TData data)
+        public override async Task HandleWithContextAndData(TMessage message, MessageContext context, TData data)
         {
             try
             {
@@ -30,7 +31,7 @@ namespace Jal.Router.Impl.Patterns
                 {
                     var m = CreateAggregatedMessage(message, context, data);
 
-                    Publish(m, context, data);
+                    await Publish(m, context, data).ConfigureAwait(false);
                 }
                 else
                 {

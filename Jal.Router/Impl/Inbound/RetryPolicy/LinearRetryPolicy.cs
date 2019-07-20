@@ -1,7 +1,7 @@
 using System;
-using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface;
 
-namespace Jal.Router.Impl.Inbound.RetryPolicy
+namespace Jal.Router.Impl
 {
     public class LinearRetryPolicy : IRetryPolicy
     {
@@ -16,7 +16,7 @@ namespace Jal.Router.Impl.Inbound.RetryPolicy
             _maxretrycount = maxretrycount;
         }
 
-        public bool CanRetry(int currentretrycount, TimeSpan nextretryinterval)
+        public bool CanRetry(int currentretrycount)
         {
             return currentretrycount <= _maxretrycount;
         }

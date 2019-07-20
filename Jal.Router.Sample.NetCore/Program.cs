@@ -4,7 +4,6 @@ using Jal.Router.AzureServiceBus.Standard.Extensions;
 using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Jal.Router.LightInject.Installer;
 using Jal.Router.Model;
 using LightInject;
@@ -12,15 +11,15 @@ using Jal.Router.Extensions;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.LightInject.Installer;
-using Jal.Router.Impl.MonitoringTask;
 using Jal.ChainOfResponsability.LightInject.Installer;
 using Jal.Router.Impl.Patterns;
 using Jal.Router.Interface.Patterns;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
-using Jal.Router.Impl.Inbound.RetryPolicy;
-using Jal.Router.Impl.Management.ShutdownWatcher;
-using Jal.Router.Impl.ValueFinder;
+using System.Threading.Tasks;
+using Jal.Router.Newtonsoft.Extensions;
+using Jal.Router.Newtonsoft.LightInject.Installer;
+using System.Collections.Generic;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -34,6 +33,7 @@ namespace Jal.Router.Sample.NetCore
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
             container.RegisterFrom<AzureStorageCompositionRoot>();
+            container.RegisterFrom<NewtonsoftCompositionRoot>();
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -43,8 +43,9 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueListenByOneHandlerWithException>(typeof(QueueListenByOneHandlerWithException).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToPublishHandler>(typeof(ToPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
-            container.Register<IMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, EndHandler>(typeof(EndHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToReplyHandler>(typeof(ToReplyHandler).FullName, new PerContainerLifetime());
@@ -52,20 +53,24 @@ namespace Jal.Router.Sample.NetCore
 
             container.Register<IMessageHandler<Message>, QueueToRead>(typeof(QueueToRead).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
-            container.Register<IMessageHandler<Message>, QueueToReadGroup>(typeof(QueueToReadGroup).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, QueueToReadPartition>(typeof(QueueToReadPartition).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenSessionSenderHandlers>(typeof(QueueListenSessionSenderHandlers).FullName, new PerContainerLifetime());
             
             var host = container.GetInstance<IHost>();
             host.Configuration
-                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentGroups=1 })
+                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
-                .AddMonitoringTask<HeartBeatLogger>(1000)
-                .EnableEntityStorage()
+                //.AddMonitoringTask<HeartBeatLogger>(150)
+                .UseNewtonsoft()
+                //.AddMonitoringTask<ListenerMonitor>(30)
+                //.AddMonitoringTask<ListenerRestartMonitor>(60)
+                //.AddMonitoringTask<PointToPointChannelMonitor>(60)
+                //.EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
 
-            //var facade = container.GetInstance<IEntityStorageFacade>();
+            //var facade = container.GetInstance<IEntityStorageGateway>();
 
-            //var messages = facade.GetMessages(new DateTime(2018, 12, 7), new DateTime(2018, 12, 9), "queueperformancetoread_handler");
+            //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
             host.RunAndBlock();
         }
@@ -88,6 +93,8 @@ namespace Jal.Router.Sample.NetCore
         private readonly string _topicpublishedfromqueue = "topicpublishedfromqueue";
 
         private readonly string _queuestart = "queuestart";
+
+        private readonly string _alternativequeuestart = "alternativequeuestart";
 
         private readonly string _queuecontinue = "queuecontinue";
 
@@ -121,6 +128,10 @@ namespace Jal.Router.Sample.NetCore
 
         private readonly string _sessiontopic = "sessiontopic";
 
+        private readonly string _forwardqueue = "forwardqueue";
+
+        private readonly string _forwardqueueendpoint = "forwardqueueendpoint";
+
         private readonly string _sendersessionqueue = "sendersessionqueue";
 
         public RouterConfigurationSmokeTest()
@@ -136,9 +147,9 @@ namespace Jal.Router.Sample.NetCore
                 TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
             };
 
-            RegisterGroup("xx").ForQueue(_sessionqueue, config.ConnectionString).Until(x => false);
+            RegisterPartition("xx").ForQueue(_sessionqueue, config.ConnectionString).Until(x => false);
 
-            RegisterGroup("yy").ForSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).Until(x => false);
+            RegisterPartition("yy").ForSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).Until(x => false);
 
 
             RegisterHandler<IMessageHandler<Message>>(_sendersessionqueue + "_handler")
@@ -156,7 +167,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_sessionqueue, config.ConnectionString);
             })
-            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            .ForMessage<Message>().Use<QueueToReadPartition>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -166,7 +177,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString);
             })
-            .ForMessage<Message>().Use<QueueToReadGroup>(x =>
+            .ForMessage<Message>().Use<QueueToReadPartition>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
@@ -209,6 +220,8 @@ namespace Jal.Router.Sample.NetCore
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config);
 
+            this.RegisterQueue(new AzureServiceBusQueue(_alternativequeuestart), config);
+
             this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queueend), config);
@@ -218,6 +231,8 @@ namespace Jal.Router.Sample.NetCore
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config);
+
+            this.RegisterQueue(new AzureServiceBusQueue(_forwardqueue), config);
 
             this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config);
 
@@ -280,7 +295,7 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterEndPoint("toreplyendpoint")
             .ForMessage<Message>()
-            .To(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
+            .To<Message>(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
 
             RegisterEndPoint("replyendpoint")
             .ForMessage<Message>()
@@ -382,6 +397,15 @@ namespace Jal.Router.Sample.NetCore
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             }).UseMiddleware(x => x.Add<Middleware>());
 
+            Func<MessageContext, Handler, Task> init = (c, r) => {
+                Console.WriteLine("HIiii");
+                return Task.CompletedTask;
+            };
+
+            RegisterEndPoint(_forwardqueueendpoint)
+            .ForMessage<Message>()
+            .To(x => x.AddPointToPointChannel(config.ConnectionString, _forwardqueue));
+
             RegisterHandler<IMessageHandler<Message>>(_queuelistenbyonehandlerwithexception + "_handler")
             .ToListen(x =>
             {
@@ -390,7 +414,16 @@ namespace Jal.Router.Sample.NetCore
             .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
-            }).OnErrorSendFailedMessageTo(_errorqueueendpoint);
+            }).OnError(e=>e.Use<ForwardRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", _errorqueueendpoint } }) )
+            .OnEntry(e=> {
+                e.Use<RouteEntryMessageHandler>(new Dictionary<string, object>() { { "init", init } });
+                e.Use<ForwardRouteEntryMessageHandler>(new Dictionary<string, object>() { { "endpoint", _forwardqueueendpoint } });
+            });
+
+            Func<MessageContext, Exception, ErrorHandler, Task > func = (c, e, r) => {
+                Console.WriteLine("HIiii");
+                return Task.CompletedTask;
+            }; 
 
             RegisterHandler<IMessageHandler<Message>>(_queuelistenbyonehandlerwithexceptionandretry + "_handler")
             .ToListen(x =>
@@ -401,10 +434,12 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
-            .OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
-            .OnEntry(x=>x.EnableEntityStorage(true))
-            .OnErrorSendFailedMessageTo(_errorqueueendpoint)
-            ; 
+            //.OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
+            .OnError(x=>x.Use<RetryRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", "retryendpoint" } , { "policy", new LinearRetryPolicy(5, 3) }, { "fallback", func } }).For<ApplicationException>())
+            //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
+            //.OnEntry(x=>x.EnableEntityStorage(true))
+            //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
+            ;
 
             RegisterEndPoint(_errorqueueendpoint)
                 .ForMessage<Message>()
@@ -418,6 +453,12 @@ namespace Jal.Router.Sample.NetCore
                 x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("start")
                 .ToListen(y => y.AddQueue(_queuestart, config.ConnectionString))
                 .ForMessage<Message>().Use<StartHandler>(y => {
+                    y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
+                });
+
+                x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("alternative")
+                .ToListen(y => y.AddQueue(_alternativequeuestart, config.ConnectionString))
+                .ForMessage<Message>().Use<AlternativeStartHandler>(y => {
                     y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
             },
@@ -454,19 +495,21 @@ namespace Jal.Router.Sample.NetCore
 
     public class EndHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
             data.Status = "end";
 
             data.Name = message.Name;
+
+            return Task.CompletedTask;
         }
     }
 
     public class ContinueHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
 
@@ -474,15 +517,15 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_end", OperationId = context.IdentityContext.OperationId };
+            var identity = new IdentityContext(context.IdentityContext.Id + "_end", context.IdentityContext.OperationId);
 
-            context.Send(data, new Message() { Name = message.Name }, "endendpoint", identity, context.SagaContext.Id);
+            return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
         }
     }
 
     public class StartHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public override void HandleWithContextAndData(Message message, MessageContext context, Data data)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
         {
             data.Status = "initial";
 
@@ -492,113 +535,140 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext() { Id = context.IdentityContext.Id + "_continue", OperationId = context.IdentityContext.OperationId };
+            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
 
-            context.Send(data, new Message() { Name=message.Name }, "continueendpoint", identity, context.SagaContext.Id);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
         }
     }
 
-    public class Middleware : IMiddleware<MessageContext>
+    public class AlternativeStartHandler : AbstractMessageHandlerWithData<Message, Data>
     {
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public override Task HandleWithContextAndData(Message message, MessageContext context, Data data)
+        {
+            data.Status = "initial";
+
+            Console.WriteLine("message handled by " + GetType().Name + " " + data.Status);
+
+            data.Status = "start";
+
+            data.Name = message.Name;
+
+            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
+
+            return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
+        }
+    }
+
+    public class Middleware : IMiddlewareAsync<MessageContext>
+    {
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             Console.WriteLine("Start " + GetType().Name);
-            next(context);
+
+            await next(context);
+
             Console.WriteLine("End " + GetType().Name);
         }
     }
 
     public class FromPublishHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
+            return Task.CompletedTask;
         }
     }
 
     
     public class ToReplyHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
+            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
         }
     }
 
     public class FromReplyHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
+            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
         }
     }
 
     
     public class ToPublishHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
+            return context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
         }
     }
 
     public class TopicListenByOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueToRead : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name + " " + message.Name);
+
+            return Task.CompletedTask;
         }
     }
 
-    public class QueueToReadGroup : AbstractMessageHandler<Message>
+    public class QueueToReadPartition : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
-            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.GroupId);
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.PartitionId);
+
+            return Task.CompletedTask;
         }
     }
 
     public class QueueToSend : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
             for (int i = 0; i < 100; i++)
             {
-                context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
+                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
             }
-
-            
         }
     }
 
     public class QueueListenByOneHandlerWithException : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
             throw new ApplicationException("Error");
@@ -607,38 +677,41 @@ namespace Jal.Router.Sample.NetCore
 
     public class HandlingTwoQueuesInOneHandler : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByTwoAHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenByTwoBHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override Task HandleWithContext(Message message, MessageContext context)
         {
             Console.WriteLine("message handled by " + GetType().Name);
+            return Task.CompletedTask;
         }
     }
 
     public class QueueListenSessionSenderHandlers : AbstractMessageHandler<Message>
     {
-        public override void HandleWithContext(Message message, MessageContext context)
+        public override async Task HandleWithContext(Message message, MessageContext context)
         {
             for (int i = 0; i < 5; i++)
             {
-                context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"1-{i}", GroupId = i.ToString() },"X");
-                context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"2-{i}", GroupId = i.ToString() }, "X");
-                context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"3-{i}", GroupId = i.ToString() }, "X");
-                context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext() { Id = $"4-{i}", GroupId = i.ToString() }, "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext($"1-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext($"2-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext($"3-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext($"4-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
             }
         }
     }

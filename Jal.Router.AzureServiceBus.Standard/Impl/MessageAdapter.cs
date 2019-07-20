@@ -4,10 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Jal.Router.Impl.Inbound;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.InteropExtensions;
@@ -20,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     }
     public class MessageAdapter : AbstractMessageAdapter
     {
-        public MessageAdapter(IComponentFactory factory, IConfiguration configuration, IBus bus) : base(factory, configuration, bus)
+        public MessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
         {
         }
 
@@ -30,72 +28,70 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (sbmessage != null)
             {
-                var storage = Factory.Create<IEntityStorage>(Configuration.StorageType);
+                var serializer = Factory.CreateMessageSerializer();
 
-                var serializer = Factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
-
-                var context = new MessageContext(Bus, serializer, storage)
-                {
-                    DateTimeUtc = DateTime.UtcNow,
-                };
-
-                context.IdentityContext.Id = sbmessage.MessageId;
-
-                context.IdentityContext.ReplyToRequestId = sbmessage.ReplyToSessionId;
-
-                context.IdentityContext.RequestId = sbmessage.SessionId;
-
-                context.IdentityContext.GroupId = sbmessage.SessionId;
+                var operationid = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(OperationId))
                 {
-                    context.IdentityContext.OperationId = sbmessage.UserProperties[OperationId].ToString();
+                    operationid = sbmessage.UserProperties[OperationId].ToString();
                 }
+
+                var parentid = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(ParentId))
                 {
-                    context.IdentityContext.ParentId = sbmessage.UserProperties[ParentId].ToString();
+                    parentid = sbmessage.UserProperties[ParentId].ToString();
                 }
+
+                var identitycontext = new IdentityContext(sbmessage.MessageId, operationid, parentid, sbmessage.SessionId, sbmessage.ReplyToSessionId, sbmessage.SessionId);
+
+                var trackings = new List<Tracking>();
+
+                if (sbmessage.UserProperties.ContainsKey(Trackings))
+                {
+                    trackings = serializer.Deserialize(sbmessage.UserProperties[Trackings].ToString(), typeof(List<Tracking>)) as List<Tracking>;
+                }
+
+                var from = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(From))
                 {
-                    context.Origin.From = sbmessage.UserProperties[From].ToString();
+                    from = sbmessage.UserProperties[From].ToString();
                 }
 
-                if (sbmessage.UserProperties.ContainsKey(ContentId))
-                {
-                    context.ContentId = sbmessage.UserProperties[ContentId].ToString();
-                }
-
-                if (sbmessage.UserProperties.ContainsKey(Tracks))
-                {
-                    context.Tracks = Deserialize(sbmessage.UserProperties[Tracks].ToString(), typeof(List<Track>)) as List<Track>;
-                }
-
-                if (sbmessage.UserProperties.ContainsKey(SagaId))
-                {
-                    context.SagaContext.Id = sbmessage.UserProperties[SagaId].ToString();
-                }
-
-                if (sbmessage.UserProperties.ContainsKey(Version))
-                {
-                    context.Version = sbmessage.UserProperties[Version].ToString();
-                }
+                var key = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(Origin))
                 {
-                    context.Origin.Key = sbmessage.UserProperties[Origin].ToString();
+                    key = sbmessage.UserProperties[Origin].ToString();
                 }
 
-                if (sbmessage.UserProperties.ContainsKey(RetryCount))
+                var version = string.Empty;
+
+                if (sbmessage.UserProperties.ContainsKey(Version))
                 {
-                    context.RetryCount = Convert.ToInt32(sbmessage.UserProperties[RetryCount].ToString());
+                    version = sbmessage.UserProperties[Version].ToString();
+                }
+
+                var sagaid = string.Empty;
+
+                if (sbmessage.UserProperties.ContainsKey(SagaId))
+                {
+                    sagaid = sbmessage.UserProperties[SagaId].ToString();
+                }
+
+                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version);
+
+                if (sbmessage.UserProperties.ContainsKey(ContentId))
+                {
+                    context.ContentContext.UpdateId(sbmessage.UserProperties[ContentId].ToString());
                 }
 
                 if (sbmessage.UserProperties != null)
                 {
                     foreach (var property in sbmessage.UserProperties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    && x.Key != RetryCount && x.Key != SagaId && x.Key!=Tracks && x.Key!= ContentId && x.Key != ParentId && x.Key != OperationId))
+                    &&  x.Key != SagaId && x.Key!=Trackings && x.Key!= ContentId && x.Key != ParentId && x.Key != OperationId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -106,7 +102,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override string GetContent(object message)
+        protected override string ReadContent(object message)
         {
             var sbmessage = message as Message;
 
@@ -151,9 +147,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override object Write(MessageContext context)
+        protected override object WriteMetadataAndContent(MessageContext context)
         {
-            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.Content)) { ContentType = "application/json" };
+            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.ContentContext.Data)) { ContentType = "application/json" };
 
             foreach (var header in context.Headers)
             {
@@ -175,18 +171,20 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(SagaId, context.SagaContext.Id);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ContentId))
+            if (!string.IsNullOrWhiteSpace(context.ContentContext.Id))
             {
-                brokeredmessage.UserProperties.Add(ContentId, context.ContentId);
+                brokeredmessage.UserProperties.Add(ContentId, context.ContentContext.Id);
             }
 
-            if (context.Tracks != null)
+            if (context.TrackingContext != null)
             {
-                var root = Serialize(context.Tracks);
+                var serializer = Factory.CreateMessageSerializer();
+
+                var root = serializer.Serialize(context.TrackingContext.Trackings);
 
                 if (!string.IsNullOrWhiteSpace(root))
                 {
-                    brokeredmessage.UserProperties.Add(Tracks, root);
+                    brokeredmessage.UserProperties.Add(Trackings, root);
                 }
             }
 
@@ -215,9 +213,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.SessionId = context.IdentityContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.GroupId))
+            if (!string.IsNullOrWhiteSpace(context.IdentityContext.PartitionId))
             {
-                brokeredmessage.SessionId = context.IdentityContext.GroupId;
+                brokeredmessage.SessionId = context.IdentityContext.PartitionId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
@@ -229,8 +227,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 brokeredmessage.UserProperties.Add(ParentId, context.IdentityContext.ParentId);
             }
-
-            brokeredmessage.UserProperties.Add(RetryCount, context.RetryCount.ToString());
 
             return brokeredmessage;
         }

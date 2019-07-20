@@ -4,10 +4,10 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IOnRouteOptionBuilder
     {
-        IOnRouteOptionBuilder OnErrorSendFailedMessageTo(string endpointname);
+        IOnRouteOptionBuilder OnError(Action<IOnRouteErrorBuilder> action);
         IOnRouteOptionBuilder UseMiddleware(Action<IInboundMiddlewareBuilder> action);
         IOnRouteOptionBuilder OnEntry(Action<IOnRouteEntryBuilder> action);
-        IOnRouteOptionBuilder ForwardMessageTo(string endpointname);
-        IOnRouteOptionBuilder AsClaimCheck();
+        IOnRouteOptionBuilder OnExit(Action<IOnRouteExitBuilder> action);
+        void With(Action<IOnRouteWithBuilder> action);
     }
 }

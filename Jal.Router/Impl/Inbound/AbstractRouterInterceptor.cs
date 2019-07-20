@@ -1,8 +1,8 @@
 ﻿using System;
-using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public abstract class AbstractRouterInterceptor : IRouterInterceptor
     {

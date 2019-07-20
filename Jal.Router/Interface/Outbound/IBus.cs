@@ -1,30 +1,33 @@
 using Jal.Router.Model;
+using System.Threading.Tasks;
 
-namespace Jal.Router.Interface.Outbound
+namespace Jal.Router.Interface
 {
 
     public interface IBus
     {
-        TResult Reply<TContent, TResult>(TContent content, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class;
 
-        TResult Reply<TContent, TResult>(TContent content, Origin origin, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class;
 
-        void Send<TContent>(TContent content, Options options);
+        Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult : class;
 
-        void Send<TContent>(TContent content, Origin origin, Options options);
+        Task Send<TContent>(TContent content, Options options);
 
-        void Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
+        Task Send<TContent>(TContent content, Origin origin, Options options);
 
-        void FireAndForget<TContent>(TContent content, Options options);
+        Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
 
-        void FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
+        Task FireAndForget<TContent>(TContent content, Options options);
 
-        void FireAndForget<TContent>(TContent content, Origin origin, Options options);
+        Task FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
 
-        void Publish<TContent>(TContent content, Options options);
+        Task FireAndForget<TContent>(TContent content, Origin origin, Options options);
 
-        void Publish<TContent>(TContent content, Origin origin, Options options);
+        Task Publish<TContent>(TContent content, Options options);
 
-        void Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
+        Task Publish<TContent>(TContent content, Origin origin, Options options);
+
+        Task Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
     }
 }

@@ -1,7 +1,7 @@
 using System.Configuration;
 using Jal.Router.Interface;
 
-namespace Jal.Router.Impl.ValueFinder
+namespace Jal.Router.Impl
 {
     public class ConnectionStringValueFinder : IValueFinder
     {

@@ -26,7 +26,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(method));
             }
 
-            _routemethod.Evaluator = method;
+            _routemethod.UpdateEvaluator(method);
         }
 
         public void When(Func<TContent, TConsumer, MessageContext, bool> method)
@@ -36,7 +36,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(method));
             }
 
-            _routemethod.EvaluatorWithContext = method;
+            _routemethod.UpdateEvaluatorWithContext(method);
         }
     }
 }

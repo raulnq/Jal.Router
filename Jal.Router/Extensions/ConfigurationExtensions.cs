@@ -1,5 +1,5 @@
-﻿using Jal.Router.Impl.Management.ShutdownWatcher;
-using Jal.Router.Interface.Management;
+﻿using Jal.Router.Impl;
+using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {

@@ -25,5 +25,10 @@ namespace Jal.Router.Fluent.Impl
 
             return builder;
         }
+
+        public ILastListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>()
+        {
+            return RegisterHandler<THandler>(typeof(THandler).Name.ToLower());
+        }
     }
 }

@@ -1,159 +1,180 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
-using Jal.Router.Model.Inbound;
-using Jal.Router.Model.Outbound;
 using Microsoft.Azure.ServiceBus;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-
     public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
     {
+        private QueueClient _client;
 
-        public Func<object[]> CreateSenderMethodFactory(SenderMetadata metadata)
+        public void Open(SenderContext sendercontext)
         {
-            return () => new object[] { new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath) };
+            _client = new QueueClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+
+            if(_parameter.TimeoutInSeconds>0)
+            {
+                _client.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(_parameter.TimeoutInSeconds);
+            }
         }
 
-        public Action<object[]> DestroySenderMethodFactory(SenderMetadata metadata)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
-            return sender =>
+            var sbmessage = message as Message;
+
+            if (sbmessage != null)
             {
-                var client = sender[0] as QueueClient;
-                
-                client.CloseAsync().GetAwaiter().GetResult();
-            };
+                await _client.SendAsync(sbmessage).ConfigureAwait(false);
+
+                return sbmessage.MessageId;
+            }
+
+            return string.Empty;
         }
 
-        public Func<object[], object, string> SendMethodFactory(SenderMetadata metadata)
+        public void Open(ListenerContext listenercontext)
         {
-            return (sender, message) =>
-            {
-                var client = sender[0] as QueueClient;
-
-                var sbmessage = message as Message;
-
-                if (sbmessage != null)
-                {
-                    client.SendAsync(sbmessage).GetAwaiter().GetResult();
-
-                    return sbmessage.MessageId;
-                }
-
-                return string.Empty;
-            };
+            _client = new QueueClient(listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
         }
 
-     
-
-        public Func<object[]> CreateListenerMethodFactory(ListenerMetadata metadata)
+        public bool IsActive(ListenerContext listenercontext)
         {
-            return () =>
-            {
-
-                var client = new QueueClient(metadata.Channel.ToConnectionString, metadata.Channel.ToPath);
-
-                return new object[] { client };
-            };
+            return !_client.IsClosedOrClosing;
         }
 
-        public Action<object[]> DestroyListenerMethodFactory(ListenerMetadata metadata)
+        public bool IsActive(SenderContext sendercontext)
         {
-            return listener =>
-            {
-                var client = listener[0] as QueueClient;
-
-                client.CloseAsync().GetAwaiter().GetResult();
-            };
+            return !_client.IsClosedOrClosing;
         }
 
-        public Action<object[]> ListenerMethodFactory(ListenerMetadata metadata)
+        public Task Close(SenderContext sendercontext)
         {
-            var options = CreateOptions(metadata);
+            return _client.CloseAsync();
+        }
 
-            var sessionoptions = CreateSessionOptions(metadata);
+        public void Listen(ListenerContext listenercontext)
+        {
+            var options = CreateOptions(listenercontext);
 
-            var adapter = Factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
+            var sessionoptions = CreateSessionOptions(listenercontext);
 
-            Action<Message, MessageContext> handler = (message, context) =>
+            var adapter = Factory.CreateMessageAdapter();
+
+            if (listenercontext.Partition != null)
             {
-                foreach (var runtimehandler in metadata.Routes.Select(x => x.RuntimeHandler))
-                {
-                    var clone = message.Clone();
+                _client.RegisterSessionHandler(async (ms, message, token) => {
 
-                    runtimehandler(clone, metadata.Channel);
-                }
-            };
+                    var context = adapter.ReadMetadata(message);
 
-            return (listener) =>
-            {
-                var client = listener[0] as QueueClient;
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
-                if(metadata.Group!=null)
-                {
-                    client.RegisterSessionHandler(async (ms, message, token) => {
-
-                        var context=adapter.ReadMetadata(message);
-
-                        await OnMessageAsync(metadata, context, () => handler(message, context), () => ms.CompleteAsync(message.SystemProperties.LockToken), ()=> ms.CloseAsync());
-
-                    }, sessionoptions);
-                }
-                else
-                {
-                    client.RegisterMessageHandler(async (message, token) =>
+                    try
                     {
-                        var context = adapter.ReadMetadata(message);
+                        var handlers = new List<Task>();
 
-                        await OnMessageAsync(metadata, context, () => handler(message, context), () => client.CompleteAsync(message.SystemProperties.LockToken));
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        {
+                            var clone = message.Clone();
 
-                    }, options);
-                }
-            };
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
+                        }
+
+                        await Task.WhenAll(handlers.ToArray());
+
+                        await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+
+                        if (listenercontext.Partition.Until(context))
+                        {
+                            await ms.CloseAsync().ConfigureAwait(false);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                    }
+                    finally
+                    {
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    }
+
+                }, sessionoptions);
+            }
+            else
+            {
+                _client.RegisterMessageHandler(async (message, token) =>
+                {
+                    var context = adapter.ReadMetadata(message);
+
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+
+                    try
+                    {
+                        var handlers = new List<Task>();
+
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        {
+                            var clone = message.Clone();
+
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
+                        }
+
+                        await Task.WhenAll(handlers.ToArray());
+
+                        await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                    }
+                    finally
+                    {
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    }
+                }, options);
+            }
         }
 
-        private SessionHandlerOptions CreateSessionOptions(ListenerMetadata metadata)
+        private SessionHandlerOptions CreateSessionOptions(ListenerContext listenercontext)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
                 var context = args.ExceptionReceivedContext;
 
-                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
 
                 return Task.CompletedTask;
             };
 
             var options = new SessionHandlerOptions(handler) { AutoComplete = false };
 
-            if (_parameter.MaxConcurrentGroups > 0)
+            if (_parameter.MaxConcurrentPartitions > 0)
             {
-                options.MaxConcurrentSessions = _parameter.MaxConcurrentGroups;
+                options.MaxConcurrentSessions = _parameter.MaxConcurrentPartitions;
             }
-            if (_parameter.AutoRenewGroupTimeoutInSeconds > 0)
+            if (_parameter.AutoRenewPartitionTimeoutInSeconds > 0)
             {
-                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewGroupTimeoutInSeconds);
+                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewPartitionTimeoutInSeconds);
             }
-            if (_parameter.MessageGroupTimeoutInSeconds > 0)
+            if (_parameter.MessagePartitionTimeoutInSeconds > 0)
             {
-                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessageGroupTimeoutInSeconds);
+                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessagePartitionTimeoutInSeconds);
             }
             return options;
         }
 
-        private MessageHandlerOptions CreateOptions(ListenerMetadata metadata)
+        private MessageHandlerOptions CreateOptions(ListenerContext listenercontext)
         {
             Func<ExceptionReceivedEventArgs, Task> handler = args =>
             {
                 var context = args.ExceptionReceivedContext;
 
-                Logger.Log($"Message failed to {metadata.Channel.ToString()} channel {metadata.Channel.GetPath()} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
+                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
 
                 return Task.CompletedTask;
             } ;
@@ -171,10 +192,15 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return options;
         }
 
+        public Task Close(ListenerContext context)
+        {
+            return _client.CloseAsync();
+        }
+
         private readonly AzureServiceBusParameter _parameter;
 
-        public AzureServiceBusQueue(IComponentFactory factory, IConfiguration configuration, ILogger logger, IParameterProvider provider) 
-            : base(factory, configuration, logger)
+        public AzureServiceBusQueue(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider) 
+            : base(factory, logger)
         {
             _parameter = provider.Get<AzureServiceBusParameter>();
         }

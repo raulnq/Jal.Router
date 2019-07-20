@@ -1,45 +1,47 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public abstract class AbstractEntityStorage : IEntityStorage
     {
-        public virtual MessageEntity CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public virtual Task CreateMessageEntity(MessageContext context, MessageEntity messageentity)
         {
-            return null;
+            return Task.CompletedTask;
         }
 
-        public virtual SagaEntity CreateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual Task CreateSagaData(MessageContext context, SagaData sagadata)
         {
-            return null;
+            return Task.CompletedTask;
         }
 
-        public virtual void UpdateSagaEntity(MessageContext context, SagaEntity sagaentity)
+        public virtual Task UpdateSagaData(MessageContext context, SagaData sagadata)
         {
-            
+            return Task.CompletedTask;
         }
 
-        public virtual SagaEntity GetSagaEntity(string entityid)
+        public virtual Task<SagaData> GetSagaData(string id)
         {
-            return null;
+            return Task.FromResult(default(SagaData));
         }
 
-        public virtual SagaEntity[] GetSagaEntities(DateTime start, DateTime end, string saganame, string sagastoragename = "")
+        public virtual Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
         {
-            return null;
+            return Task.FromResult(default(SagaData[]));
         }
 
-        public virtual MessageEntity[] GetMessageEntitiesBySagaEntity(SagaEntity sagaentity, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null)
         {
-            return null;
+            return Task.FromResult(default(MessageEntity[]));
         }
 
-        public virtual MessageEntity[] GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, string messagestoragename = "")
+        public virtual Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routenameorendpointname, IDictionary<string, string> options = null)
         {
-            return null;
+            return Task.FromResult(default(MessageEntity[]));
         }
     }
 }

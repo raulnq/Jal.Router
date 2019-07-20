@@ -3,7 +3,6 @@ using Common.Logging;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using LightInject;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All

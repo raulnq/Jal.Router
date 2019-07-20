@@ -1,11 +1,11 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl.ValueFinder;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Extensions
 {
-        public static class ListenerChannelBuilderExtensions
+    public static class ListenerChannelBuilderExtensions
     {
         public static void AddPointToPointChannel(this IListenerChannelBuilder builder, string path, string connectionstring)
         {

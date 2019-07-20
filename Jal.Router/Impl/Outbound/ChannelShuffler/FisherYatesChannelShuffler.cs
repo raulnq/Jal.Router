@@ -1,8 +1,8 @@
 ﻿using System;
-using Jal.Router.Interface.Outbound;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound.ChannelShuffler
+namespace Jal.Router.Impl
 {
     public class FisherYatesChannelShuffler : IChannelShuffler
     {

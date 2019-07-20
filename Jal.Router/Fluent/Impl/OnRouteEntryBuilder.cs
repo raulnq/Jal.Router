@@ -1,5 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
@@ -12,30 +13,11 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-
-        public IOnRouteEntryBuilder BuildIdentityWith(Func<MessageContext, IdentityContext> builder)
+        public void Use<TMessageHandler>(IDictionary<string, object> parameters) where TMessageHandler : IRouteEntryMessageHandler
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-            _route.IdentityConfiguration.Builder = builder;
-            return this;
-        }
+            var handler = new Handler(typeof(TMessageHandler), parameters);
 
-
-        public IOnRouteEntryBuilder EnableEntityStorage(bool ignoreexceptions=true)
-        {
-            _route.StorageConfiguration.Enabled = true;
-            _route.StorageConfiguration.IgnoreExceptions = ignoreexceptions;
-            return this;
-        }
-
-        public IOnRouteEntryBuilder DisableEntityStorage()
-        {
-            _route.StorageConfiguration.Enabled = false;
-            _route.StorageConfiguration.IgnoreExceptions = true;
-            return this;
+            _route.EntryHandlers.Add(handler);
         }
     }
 }

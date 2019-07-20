@@ -4,6 +4,8 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IForExceptionBuilder
     {
-        void For<TExeption>() where TExeption : Exception;
+        void For<TException>() where TException : Exception;
+
+        void For<TExceptionA, TExceptionB>() where TExceptionA : Exception  where TExceptionB : Exception;
     }
 }

@@ -1,8 +1,9 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -10,7 +11,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 namespace Jal.Router.ApplicationInsights.Impl
 {
 
-    public class RouterLogger : AbstractApplicationInsightsLogger, IMiddleware<MessageContext>
+    public class RouterLogger : AbstractApplicationInsightsLogger, IMiddlewareAsync<MessageContext>
     {
 
         public RouterLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
@@ -19,7 +20,7 @@ namespace Jal.Router.ApplicationInsights.Impl
         }
 
 
-        public void Execute(Context<MessageContext> context, Action<Context<MessageContext>> next)
+        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
             var telemetry = new RequestTelemetry();
 
@@ -27,30 +28,21 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
-            var name = context.Data.Route.Name;
-
-            if (!string.IsNullOrWhiteSpace(context.Data.Saga?.Name))
-            {
-                name = $"{context.Data.Saga?.Name}_{name}";
-            }
-
             try
             {
                 telemetry.Timestamp = context.Data.DateTimeUtc;
 
                 telemetry.Id = $"{context.Data.IdentityContext.Id}";
 
-                telemetry.Name = name;
+                telemetry.Name = context.Data.Name;
 
                 telemetry.Source = context.Data.Origin.From;
-
+                
                 PopulateProperties(telemetry.Properties, context.Data);
-
-                PopulateMetrics(telemetry.Metrics, context.Data);
 
                 PopulateContext(telemetry.Context, context.Data);
 
-                next(context);
+                await next(context);
 
                 telemetry.ResponseCode = "200";
 
@@ -65,8 +57,6 @@ namespace Jal.Router.ApplicationInsights.Impl
                 var telemetryexception = new ExceptionTelemetry(exception);
 
                 PopulateProperties(telemetryexception.Properties, context.Data);
-
-                PopulateMetrics(telemetryexception.Metrics, context.Data);
 
                 PopulateContext(telemetryexception.Context, context.Data);
 

@@ -1,14 +1,13 @@
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using System.Threading.Tasks;
 
 namespace Jal.Router.AzureStorage.Impl
 {
     public class AzureEntityStorageStartupTask : IStartupTask
     {
-
         private readonly ILogger _logger;
 
         private readonly AzureStorageParameter _parameter;
@@ -31,15 +30,14 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        public void Run()
+        public async Task Run()
         {
 
             if(!string.IsNullOrWhiteSpace(_parameter.TableStorageConnectionString))
             {
                 var sagatable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
-                var sagaresult = sagatable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
-
+                var sagaresult = await sagatable.CreateIfNotExistsAsync().ConfigureAwait(false);
 
                 if (sagaresult)
                 {
@@ -52,7 +50,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                 var messagetable = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
-                var messageresult = messagetable.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                var messageresult =await messagetable.CreateIfNotExistsAsync().ConfigureAwait(false);
 
                 if (messageresult)
                 {

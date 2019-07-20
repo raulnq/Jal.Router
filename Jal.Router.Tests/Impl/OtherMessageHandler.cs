@@ -1,6 +1,7 @@
 ﻿using System;
-using Jal.Router.Impl;
-using Jal.Router.Interface.Outbound;
+using System.Threading.Tasks;
+using Jal.Router.Extensions;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Jal.Router.Tests.Model;
 
@@ -15,13 +16,15 @@ namespace Jal.Router.Tests.Impl
             _bus = bus;
         }
 
-        public void Handle(Message message, Data data)
+        public Task Handle(Message message, Data data)
         {
             Console.WriteLine($"Other Sender {message.Name}");
 
-            _bus.Send(message, new Options() {EndPointName = "route1" });
+            //return _bus.Send(message, new Options() {EndPointName = "route1" });
 
             //throw new ApplicationException();
+
+            return Task.CompletedTask;
         }
     }
 
@@ -34,12 +37,12 @@ namespace Jal.Router.Tests.Impl
             _bus = bus;
         }
 
-        public void Handle(MessageContext context, Message message, Data data)
+        public Task Handle(MessageContext context, Message message, Data data)
         {
             Console.WriteLine($"SagaInput1HandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInput1HandlerMessageHandler";
             //throw new Exception("error");
-            _bus.Publish(message, new Options() {EndPointName = "SagaInputTopicHandlerMessageHandler", SagaContext = context.SagaContext});
+            return context.Publish(message, "SagaInputTopicHandlerMessageHandler");
         }
     }
 
@@ -52,11 +55,11 @@ namespace Jal.Router.Tests.Impl
             _bus = bus;
         }
 
-        public void Handle(MessageContext context, Message message, Data data)
+        public Task Handle(MessageContext context, Message message, Data data)
         {
             Console.WriteLine($"SagaInputTopicHandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInputTopicHandlerMessageHandler";
-            _bus.Publish(message, new Options() {EndPointName = "SagaInputTopic2HandlerMessageHandler", SagaContext = context.SagaContext });
+            return context.Publish(message, "SagaInputTopic2HandlerMessageHandler");
         }
     }
 
@@ -69,10 +72,12 @@ namespace Jal.Router.Tests.Impl
             _bus = bus;
         }
 
-        public void Handle(MessageContext context, Message message, Data data)
+        public Task Handle(MessageContext context, Message message, Data data)
         {
             Console.WriteLine($"SagaInputTopic2HandlerMessageHandler Name {message.Name}");
             data.Status = "SagaInputTopic2HandlerMessageHandler";
+
+            return Task.CompletedTask;
 
         }
     }
