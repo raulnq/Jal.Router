@@ -5,7 +5,7 @@ using Jal.Router.Interface;
 using Jal.Router.Model;
 
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public abstract class AbstractEntityStorage : IEntityStorage
     {

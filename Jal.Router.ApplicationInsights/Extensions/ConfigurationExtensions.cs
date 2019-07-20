@@ -1,6 +1,6 @@
 using Jal.Router.ApplicationInsights.Impl;
-using Jal.Router.Interface.Management;
-using Jal.Router.Model.Management;
+using Jal.Router.Interface;
+using Jal.Router.Model;
 
 namespace Jal.Router.ApplicationInsights.Extensions
 {

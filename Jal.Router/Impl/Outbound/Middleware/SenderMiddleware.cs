@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound.Middleware
+namespace Jal.Router.Impl
 {
     public class SenderMiddleware : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
     {

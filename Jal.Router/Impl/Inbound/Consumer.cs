@@ -2,10 +2,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public class Consumer : IConsumer
     {

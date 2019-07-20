@@ -1,6 +1,4 @@
-﻿using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
+﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System;
 

@@ -1,5 +1,4 @@
 ﻿using Jal.Router.Model;
-using Jal.Router.Model.Management;
 using System.Collections.Generic;
 
 namespace Jal.Router.Model
@@ -18,11 +17,11 @@ namespace Jal.Router.Model
 
         public List<SenderContext> SenderContexts { get; }
 
-        public List<PointToPointChannel> PointToPointChannels { get; }
+        public List<PointToPointChannelResource> PointToPointChannels { get; }
 
-        public List<PublishSubscribeChannel> PublishSubscribeChannels { get; }
+        public List<PublishSubscribeChannelResource> PublishSubscribeChannels { get; }
 
-        public List<SubscriptionToPublishSubscribeChannel> SubscriptionToPublishSubscribeChannels { get; }
+        public List<SubscriptionToPublishSubscribeChannelResource> SubscriptionToPublishSubscribeChannels { get; }
 
         public RuntimeContext()
         {
@@ -36,11 +35,11 @@ namespace Jal.Router.Model
 
             Routes = new List<Route>();
 
-            PointToPointChannels = new List<PointToPointChannel>();
+            PointToPointChannels = new List<PointToPointChannelResource>();
 
-            PublishSubscribeChannels = new List<PublishSubscribeChannel>();
+            PublishSubscribeChannels = new List<PublishSubscribeChannelResource>();
 
-            SubscriptionToPublishSubscribeChannels = new List<SubscriptionToPublishSubscribeChannel>();
+            SubscriptionToPublishSubscribeChannels = new List<SubscriptionToPublishSubscribeChannelResource>();
 
             Partitions = new List<Partition>();
         }

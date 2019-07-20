@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Model;
 
-namespace Jal.Router.Interface.Inbound
+namespace Jal.Router.Interface
 {
     public interface IRouter
     {

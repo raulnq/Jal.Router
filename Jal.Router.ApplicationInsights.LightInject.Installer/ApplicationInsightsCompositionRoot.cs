@@ -2,7 +2,6 @@
 using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 using LightInject;
 
 namespace Jal.Router.ApplicationInsights.LightInject.Installer

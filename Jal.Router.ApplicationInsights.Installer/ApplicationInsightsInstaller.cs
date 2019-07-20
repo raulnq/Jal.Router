@@ -5,7 +5,6 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 
 namespace Jal.Router.ApplicationInsights.Installer
 {

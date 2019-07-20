@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl
 {
     public class Sender : ISender
     {

@@ -2,13 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Fluent.Interfaces;
-using Jal.Router.Impl.Outbound.Middleware;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl
 {
     public class Bus : IBus
     {

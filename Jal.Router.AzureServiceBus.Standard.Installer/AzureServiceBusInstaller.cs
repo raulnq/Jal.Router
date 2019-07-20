@@ -3,8 +3,6 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Jal.Router.AzureServiceBus.Standard.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Installer
 {

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.InteropExtensions;

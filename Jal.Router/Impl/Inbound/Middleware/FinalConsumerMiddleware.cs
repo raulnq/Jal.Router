@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public class FinalConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {

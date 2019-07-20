@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using Jal.ChainOfResponsability.Fluent.Interfaces;
 using Jal.ChainOfResponsability.Intefaces;
-using Jal.Router.Impl.Inbound.Middleware;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public class Router : IRouter
     {

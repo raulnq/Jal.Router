@@ -1,4 +1,4 @@
-﻿namespace Jal.Router.Impl.Outbound
+﻿namespace Jal.Router.Impl
 {
     public class NullBusInterceptor : AbstractBusInterceptor
     {

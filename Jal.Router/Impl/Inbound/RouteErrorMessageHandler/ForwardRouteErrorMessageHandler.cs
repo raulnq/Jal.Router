@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound.RouteErrorMessageHandler
+namespace Jal.Router.Impl
 {
     public class ForwardRouteErrorMessageHandler : IRouteErrorMessageHandler
     {

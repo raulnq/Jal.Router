@@ -1,8 +1,6 @@
 ﻿using System;
 using Jal.Router.AzureServiceBus.Standard.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
 using LightInject;
 
 namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer

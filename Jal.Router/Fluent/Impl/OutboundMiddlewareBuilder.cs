@@ -1,6 +1,6 @@
 ﻿using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Interface.Outbound;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl

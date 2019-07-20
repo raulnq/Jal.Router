@@ -6,7 +6,7 @@ using Jal.ChainOfResponsability.Model;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound.Middleware
+namespace Jal.Router.Impl
 {
 
     public class RouteMiddleware : IMiddlewareAsync<MessageContext>

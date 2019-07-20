@@ -5,7 +5,6 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Interface;
 using Jal.Router.Logger.Impl;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 
 namespace Jal.Router.Logger.Installer
 {

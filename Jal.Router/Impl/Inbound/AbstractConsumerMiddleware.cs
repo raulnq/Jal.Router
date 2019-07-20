@@ -1,7 +1,6 @@
 ﻿using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 
-namespace Jal.Router.Impl.Inbound
+namespace Jal.Router.Impl
 {
     public abstract class AbstractConsumerMiddleware : AbstractMessageHandler
     {

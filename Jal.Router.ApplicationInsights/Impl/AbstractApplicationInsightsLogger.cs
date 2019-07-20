@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;

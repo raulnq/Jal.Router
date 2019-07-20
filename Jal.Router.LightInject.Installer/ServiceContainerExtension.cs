@@ -1,26 +1,9 @@
 ﻿using System.Reflection;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Impl;
-using Jal.Router.Impl.Inbound;
-using Jal.Router.Impl.Inbound.RouteErrorMessageHandler;
-using Jal.Router.Impl.Inbound.Middleware;
-using Jal.Router.Impl.Management;
-using Jal.Router.Impl.Management.ShutdownWatcher;
-using Jal.Router.Impl.MonitoringTask;
-using Jal.Router.Impl.Outbound;
-using Jal.Router.Impl.Outbound.ChannelShuffler;
-using Jal.Router.Impl.Outbound.Middleware;
-using Jal.Router.Impl.ShutdownTask;
-using Jal.Router.Impl.StartupTask;
-using Jal.Router.Impl.ValueFinder;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Management;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 using LightInject;
-using Jal.Router.Impl.Inbound.RouteEntryMessageHandler;
 
 namespace Jal.Router.LightInject.Installer
 {
@@ -67,11 +50,11 @@ namespace Jal.Router.LightInject.Installer
 
         public static void RegisterRouter(this IServiceContainer container)
         {
-            container.Register<IShutdownTask, PointToPointChannelDestructor>(typeof(PointToPointChannelDestructor).FullName, new PerContainerLifetime());
+            container.Register<IShutdownTask, PointToPointChannelResourceDestructor>(typeof(PointToPointChannelResourceDestructor).FullName, new PerContainerLifetime());
 
-            container.Register<IShutdownTask, PublishSubscribeChannelDestructor>(typeof(PublishSubscribeChannelDestructor).FullName, new PerContainerLifetime());
+            container.Register<IShutdownTask, PublishSubscribeChannelResourceDestructor>(typeof(PublishSubscribeChannelResourceDestructor).FullName, new PerContainerLifetime());
 
-            container.Register<IShutdownTask, SubscriptionToPublishSubscribeChannelDestructor>(typeof(SubscriptionToPublishSubscribeChannelDestructor).FullName, new PerContainerLifetime());
+            container.Register<IShutdownTask, SubscriptionToPublishSubscribeChannelResourceDestructor>(typeof(SubscriptionToPublishSubscribeChannelResourceDestructor).FullName, new PerContainerLifetime());
 
             container.Register<IChannelShuffler, DefaultChannelShuffler>(typeof(DefaultChannelShuffler).FullName, new PerContainerLifetime());
 
@@ -87,7 +70,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ISender, Sender>(new PerContainerLifetime());
 
-            container.Register<IRouter, Impl.Inbound.Router>(new PerContainerLifetime());
+            container.Register<IRouter, Impl.Router>(new PerContainerLifetime());
 
             container.Register<IConsumer, Consumer>(new PerContainerLifetime());
 
@@ -103,7 +86,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdown, Shutdown>(new PerContainerLifetime());
 
-            container.Register<IStartupTask, SubscriptionToPublishSubscribeChannelCreator>(typeof (SubscriptionToPublishSubscribeChannelCreator).FullName,new PerContainerLifetime());
+            container.Register<IStartupTask, SubscriptionToPublishSubscribeChannelResourceCreator>(typeof (SubscriptionToPublishSubscribeChannelResourceCreator).FullName,new PerContainerLifetime());
 
             container.Register<IStartupTask, StartupBeatLogger>(typeof (StartupBeatLogger).FullName, new PerContainerLifetime());
 
@@ -115,9 +98,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IStartupTask, RuntimeConfigurationLoader>(typeof(RuntimeConfigurationLoader).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, PointToPointChannelCreator>(typeof(PointToPointChannelCreator).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, PointToPointChannelResourceCreator>(typeof(PointToPointChannelResourceCreator).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, PublishSubscribeChannelCreator>(typeof(PublishSubscribeChannelCreator).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, PublishSubscribeChannelResourceCreator>(typeof(PublishSubscribeChannelResourceCreator).FullName, new PerContainerLifetime());
 
             container.Register<IStartupTask, ListenerLoader>(typeof (ListenerLoader).FullName,new PerContainerLifetime());
 
@@ -188,7 +171,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEntityStorage, NullStorage>(typeof (NullStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.Inbound.Middleware.ConsumerMiddleware>(typeof (Impl.Inbound.Middleware.ConsumerMiddleware).FullName, new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, RouteMiddleware>(typeof (RouteMiddleware).FullName,new PerContainerLifetime());
 
@@ -198,7 +181,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.Outbound.Middleware.SenderMiddleware>(typeof (Impl.Outbound.Middleware.SenderMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.SenderMiddleware>(typeof (Impl.SenderMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Interface.Inbound;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl

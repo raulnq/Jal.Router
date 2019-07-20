@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using Jal.Router.Interface.Inbound;
-using Jal.Router.Interface.Outbound;
+using Jal.Router.Interface;
 
 namespace Jal.Router.Fluent.Interface
 {

@@ -1,4 +1,4 @@
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 using Jal.Router.Newtonsoft.Impl;
 
 namespace Jal.Router.Newtonsoft.Extensions

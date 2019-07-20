@@ -1,6 +1,6 @@
 using Jal.Router.AzureServiceBus.Standard.Impl;
 using Jal.Router.AzureServiceBus.Standard.Model;
-using Jal.Router.Interface.Management;
+using Jal.Router.Interface;
 
 namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {

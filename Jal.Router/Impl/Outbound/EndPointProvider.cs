@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Outbound;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Outbound
+namespace Jal.Router.Impl
 {
     public class EndPointProvider : IEndPointProvider
     {

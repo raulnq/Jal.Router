@@ -1,6 +1,6 @@
 using System;
 using Jal.Router.Interface;
-using Jal.Router.Model.Management;
+using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 
 namespace Jal.Router.ApplicationInsights.Impl

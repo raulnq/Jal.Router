@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 

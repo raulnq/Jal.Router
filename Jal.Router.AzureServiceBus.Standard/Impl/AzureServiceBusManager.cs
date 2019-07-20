@@ -4,8 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
-using Jal.Router.Model.Management;
+using Jal.Router.Model;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ServiceBus.Fluent;
 using Microsoft.Azure.ServiceBus;
@@ -38,7 +37,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             LoggerCallbackHandler.UseDefaultLogging = false;
         }
 
-        public async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannel channel)
+        public async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -113,7 +112,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannel channel)
+        public async Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -147,7 +146,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<bool> CreateIfNotExist(PublishSubscribeChannel channel)
+        public async Task<bool> CreateIfNotExist(PublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -205,7 +204,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<bool> DeleteIfExist(PublishSubscribeChannel channel)
+        public async Task<bool> DeleteIfExist(PublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -230,7 +229,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannel channel)
+        public async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -266,7 +265,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         }
 
-        public async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannel channel)
+        public async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -301,7 +300,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public async Task<PointToPointChannelStatistics> Get(PointToPointChannel channel)
+        public async Task<PointToPointChannelStatistics> Get(PointToPointChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -336,7 +335,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public async Task<bool> CreateIfNotExist(PointToPointChannel channel)
+        public async Task<bool> CreateIfNotExist(PointToPointChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -406,7 +405,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<bool> DeleteIfExist(PointToPointChannel channel)
+        public async Task<bool> DeleteIfExist(PointToPointChannelResource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 

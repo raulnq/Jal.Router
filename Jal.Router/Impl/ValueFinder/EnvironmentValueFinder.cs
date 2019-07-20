@@ -1,7 +1,7 @@
 ﻿using System;
 using Jal.Router.Interface;
 
-namespace Jal.Router.Impl.ValueFinder
+namespace Jal.Router.Impl
 {
     public class EnvironmentValueFinder : IValueFinder
     {

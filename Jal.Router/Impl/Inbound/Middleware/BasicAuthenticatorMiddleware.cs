@@ -6,7 +6,7 @@ using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Inbound.Middleware
+namespace Jal.Router.Impl
 {
     public class BasicAuthenticatorMiddleware : IMiddlewareAsync<MessageContext>
     {

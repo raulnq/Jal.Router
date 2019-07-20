@@ -1,6 +1,5 @@
 ﻿using Jal.Router.AzureStorage.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Interface.Management;
 using LightInject;
 
 namespace Jal.Router.AzureStorage.LightInject.Installer

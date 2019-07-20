@@ -4,7 +4,6 @@ using Jal.Router.Fluent.Impl;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 
 namespace Jal.Router.Impl
 {
@@ -16,11 +15,11 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _enpoints = new List<EndPoint>();
 
-        private readonly List<SubscriptionToPublishSubscribeChannel> _subscriptions = new List<SubscriptionToPublishSubscribeChannel>();
+        private readonly List<SubscriptionToPublishSubscribeChannelResource> _subscriptions = new List<SubscriptionToPublishSubscribeChannelResource>();
 
-        private readonly List<PublishSubscribeChannel> _publishsubscribechannels = new List<PublishSubscribeChannel>();
+        private readonly List<PublishSubscribeChannelResource> _publishsubscribechannels = new List<PublishSubscribeChannelResource>();
 
-        private readonly List<PointToPointChannel> _pointtopointchannels = new List<PointToPointChannel>();
+        private readonly List<PointToPointChannelResource> _pointtopointchannels = new List<PointToPointChannelResource>();
 
         private readonly List<Saga> _sagas = new List<Saga>();
 
@@ -50,24 +49,24 @@ namespace Jal.Router.Impl
             return _enpoints.ToArray();
         }
 
-        public SubscriptionToPublishSubscribeChannel[] GetSubscriptionsToPublishSubscribeChannel()
+        public SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResources()
         {
             foreach (var subscription in _subscriptions)
             {
                 if(subscription.Rules.Count==0)
                 {
-                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelRule() { Name = "$Default", Filter = $"origin='{_origin.Key}'", IsDefault = true });
+                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelRule($"origin='{_origin.Key}'", "$Default", true));
                 }
             }
             return _subscriptions.ToArray();
         }
 
-        public PointToPointChannel[] GetPointToPointChannels()
+        public PointToPointChannelResource[] GetPointToPointChannelResources()
         {
             return _pointtopointchannels.ToArray();
         }
 
-        public PublishSubscribeChannel[] GetPublishSubscribeChannels()
+        public PublishSubscribeChannelResource[] GetPublishSubscribeChannelResources()
         {
             return _publishsubscribechannels.ToArray();
         }
@@ -106,7 +105,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path, properties, typeof(TValueFinder), connectionstringprovider);
+            var channel = new SubscriptionToPublishSubscribeChannelResource(subscription, path, properties, typeof(TValueFinder), connectionstringprovider);
 
             if(rule!=null)
             {
@@ -131,7 +130,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            var channel = new SubscriptionToPublishSubscribeChannel(subscription, path, connectionstring, properties);
+            var channel = new SubscriptionToPublishSubscribeChannelResource(subscription, path, connectionstring, properties);
 
             if (rule != null)
             {
@@ -153,7 +152,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            var channel = new PointToPointChannel(path, properties, typeof(TValueFinder), connectionstringprovider);
+            var channel = new PointToPointChannelResource(path, properties, typeof(TValueFinder), connectionstringprovider);
 
             _pointtopointchannels.Add(channel);
         }
@@ -169,7 +168,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            var channel = new PointToPointChannel(path, connectionstring, properties);
+            var channel = new PointToPointChannelResource(path, connectionstring, properties);
 
             _pointtopointchannels.Add(channel);
         }
@@ -186,7 +185,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstringprovider));
             }
 
-            var channel = new PublishSubscribeChannel(path, properties, typeof(TValueFinder), connectionstringprovider);
+            var channel = new PublishSubscribeChannelResource(path, properties, typeof(TValueFinder), connectionstringprovider);
 
             _publishsubscribechannels.Add(channel);
         }
@@ -202,7 +201,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            var channel = new PublishSubscribeChannel(path, connectionstring, properties);
+            var channel = new PublishSubscribeChannelResource(path, connectionstring, properties);
 
             _publishsubscribechannels.Add(channel);
         }

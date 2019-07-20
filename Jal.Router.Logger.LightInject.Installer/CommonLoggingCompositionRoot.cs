@@ -2,7 +2,6 @@
 using Jal.Router.Interface;
 using Jal.Router.Logger.Impl;
 using Jal.Router.Model;
-using Jal.Router.Model.Management;
 using LightInject;
 
 namespace Jal.Router.Logger.LightInject.Installer
