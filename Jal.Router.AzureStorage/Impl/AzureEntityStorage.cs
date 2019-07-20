@@ -564,7 +564,7 @@ namespace Jal.Router.AzureStorage.Impl
 
                     var record = result.Result as SagaRecord;
 
-                    if (record != null)
+                    if (record != null && record.Ended==null)
                     {
                         record.Updated = sagadata.Updated;
 

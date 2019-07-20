@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Microsoft.WindowsAzure.Storage;

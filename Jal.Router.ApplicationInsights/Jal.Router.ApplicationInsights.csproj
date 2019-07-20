@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.7.5</Version>
+    <Version>1.7.8</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with ApplicationInsights</Description>
     <Copyright />

@@ -16,7 +16,7 @@ namespace Jal.Router.Impl
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
         public IList<TaskMetadata> MonitoringTaskTypes { get; }
-        public Type ChannelManagerType { get; private set; }
+        public Type ChannelResourceType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
         public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
@@ -86,9 +86,9 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager
+        public IConfiguration UseChannelResource<TChannelResource>() where TChannelResource : IChannelResource
         {
-            ChannelManagerType = typeof(TChannelManager);
+            ChannelResourceType = typeof(TChannelResource);
             return this;
         }
 
@@ -208,7 +208,7 @@ namespace Jal.Router.Impl
             UseBusInterceptor<NullBusInterceptor>();
             UseStorage<NullStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UseChannelManager<NullChannelManager>();
+            UseChannelResource<NullChannelResource>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();

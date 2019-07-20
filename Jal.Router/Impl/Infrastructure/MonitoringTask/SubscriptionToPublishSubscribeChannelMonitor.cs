@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
 
                 var loggers = loggertypes.Select(x => Factory.CreateLogger<SubscriptionToPublishSubscribeChannelStatistics>(x)).ToArray();
 
-                var manager = Factory.CreateChannelManager();
+                var manager = Factory.CreateChannelResource();
 
                 foreach (var subscription in Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
                 {

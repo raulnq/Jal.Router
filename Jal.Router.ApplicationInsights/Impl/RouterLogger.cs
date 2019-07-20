@@ -28,23 +28,16 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             stopwatch.Start();
 
-            var name = context.Data.Route.Name;
-
-            if (!string.IsNullOrWhiteSpace(context.Data.Saga?.Name))
-            {
-                name = $"{context.Data.Saga?.Name}_{name}";
-            }
-
             try
             {
                 telemetry.Timestamp = context.Data.DateTimeUtc;
 
                 telemetry.Id = $"{context.Data.IdentityContext.Id}";
 
-                telemetry.Name = name;
+                telemetry.Name = context.Data.Name;
 
                 telemetry.Source = context.Data.Origin.From;
-
+                
                 PopulateProperties(telemetry.Properties, context.Data);
 
                 PopulateContext(telemetry.Context, context.Data);

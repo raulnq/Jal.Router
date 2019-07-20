@@ -157,7 +157,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(typeof(NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel).FullName);
 
-            container.Register<IChannelManager, NullChannelManager>(typeof (NullChannelManager).FullName,new PerContainerLifetime());
+            container.Register<IChannelResource, NullChannelResource>(typeof (NullChannelResource).FullName,new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 

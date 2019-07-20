@@ -1,5 +1,4 @@
-﻿using System;
-using Jal.ChainOfResponsability.Intefaces;
+﻿using Jal.ChainOfResponsability.Intefaces;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Model;
 

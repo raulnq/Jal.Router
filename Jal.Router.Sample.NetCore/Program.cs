@@ -60,7 +60,7 @@ namespace Jal.Router.Sample.NetCore
             host.Configuration
                 .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
-                .AddMonitoringTask<HeartBeatLogger>(15)
+                //.AddMonitoringTask<HeartBeatLogger>(150)
                 .UseNewtonsoft()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
@@ -68,9 +68,9 @@ namespace Jal.Router.Sample.NetCore
                 //.EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
 
-            var facade = container.GetInstance<IEntityStorageGateway>();
+            //var facade = container.GetInstance<IEntityStorageGateway>();
 
-            var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
+            //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
             host.RunAndBlock();
         }

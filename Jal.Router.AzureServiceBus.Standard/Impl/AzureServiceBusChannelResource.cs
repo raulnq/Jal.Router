@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusManager : IChannelManager
+    public class AzureServiceBusChannelResource : IChannelResource
     {
         public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
 
@@ -30,7 +30,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly IComponentFactoryGateway _factory;
 
-        public AzureServiceBusManager(IComponentFactoryGateway factory)
+        public AzureServiceBusChannelResource(IComponentFactoryGateway factory)
         {
             _factory = factory;
 

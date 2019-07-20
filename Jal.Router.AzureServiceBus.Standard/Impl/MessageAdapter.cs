@@ -44,12 +44,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     parentid = sbmessage.UserProperties[ParentId].ToString();
                 }
 
-                var identitycontext = new IdentityContext(sbmessage.MessageId, operationid, parentid, sbmessage.SessionId)
-                {
-                    ReplyToRequestId = sbmessage.ReplyToSessionId,
-
-                    RequestId = sbmessage.SessionId
-                };
+                var identitycontext = new IdentityContext(sbmessage.MessageId, operationid, parentid, sbmessage.SessionId, sbmessage.ReplyToSessionId, sbmessage.SessionId);
 
                 var trackings = new List<Tracking>();
 

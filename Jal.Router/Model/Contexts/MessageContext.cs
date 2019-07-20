@@ -35,7 +35,7 @@ namespace Jal.Router.Model
             {
                 if(EndPoint!=null)
                 {
-                    return EndPoint.Name;
+                    return Saga == null ? EndPoint.Name : Saga.Name + "/" + EndPoint.Name;
                 }
                 else
                 {
@@ -107,7 +107,7 @@ namespace Jal.Router.Model
                 TrackingContext?.ToEntity(), IdentityContext?.ToEntity(), Name);
         }
 
-        public Dictionary<string, string> CopyHeaders()
+        public Dictionary<string, string> CreateCopyOfHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
         }

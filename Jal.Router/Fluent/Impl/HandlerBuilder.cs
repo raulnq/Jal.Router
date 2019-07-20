@@ -1,6 +1,5 @@
 ﻿using System;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Impl;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl

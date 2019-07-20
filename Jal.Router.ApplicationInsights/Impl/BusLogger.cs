@@ -26,7 +26,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             var telemetry = new DependencyTelemetry()
             {
-                Name = context.Data.EndPoint.Name,
+                Name = context.Data.Name,
 
                 Id = context.Data.IdentityContext.Id,
 

@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
             {
                 var endpointname = metadata.Parameters["endpoint"] as string;
 
-                var options = new Options(endpointname, context.CopyHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
+                var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
 
                 var serializer = _factory.CreateMessageSerializer();
 

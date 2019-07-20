@@ -18,7 +18,7 @@ namespace Jal.Router.Impl
 
             Logger.Log("Creating publish subscribe channels");
 
-            var manager = Factory.CreateChannelManager();
+            var manager = Factory.CreateChannelResource();
 
             foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannels)
             {

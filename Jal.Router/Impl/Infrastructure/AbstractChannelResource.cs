@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractChannelManager : IChannelManager
+    public abstract class AbstractChannelResource : IChannelResource
     {
         public virtual Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannelResource channel)
         {

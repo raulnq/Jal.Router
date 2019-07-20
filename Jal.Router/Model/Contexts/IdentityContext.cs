@@ -5,8 +5,8 @@
         public string Id { get; private set; }
         public string OperationId { get; private set; }
         public string ParentId { get; private set; }
-        public string ReplyToRequestId { get; set; }
-        public string RequestId { get; set;  }
+        public string ReplyToRequestId { get; private set; }
+        public string RequestId { get; private set;  }
         public string PartitionId { get; private set; }
         private  IdentityContext()
         {
@@ -33,13 +33,39 @@
             PartitionId = partitionid;
         }
 
-        public IdentityContext Clone()
+        public IdentityContext(string id, string operationid, string parentid, string partitionid, string replytorequestid, string requestid) : this(id, operationid, parentid, partitionid)
+        {
+            ReplyToRequestId = replytorequestid;
+            RequestId = requestid;
+        }
+
+        public IdentityContext CreateCopy()
         {
             return new IdentityContext(Id, OperationId, ParentId, PartitionId)
             {
                 RequestId = RequestId,
                 ReplyToRequestId = ReplyToRequestId
             };
+        }
+
+        public void UpdateParentId(string parentid)
+        {
+            ParentId = parentid;
+        }
+
+        public void UpdateId(string id)
+        {
+            Id = id;
+        }
+
+        public void UpdateRequestId(string requestid)
+        {
+            RequestId = requestid;
+        }
+
+        public void UpdateReplyToRequestId(string replytorequestid)
+        {
+            ReplyToRequestId = replytorequestid;
         }
 
         public IdentityContextEntity ToEntity()

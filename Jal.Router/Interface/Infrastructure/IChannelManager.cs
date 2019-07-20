@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
-    public interface IChannelManager
+    public interface IChannelResource
     {
         Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannelResource channel);
 

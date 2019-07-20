@@ -45,7 +45,5 @@ namespace Jal.Router.Extensions
 
             return builder.ForSubscriptionToPublishSubscribeChannel<NullValueFinder>(path, subscription, provider);
         }
-
-
     }
 }

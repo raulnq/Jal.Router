@@ -21,7 +21,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                 .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UseChannelManager<AzureServiceBusManager>()
+                .UseChannelResource<AzureServiceBusChannelResource>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }

@@ -18,7 +18,7 @@ namespace Jal.Router.Impl
 
             Logger.Log("Creating point to point channels");
 
-            var manager = Factory.CreateChannelManager();
+            var manager = Factory.CreateChannelResource();
 
             foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
             {

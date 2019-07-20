@@ -24,9 +24,9 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public IChannelManager CreateChannelManager()
+        public IChannelResource CreateChannelResource()
         {
-            return _factory.Create<IChannelManager>(_configuration.ChannelManagerType);
+            return _factory.Create<IChannelResource>(_configuration.ChannelResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()

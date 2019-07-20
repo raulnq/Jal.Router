@@ -24,7 +24,7 @@ namespace Jal.Router.Impl
 
             _logger.Log("Deleting point to point channels");
 
-            var manager = _factory.CreateChannelManager();
+            var manager = _factory.CreateChannelResource();
 
             foreach (var channel in _factory.Configuration.Runtime.PointToPointChannels)
             {

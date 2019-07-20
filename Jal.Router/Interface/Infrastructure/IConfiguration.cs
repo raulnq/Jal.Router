@@ -17,7 +17,7 @@ namespace Jal.Router.Interface
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
         IList<TaskMetadata> MonitoringTaskTypes { get; }
-        Type ChannelManagerType { get; }
+        Type ChannelResourceType { get; }
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
@@ -44,7 +44,7 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UseChannelManager<TChannelManager>() where TChannelManager : IChannelManager;
+        IConfiguration UseChannelResource<TChannelManager>() where TChannelManager : IChannelResource;
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;

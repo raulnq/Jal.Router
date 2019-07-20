@@ -36,6 +36,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             properties.Add("identity_requestid", context.IdentityContext?.RequestId);
             properties.Add("identity_operationid", context.IdentityContext?.OperationId);
             properties.Add("identity_parentid", context.IdentityContext?.ParentId);
+            properties.Add("identity_partitionid", context.IdentityContext?.PartitionId);
 
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);
