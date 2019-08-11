@@ -75,8 +75,8 @@ namespace Jal.Router.Model
 
         public void Add()
         {
-            var tracking = new Tracking(Context.Id, Context.Origin?.Key, Context.Origin?.From,
-                Context.SagaContext?.SagaData?.Id, Context.Route?.Name, Context.Saga?.Name);
+            var tracking = new Tracking(Context.Id, Context.SagaContext?.SagaData?.Id, Context.Origin?.From,
+                 Context.Origin?.Key, Context.Route?.Name, Context.Saga?.Name);
 
             Trackings.Add(tracking);
         }

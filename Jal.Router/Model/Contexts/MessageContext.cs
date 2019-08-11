@@ -48,6 +48,12 @@ namespace Jal.Router.Model
 
         }
 
+        public MessageContext(IBus bus) 
+            :this(bus, new IdentityContext(string.Empty), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty)
+        {
+
+        }
+
         public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version)
         {
             _bus = bus;
