@@ -15,17 +15,17 @@ namespace Jal.Router.Impl
 
         public MessageContext ReadMetadata(object message)
         {
-            return new MessageContext();
+            return default(MessageContext);
         }
 
         public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
         {
-            return Task.FromResult(new MessageContext());
+            return Task.FromResult(default(MessageContext));
         }
 
         public Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint endpoint)
         {
-            return Task.FromResult(new MessageContext());
+            return Task.FromResult(default(MessageContext));
         }
     }
 }

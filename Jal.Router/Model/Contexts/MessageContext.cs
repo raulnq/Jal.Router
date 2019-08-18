@@ -43,13 +43,14 @@ namespace Jal.Router.Model
                 }
             }
         }
-        public MessageContext()
+
+        public MessageContext(IBus bus): this(bus, Guid.NewGuid().ToString())
         {
 
         }
 
-        public MessageContext(IBus bus) 
-            :this(bus, new IdentityContext(string.Empty), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty)
+        public MessageContext(IBus bus, string id) 
+            :this(bus, new IdentityContext(id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty)
         {
 
         }
