@@ -53,6 +53,11 @@
             ParentId = parentid;
         }
 
+        public void UpdateOperationId(string operationid)
+        {
+            OperationId = operationid;
+        }
+
         public void UpdateId(string id)
         {
             Id = id;

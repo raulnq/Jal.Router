@@ -414,10 +414,10 @@ namespace Jal.Router.Sample.NetCore
             .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
-            }).OnError(e=>e.Use<ForwardRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", _errorqueueendpoint } }) )
+            }).OnError(e=>e.ForwardMessageTo(_errorqueueendpoint))
             .OnEntry(e=> {
-                e.Use<RouteEntryMessageHandler>(new Dictionary<string, object>() { { "init", init } });
-                e.Use<ForwardRouteEntryMessageHandler>(new Dictionary<string, object>() { { "endpoint", _forwardqueueendpoint } });
+                e.Execute(init);
+                e.ForwardMessageTo(_forwardqueueendpoint);
             });
 
             Func<MessageContext, Exception, ErrorHandler, Task > func = (c, e, r) => {
