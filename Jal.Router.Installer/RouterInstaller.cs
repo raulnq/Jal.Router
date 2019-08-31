@@ -49,7 +49,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IBus>().ImplementedBy<Bus>().LifestyleSingleton());
 
-            container.Register(Component.For<ISender>().ImplementedBy<Sender>().LifestyleSingleton());
+            container.Register(Component.For<IProducer>().ImplementedBy<Producer>().LifestyleSingleton());
 
             container.Register(Component.For<IComponentFactory>().ImplementedBy<ComponentFactory>().LifestyleSingleton());
 
@@ -145,7 +145,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(Impl.ConsumerMiddleware)).Named(typeof(Impl.ConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(RouteMiddleware)).Named(typeof(RouteMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(RouterMiddleware)).Named(typeof(RouterMiddleware).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(InitialConsumerMiddleware)).Named(typeof(InitialConsumerMiddleware).FullName).LifestyleSingleton());
 
@@ -155,7 +155,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusMiddleware>().LifestyleSingleton().Named(typeof(BusMiddleware).FullName));
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.SenderMiddleware>().LifestyleSingleton().Named(typeof(Impl.SenderMiddleware).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.ProducerMiddleware>().LifestyleSingleton().Named(typeof(Impl.ProducerMiddleware).FullName));
 
             container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
 

@@ -166,7 +166,7 @@ namespace Jal.Router.Impl
                         chain.UseAsync(type);
                     }
 
-                    await chain.UseAsync<SenderMiddleware>().RunAsync(message).ConfigureAwait(false);
+                    await chain.UseAsync<ProducerMiddleware>().RunAsync(message).ConfigureAwait(false);
                 }
                 else
                 {

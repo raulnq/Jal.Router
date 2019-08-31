@@ -7,13 +7,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class SenderMiddleware : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
+    public class ProducerMiddleware : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
     {
-        private readonly ISender _sender;
+        private readonly IProducer _producer;
 
-        public SenderMiddleware(ISender sender, IComponentFactoryGateway factory, IConfiguration configuration) : base(configuration, factory)
+        public ProducerMiddleware(IProducer producer, IComponentFactoryGateway factory, IConfiguration configuration) : base(configuration, factory)
         {
-            _sender = sender;
+            _producer = producer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             
             try
             {
-                await _sender.Send(context.Data).ConfigureAwait(false);
+                await _producer.Send(context.Data).ConfigureAwait(false);
             }
             finally
             {

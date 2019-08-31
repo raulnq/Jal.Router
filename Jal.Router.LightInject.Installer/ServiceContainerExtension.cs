@@ -68,7 +68,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IHost, Host>(new PerContainerLifetime());
 
-            container.Register<ISender, Sender>(new PerContainerLifetime());
+            container.Register<IProducer, Producer>(new PerContainerLifetime());
 
             container.Register<IRouter, Impl.Router>(new PerContainerLifetime());
 
@@ -173,7 +173,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, RouteMiddleware>(typeof (RouteMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, RouterMiddleware>(typeof (RouterMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, InitialConsumerMiddleware>(typeof (InitialConsumerMiddleware).FullName,new PerContainerLifetime());
 
@@ -181,7 +181,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.SenderMiddleware>(typeof (Impl.SenderMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.ProducerMiddleware>(typeof (Impl.ProducerMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
 

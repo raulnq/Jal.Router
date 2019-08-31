@@ -414,7 +414,8 @@ namespace Jal.Router.Sample.NetCore
             .ForMessage<Message>().Use<QueueListenByOneHandlerWithException>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
-            }).OnError(e=>e.ForwardMessageTo(_errorqueueendpoint))
+            })
+            .OnError(e=>e.ForwardMessageTo(_errorqueueendpoint))
             .OnEntry(e=> {
                 e.Execute(init);
                 e.ForwardMessageTo(_forwardqueueendpoint);
@@ -435,7 +436,9 @@ namespace Jal.Router.Sample.NetCore
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             })
             //.OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
-            .OnError(x=>x.Use<RetryRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", "retryendpoint" } , { "policy", new LinearRetryPolicy(5, 3) }, { "fallback", func } }).For<ApplicationException>())
+            //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" } , { "parameter2", "value2" }, { "parameter3", "value3" } }))
+            //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }).For<ApplicationException>())
+            //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }))
             //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
             //.OnEntry(x=>x.EnableEntityStorage(true))
             //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
@@ -444,12 +447,16 @@ namespace Jal.Router.Sample.NetCore
             RegisterEndPoint(_errorqueueendpoint)
                 .ForMessage<Message>()
                 .To(x => x.AddQueue(config.ConnectionString, _errorqueue));
+                //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" }, { "parameter3", "value3" } }))
+                //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }))
+                //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }));
 
             RegisterEndPoint("retryendpoint")
                 .ForMessage<Message>()
                 .To(x => x.AddQueue(config.ConnectionString, _queuelistenbyonehandlerwithexceptionandretry));
 
-            RegisterSaga<Data>("saga", x => {
+        RegisterSaga<Data>("saga", 
+            x => {
                 x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("start")
                 .ToListen(y => y.AddQueue(_queuestart, config.ConnectionString))
                 .ForMessage<Message>().Use<StartHandler>(y => {
@@ -462,25 +469,25 @@ namespace Jal.Router.Sample.NetCore
                     y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
             },
-                x =>
+            x =>
+            {
+                x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("continue")
+                .ToListen(y => y.AddQueue(_queuecontinue, config.ConnectionString))
+                .ForMessage<Message>().Use<ContinueHandler>(y =>
                 {
-                    x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("continue")
-                    .ToListen(y => y.AddQueue(_queuecontinue, config.ConnectionString))
-                    .ForMessage<Message>().Use<ContinueHandler>(y =>
-                    {
-                        y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "CONTINUE");
-                    });
-                },
-                x =>
+                    y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "CONTINUE");
+                });
+            },
+            x =>
+            {
+                x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("end")
+                .ToListen(y => y.AddQueue(_queueend, config.ConnectionString))
+                .ForMessage<Message>().Use<EndHandler>(y =>
                 {
-                    x.RegisterHandler<IMessageHandlerWithData<Message, Data>>("end")
-                    .ToListen(y => y.AddQueue(_queueend, config.ConnectionString))
-                    .ForMessage<Message>().Use<EndHandler>(y =>
-                    {
-                        y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data),"END");
-                    });
-                }
-                );
+                    y.With((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data),"END");
+                });
+            }
+         );
 
             RegisterEndPoint("continueendpoint")
             .ForMessage<Message>()

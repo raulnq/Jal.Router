@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
-    public interface ISender
+    public interface IProducer
     {
         Task Send(MessageContext context);
     }

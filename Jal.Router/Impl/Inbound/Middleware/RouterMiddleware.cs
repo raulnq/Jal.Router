@@ -9,13 +9,13 @@ using Jal.Router.Model;
 namespace Jal.Router.Impl
 {
 
-    public class RouteMiddleware : IMiddlewareAsync<MessageContext>
+    public class RouterMiddleware : IMiddlewareAsync<MessageContext>
     {
         private readonly IComponentFactoryGateway _factory;
 
         private readonly ILogger _logger;
 
-        public RouteMiddleware(IComponentFactoryGateway factory, ILogger logger)
+        public RouterMiddleware(IComponentFactoryGateway factory, ILogger logger)
         {
             _factory = factory;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace Jal.Router.Impl
                 {
                     var handler = _factory.CreateRouteErrorMessageHandler(item.Type);
 
-                    handled = await handler.OnException(messagecontext, ex, item).ConfigureAwait(false);
+                    handled = await handler.Handle(messagecontext, ex, item).ConfigureAwait(false);
 
                     if (handled)
                     {

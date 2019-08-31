@@ -16,7 +16,7 @@ Just another library to route in/out messages
 * Outgoing message error handling: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc)(done)
 * Register error resource together with the main one
 * Async support (done)
-* Allows anonymous handlers
+* Allows anonymous handlers, the handler interface could be define in the Use statement.
 * Incoming message forwarding (done)
 * Incoming message error handling rework: be able to setup a multi type destination of the handled message (endpoint, local storage, remote storage, etc) (done)
 * Move the json serializer to its own package (done)
@@ -25,3 +25,4 @@ Just another library to route in/out messages
 * Second level retry logic (done)
 * Send a message directly to the pipeline.
 * Bug: the message inside of a saga is having the default status on the storage (done)
+* Bug: If the saga was ended new messages should be skipped.
