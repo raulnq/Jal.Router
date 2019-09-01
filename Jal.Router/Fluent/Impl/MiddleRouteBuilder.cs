@@ -14,21 +14,16 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public IMiddleListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>(string name)
+        public IMiddleListenerRouteBuilder<TData> RegisterHandler(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var builder = new MiddleNameRouteBuilder<THandler, TData>(_saga, name);
+            var builder = new MiddleNameRouteBuilder<TData>(_saga, name);
 
             return builder;
-        }
-
-        public IMiddleListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>()
-        {
-            return RegisterHandler<THandler>(typeof(THandler).Name.ToLower());
         }
     }
 }

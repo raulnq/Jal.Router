@@ -7,7 +7,7 @@ Just another library to route in/out messages
 * Documentation
 * Unit testing
 * Feature: Register error resource together with the main one
-* Feature: Allows anonymous handlers, the handler interface could be define in the Use statement.
+* Feature: Allows anonymous handlers.
 * Feature: Allows message consumption during scheduled periods of time
 * Feature: In-memory message broker
 * Bug: If the saga was ended new messages should be skipped.
