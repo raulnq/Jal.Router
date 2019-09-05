@@ -61,7 +61,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 stopwatch.Stop();
 
-                log.Information("[Bus.cs, {channel}, {id}] End Call. Took {duration} endpoint: {endpoint} path: {path}", context.Data.Channel.ToString(), context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
+                log.Information("[Bus.cs, {channel}, {id}] End Call. Took {duration} ms. endpoint: {endpoint} path: {path}", context.Data.Channel.ToString(), context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
             }
         }
     }
