@@ -20,40 +20,40 @@ namespace Jal.Router.Serilog.Impl
 
             if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.ParentId))
             {
-                log = log.ForContext("parentid", context.Data.IdentityContext.ParentId);
+                log = log.ForContext("ParentId", context.Data.IdentityContext.ParentId);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.OperationId))
             {
-                log = log.ForContext("operationid", context.Data.IdentityContext.OperationId);
+                log = log.ForContext("OperationId", context.Data.IdentityContext.OperationId);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.SagaData?.Id))
             {
-                log = log.ForContext("sagaid", context.Data.SagaContext?.SagaData?.Id);
+                log = log.ForContext("SagaId", context.Data.SagaContext?.SagaData?.Id);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.Origin.From))
             {
-                log = log.ForContext("from", context.Data.Origin.From);
+                log = log.ForContext("From", context.Data.Origin.From);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.Origin.Key))
             {
-                log = log.ForContext("origin", context.Data.Origin.Key);
+                log = log.ForContext("Origin", context.Data.Origin.Key);
             }
 
             try
             {
-                log.Information("[Router.cs, Route, {id}] Start Call. Message arrived. route: {route} saga: {saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Information("[Router, Route, {Id}] Start Call. Message arrived. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
 
                 await next(context);
 
-                log.Information("[Router.cs, Route, {id}] Message routed. route: {route} saga: {saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Information("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
             }
             catch (Exception exception)
             {
-                log.Error(exception, "[Router.cs, Route, {id}] Exception. route: {route} saga: {saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Error(exception, "[Router, Route, {Id}] Exception. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
 
                 throw;
             }
@@ -61,7 +61,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 stopwatch.Stop();
 
-                log.Information("[Router.cs, Route, {id}] End Call. Took {duration} ms. Message routed. route: {route} saga: {saga}", context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Information("[Router, Route, {Id}] End Call. Took {Duration} ms. Message routed. route: {Route} saga: {Saga}", context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.Route?.Name, context.Data.Saga?.Name);
             }
         }
     }

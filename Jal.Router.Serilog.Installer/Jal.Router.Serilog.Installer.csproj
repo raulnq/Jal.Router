@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Company>Raul Naupari</Company>
     <Description>Castle Windsor installer for the Jal.Router.Serilog library</Description>
     <Copyright />
