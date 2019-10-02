@@ -564,43 +564,47 @@ namespace Jal.Router.AzureStorage.Impl
 
                     var record = result.Result as SagaRecord;
 
-                    if (record != null && record.Ended==null)
+                    if (record != null)
                     {
-                        record.Updated = sagadata.Updated;
-
-                        if (!string.IsNullOrWhiteSpace(sagadata.Status))
+                        if(record.Ended == null)
                         {
-                            record.Status = sagadata.Status;
+                            record.Updated = sagadata.Updated;
+
+                            if (!string.IsNullOrWhiteSpace(sagadata.Status))
+                            {
+                                record.Status = sagadata.Status;
+                            }
+
+                            record.Duration = sagadata.Duration;
+
+                            if (sagadata.Ended != null)
+                            {
+                                record.Ended = sagadata.Ended;
+                            }
+
+                            record.ETag = "*";
+
+                            record.Data = null;
+
+                            record.Data0 = null;
+
+                            record.Data1 = null;
+
+                            record.Data2 = null;
+
+                            record.Data3 = null;
+
+                            record.Data4 = null;
+
+                            record.NumberOfDataArrays = 0;
+
+                            record.SizeOfDataArraysOnKilobytes = 0;
+
+                            WriteSaga(sagadata, record);
+
+                            await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                         }
 
-                        record.Duration = sagadata.Duration;
-
-                        if (sagadata.Ended != null)
-                        {
-                            record.Ended = sagadata.Ended;
-                        }
-
-                        record.ETag = "*";
-
-                        record.Data = null;
-
-                        record.Data0 = null;
-
-                        record.Data1 = null;
-
-                        record.Data2 = null;
-
-                        record.Data3 = null;
-
-                        record.Data4 = null;
-
-                        record.NumberOfDataArrays = 0;
-
-                        record.SizeOfDataArraysOnKilobytes = 0;
-
-                        WriteSaga(sagadata, record);
-
-                        await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                     }
                     else
                     {
