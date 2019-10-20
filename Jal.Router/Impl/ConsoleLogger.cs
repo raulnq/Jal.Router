@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace Jal.Router.Impl
 {
+
     public class ConsoleLogger : ILogger
     {
         private readonly IConfiguration _configuration;
