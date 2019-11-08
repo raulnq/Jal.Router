@@ -25,7 +25,7 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Info($"[Router.cs, Route, {context.Data.Id}] Start Call. Message arrived. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.SagaData?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
+                _log.Debug($"[Router.cs, Route, {context.Data.Id}] Start Call. Message arrived. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.SagaData?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
 
                 await next(context);
 
@@ -41,7 +41,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Info($"[Router.cs, Route, {context.Data.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.SagaData?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
+                _log.Debug($"[Router.cs, Route, {context.Data.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.SagaData?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
             }
         }
     }

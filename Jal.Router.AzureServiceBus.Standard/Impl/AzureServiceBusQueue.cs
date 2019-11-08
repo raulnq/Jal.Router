@@ -125,7 +125,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                         }
 
                         await Task.WhenAll(handlers.ToArray());
-
+                        
                         await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)

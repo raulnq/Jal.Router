@@ -7,7 +7,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class ProducerMiddleware : AbstractOutboundMessageHandler, IMiddlewareAsync<MessageContext>
+    public class ProducerMiddleware : AbstractProducerMessageHandler, IMiddlewareAsync<MessageContext>
     {
         private readonly IProducer _producer;
 

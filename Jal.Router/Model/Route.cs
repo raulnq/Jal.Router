@@ -72,6 +72,11 @@ namespace Jal.Router.Model
     {
         public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
 
+        public bool AnyRouteMethods()
+        {
+            return RouteMethods!=null && RouteMethods.Count>0;
+        }
+
         public Type ConsumerType { get; private set; }
 
         public Route(string name, Type consumertype, List<Channel> channels) : base(name, typeof(TContent), typeof(TConsumer), channels)

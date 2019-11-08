@@ -45,11 +45,11 @@ namespace Jal.Router.Serilog.Impl
 
             try
             {
-                log.Information("[Router, Route, {Id}] Start Call. Message arrived. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Debug("[Router, Route, {Id}] Start Call. Message arrived. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
 
                 await next(context);
 
-                log.Information("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.ForContext("Type","message-consumer").Debug("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
             }
             catch (Exception exception)
             {
@@ -61,7 +61,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 stopwatch.Stop();
 
-                log.Information("[Router, Route, {Id}] End Call. Took {Duration} ms. Message routed. route: {Route} saga: {Saga}", context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.Debug("[Router, Route, {Id}] End Call. Took {Duration} ms. Message routed. route: {Route} saga: {Saga}", context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.Route?.Name, context.Data.Saga?.Name);
             }
         }
     }

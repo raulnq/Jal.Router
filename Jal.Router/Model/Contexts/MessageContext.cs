@@ -29,6 +29,13 @@ namespace Jal.Router.Model
                 return IdentityContext?.Id;
             }
         }
+
+
+        public bool FromSaga()
+        {
+            return Saga != null && SagaContext.SagaData != null && SagaContext.SagaData.Data != null;
+        }
+
         public string Name
         {
             get

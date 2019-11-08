@@ -45,11 +45,11 @@ namespace Jal.Router.Serilog.Impl
 
             try
             {
-                log.Information("[Bus, {Channel}, {Id}] Start Call. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
+                log.Debug("[Bus, {Channel}, {Id}] Start Call. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
 
                 await next(context);
 
-                log.Information("[Bus, {Channel}, {Id}] Message sent. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
+                log.ForContext("Type","message-producer").Information("[Bus, {Channel}, {Id}] Message sent. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
             }
             catch (Exception exception)
             {
@@ -61,7 +61,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 stopwatch.Stop();
 
-                log.Information("[Bus, {Channel}, {Id}] End Call. Took {Duration} ms. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
+                log.Debug("[Bus, {Channel}, {Id}] End Call. Took {Duration} ms. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, stopwatch.ElapsedMilliseconds, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
             }
         }
     }

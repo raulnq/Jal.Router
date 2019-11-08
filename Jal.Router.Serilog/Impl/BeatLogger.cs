@@ -10,7 +10,7 @@ namespace Jal.Router.Serilog.Impl
 
         public void Log(Beat message, DateTime datetime)
         {
-            l.Information("{Name} - {Action}", message.Name, message.Action);
+            l.ForContext("Type", $"job-{message.Action.ToLower()}").Information("{Name} - {Action}", message.Name, message.Action);
         }
     }
 }
