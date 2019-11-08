@@ -5,7 +5,7 @@
     <Version>1.8.6</Version>
     <Authors>Raul Naupari</Authors>
     <Company>Raul Naupari</Company>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <Description>LightInject installer for the Azure stack of the Jal.Router library</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

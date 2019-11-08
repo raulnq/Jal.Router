@@ -7,7 +7,7 @@
     <Company>Raul Naupari</Company>
     <Description>Castle Windsor installer for the Jal.Router.AzureStorage library</Description>
     <Copyright />
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
     <PackageTags />

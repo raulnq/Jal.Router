@@ -7,11 +7,11 @@
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with Serilog</Description>
     <Copyright />
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
     <PackageTags />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
