@@ -49,7 +49,7 @@ namespace Jal.Router.Serilog.Impl
 
                 await next(context);
 
-                log.ForContext("Type","message-consumer").Debug("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
+                log.ForContext("Type","message-consumer").Information("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
             }
             catch (Exception exception)
             {

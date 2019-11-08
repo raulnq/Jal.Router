@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Raul Naupari</Authors>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Company>Raul Naupari</Company>
     <Description>LightInject installer for the Jal.Router.Serilog library</Description>
     <Copyright />
