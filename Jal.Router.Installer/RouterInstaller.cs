@@ -44,7 +44,9 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IParameterProvider>().ImplementedBy<ParameterProvider>().LifestyleSingleton());
 
             container.Register(Component.For<IConsumer>().ImplementedBy<Consumer>().LifestyleSingleton());
-            
+
+            container.Register(Component.For<ITypedConsumer>().ImplementedBy<TypedConsumer>().LifestyleSingleton());
+
             container.Register(Component.For<IEndPointProvider>().ImplementedBy<EndPointProvider>().LifestyleSingleton());
 
             container.Register(Component.For<IBus>().ImplementedBy<Bus>().LifestyleSingleton());

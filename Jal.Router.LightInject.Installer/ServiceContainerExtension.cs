@@ -74,6 +74,8 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IConsumer, Consumer>(new PerContainerLifetime());
 
+            container.Register<ITypedConsumer, TypedConsumer>(new PerContainerLifetime());
+
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
             container.Register<IComponentFactory, ComponentFactory>(new PerContainerLifetime());

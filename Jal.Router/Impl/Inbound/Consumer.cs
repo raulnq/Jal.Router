@@ -6,16 +6,20 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
+
     public class Consumer : IConsumer
     {
         private readonly IComponentFactoryGateway _factory;
 
         private readonly ILogger _logger;
 
-        public Consumer(IComponentFactoryGateway factory, ILogger logger)
+        private readonly ITypedConsumer _typedconsumer;
+
+        public Consumer(IComponentFactoryGateway factory, ILogger logger, ITypedConsumer typedconsumer)
         {
             _factory = factory;
             _logger = logger;
+            _typedconsumer = typedconsumer;
         }
 
         public async Task Consume(MessageContext context)
@@ -66,9 +70,9 @@ namespace Jal.Router.Impl
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (Select(context, content, method, consumer))
+                    if (_typedconsumer.Select(context, content, method, consumer))
                     {
-                        return Consume(context, content, method, consumer);
+                        return _typedconsumer.Consume(context, content, method, consumer);
                     }
                 }
             }
@@ -90,14 +94,14 @@ namespace Jal.Router.Impl
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (Select(context, content, method, consumer))
+                    if (_typedconsumer.Select(context, content, method, consumer))
                     {
                         if (!string.IsNullOrWhiteSpace(method.Status))
                         {
                             context.SagaContext.SagaData.UpdateStatus(method.Status);
                         }
 
-                        return Consume(context, content, method, consumer, data);
+                        return _typedconsumer.Consume(context, content, method, consumer, data);
                     }
                 }
             }
@@ -105,67 +109,6 @@ namespace Jal.Router.Impl
             return Task.CompletedTask;
         }
 
-        private bool Select<TContent, THandler>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
-        {
-            if (routemethod.EvaluatorWithContext == null)
-            {
-                if (routemethod.Evaluator == null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return routemethod.Evaluator(content, handler);
-                }
-            }
-            else
-            {
-                return routemethod.EvaluatorWithContext(content, handler, context);
-            }
-        }
 
-        private Task Consume<TContent, THandler>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
-        {
-            if (routemethod.ConsumerWithContext != null)
-            {
-                return routemethod.ConsumerWithContext(content, handler, context);
-            }
-            else
-            {
-                if(routemethod.Consumer!=null)
-                {
-                    return routemethod.Consumer(content, handler);
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private Task Consume<TContent, THandler, TData>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler, TData data) where THandler : class
-            where TData : class, new()
-        {
-            if (routemethod.ConsumerWithContext != null)
-            {
-                return routemethod.ConsumerWithContext(content, handler, context);
-            }
-            else
-            {
-                if (routemethod.Consumer != null)
-                {
-                    return routemethod.Consumer(content, handler);
-                }
-                else
-                {
-                    if (routemethod.ConsumerWithDataAndContext != null)
-                    {
-                        return routemethod.ConsumerWithDataAndContext(content, handler, context, data);
-                    }
-                    else
-                    {
-                        return routemethod.ConsumerWithData?.Invoke(content, handler, data);
-                    }
-                }
-            }
-        }
     }
 }

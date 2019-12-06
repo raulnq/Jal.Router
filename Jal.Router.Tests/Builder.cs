@@ -4,6 +4,7 @@ using Jal.Router.Model;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
 {
@@ -44,8 +45,66 @@ namespace Jal.Router.Tests
 
         public static Route<object, Handler> CreateRoute()
         {
-            return new Route<object, Handler>("route", typeof(Handler), new List<Channel>());
+            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>());
+
+            return route;
         }
+
+        public static Route<object, Handler> CreateRouteWithConsumer(string status=null)
+        {
+            var route = CreateRoute();
+
+            var method = new RouteMethod<object, Handler>((o,h)=>Task.CompletedTask, status);
+
+            route.RouteMethods.Add(method);
+
+            return route;
+        }
+
+        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, Task> consumer)
+        {
+            var route = CreateRoute();
+
+            var method = new RouteMethod<object, Handler>(consumer);
+
+            route.RouteMethods.Add(method);
+
+            return route;
+        }
+
+        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, MessageContext, Task> consumer)
+        {
+            var route = CreateRoute();
+
+            var method = new RouteMethod<object, Handler>(consumer);
+
+            route.RouteMethods.Add(method);
+
+            return route;
+        }
+
+        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, object, Task> consumer)
+        {
+            var route = CreateRoute();
+
+            var method = new RouteMethod<object, Handler>(consumer);
+
+            route.RouteMethods.Add(method);
+
+            return route;
+        }
+
+        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, MessageContext, object, Task> consumer)
+        {
+            var route = CreateRoute();
+
+            var method = new RouteMethod<object, Handler>(consumer);
+
+            route.RouteMethods.Add(method);
+
+            return route;
+        }
+
 
         public static Mock<IComponentFactoryGateway> CreateFactoryMock()
         {
