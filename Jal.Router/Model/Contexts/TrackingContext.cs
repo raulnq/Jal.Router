@@ -20,6 +20,16 @@ namespace Jal.Router.Model
             return new TrackingContextEntity(Trackings);
         }
 
+        public Tracking[] GetTracksOfSaga(string sagaid)
+        {
+            if (!string.IsNullOrWhiteSpace(sagaid))
+            {
+                return Trackings.Where(x => x.SagaId == sagaid).ToArray();
+            }
+
+            return new Tracking[] { };
+        }
+
         public Tracking[] GetTracksOfTheCurrentSaga()
         {
             if (!string.IsNullOrWhiteSpace(Context.SagaContext.SagaData.Id))
