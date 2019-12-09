@@ -62,6 +62,14 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
+            container.Register<IListenerContextLoader, ListenerContextLoader>(new PerContainerLifetime());
+
+            container.Register<IRuntimeListenerContextLoader, RuntimeListenerContextLoader>(new PerContainerLifetime());
+
+            container.Register<ISenderContextLoader, SenderContextLoader>(new PerContainerLifetime());
+
+            container.Register<IRuntimeSenderContextLoader, RuntimeSenderContextLoader>(new PerContainerLifetime());
+
             container.Register<IParameterProvider, ParameterProvider>(new PerContainerLifetime());
 
             container.Register<IComponentFactoryGateway, ComponentFactoryGateway>(new PerContainerLifetime());

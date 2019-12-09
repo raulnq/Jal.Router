@@ -27,6 +27,14 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<IListenerContextLoader>().ImplementedBy<ListenerContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<IRuntimeListenerContextLoader>().ImplementedBy<RuntimeListenerContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<ISenderContextLoader>().ImplementedBy<SenderContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<IRuntimeSenderContextLoader>().ImplementedBy<RuntimeSenderContextLoader>().LifestyleSingleton());
+
             container.Register(Component.For<IShutdownTask>().ImplementedBy<PointToPointChannelResourceDestructor>().LifestyleSingleton().Named(typeof(PointToPointChannelResourceDestructor).FullName));
 
             container.Register(Component.For<IShutdownTask>().ImplementedBy<PublishSubscribeChannelResourceDestructor>().LifestyleSingleton().Named(typeof(PublishSubscribeChannelResourceDestructor).FullName));
