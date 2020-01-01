@@ -20,7 +20,7 @@ namespace Jal.Router.Impl
         {
             var messagecontext = context.Data;
 
-            messagecontext.TrackingContext.Add();
+            messagecontext.TrackingContext.AddEntry();
 
             try
             {

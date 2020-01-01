@@ -14,10 +14,11 @@ namespace Jal.Router.Model
 
         public List<Route> Routes { get; private set; }
 
-        public ListenerContext(Channel channel)
+        public ListenerContext(Channel channel, IListenerChannel listener, Partition partition)
         {
             Channel = channel;
             Routes = new List<Route>();
+            Partition = partition;
         }
 
         public string Id
@@ -26,16 +27,6 @@ namespace Jal.Router.Model
             {
                 return $"{Partition?.ToString()} {Channel.FullPath} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
             }
-        }
-
-        public void UpdatePartition(Partition partition)
-        {
-            Partition = partition;
-        }
-
-        public void UpdateListenerChannel(IListenerChannel listener)
-        {
-            ListenerChannel = listener;
         }
     }
 }

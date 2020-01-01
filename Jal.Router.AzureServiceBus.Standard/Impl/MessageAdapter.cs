@@ -22,14 +22,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
         }
 
-        public override MessageContext ReadMetadata(object message)
+        protected override MessageContext ReadMetadata(object message, IMessageSerializer serializer)
         {
             var sbmessage = message as Message;
 
             if (sbmessage != null)
             {
-                var serializer = Factory.CreateMessageSerializer();
-
                 var operationid = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(OperationId))
@@ -81,12 +79,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     sagaid = sbmessage.UserProperties[SagaId].ToString();
                 }
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version);
+                var contentid = string.Empty;
 
                 if (sbmessage.UserProperties.ContainsKey(ContentId))
                 {
-                    context.ContentContext.UpdateId(sbmessage.UserProperties[ContentId].ToString());
+                    contentid = sbmessage.UserProperties[ContentId].ToString();
                 }
+
+                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, contentid);
 
                 if (sbmessage.UserProperties != null)
                 {
@@ -147,9 +147,16 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override object WriteMetadataAndContent(MessageContext context)
+        protected override object Write(MessageContext context, IMessageSerializer serializer)
         {
-            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(context.ContentContext.Data)) { ContentType = "application/json" };
+            var data = context.ContentContext.Data;
+
+            if(context.ContentContext.IsClaimCheck)
+            {
+                data = string.Empty;
+            }
+
+            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(data)) { ContentType = "application/json" };
 
             foreach (var header in context.Headers)
             {
@@ -178,8 +185,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (context.TrackingContext != null)
             {
-                var serializer = Factory.CreateMessageSerializer();
-
                 var root = serializer.Serialize(context.TrackingContext.Trackings);
 
                 if (!string.IsNullOrWhiteSpace(root))

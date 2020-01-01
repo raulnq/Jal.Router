@@ -5,13 +5,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractMessageHandler
+    public abstract class AbstractMiddleware
     {
         protected readonly IConfiguration Configuration;
 
         protected readonly IComponentFactoryGateway Factory;
 
-        protected AbstractMessageHandler(IConfiguration configuration, IComponentFactoryGateway factory)
+        protected AbstractMiddleware(IConfiguration configuration, IComponentFactoryGateway factory)
         {
             Configuration = configuration;
 
@@ -26,7 +26,11 @@ namespace Jal.Router.Impl
                 {
                     var storage = Factory.CreateEntityStorage();
 
-                    await storage.CreateMessageEntity(messagecontext, messagecontext.ToEntity()).ConfigureAwait(false);
+                    var entity = messagecontext.ToEntity();
+
+                    var id = await storage.Create(entity).ConfigureAwait(false);
+
+                    entity.SetId(id);
                 }
                 catch (Exception)
                 {

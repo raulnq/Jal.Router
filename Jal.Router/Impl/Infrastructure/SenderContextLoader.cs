@@ -15,29 +15,23 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public void Load(EndPoint endpoint, Channel channel)
+        public SenderContext Load(Channel channel)
         {
-            var newsendercontext = new SenderContext(channel);
-
-            newsendercontext.Endpoints.Add(endpoint);
-
-            _factory.Configuration.Runtime.SenderContexts.Add(newsendercontext);
-
             var senderchannel = default(ISenderChannel);
 
             var readerchannel = default(IReaderChannel);
 
-            if (newsendercontext.Channel.Type == ChannelType.PointToPoint)
+            if (channel.Type == ChannelType.PointToPoint)
             {
                 senderchannel = _factory.CreatePointToPointChannel();
             }
 
-            if (newsendercontext.Channel.Type == ChannelType.PublishSubscribe)
+            if (channel.Type == ChannelType.PublishSubscribe)
             {
                 senderchannel = _factory.CreatePublishSubscribeChannel();
             }
 
-            if (newsendercontext.Channel.Type == ChannelType.RequestReplyToPointToPoint)
+            if (channel.Type == ChannelType.RequestReplyToPointToPoint)
             {
                 var requestresplychannel = _factory.CreateRequestReplyChannelFromPointToPointChannel();
 
@@ -46,7 +40,7 @@ namespace Jal.Router.Impl
                 senderchannel = requestresplychannel;
             }
 
-            if (newsendercontext.Channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+            if (channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
             {
                 var requestresplychannel = _factory.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
 
@@ -55,19 +49,18 @@ namespace Jal.Router.Impl
                 senderchannel = requestresplychannel;
             }
 
+            var sendercontext = new SenderContext(channel, senderchannel, readerchannel);
+
+            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
+
             if (senderchannel != null)
             {
-                senderchannel.Open(newsendercontext);
+                senderchannel.Open(sendercontext);
 
-                newsendercontext.UpdateSenderChannel(senderchannel);
-
-                if (readerchannel != null)
-                {
-                    newsendercontext.UpdateReaderChannel(readerchannel);
-                }
-
-                _logger.Log($"Opening {newsendercontext.Id}");
+                _logger.Log($"Opening {sendercontext.Id}");
             }
+
+            return sendercontext;
         }
     }
 }

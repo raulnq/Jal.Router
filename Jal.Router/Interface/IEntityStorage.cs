@@ -7,15 +7,15 @@ namespace Jal.Router.Interface
 {
     public interface IEntityStorage
     {
-        Task CreateMessageEntity(MessageContext context, MessageEntity messageentity);
+        Task<string> Create(MessageEntity messageentity);
 
-        Task CreateSagaData(MessageContext context, SagaData sagadata);
+        Task<string> Create(SagaData sagadata);
 
-        Task UpdateSagaData(MessageContext context, SagaData sagadata);
+        Task Update(SagaData sagadata);
 
-        Task<SagaData> GetSagaData(string id);
+        Task<SagaData> Get(string id);
 
-        Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string,string> options=null);
+        Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IDictionary<string,string> options=null);
 
         Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null);
 

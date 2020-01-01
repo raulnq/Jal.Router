@@ -8,16 +8,19 @@ namespace Jal.Router.Impl
 {
     public class Producer : IProducer
     {
-        public Producer(IComponentFactoryGateway factory, IConfiguration configuration, ILogger logger)
+        public Producer(IComponentFactoryGateway factory, IConfiguration configuration, ILogger logger, ISenderContextLoader loader)
         {
             _factory = factory;
             _configuration = configuration;
             _logger = logger;
+            _loader = loader;
         }
 
         private readonly IComponentFactoryGateway _factory;
 
         private readonly IConfiguration _configuration;
+
+        private readonly ISenderContextLoader _loader;
 
         private readonly ILogger _logger;
 
@@ -29,15 +32,15 @@ namespace Jal.Router.Impl
             {
                 var adapter = _factory.CreateMessageAdapter();
 
-                var message = await adapter.WriteMetadataAndContent(context, context.EndPoint).ConfigureAwait(false);
+                var message = await adapter.WritePhysicalMessage(context).ConfigureAwait(false);
 
                 var sendercontext = _configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == context.Channel.Id);
 
                 if (sendercontext == null)
                 {
-                    sendercontext = DynamicEndpointLoader(context.Channel, context);
+                    sendercontext = _loader.Load(context.Channel);
 
-                    _configuration.Runtime.SenderContexts.Add(sendercontext);
+                    sendercontext.Endpoints.Add(context.EndPoint);
                 }
 
                 id = await sendercontext.SenderChannel.Send(sendercontext, message).ConfigureAwait(false);
@@ -79,26 +82,6 @@ namespace Jal.Router.Impl
             {
                 _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
             }
-        }
-
-        private SenderContext DynamicEndpointLoader(Channel channel, MessageContext context)
-        {
-            var sender = new SenderContext(channel);
-
-            sender.Endpoints.Add(context.EndPoint);
-
-            var senderchannel = _factory.CreateSenderChannel(sender.Channel.Type);
-
-            if(senderchannel!=null)
-            {
-                senderchannel.Open(sender);
-
-                sender.UpdateSenderChannel(senderchannel);
-
-                _logger.Log($"Opening {sender.Id}");
-            }
-
-            return sender;
         }
     }
 }

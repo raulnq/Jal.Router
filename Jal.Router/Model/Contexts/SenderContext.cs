@@ -1,5 +1,4 @@
 ﻿using Jal.Router.Interface;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,27 +14,20 @@ namespace Jal.Router.Model
 
         public ISenderChannel SenderChannel { get; private set; }
 
-        public SenderContext(Channel channel)
+        public SenderContext(Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel)
         {
             Channel = channel;
             Endpoints = new List<EndPoint>();
+            SenderChannel = senderchannel;
+            ReaderChannel = readerchannel;
         }
 
         public string Id
         {
-            get{
+            get
+            {
                 return $"{Channel.FullPath} {Channel.ToString()} channel ({Endpoints.Count}): {string.Join(",", Endpoints.Select(x => x.Name))}";
             }
-        }
-
-        public void UpdateReaderChannel(IReaderChannel reader)
-        {
-            ReaderChannel = reader;
-        }
-
-        public void UpdateSenderChannel(ISenderChannel sender)
-        {
-            SenderChannel = sender;
         }
     }
 }

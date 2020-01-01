@@ -22,16 +22,14 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in endpoint.Channels)
                 {
-                    var sender = Factory.Configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
+                    var sendercontext = Factory.Configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
 
-                    if (sender != null)
+                    if (sendercontext == null)
                     {
-                        sender.Endpoints.Add(endpoint);
+                        sendercontext =_loader.Load(channel);
                     }
-                    else
-                    {
-                        _loader.Load(endpoint, channel);
-                    }
+
+                    sendercontext.Endpoints.Add(endpoint);
                 }
             }
 

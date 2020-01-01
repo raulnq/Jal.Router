@@ -28,9 +28,9 @@ namespace Jal.Router.Serilog.Impl
                 log = log.ForContext("OperationId", context.Data.IdentityContext.OperationId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.SagaData?.Id))
+            if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.Data?.Id))
             {
-                log = log.ForContext("SagaId", context.Data.SagaContext?.SagaData?.Id);
+                log = log.ForContext("SagaId", context.Data.SagaContext?.Data?.Id);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.Origin.From))

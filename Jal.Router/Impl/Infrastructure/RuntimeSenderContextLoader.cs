@@ -25,7 +25,9 @@ namespace Jal.Router.Impl
 
             newendpoint.Channels.Add(newchannel);
 
-            _loader.Load(newendpoint, newchannel);
+            var sendercontext = _loader.Load(newchannel);
+
+            sendercontext.Endpoints.Add(newendpoint);
         }
 
         public void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path)
@@ -40,7 +42,9 @@ namespace Jal.Router.Impl
 
             newendpoint.Channels.Add(newchannel);
 
-            _loader.Load(newendpoint, newchannel);
+            var sendercontext = _loader.Load(newchannel);
+
+            sendercontext.Endpoints.Add(newendpoint);
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
 {
+
     [TestClass]
     public class ConsumerTests
     {
@@ -26,7 +27,7 @@ namespace Jal.Router.Tests
         }
 
         [TestMethod]
-        public async Task Consume_WithoutRoutes_ShouldDoNothing()
+        public async Task Consume_WithNoRoutes_ShouldDoNothing()
         {
             var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
 
@@ -115,7 +116,7 @@ namespace Jal.Router.Tests
 
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Once());
 
-                messagecontext.SagaContext.SagaData.Status.ShouldBe("status");
+                messagecontext.SagaContext.Data.Status.ShouldBe("status");
             }
             else
             {
@@ -123,7 +124,7 @@ namespace Jal.Router.Tests
 
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
 
-                messagecontext.SagaContext.SagaData.Status.ShouldNotBe("status");
+                messagecontext.SagaContext.Data.Status.ShouldNotBe("status");
             }
 
         }

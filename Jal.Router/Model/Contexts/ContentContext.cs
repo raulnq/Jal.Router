@@ -10,21 +10,23 @@ namespace Jal.Router.Model
 
         public string Id { get; private set; }
 
+        public MessageContext Context { get; private set; }
+
+        public bool IsClaimCheck { get; private set; }
+
         public object Response { get; private set; }
 
-        public ContentContext()
+        public ContentContext(MessageContext context, string id, bool isClaimCheck)
         {
-
+            Id = id;
+            Context = context;
+            IsClaimCheck = isClaimCheck;
         }
 
-        public ContentContext(Type type)
-        {
-            Type = type;
-        }
-
-        public ContentContext(Type type, string data): this(type)
+        public ContentContext(MessageContext context, string id, bool isClaimCheck, Type type, string data):this(context, id, isClaimCheck)
         {
             Data = data;
+            Type = type;
         }
 
         public void UpdateResponse(object response)
@@ -32,29 +34,9 @@ namespace Jal.Router.Model
             Response = response;
         }
 
-        public void UpdateType(Type type)
-        {
-            Type = type;
-        }
-
-        public void UpdateId(string id)
-        {
-            Id = id;
-        }
-
-        public void CreateId()
+        public void GenerateId()
         {
             Id = Guid.NewGuid().ToString();
-        }
-
-        public void UpdateData(string content)
-        {
-            Data = content;
-        }
-
-        public void CleanData()
-        {
-            Data = string.Empty;
         }
 
         public ContentContextEntity ToEntity()

@@ -57,7 +57,7 @@ namespace Jal.Router.Model
             Id = id;
         }
 
-        public void UpdateId(string id)
+        public void SetId(string id)
         {
             Id = id;
         }

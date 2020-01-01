@@ -26,7 +26,9 @@ namespace Jal.Router.Impl
 
             var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
 
-            _loader.Load(newroute, newchannel);
+            var listenercontext = _loader.Load(newchannel);
+
+            listenercontext.Routes.Add(newroute);
         }
 
         public void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription)
@@ -41,7 +43,9 @@ namespace Jal.Router.Impl
 
             var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
 
-            _loader.Load(newroute, newchannel);
+            var listenercontext = _loader.Load(newchannel);
+
+            listenercontext.Routes.Add(newroute);
         }
     }
 }

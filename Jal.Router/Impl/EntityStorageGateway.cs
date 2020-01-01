@@ -19,7 +19,7 @@ namespace Jal.Router.Impl
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetSagaData(start, end, saganame, options);
+            return storage.Get(start, end, saganame, options);
         }
 
         public Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, IDictionary<string, string> options = null)

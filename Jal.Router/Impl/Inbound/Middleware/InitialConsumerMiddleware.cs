@@ -24,13 +24,17 @@ namespace Jal.Router.Impl
 
             var storage = Factory.CreateEntityStorage();
 
-            var sagadata = messagecontext.SagaContext.CreateSagaData(DefaultStatus);
+            var sagadata = messagecontext.SagaContext.Create(DefaultStatus);
 
-            await storage.CreateSagaData(messagecontext, sagadata).ConfigureAwait(false);
+            var id = await storage.Create(sagadata).ConfigureAwait(false);
 
-            messagecontext.SagaContext.UpdateSagaData(sagadata);
+            sagadata.SetId(id);
 
-            messagecontext.TrackingContext.Add();
+            messagecontext.SagaContext.Load(sagadata);
+
+            messagecontext.SagaContext.SetId(id);
+
+            messagecontext.TrackingContext.AddEntry();
 
             try
             {
@@ -41,7 +45,7 @@ namespace Jal.Router.Impl
                 await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
             }
 
-            await storage.UpdateSagaData(messagecontext, sagadata).ConfigureAwait(false);
+            await storage.Update(sagadata).ConfigureAwait(false);
         }
     }
 }

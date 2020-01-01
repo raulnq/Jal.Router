@@ -24,37 +24,37 @@ namespace Jal.Router.Impl
 
             var storage = Factory.CreateEntityStorage();
 
-            messagecontext.SagaContext.UpdateSagaData(await storage.GetSagaData(messagecontext.SagaContext.Id).ConfigureAwait(false));
+            messagecontext.SagaContext.Load(await storage.Get(messagecontext.SagaContext.Id).ConfigureAwait(false));
 
-            if (messagecontext.SagaContext.SagaData != null)
+            if (messagecontext.SagaContext.IsLoaded())
             {
-                messagecontext.SagaContext.SagaData.UpdateStatus(DefaultStatus);
+                messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                context.Data.TrackingContext.Add();
+                context.Data.TrackingContext.AddEntry();
 
-                if (context.Data.SagaContext.SagaData.Data != null)
+                if (context.Data.SagaContext.Data.IsValid())
                 {
                     try
                     {
                         await _consumer.Consume(context.Data).ConfigureAwait(false);
 
-                        messagecontext.SagaContext.SagaData.UpdateEndedDateTime(messagecontext.DateTimeUtc);
+                        messagecontext.SagaContext.Data.End(messagecontext.DateTimeUtc);
                     }
                     finally
                     {
                         await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
                     }
 
-                    await storage.UpdateSagaData(messagecontext, messagecontext.SagaContext.SagaData).ConfigureAwait(false);
+                    await storage.Update(messagecontext.SagaContext.Data).ConfigureAwait(false);
                 }
                 else
                 {
-                    throw new ApplicationException($"Empty/Invalid saga record data {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                    throw new ApplicationException($"Empty/Invalid saga record data {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
                 }
             }
             else
             {
-                throw new ApplicationException($"No saga record type {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                throw new ApplicationException($"No saga record type {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
             }
         }
     }

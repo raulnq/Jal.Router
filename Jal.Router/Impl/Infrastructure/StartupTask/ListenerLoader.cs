@@ -24,14 +24,12 @@ namespace Jal.Router.Impl
                 {
                     var listenercontext = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
 
-                    if (listenercontext != null)
+                    if (listenercontext == null)
                     {
-                        listenercontext.Routes.Add(route);
+                        listenercontext = _loader.Load(channel);
                     }
-                    else
-                    {
-                        _loader.Load(route, channel);
-                    }
+
+                    listenercontext.Routes.Add(route);
                 }
             }
 

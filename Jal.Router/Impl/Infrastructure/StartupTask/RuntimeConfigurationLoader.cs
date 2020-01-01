@@ -41,7 +41,7 @@ namespace Jal.Router.Impl
                 {
                     route.UpdateRuntimeHandler(async (message, channel) => {
 
-                        var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+                        var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
 
                         context.UpdateChannel(channel);
 
@@ -60,7 +60,7 @@ namespace Jal.Router.Impl
                     {
                         route.UpdateRuntimeHandler(async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
 
                             context.UpdateChannel(channel);
 
@@ -81,7 +81,7 @@ namespace Jal.Router.Impl
 
                         route.UpdateRuntimeHandler(async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
 
                             context.UpdateChannel(channel);
 
@@ -98,7 +98,7 @@ namespace Jal.Router.Impl
                     {
                         route.UpdateRuntimeHandler(async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromRoute(message, route).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
 
                             context.UpdateChannel(channel);
 

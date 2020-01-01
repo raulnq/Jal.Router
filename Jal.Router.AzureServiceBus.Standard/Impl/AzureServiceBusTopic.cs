@@ -53,7 +53,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _subscriptionclient.RegisterSessionHandler(async (ms, message, token) => {
 
-                    var context = adapter.ReadMetadata(message);
+                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -92,7 +92,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _subscriptionclient.RegisterMessageHandler(async (message, token) =>
                 {
-                    var context = adapter.ReadMetadata(message);
+                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 

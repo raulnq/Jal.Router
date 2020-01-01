@@ -36,7 +36,7 @@ namespace Jal.Router.Tests
 
             var sagacontext = new SagaContext(messagecontext, "id");
 
-            sagacontext.UpdateSagaData(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
+            sagacontext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
 
             messagecontext.UpdateSagaContext(sagacontext);
 

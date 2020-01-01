@@ -38,15 +38,15 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                var errormetadata = messagecontext.Route.ErrorHandlers.Where(x=> x.ExceptionTypes.Count == 0 || x.ExceptionTypes.Contains(ex.GetType()));
+                var errorhandlers = messagecontext.Route.ErrorHandlers.Where(x=> x.ExceptionTypes.Count == 0 || x.ExceptionTypes.Contains(ex.GetType()));
 
                 var handled = false;
 
-                foreach (var item in errormetadata)
+                foreach (var errorhandler in errorhandlers)
                 {
-                    var handler = _factory.CreateRouteErrorMessageHandler(item.Type);
+                    var handler = _factory.CreateRouteErrorMessageHandler(errorhandler.Type);
 
-                    handled = await handler.Handle(messagecontext, ex, item).ConfigureAwait(false);
+                    handled = await handler.Handle(messagecontext, ex, errorhandler).ConfigureAwait(false);
 
                     if (handled)
                     {

@@ -42,7 +42,7 @@ namespace Jal.Router.Impl
 
                     var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType, context.Saga.DataType);
 
-                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.SagaData.Data }) as Task;
+                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.Data.Data }) as Task;
 
                     await task;
                 }
@@ -98,7 +98,7 @@ namespace Jal.Router.Impl
                     {
                         if (!string.IsNullOrWhiteSpace(method.Status))
                         {
-                            context.SagaContext.SagaData.UpdateStatus(method.Status);
+                            context.SagaContext.Data.SetStatus(method.Status);
                         }
 
                         return _typedconsumer.Consume(context, content, method, consumer, data);

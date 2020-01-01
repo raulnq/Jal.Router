@@ -41,8 +41,8 @@ namespace Jal.Router.ApplicationInsights.Impl
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);
 
-            properties.Add("saga_id", context.SagaContext?.SagaData?.Id);
-            properties.Add("saga_status", context.SagaContext?.SagaData?.Status);
+            properties.Add("saga_id", context.SagaContext?.Data?.Id);
+            properties.Add("saga_status", context.SagaContext?.Data?.Status);
             properties.Add("saga_name", context.Saga?.Name);
 
             properties.Add("version", context.Version);
