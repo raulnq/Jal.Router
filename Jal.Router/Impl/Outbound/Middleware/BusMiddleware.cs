@@ -46,7 +46,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in channels)
                 {
-                    context.Data.UpdateChannel(channel);
+                    context.Data.SetChannel(channel);
 
                     try
                     {

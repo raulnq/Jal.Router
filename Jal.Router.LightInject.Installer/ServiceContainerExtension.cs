@@ -155,12 +155,18 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMessageAdapter, NullMessageAdapter>(typeof (NullMessageAdapter).FullName,new PerContainerLifetime());
 
+            container.Register<IMessageAdapter, FileSystemMessageAdapter>(typeof(FileSystemMessageAdapter).FullName, new PerContainerLifetime());
+
             container.Register<IMessageStorage, NullMessageStorage>(typeof(NullMessageStorage).FullName, new PerContainerLifetime());
 
             container.Register<IRouterInterceptor, NullRouterInterceptor>(typeof (NullRouterInterceptor).FullName,new PerContainerLifetime());
 
             container.Register<IPointToPointChannel, NullPointToPointChannel>(typeof (NullPointToPointChannel).FullName);
 
+            container.Register<IPointToPointChannel, FileSystemPointToPointChannel>(typeof(FileSystemPointToPointChannel).FullName);
+
+            container.Register<IPublishSubscribeChannel, FileSystemPublishSubscribeChannel>(typeof(FileSystemPublishSubscribeChannel).FullName);
+            
             container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof (NullPublishSubscribeChannel).FullName);
 
             container.Register<IRequestReplyChannelFromPointToPointChannel, NullRequestReplyChannelFromPointToPointChannel>(typeof (NullRequestReplyChannelFromPointToPointChannel).FullName);
@@ -168,6 +174,8 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(typeof(NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel).FullName);
 
             container.Register<IChannelResource, NullChannelResource>(typeof (NullChannelResource).FullName,new PerContainerLifetime());
+
+            container.Register<IChannelResource, FileSystemChannelResource>(typeof(FileSystemChannelResource).FullName, new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 

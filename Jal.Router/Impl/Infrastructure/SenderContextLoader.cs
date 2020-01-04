@@ -15,7 +15,7 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public SenderContext Load(Channel channel)
+        public SenderContext Create(Channel channel)
         {
             var senderchannel = default(ISenderChannel);
 
@@ -51,16 +51,17 @@ namespace Jal.Router.Impl
 
             var sendercontext = new SenderContext(channel, senderchannel, readerchannel);
 
-            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
+            return sendercontext;
+        }
 
-            if (senderchannel != null)
+        public void Open(SenderContext sendercontext)
+        {
+            if (sendercontext.SenderChannel != null)
             {
-                senderchannel.Open(sendercontext);
+                sendercontext.SenderChannel.Open(sendercontext);
 
                 _logger.Log($"Opening {sendercontext.Id}");
             }
-
-            return sendercontext;
         }
     }
 }

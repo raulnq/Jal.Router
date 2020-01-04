@@ -52,27 +52,16 @@ namespace Jal.Router.Impl
 
             var contentcontext = new ContentContext(context,  context.ContentContext.Id, useclaimcheck, contenttype, data);
 
-            context.UpdateContent(contentcontext);
+            context.SetContent(contentcontext);
 
             return context;
         }
 
-        public Task<MessageContext> ReadMetadataAndContentPhysicalMessage(object message, EndPoint endpoint)
+        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck)
         {
             var context = ReadMetadataFromPhysicalMessage(message);
 
-            context.UpdateEndPoint(endpoint);
-
-            return ReadContent(message, context, endpoint.ReplyContentType, endpoint.UseClaimCheck);
-        }
-
-        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Route route)
-        {
-            var context = ReadMetadataFromPhysicalMessage(message);
-
-            context.UpdateRoute(route);
-
-            return ReadContent(message, context, route.ContentType, route.UseClaimCheck);
+            return ReadContent(message, context, contenttype, useclaimcheck);
         }
 
         public async Task<object> WritePhysicalMessage(MessageContext context)

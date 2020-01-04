@@ -7,20 +7,16 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractMiddleware
     {
-        protected readonly IConfiguration Configuration;
-
         protected readonly IComponentFactoryGateway Factory;
 
-        protected AbstractMiddleware(IConfiguration configuration, IComponentFactoryGateway factory)
+        protected AbstractMiddleware(IComponentFactoryGateway factory)
         {
-            Configuration = configuration;
-
             Factory = factory;
         }
 
         protected async Task CreateMessageEntityAndSave(MessageContext messagecontext)
         {
-            if (Configuration.Storage.Enabled)
+            if (Factory.Configuration.Storage.Enabled)
             {
                 try
                 {
@@ -34,7 +30,7 @@ namespace Jal.Router.Impl
                 }
                 catch (Exception)
                 {
-                    if (!Configuration.Storage.IgnoreExceptions)
+                    if (!Factory.Configuration.Storage.IgnoreExceptions)
                     {
                         throw;
                     }

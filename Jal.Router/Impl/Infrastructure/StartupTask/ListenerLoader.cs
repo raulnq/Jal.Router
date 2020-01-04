@@ -26,11 +26,18 @@ namespace Jal.Router.Impl
 
                     if (listenercontext == null)
                     {
-                        listenercontext = _loader.Load(channel);
+                        listenercontext = _loader.Create(channel);
+
+                        Factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
                     }
 
                     listenercontext.Routes.Add(route);
                 }
+            }
+
+            foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
+            {
+                _loader.Open(listenercontext);
             }
 
             Logger.Log("Listeners loaded");

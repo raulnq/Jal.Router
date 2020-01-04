@@ -31,7 +31,7 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Func<object, Channel, Task> RuntimeHandler { get; private set; }
+        public Func<object, Channel, Task> Consumer { get; private set; }
 
         public List<Channel> Channels { get; }
 
@@ -57,9 +57,9 @@ namespace Jal.Router.Model
             UseClaimCheck = useclaimcheck;
         }
 
-        public void UpdateRuntimeHandler(Func<object, Channel, Task> runtimehandler)
+        public void SetConsumer(Func<object, Channel, Task> consumer)
         {
-            RuntimeHandler = runtimehandler;
+            Consumer = consumer;
         }
 
         public void UpdateWhen(Func<MessageContext, bool> when)

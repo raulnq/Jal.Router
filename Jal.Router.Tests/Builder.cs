@@ -18,11 +18,11 @@ namespace Jal.Router.Tests
 
             if(route==null)
             {
-                messagecontext.UpdateRoute(new Route<object, Handler>("route", typeof(Handler), new List<Channel>()));
+                messagecontext.SetRoute(new Route<object, Handler>("route", typeof(Handler), new List<Channel>()));
             }
             else
             {
-                messagecontext.UpdateRoute(route);
+                messagecontext.SetRoute(route);
             }
 
             return messagecontext;
@@ -32,7 +32,7 @@ namespace Jal.Router.Tests
         {
             var messagecontext = CreateMessageContext(route);
 
-            messagecontext.UpdateSaga(new Saga("name", typeof(object)));
+            messagecontext.SetSaga(new Saga("name", typeof(object)));
 
             var sagacontext = new SagaContext(messagecontext, "id");
 
@@ -117,6 +117,21 @@ namespace Jal.Router.Tests
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 
             return factorymock;
+        }
+
+        public static Mock<IEntityStorage> CreateEntityStorage(string id=null)
+        {
+            var entitystoragemock = new Mock<IEntityStorage>();
+
+            entitystoragemock.Setup(x => x.Create(It.IsAny<SagaData>())).ReturnsAsync(id);
+
+            entitystoragemock.Setup(x => x.Update(It.IsAny<SagaData>()));
+
+            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).ReturnsAsync(id);
+
+            entitystoragemock.Setup(x => x.Get(It.IsAny<string>())).ReturnsAsync(new SagaData(id, new object(), typeof(object), "name", DateTime.Now, 0, string.Empty, null, null, 0));
+
+            return entitystoragemock;
         }
 
         public static Mock<IComponentFactoryGateway> CreateFactoryMockWithHandler<T>() where T : class, new() 

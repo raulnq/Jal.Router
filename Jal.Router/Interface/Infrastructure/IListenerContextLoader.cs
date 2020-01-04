@@ -4,6 +4,8 @@ namespace Jal.Router.Interface
 {
     public interface IListenerContextLoader
     {
-        ListenerContext Load(Channel channel);
+        ListenerContext Create(Channel channel);
+
+        void Open(ListenerContext listenercontext);
     }
 }

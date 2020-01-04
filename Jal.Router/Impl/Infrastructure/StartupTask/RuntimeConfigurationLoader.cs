@@ -1,5 +1,4 @@
-﻿using Jal.Router.Impl;
-using Jal.Router.Interface;
+﻿using Jal.Router.Interface;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
@@ -39,11 +38,13 @@ namespace Jal.Router.Impl
 
                 foreach (var route in source.GetRoutes())
                 {
-                    route.UpdateRuntimeHandler(async (message, channel) => {
+                    route.SetConsumer(async (message, channel) => {
 
-                        var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
+                        var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
-                        context.UpdateChannel(channel);
+                        context.SetRoute(route);
+
+                        context.SetChannel(channel);
 
                         await _router.Route<ConsumerMiddleware>(context).ConfigureAwait(false);
                     });
@@ -58,13 +59,15 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.InitialRoutes)
                     {
-                        route.UpdateRuntimeHandler(async (message, channel) => {
+                        route.SetConsumer(async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
-                            context.UpdateChannel(channel);
+                            context.SetRoute(route);
 
-                            context.UpdateSaga(saga);
+                            context.SetChannel(channel);
+
+                            context.SetSaga(saga);
 
                             await _router.Route<InitialConsumerMiddleware>(context).ConfigureAwait(false); ;
                         });
@@ -77,18 +80,20 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.FinalRoutes)
                     {
-                        Factory.Configuration.Runtime.Routes.Add(route);
+                        route.SetConsumer(async (message, channel) => {
 
-                        route.UpdateRuntimeHandler(async (message, channel) => {
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
+                            context.SetRoute(route);
 
-                            context.UpdateChannel(channel);
+                            context.SetChannel(channel);
 
-                            context.UpdateSaga(saga);
+                            context.SetSaga(saga);
 
                             await _router.Route<FinalConsumerMiddleware>(context).ConfigureAwait(false); ;
                         });
+
+                        Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }
 
@@ -96,13 +101,15 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.Routes)
                     {
-                        route.UpdateRuntimeHandler(async (message, channel) => {
+                        route.SetConsumer(async (message, channel) => {
 
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route).ConfigureAwait(false);
+                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
-                            context.UpdateChannel(channel);
+                            context.SetRoute(route);
 
-                            context.UpdateSaga(saga);
+                            context.SetChannel(channel);
+
+                            context.SetSaga(saga);
 
                             await _router.Route<MiddleConsumerMiddleware>(context).ConfigureAwait(false);
                         });

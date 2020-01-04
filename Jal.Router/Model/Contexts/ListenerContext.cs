@@ -19,6 +19,7 @@ namespace Jal.Router.Model
             Channel = channel;
             Routes = new List<Route>();
             Partition = partition;
+            ListenerChannel = listener;
         }
 
         public string Id

@@ -9,13 +9,10 @@ namespace Jal.Router.Impl
 {
     public class FinalConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _consumer;
-
         private const string DefaultStatus = "ENDED";
 
-        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration) : base(configuration, factory)
+        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory, consumer)
         {
-            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -28,22 +25,13 @@ namespace Jal.Router.Impl
 
             if (messagecontext.SagaContext.IsLoaded())
             {
-                messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
-
-                context.Data.TrackingContext.AddEntry();
-
-                if (context.Data.SagaContext.Data.IsValid())
+                if (messagecontext.SagaContext.Data.IsValid())
                 {
-                    try
-                    {
-                        await _consumer.Consume(context.Data).ConfigureAwait(false);
+                    messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                        messagecontext.SagaContext.Data.End(messagecontext.DateTimeUtc);
-                    }
-                    finally
-                    {
-                        await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
-                    }
+                    await Consume(messagecontext);
+
+                    messagecontext.SagaContext.Data.End(messagecontext.DateTimeUtc);
 
                     await storage.Update(messagecontext.SagaContext.Data).ConfigureAwait(false);
                 }

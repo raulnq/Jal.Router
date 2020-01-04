@@ -26,11 +26,18 @@ namespace Jal.Router.Impl
 
                     if (sendercontext == null)
                     {
-                        sendercontext =_loader.Load(channel);
+                        sendercontext =_loader.Create(channel);
+
+                        Factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
                     }
 
                     sendercontext.Endpoints.Add(endpoint);
                 }
+            }
+
+            foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
+            {
+                _loader.Open(sendercontext);
             }
 
             Logger.Log("Senders loaded");

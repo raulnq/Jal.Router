@@ -94,27 +94,27 @@ namespace Jal.Router.Model
             Host = Environment.MachineName;
         }
 
-        public void UpdateContent(ContentContext contentcontext)
+        public void SetContent(ContentContext contentcontext)
         {
             ContentContext = contentcontext;
         }
 
-        public void UpdateRoute(Route route)
+        public void SetRoute(Route route)
         {
             Route = route;
         }
 
-        public void UpdateEndPoint(EndPoint endpoint)
+        public void SetEndPoint(EndPoint endpoint)
         {
             EndPoint = endpoint;
         }
 
-        public void UpdateChannel(Channel channel)
+        public void SetChannel(Channel channel)
         {
             Channel = channel;
         }
 
-        public void UpdateSaga(Saga saga)
+        public void SetSaga(Saga saga)
         {
             Saga = saga;
         }

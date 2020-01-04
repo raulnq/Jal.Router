@@ -38,9 +38,13 @@ namespace Jal.Router.Impl
 
                 if (sendercontext == null)
                 {
-                    sendercontext = _loader.Load(context.Channel);
+                    sendercontext = _loader.Create(context.Channel);
+
+                    _configuration.Runtime.SenderContexts.Add(sendercontext);
 
                     sendercontext.Endpoints.Add(context.EndPoint);
+
+                    _loader.Open(sendercontext);
                 }
 
                 id = await sendercontext.SenderChannel.Send(sendercontext, message).ConfigureAwait(false);

@@ -4,6 +4,8 @@ namespace Jal.Router.Interface
 {
     public interface ISenderContextLoader
     {
-        SenderContext Load(Channel channel);
+        SenderContext Create(Channel channel);
+
+        void Open(SenderContext sendercontext);
     }
 }

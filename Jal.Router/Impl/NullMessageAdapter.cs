@@ -18,12 +18,7 @@ namespace Jal.Router.Impl
             return default(MessageContext);
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Route route)
-        {
-            return Task.FromResult(default(MessageContext));
-        }
-
-        public Task<MessageContext> ReadMetadataAndContentPhysicalMessage(object message, EndPoint endpoint)
+        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck)
         {
             return Task.FromResult(default(MessageContext));
         }

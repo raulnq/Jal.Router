@@ -4,7 +4,7 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractProducerMiddleware : AbstractMiddleware
     {
-        protected AbstractProducerMiddleware(IConfiguration configuration, IComponentFactoryGateway factory) : base(configuration, factory)
+        protected AbstractProducerMiddleware(IComponentFactoryGateway factory) : base(factory)
         {
 
         }

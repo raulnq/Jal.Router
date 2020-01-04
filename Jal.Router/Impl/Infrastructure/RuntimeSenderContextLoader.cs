@@ -8,9 +8,12 @@ namespace Jal.Router.Impl
     {
         private readonly ISenderContextLoader _loader;
 
-        public RuntimeSenderContextLoader(ISenderContextLoader loader)
+        private IComponentFactoryGateway _factory;
+
+        public RuntimeSenderContextLoader(ISenderContextLoader loader, IComponentFactoryGateway factory)
         {
             _loader = loader;
+            _factory = factory;
         }
 
         public void AddPointToPointChannel<TMessage>(string name, string connectionstring, string path)
@@ -25,9 +28,13 @@ namespace Jal.Router.Impl
 
             newendpoint.Channels.Add(newchannel);
 
-            var sendercontext = _loader.Load(newchannel);
+            var sendercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 
             sendercontext.Endpoints.Add(newendpoint);
+
+            _loader.Open(sendercontext);
         }
 
         public void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path)
@@ -42,9 +49,13 @@ namespace Jal.Router.Impl
 
             newendpoint.Channels.Add(newchannel);
 
-            var sendercontext = _loader.Load(newchannel);
+            var sendercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 
             sendercontext.Endpoints.Add(newendpoint);
+
+            _loader.Open(sendercontext);
         }
     }
 }

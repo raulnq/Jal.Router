@@ -61,7 +61,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
                             var clone = message.Clone();
 
@@ -100,7 +100,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
                             var clone = message.Clone();
 

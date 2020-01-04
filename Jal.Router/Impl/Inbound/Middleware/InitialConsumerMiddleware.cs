@@ -9,13 +9,10 @@ namespace Jal.Router.Impl
 {
     public class InitialConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _consumer;
-
         private const string DefaultStatus = "STARTED";
 
-        public InitialConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration):base(configuration, factory)
+        public InitialConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
         {
-            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -34,16 +31,7 @@ namespace Jal.Router.Impl
 
             messagecontext.SagaContext.SetId(id);
 
-            messagecontext.TrackingContext.AddEntry();
-
-            try
-            {
-                await _consumer.Consume(messagecontext).ConfigureAwait(false);
-            }
-            finally
-            {
-                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
-            }
+            await Consume(messagecontext);
 
             await storage.Update(sagadata).ConfigureAwait(false);
         }

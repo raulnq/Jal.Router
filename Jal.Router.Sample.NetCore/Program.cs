@@ -20,6 +20,8 @@ using System.Threading.Tasks;
 using Jal.Router.Newtonsoft.Extensions;
 using Jal.Router.Newtonsoft.LightInject.Installer;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -28,7 +30,7 @@ namespace Jal.Router.Sample.NetCore
         static void Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
+            container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
@@ -55,10 +57,14 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueToSend>(typeof(QueueToSend).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueToReadPartition>(typeof(QueueToReadPartition).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenSessionSenderHandlers>(typeof(QueueListenSessionSenderHandlers).FullName, new PerContainerLifetime());
-            
+
+            //var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            //Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
+            var appRoot = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);//appPathMatcher.Match(path).Value;
             var host = container.GetInstance<IHost>();
             host.Configuration
-                .UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
+                //.UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
+                .UseFileSystem(new FileSystemParameter() { Path = appRoot })
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 .UseNewtonsoft()
@@ -73,6 +79,56 @@ namespace Jal.Router.Sample.NetCore
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
             host.RunAndBlock();
+
+            //var bus = container.GetInstance<IBus>();
+
+            //var context = new MessageContext(bus);
+
+            //context.Send(new Message() { Name = "Hi" }, "endpoint");
+
+            //Console.ReadLine();
+        }
+    }
+
+    public class FileRouterConfigurationSmokeTest : AbstractRouterConfigurationSource
+    {
+        public FileRouterConfigurationSmokeTest()
+        {
+            RegisterOrigin("smoketestapp", "123");
+
+            RegisterHandler("handler")
+            .ToListen(x =>
+            {
+                x.AddPointToPointChannel("queuea", "connectionstring");
+            })
+            .ForMessage<Message>().Use<IMessageHandler<Message>, ToPublishHandler>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterHandler("handler")
+            .ToListen(x =>
+            {
+                x.AddSubscriptionToPublishSubscribeChannel("topica", "subscription1", "connectionstring");
+            })
+            .ForMessage<Message>().Use<IMessageHandler<Message>, QueueListenByOneHandler>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
+
+            RegisterEndPoint("endpoint")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel("connectionstring", "queuea"));
+
+            RegisterEndPoint("fromqueueendpoint")
+                .ForMessage<Message>()
+                .To(x => x.AddPublishSubscribeChannel("connectionstring", "topica"));
+
+            RegisterPointToPointChannel("queuea", "connectionstring", new Dictionary<string, string>());
+
+            RegisterPublishSubscribeChannel("topica", "connectionstring", new Dictionary<string, string>());
+
+            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topica", "connectionstring", new Dictionary<string, string>());
         }
     }
 

@@ -16,7 +16,7 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public ListenerContext Load(Channel channel)
+        public ListenerContext Create(Channel channel)
         {
             var listenerchannel = _factory.CreateListenerChannel(channel.Type);
 
@@ -24,18 +24,19 @@ namespace Jal.Router.Impl
 
             var listenercontext = new ListenerContext(channel, listenerchannel, partition);
 
-            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
+            return listenercontext;
+        }
 
-            if (listenerchannel != null)
+        public void Open(ListenerContext listenercontext)
+        {
+            if (listenercontext.ListenerChannel != null)
             {
-                listenerchannel.Open(listenercontext);
+                listenercontext.ListenerChannel.Open(listenercontext);
 
-                listenerchannel.Listen(listenercontext);
+                listenercontext.ListenerChannel.Listen(listenercontext);
 
                 _logger.Log($"Listening {listenercontext.Id}");
             }
-
-            return listenercontext;
         }
     }
 }

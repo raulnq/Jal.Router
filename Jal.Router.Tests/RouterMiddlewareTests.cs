@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
 {
+
     [TestClass]
     public class RouterMiddlewareTests
     {

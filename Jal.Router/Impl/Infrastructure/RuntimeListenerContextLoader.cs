@@ -9,9 +9,12 @@ namespace Jal.Router.Impl
     {
         private readonly IListenerContextLoader _loader;
 
-        public RuntimeListenerContextLoader(IListenerContextLoader loader)
+        private IComponentFactoryGateway _factory;
+
+        public RuntimeListenerContextLoader(IListenerContextLoader loader, IComponentFactoryGateway factory)
         {
             _loader = loader;
+            _factory = factory;
         }
 
         public void AddPointToPointChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path)
@@ -26,9 +29,13 @@ namespace Jal.Router.Impl
 
             var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
 
-            var listenercontext = _loader.Load(newchannel);
+            var listenercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
 
             listenercontext.Routes.Add(newroute);
+
+            _loader.Open(listenercontext);
         }
 
         public void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription)
@@ -43,9 +50,13 @@ namespace Jal.Router.Impl
 
             var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
 
-            var listenercontext = _loader.Load(newchannel);
+            var listenercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
 
             listenercontext.Routes.Add(newroute);
+
+            _loader.Open(listenercontext);
         }
     }
 }
