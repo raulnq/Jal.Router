@@ -24,11 +24,23 @@ namespace Jal.Router.Extensions
                 .SetChannelProviderName("File System")
                 .UsePointToPointChannel<FileSystemPointToPointChannel>()
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
+                .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
+                .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>()
+                .UseChannelResource<FileSystemChannelResource>()
+                .UseMessageAdapter<MessageAdapter>()
+                .AddParameter(p);
+        }
+
+        public static IConfiguration UseInMemory(this IConfiguration configuration)
+        {
+            return configuration
+                .SetChannelProviderName("In-Memory")
+                .UsePointToPointChannel<InMemoryPointToPointChannel>()
+                .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 //.UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
                 //.UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UseChannelResource<FileSystemChannelResource>()
-                .UseMessageAdapter<FileSystemMessageAdapter>()
-                .AddParameter(p);
+                .UseChannelResource<InMemoryChannelResource>()
+                .UseMessageAdapter<MessageAdapter>();
         }
     }
 }

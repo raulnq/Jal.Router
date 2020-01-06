@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
-    public class FileSystemMessage
+    public class Message
     {
         public string Id { get; set; }
 
@@ -37,7 +37,7 @@ namespace Jal.Router.Model
 
         public string ContentType { get; set; }
 
-        public FileSystemMessage()
+        public Message()
         {
             Headers = new Dictionary<string, string>();
         }

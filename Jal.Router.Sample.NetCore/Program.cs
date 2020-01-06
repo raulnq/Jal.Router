@@ -58,13 +58,30 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueToReadPartition>(typeof(QueueToReadPartition).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenSessionSenderHandlers>(typeof(QueueListenSessionSenderHandlers).FullName, new PerContainerLifetime());
 
+            container.Register<IMessageHandler<Message>, HandlerQueueA>(typeof(HandlerQueueA).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, HandlerTopic1Subscription1>(typeof(HandlerTopic1Subscription1).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandler<Message>, HandlerQueue3>(typeof(HandlerQueue3).FullName, new PerContainerLifetime());
             //var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
             //Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
             var appRoot = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);//appPathMatcher.Match(path).Value;
             var host = container.GetInstance<IHost>();
+            var bus = container.GetInstance<IBus>();
+            var parameter = new FileSystemParameter() { Path = appRoot };
+            parameter.AddEndpointHandler("sendtoqueue1", (fs, ms, me, fn) =>
+             {
+                 var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
+
+                 fs.CreateFile(path, fn, me);
+             });
+            parameter.AddEndpointHandler("sendtoqueue2", (fs, ms, me, fn) =>
+            {
+                var path = fs.CreatePointToPointChannelPath(parameter, "connectionstring", "queue3");
+
+                fs.CreateFile(path, fn, me);
+            });
             host.Configuration
                 //.UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
-                .UseFileSystem(new FileSystemParameter() { Path = appRoot })
+                .UseFileSystem(parameter)
                 .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=narwhalappssaeus001;AccountKey=xn2flH2joqs8LM0JKQXrOAWEEXc/I4e9AF873p1W/2grHSht8WEIkBbbl3PssTatuRCLlqMxbkvhKN9VmcPsFA==") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 .UseNewtonsoft()
@@ -96,39 +113,80 @@ namespace Jal.Router.Sample.NetCore
         {
             RegisterOrigin("smoketestapp", "123");
 
-            RegisterHandler("handler")
+            RegisterHandler("handler1")
             .ToListen(x =>
             {
                 x.AddPointToPointChannel("queuea", "connectionstring");
             })
-            .ForMessage<Message>().Use<IMessageHandler<Message>, ToPublishHandler>(x =>
+            .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerQueueA>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
 
-            RegisterHandler("handler")
+            RegisterHandler("handler2")
             .ToListen(x =>
             {
-                x.AddSubscriptionToPublishSubscribeChannel("topica", "subscription1", "connectionstring");
+                x.AddSubscriptionToPublishSubscribeChannel("topic1", "subscription1", "connectionstring");
             })
-            .ForMessage<Message>().Use<IMessageHandler<Message>, QueueListenByOneHandler>(x =>
+            .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerTopic1Subscription1>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
 
-            RegisterEndPoint("endpoint")
-                .ForMessage<Message>()
-                .To(x => x.AddPointToPointChannel("connectionstring", "queuea"));
+            RegisterHandler("handler3")
+            .ToListen(x =>
+            {
+                x.AddPointToPointChannel("queue3", "connectionstring");
+            })
+            .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerQueue3>(x =>
+            {
+                x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
+            });
 
-            RegisterEndPoint("fromqueueendpoint")
+            RegisterEndPoint("sendtoqueue1")
                 .ForMessage<Message>()
-                .To(x => x.AddPublishSubscribeChannel("connectionstring", "topica"));
+                .To(x => x.AddPointToPointChannel("connectionstring", "queue1"));
+
+            RegisterEndPoint("sendtoqueue2")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel("connectionstring", "queue2"));
 
             RegisterPointToPointChannel("queuea", "connectionstring", new Dictionary<string, string>());
 
-            RegisterPublishSubscribeChannel("topica", "connectionstring", new Dictionary<string, string>());
+            RegisterPointToPointChannel("queue3", "connectionstring", new Dictionary<string, string>());
 
-            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topica", "connectionstring", new Dictionary<string, string>());
+            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topic1", "connectionstring", new Dictionary<string, string>());
+        }
+    }
+
+    public class HandlerQueueA : AbstractMessageHandler<Message>
+    {
+        public override Task HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name);
+
+            return context.Send(new Message() { }, "sendtoqueue1");
+        }
+    }
+
+    public class HandlerTopic1Subscription1 : AbstractMessageHandler<Message>
+    {
+        public override Task HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name);
+
+            return context.Send(new Message() { }, "sendtoqueue2");
+        }
+    }
+
+    public class HandlerQueue3 : AbstractMessageHandler<Message>
+    {
+        public override Task HandleWithContext(Message message, MessageContext context)
+        {
+            Console.WriteLine("message handled by " + GetType().Name);
+
+            //return context.Send(new Message() { }, "sendtoqueueb");
+            return Task.CompletedTask;
         }
     }
 
@@ -555,6 +613,8 @@ namespace Jal.Router.Sample.NetCore
 
         }
     }
+
+
 
     public class EndHandler : AbstractMessageHandlerWithData<Message, Data>
     {

@@ -23,7 +23,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<string> Send(SenderContext sendercontext, object message)
         {
-            var sbmessage = message as Message;
+            var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
             if (sbmessage != null)
             {

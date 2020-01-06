@@ -1,9 +1,11 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
@@ -12,19 +14,18 @@ namespace Jal.Router.Impl
     {
         private readonly FileSystemParameter _parameter;
 
-        public FileSystemPointToPointChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider)
-    : base(factory, logger)
-        {
-            _parameter = provider.Get<FileSystemParameter>();
-        }
-
-        public FileSystemPointToPointChannel(IComponentFactoryGateway factory, ILogger logger) : base(factory, logger)
-        {
-        }
+        private readonly IFileSystem _filesystem;
 
         private FileSystemWatcher _watcher;
 
         private string _path;
+
+        public FileSystemPointToPointChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystem filesystem)
+        : base(factory, logger)
+        {
+            _parameter = provider.Get<FileSystemParameter>();
+            _filesystem = filesystem;
+        }
 
         public Task Close(ListenerContext listenercontext)
         {
@@ -52,17 +53,15 @@ namespace Jal.Router.Impl
         {
             var adapter = Factory.CreateMessageAdapter();
 
-            var serializer = Factory.CreateMessageSerializer();
-
             _watcher.Created += async (object sender, FileSystemEventArgs e) =>
             {
                 if(e.FullPath.Contains(".jal"))
                 {
-                    var file = File.ReadAllText(e.FullPath);
+                    Thread.Sleep(500);
 
-                    var fmessage = serializer.Deserialize<FileSystemMessage>(file);
+                    var message = _filesystem.ReadFile(e.FullPath);
 
-                    var context = adapter.ReadMetadataFromPhysicalMessage(fmessage);
+                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -72,12 +71,12 @@ namespace Jal.Router.Impl
 
                         foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
-                            handlers.Add(runtimehandler(fmessage, listenercontext.Channel));
+                            handlers.Add(runtimehandler(message, listenercontext.Channel));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
 
-                        File.Delete(e.FullPath);
+                        _filesystem.DeleteFile(e.FullPath);
                     }
                     catch (Exception ex)
                     {
@@ -95,31 +94,44 @@ namespace Jal.Router.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            var path = FileSystemChannelResource.CreatePointToPointChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
+            var path = _filesystem.CreatePointToPointChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
 
             _watcher = new FileSystemWatcher(path);
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _path = FileSystemChannelResource.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _filesystem.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
         }
 
         public Task<string> Send(SenderContext sendercontext, object message)
         {
-            var fmessage = message as FileSystemMessage;
+            var m = message as Message;
 
-            if (fmessage != null)
+            if (m != null)
             {
                 var filename = $"{Guid.NewGuid().ToString()}.jal";
 
-                var fullpath = Path.Combine(_path, filename);
+                var handledbymock = false;
 
-                var serializer = Factory.CreateMessageSerializer();
+                foreach (var endpoint in sendercontext.Endpoints)
+                {
+                    if (_parameter.Mocks.ContainsKey(endpoint.Name))
+                    {
+                        var serializer = Factory.CreateMessageSerializer();
 
-                File.WriteAllText(fullpath, serializer.Serialize(fmessage));
+                        _parameter.Mocks[endpoint.Name](_filesystem, serializer, m, filename);
 
-                return Task.FromResult(fmessage.Id);
+                        handledbymock = true;
+                    }
+                }
+
+                if(!handledbymock)
+                {
+                    _filesystem.CreateFile(_path, filename, m);
+                }
+
+                return Task.FromResult(m.Id);
             }
 
             return Task.FromResult(string.Empty);

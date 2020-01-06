@@ -29,6 +29,7 @@ namespace Jal.Router.Impl
         public bool IsActive(SenderContext context)
         {
             return false;
+
         }
     }
 }

@@ -16,15 +16,15 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     {
         public static UTF8Encoding Utf8 { get; } = new UTF8Encoding(false, true);
     }
-    public class MessageAdapter : AbstractMessageAdapter
+    public class AzureServiceBusMessageAdapter : AbstractMessageAdapter
     {
-        public MessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
+        public AzureServiceBusMessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
         {
         }
 
         protected override MessageContext ReadMetadata(object message, IMessageSerializer serializer)
         {
-            var sbmessage = message as Message;
+            var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
             if (sbmessage != null)
             {
@@ -104,7 +104,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         protected override string ReadContent(object message)
         {
-            var sbmessage = message as Message;
+            var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
             if (sbmessage != null)
             {
@@ -156,7 +156,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 data = string.Empty;
             }
 
-            var brokeredmessage = new Message(Encoding.UTF8.GetBytes(data)) { ContentType = "application/json" };
+            var brokeredmessage = new Microsoft.Azure.ServiceBus.Message(Encoding.UTF8.GetBytes(data)) { ContentType = "application/json" };
 
             foreach (var header in context.Headers)
             {

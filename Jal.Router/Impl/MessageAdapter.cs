@@ -4,15 +4,15 @@ using System;
 
 namespace Jal.Router.Impl
 {
-    public class FileSystemMessageAdapter : AbstractMessageAdapter
+    public class MessageAdapter : AbstractMessageAdapter
     {
-        public FileSystemMessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
+        public MessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
         {
         }
 
         protected override string ReadContent(object message)
         {
-            var fmessage = message as FileSystemMessage;
+            var fmessage = message as Message;
 
             if (fmessage != null)
             {
@@ -23,7 +23,7 @@ namespace Jal.Router.Impl
 
         protected override MessageContext ReadMetadata(object message, IMessageSerializer serializer)
         {
-            var fmessage = message as FileSystemMessage;
+            var fmessage = message as Message;
 
             if (fmessage != null)
             {
@@ -69,7 +69,7 @@ namespace Jal.Router.Impl
                 data = string.Empty;
             }
 
-            var filemessage = new FileSystemMessage(){ ContentType = "application/json", Content = data };
+            var filemessage = new Message(){ ContentType = "application/json", Content = data };
 
             foreach (var header in context.Headers)
             {
