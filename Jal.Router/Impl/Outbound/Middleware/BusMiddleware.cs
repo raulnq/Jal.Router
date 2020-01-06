@@ -46,7 +46,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in channels)
                 {
-                    context.Data.UpdateChannel(channel);
+                    context.Data.SetChannel(channel);
 
                     try
                     {
@@ -74,7 +74,7 @@ namespace Jal.Router.Impl
                             {
                                 var handler = _factory.CreateBusErrorMessageHandler(item.Type);
 
-                                handled = await handler.OnException(messagecontext, ex, item).ConfigureAwait(false);
+                                handled = await handler.Handle(messagecontext, ex, item).ConfigureAwait(false);
 
                                 if (handled)
                                 {

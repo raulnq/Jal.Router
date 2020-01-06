@@ -20,17 +20,18 @@ namespace Jal.Router.Impl
         {
             if (metadata.Parameters.ContainsKey("endpoint"))
             {
-                var endpointname = metadata.Parameters["endpoint"] as string;
+                if (metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname))
+                {
+                    var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
 
-                var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
+                    var serializer = _factory.CreateMessageSerializer();
 
-                var serializer = _factory.CreateMessageSerializer();
+                    var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
-                var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
+                    _logger.Log($"Message {context.Id}, forwarding the message to the endpoint {endpointname} by route {context.Name}");
 
-                _logger.Log($"Message {context.Id}, forwarding the message to the endpoint {endpointname} by route {context.Name}");
-
-                await context.Send(content, context.Origin, options);
+                    await context.Send(content, context.Origin, options);
+                }
             }
         }
     }

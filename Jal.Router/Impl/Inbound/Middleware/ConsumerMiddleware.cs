@@ -9,27 +9,13 @@ namespace Jal.Router.Impl
 {
     public class ConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _consumer;
-
-        public ConsumerMiddleware(IConsumer consumer, IComponentFactoryGateway factory, IConfiguration configuration):base(configuration, factory)
+        public ConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
         {
-            _consumer = consumer;
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
         {
-            var messagecontext = context.Data;
-
-            messagecontext.TrackingContext.Add();
-
-            try
-            {
-                await _consumer.Consume(messagecontext).ConfigureAwait(false);
-            }
-            finally
-            {
-                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
-            }
+            return Consume(context.Data);
         }
     }
 }

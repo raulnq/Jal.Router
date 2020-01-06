@@ -3,8 +3,8 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IMiddleListenerRouteBuilder<THandler, out TData>
+    public interface IMiddleListenerRouteBuilder<out TData>
     {
-        IMiddleNameRouteBuilder<THandler, TData> ToListen(Action<IListenerChannelBuilder> channelbuilder);
+        IMiddleNameRouteBuilder<TData> ToListen(Action<IListenerChannelBuilder> channelbuilder);
     }
 }

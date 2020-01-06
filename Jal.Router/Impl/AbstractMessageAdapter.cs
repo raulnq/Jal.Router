@@ -35,75 +35,63 @@ namespace Jal.Router.Impl
             Bus = bus;
         }
 
-        private Task<MessageContext> ReadContentFromRoute(object message, MessageContext context, Route route)
-        {
-            return ReadContent(message, context, route.ContentType, route.UseClaimCheck);
-        }
-
-        private Task<MessageContext> ReadContentFromEndpoint(object message, MessageContext context, EndPoint endpoint)
-        {
-            return ReadContent(message, context, endpoint.ReplyContentType, endpoint.UseClaimCheck);
-        }
-
         private async Task<MessageContext> ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck)
         {
-            context.ContentContext.UpdateType(contenttype);
+            string data;
 
             if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentContext.Id))
             {
                 var storage = Factory.CreateMessageStorage();
 
-                context.ContentContext.UpdateData(await storage.Read(context.ContentContext.Id).ConfigureAwait(false));
+                data = await storage.Read(context.ContentContext.Id).ConfigureAwait(false);
             }
             else
             {
-                context.ContentContext.UpdateData(ReadContent(message));
+                data = ReadContent(message);
             }
+
+            var contentcontext = new ContentContext(context,  context.ContentContext.Id, useclaimcheck, contenttype, data);
+
+            context.SetContent(contentcontext);
 
             return context;
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint enpdoint)
+        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck)
         {
-            var context = ReadMetadata(message);
+            var context = ReadMetadataFromPhysicalMessage(message);
 
-            return ReadContentFromEndpoint(message, context, enpdoint);
+            return ReadContent(message, context, contenttype, useclaimcheck);
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
+        public async Task<object> WritePhysicalMessage(MessageContext context)
         {
-            var context = ReadMetadata(message);
-
-            context.UpdateRoute(route);
-
-            return ReadContentFromRoute(message, context, route);
-        }
-
-        public async Task<object> WriteMetadataAndContent(MessageContext context, EndPoint enpdoint)
-        {
-            var content = context.ContentContext.Data;
-
-            if(enpdoint.UseClaimCheck)
+            if(context.ContentContext.IsClaimCheck)
             {
                 var storage = Factory.CreateMessageStorage();
 
-                context.ContentContext.CreateId();
+                context.ContentContext.GenerateId();
 
                 await storage.Write(context.ContentContext.Id, context.ContentContext.Data).ConfigureAwait(false);
-
-                context.ContentContext.CleanData();
             }
 
-            var message = WriteMetadataAndContent(context);
+            var serializer = Factory.CreateMessageSerializer();
 
-            context.ContentContext.UpdateData(content);
+            var message = Write(context, serializer);
 
             return message;
         }
 
-        protected abstract object WriteMetadataAndContent(MessageContext context);
+        protected abstract object Write(MessageContext context, IMessageSerializer serializer);
 
-        public abstract MessageContext ReadMetadata(object message);
+        public MessageContext ReadMetadataFromPhysicalMessage(object message)
+        {
+            var serializer = Factory.CreateMessageSerializer();
+
+            return ReadMetadata(message, serializer);
+        }
+
+        protected abstract MessageContext ReadMetadata(object message, IMessageSerializer serializer);
 
         protected abstract string ReadContent(object message);
     }

@@ -1,7 +1,7 @@
 ﻿namespace Jal.Router.Fluent.Interface
 {
-    public interface INameRouteBuilder<THandler>
+    public interface INameRouteBuilder
     {
-        IHandlerBuilder<TContent, THandler> ForMessage<TContent>();
+        IHandlerBuilder<TContent> ForMessage<TContent>();
     }
 }

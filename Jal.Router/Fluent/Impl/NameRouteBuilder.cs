@@ -6,13 +6,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class NameRouteBuilder<THandler> : INameRouteBuilder<THandler>, IListenerRouteBuilder<THandler>, IListenerChannelBuilder
+    public class NameRouteBuilder : INameRouteBuilder, IListenerRouteBuilder, IListenerChannelBuilder
     {
         private readonly List<Route> _routes;
 
         private readonly string _name;
 
-        private readonly IList<Channel> _channels;
+        private readonly List<Channel> _channels;
 
         private Action<IListenerChannelBuilder> _channelbuilder;
 
@@ -25,17 +25,11 @@ namespace Jal.Router.Fluent.Impl
             _channels = new List<Channel>();
         }
 
-        public IHandlerBuilder<TContent, THandler> ForMessage<TContent>()
+        public IHandlerBuilder<TContent> ForMessage<TContent>()
         {
             _channelbuilder?.Invoke(this);
 
-            var value = new Route<TContent, THandler>(_name);
-
-            value.Channels.AddRange(_channels);
-
-            var builder = new HandlerBuilder<TContent, THandler>(value);
-
-            _routes.Add(value);
+            var builder = new HandlerBuilder<TContent>(_routes, _name, _channels);
 
             return builder;
         }
@@ -74,7 +68,7 @@ namespace Jal.Router.Fluent.Impl
                 connectionstringprovider, path, subscription));
         }
 
-        public INameRouteBuilder<THandler> ToListen(Action<IListenerChannelBuilder> channelbuilder)
+        public INameRouteBuilder ToListen(Action<IListenerChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {

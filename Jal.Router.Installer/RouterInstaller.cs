@@ -27,6 +27,14 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<IListenerContextLoader>().ImplementedBy<ListenerContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<IRuntimeListenerContextLoader>().ImplementedBy<RuntimeListenerContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<ISenderContextLoader>().ImplementedBy<SenderContextLoader>().LifestyleSingleton());
+
+            container.Register(Component.For<IRuntimeSenderContextLoader>().ImplementedBy<RuntimeSenderContextLoader>().LifestyleSingleton());
+
             container.Register(Component.For<IShutdownTask>().ImplementedBy<PointToPointChannelResourceDestructor>().LifestyleSingleton().Named(typeof(PointToPointChannelResourceDestructor).FullName));
 
             container.Register(Component.For<IShutdownTask>().ImplementedBy<PublishSubscribeChannelResourceDestructor>().LifestyleSingleton().Named(typeof(PublishSubscribeChannelResourceDestructor).FullName));
@@ -44,12 +52,14 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IParameterProvider>().ImplementedBy<ParameterProvider>().LifestyleSingleton());
 
             container.Register(Component.For<IConsumer>().ImplementedBy<Consumer>().LifestyleSingleton());
-            
+
+            container.Register(Component.For<ITypedConsumer>().ImplementedBy<TypedConsumer>().LifestyleSingleton());
+
             container.Register(Component.For<IEndPointProvider>().ImplementedBy<EndPointProvider>().LifestyleSingleton());
 
             container.Register(Component.For<IBus>().ImplementedBy<Bus>().LifestyleSingleton());
 
-            container.Register(Component.For<ISender>().ImplementedBy<Sender>().LifestyleSingleton());
+            container.Register(Component.For<IProducer>().ImplementedBy<Producer>().LifestyleSingleton());
 
             container.Register(Component.For<IComponentFactory>().ImplementedBy<ComponentFactory>().LifestyleSingleton());
 
@@ -145,7 +155,7 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(Impl.ConsumerMiddleware)).Named(typeof(Impl.ConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(RouteMiddleware)).Named(typeof(RouteMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(RouterMiddleware)).Named(typeof(RouterMiddleware).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(InitialConsumerMiddleware)).Named(typeof(InitialConsumerMiddleware).FullName).LifestyleSingleton());
 
@@ -155,13 +165,9 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusMiddleware>().LifestyleSingleton().Named(typeof(BusMiddleware).FullName));
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.SenderMiddleware>().LifestyleSingleton().Named(typeof(Impl.SenderMiddleware).FullName));
+            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.ProducerMiddleware>().LifestyleSingleton().Named(typeof(Impl.ProducerMiddleware).FullName));
 
             container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
-
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConnectionStringValueFinder)).Named(typeof(ConnectionStringValueFinder).FullName).LifestyleSingleton());
-
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(AppSettingValueFinder)).Named(typeof(AppSettingValueFinder).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConfigurationValueFinder)).Named(typeof(ConfigurationValueFinder).FullName).LifestyleSingleton());
 

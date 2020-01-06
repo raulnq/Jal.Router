@@ -40,22 +40,27 @@ namespace Jal.Router.Model
             Updated = created;
         }
 
-        public void UpdateId(string id)
+        public void SetId(string id)
         {
             Id = id;
         }
 
-        public void UpdateStatus(string status)
+        public void SetStatus(string status)
         {
             Status = status;
         }
 
-        public void UpdateUpdatedDateTime(DateTime updated)
+        public void Update(DateTime updated)
         {
             Updated = updated;
         }
 
-        public void UpdateEndedDateTime(DateTime ended)
+        public bool IsValid()
+        {
+            return Data != null;
+        }
+
+        public void End(DateTime ended)
         {
             Ended = ended;
             Duration = (Ended.Value - Created).TotalMilliseconds;

@@ -16,7 +16,7 @@ namespace Jal.Router.Impl
             _factory = factory;
             _logger = logger;
         }
-        public async Task<bool> OnException(MessageContext context, Exception ex, ErrorHandler metadata)
+        public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
             if(metadata.Parameters.ContainsKey("endpoint"))
             {

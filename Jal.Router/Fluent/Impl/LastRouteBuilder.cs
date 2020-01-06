@@ -14,21 +14,16 @@ namespace Jal.Router.Fluent.Impl
         }
 
 
-        public ILastListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>(string name)
+        public ILastListenerRouteBuilder<TData> RegisterHandler(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var builder = new LastNameRouteBuilder<THandler, TData>(_saga, name);
+            var builder = new LastNameRouteBuilder<TData>(_saga, name);
 
             return builder;
-        }
-
-        public ILastListenerRouteBuilder<THandler, TData> RegisterHandler<THandler>()
-        {
-            return RegisterHandler<THandler>(typeof(THandler).Name.ToLower());
         }
     }
 }

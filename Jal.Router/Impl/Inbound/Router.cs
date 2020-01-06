@@ -42,7 +42,7 @@ namespace Jal.Router.Impl
 
                 try
                 {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<RouteMiddleware>();
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<RouterMiddleware>();
 
                     foreach (var type in _factory.Configuration.InboundMiddlewareTypes)
                     {

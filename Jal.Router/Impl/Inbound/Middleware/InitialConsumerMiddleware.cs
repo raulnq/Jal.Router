@@ -9,13 +9,10 @@ namespace Jal.Router.Impl
 {
     public class InitialConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _consumer;
-
         private const string DefaultStatus = "STARTED";
 
-        public InitialConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration):base(configuration, factory)
+        public InitialConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
         {
-            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -24,24 +21,19 @@ namespace Jal.Router.Impl
 
             var storage = Factory.CreateEntityStorage();
 
-            var sagadata = messagecontext.SagaContext.CreateSagaData(DefaultStatus);
+            var sagadata = messagecontext.SagaContext.Create(DefaultStatus);
 
-            await storage.CreateSagaData(messagecontext, sagadata).ConfigureAwait(false);
+            var id = await storage.Create(sagadata).ConfigureAwait(false);
 
-            messagecontext.SagaContext.UpdateSagaData(sagadata);
+            sagadata.SetId(id);
 
-            messagecontext.TrackingContext.Add();
+            messagecontext.SagaContext.Load(sagadata);
 
-            try
-            {
-                await _consumer.Consume(messagecontext).ConfigureAwait(false);
-            }
-            finally
-            {
-                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
-            }
+            messagecontext.SagaContext.SetId(id);
 
-            await storage.UpdateSagaData(messagecontext, sagadata).ConfigureAwait(false);
+            await Consume(messagecontext);
+
+            await storage.Update(sagadata).ConfigureAwait(false);
         }
     }
 }

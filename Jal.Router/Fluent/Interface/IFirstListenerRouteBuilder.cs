@@ -2,8 +2,8 @@ using System;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IFirstListenerRouteBuilder<THandler, out TData>
+    public interface IFirstListenerRouteBuilder<out TData>
     {
-        IFirstNameRouteBuilder<THandler, TData> ToListen(Action<IListenerChannelBuilder> channelbuilder);
+        IFirstNameRouteBuilder<TData> ToListen(Action<IListenerChannelBuilder> channelbuilder);
     }
 }

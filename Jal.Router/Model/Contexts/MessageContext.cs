@@ -29,6 +29,13 @@ namespace Jal.Router.Model
                 return IdentityContext?.Id;
             }
         }
+
+
+        public bool FromSaga()
+        {
+            return Saga != null && SagaContext!=null && SagaContext.Data != null && SagaContext.Data.Data != null;
+        }
+
         public string Name
         {
             get
@@ -50,12 +57,12 @@ namespace Jal.Router.Model
         }
 
         public MessageContext(IBus bus, string id) 
-            :this(bus, new IdentityContext(id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty)
+            :this(bus, new IdentityContext(id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty)
         {
 
         }
 
-        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version)
+        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string contentid)
         {
             _bus = bus;
             Headers = new Dictionary<string, string>();
@@ -65,11 +72,11 @@ namespace Jal.Router.Model
             TrackingContext = new TrackingContext(this, tracks);
             IdentityContext = identitycontext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext();
+            ContentContext = new ContentContext(this, contentid, !string.IsNullOrEmpty(contentid));
             Host = Environment.MachineName;
         }
 
-        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, ContentContext contentcontext)
+        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, Type contenttype, string data, bool isclaimcheck)
         {
             Headers = new Dictionary<string, string>();
             Origin = origin;
@@ -83,21 +90,31 @@ namespace Jal.Router.Model
             Saga = options.Saga;
             TrackingContext = options.TrackingContext;
             DateTimeUtc = datetimeutc;
-            ContentContext = contentcontext;
+            ContentContext = new ContentContext(this, string.Empty, isclaimcheck, contenttype, data);
             Host = Environment.MachineName;
         }
 
-        public void UpdateRoute(Route route)
+        public void SetContent(ContentContext contentcontext)
+        {
+            ContentContext = contentcontext;
+        }
+
+        public void SetRoute(Route route)
         {
             Route = route;
         }
 
-        public void UpdateChannel(Channel channel)
+        public void SetEndPoint(EndPoint endpoint)
+        {
+            EndPoint = endpoint;
+        }
+
+        public void SetChannel(Channel channel)
         {
             Channel = channel;
         }
 
-        public void UpdateSaga(Saga saga)
+        public void SetSaga(Saga saga)
         {
             Saga = saga;
         }

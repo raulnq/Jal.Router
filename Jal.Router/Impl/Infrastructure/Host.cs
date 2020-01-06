@@ -94,7 +94,7 @@ namespace Jal.Router.Impl
             _state = StateStopped;
         }
 
-        public void RunAndBlock()
+        public void RunAndBlock(Action poststartedaction=null)
         {
             _logger.Log($"Starting Host");
 
@@ -103,6 +103,8 @@ namespace Jal.Router.Impl
             Watch();
 
             _logger.Log($"Host started");
+
+            poststartedaction?.Invoke();
 
             _cancellationtokensource.Token.WaitHandle.WaitOne();
 

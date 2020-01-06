@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
     public interface IHost
     {
-        void RunAndBlock();
+        void RunAndBlock(Action poststartedaction = null);
 
         void Run();
 

@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Installer
 
             container.Register(Component.For<IChannelResource>().ImplementedBy<AzureServiceBusChannelResource>().Named(typeof(AzureServiceBusChannelResource).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMessageAdapter>().ImplementedBy<MessageAdapter>().Named(typeof(MessageAdapter).FullName).LifestyleSingleton());
+            container.Register(Component.For<IMessageAdapter>().ImplementedBy<AzureServiceBusMessageAdapter>().Named(typeof(AzureServiceBusMessageAdapter).FullName).LifestyleSingleton());
         }
     }
 }

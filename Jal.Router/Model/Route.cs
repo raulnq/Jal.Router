@@ -6,19 +6,19 @@ namespace Jal.Router.Model
 {
     public class Route
     {
-        public Route(string name, Type contenttype, Type consumerinterfacetype)
+        public Route(string name, Type contenttype, Type consumerinterfacetype, List<Channel> channels)
         {
             ContentType = contenttype;
             ConsumerInterfaceType = consumerinterfacetype;
             MiddlewareTypes = new List<Type>();
             Name = name;
-            Channels = new List<Channel>();
+            Channels = channels;
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
         }
 
-        public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype) : this(name, contenttype, consumerinterfacetype)
+        public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype, List<Channel> channels) : this(name, contenttype, consumerinterfacetype, channels)
         {
             Saga = saga;
         }
@@ -31,7 +31,7 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Func<object, Channel, Task> RuntimeHandler { get; private set; }
+        public Func<object, Channel, Task> Consumer { get; private set; }
 
         public List<Channel> Channels { get; }
 
@@ -57,9 +57,9 @@ namespace Jal.Router.Model
             UseClaimCheck = useclaimcheck;
         }
 
-        public void UpdateRuntimeHandler(Func<object, Channel, Task> runtimehandler)
+        public void SetConsumer(Func<object, Channel, Task> consumer)
         {
-            RuntimeHandler = runtimehandler;
+            Consumer = consumer;
         }
 
         public void UpdateWhen(Func<MessageContext, bool> when)
@@ -72,21 +72,25 @@ namespace Jal.Router.Model
     {
         public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
 
+        public bool AnyRouteMethods()
+        {
+            return RouteMethods!=null && RouteMethods.Count>0;
+        }
+
         public Type ConsumerType { get; private set; }
 
-        public void UpdateConsumerType(Type consumertype)
+        public Route(string name, Type consumertype, List<Channel> channels) : base(name, typeof(TContent), typeof(TConsumer), channels)
         {
+            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
+
             ConsumerType = consumertype;
         }
 
-        public Route(string name) : base(name, typeof(TContent), typeof(TConsumer))
+        public Route(Saga saga, string name, Type consumertype, List<Channel> channels) : base(saga, name, typeof(TContent), typeof(TConsumer), channels)
         {
             RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
-        }
 
-        public Route(Saga saga, string name) : base(saga, name, typeof(TContent), typeof(TConsumer))
-        {
-            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
+            ConsumerType = consumertype;
         }
     }
 }

@@ -6,7 +6,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class LastNameRouteBuilder<THandler, TData> : ILastNameRouteBuilder<THandler, TData>, ILastListenerRouteBuilder<THandler, TData>, IListenerChannelBuilder
+    public class LastNameRouteBuilder<TData> : ILastNameRouteBuilder<TData>, ILastListenerRouteBuilder<TData>, IListenerChannelBuilder
     {
         private readonly string _name;
 
@@ -14,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
 
         private readonly Saga _saga;
 
-        private readonly IList<Channel> _channels;
+        private readonly List<Channel> _channels;
 
         private Action<IListenerChannelBuilder> _channelbuilder;
 
@@ -27,17 +27,11 @@ namespace Jal.Router.Fluent.Impl
             _channels = new List<Channel>();
         }
 
-        public IHandlerBuilder<TContent, THandler, TData> ForMessage<TContent>()
+        public IHandlerBuilder<TContent, TData> ForMessage<TContent>()
         {
             _channelbuilder?.Invoke(this);
 
-            var value = new Route<TContent, THandler>(_saga, _name);
-
-            value.Channels.AddRange(_channels);
-
-            var builder = new HandlerBuilder<TContent, THandler, TData>(value);
-
-            _saga.FinalRoutes.Add(value);
+            var builder = new HandlerBuilder<TContent, TData>(_saga.FinalRoutes, _name, _channels);
 
             return builder;
         }
@@ -76,7 +70,7 @@ namespace Jal.Router.Fluent.Impl
                 connectionstringprovider, path, subscription));
         }
 
-        public ILastNameRouteBuilder<THandler, TData> ToListen(Action<IListenerChannelBuilder> channelbuilder)
+        public ILastNameRouteBuilder<TData> ToListen(Action<IListenerChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {

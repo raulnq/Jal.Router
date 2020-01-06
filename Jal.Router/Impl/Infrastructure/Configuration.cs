@@ -33,14 +33,14 @@ namespace Jal.Router.Impl
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
         public IDictionary<string, object> Parameters { get; private set; }
-        public IConfiguration EnableEntityStorage(bool ignoreexceptions = true)
+        public IConfiguration EnableStorage(bool ignoreexceptions = true)
         {
             Storage.Enabled = true;
             Storage.IgnoreExceptions = ignoreexceptions;
             return this;
         }
 
-        public IConfiguration DisableEntityStorage()
+        public IConfiguration DisableStorage()
         {
             Storage.Enabled = false;
             Storage.IgnoreExceptions = true;

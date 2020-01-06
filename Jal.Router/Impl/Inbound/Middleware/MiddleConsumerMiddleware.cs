@@ -9,13 +9,10 @@ namespace Jal.Router.Impl
 {
     public class MiddleConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
     {
-        private readonly IConsumer _consumer;
-        
         private const string DefaultStatus = "IN PROCESS";
 
-        public MiddleConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer, IConfiguration configuration) : base(configuration, factory)
+        public MiddleConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory, consumer)
         {
-            _consumer = consumer;
         }
 
         public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
@@ -24,37 +21,28 @@ namespace Jal.Router.Impl
 
             var storage = Factory.CreateEntityStorage();
 
-            messagecontext.SagaContext.UpdateSagaData(await storage.GetSagaData(messagecontext.SagaContext.Id).ConfigureAwait(false));
+            messagecontext.SagaContext.Load(await storage.Get(messagecontext.SagaContext.Id).ConfigureAwait(false));
 
-            if (messagecontext.SagaContext.SagaData != null)
+            if (messagecontext.SagaContext.IsLoaded())
             {
-                messagecontext.SagaContext.SagaData.UpdateStatus(DefaultStatus);
-
-                context.Data.TrackingContext.Add();
-
-                if (messagecontext.SagaContext.SagaData.Data != null)
+                if (messagecontext.SagaContext.Data.IsValid())
                 {
-                    try
-                    {
-                        await _consumer.Consume(messagecontext).ConfigureAwait(false);
+                    messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                        messagecontext.SagaContext.SagaData.UpdateUpdatedDateTime(messagecontext.DateTimeUtc);
-                    }
-                    finally
-                    {
-                        await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
-                    }
+                    await Consume(messagecontext);
 
-                    await storage.UpdateSagaData(messagecontext, messagecontext.SagaContext.SagaData).ConfigureAwait(false);
+                    messagecontext.SagaContext.Data.Update(messagecontext.DateTimeUtc);
+
+                    await storage.Update(messagecontext.SagaContext.Data).ConfigureAwait(false);
                 }
                 else
                 {
-                    throw new ApplicationException($"Empty/Invalid saga record data {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                    throw new ApplicationException($"Empty/Invalid saga record data {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
                 }
             }
             else
             {
-                throw new ApplicationException($"No saga record type {context.Data.Saga.DataType.FullName}, saga {context.Data.Saga.Name} route {context.Data.Route.Name}");
+                throw new ApplicationException($"No saga record type {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
             }
         }
     }

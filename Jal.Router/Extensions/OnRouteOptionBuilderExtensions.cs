@@ -22,7 +22,7 @@ namespace Jal.Router.Extensions
 
         public static void Execute(this IOnRouteEntryBuilder builder, Func<MessageContext, Handler, Task> init)
         {
-            if (init!=null)
+            if (init==null)
             {
                 throw new ArgumentNullException(nameof(init));
             }
@@ -47,7 +47,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            if (policy!=null)
+            if (policy==null)
             {
                 throw new ArgumentNullException(nameof(policy));
             }

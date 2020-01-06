@@ -6,25 +6,29 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
+
     public class Consumer : IConsumer
     {
         private readonly IComponentFactoryGateway _factory;
 
         private readonly ILogger _logger;
 
-        public Consumer(IComponentFactoryGateway factory, ILogger logger)
+        private readonly ITypedConsumer _typedconsumer;
+
+        public Consumer(IComponentFactoryGateway factory, ILogger logger, ITypedConsumer typedconsumer)
         {
             _factory = factory;
             _logger = logger;
+            _typedconsumer = typedconsumer;
         }
 
         public async Task Consume(MessageContext context)
         {
             try
             {
-                if(context.SagaContext.SagaData?.Data==null)
+                if(!context.FromSaga())
                 {
-                    var routemethod = typeof(Consumer).GetMethods().First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 2);
+                    var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 2);
 
                     var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType);
 
@@ -34,11 +38,11 @@ namespace Jal.Router.Impl
                 }
                 else
                 {
-                    var routemethod = typeof(Consumer).GetMethods().First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 3);
+                    var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 3);
 
                     var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Route.ConsumerInterfaceType, context.Saga.DataType);
 
-                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.SagaData.Data }) as Task;
+                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.Data.Data }) as Task;
 
                     await task;
                 }
@@ -54,9 +58,9 @@ namespace Jal.Router.Impl
             }
         }
 
-        public Task Consume<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
+        private Task Consume<TContent, THandler>(MessageContext context, Route<TContent, THandler> route) where THandler : class
         {
-            if (route.RouteMethods != null)
+            if (route.AnyRouteMethods())
             {
                 var serializer = _factory.CreateMessageSerializer();
 
@@ -66,9 +70,9 @@ namespace Jal.Router.Impl
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (Select(context, content, method, consumer))
+                    if (_typedconsumer.Select(context, content, method, consumer))
                     {
-                        return Consume(context, content, method, consumer);
+                        return _typedconsumer.Consume(context, content, method, consumer);
                     }
                 }
             }
@@ -76,11 +80,11 @@ namespace Jal.Router.Impl
             return Task.CompletedTask;
         }
 
-        public Task Consume<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
+        private Task Consume<TContent, THandler, TData>(MessageContext context, Route<TContent, THandler> route, TData data) where THandler : class
             where TData : class, new()
         {
 
-            if (route.RouteMethods != null)
+            if (route.AnyRouteMethods())
             {
                 var serializer = _factory.CreateMessageSerializer();
 
@@ -90,14 +94,14 @@ namespace Jal.Router.Impl
 
                 foreach (var method in route.RouteMethods)
                 {
-                    if (Select(context, content, method, consumer))
+                    if (_typedconsumer.Select(context, content, method, consumer))
                     {
                         if (!string.IsNullOrWhiteSpace(method.Status))
                         {
-                            context.SagaContext.SagaData.UpdateStatus(method.Status);
+                            context.SagaContext.Data.SetStatus(method.Status);
                         }
 
-                        return Consume(context, content, method, consumer, data);
+                        return _typedconsumer.Consume(context, content, method, consumer, data);
                     }
                 }
             }
@@ -105,70 +109,6 @@ namespace Jal.Router.Impl
             return Task.CompletedTask;
         }
 
-        public bool Select<TContent, THandler>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
-        {
-            if (routemethod.EvaluatorWithContext == null)
-            {
-                if (routemethod.Evaluator == null)
-                {
-                    return true;
-                }
-                else
-                {
-                    if (routemethod.Evaluator(content, handler))
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                if (routemethod.EvaluatorWithContext(content, handler, context))
-                {
-                    return true;
-                }
-            }
 
-            return false;
-        }
-
-        public Task Consume<TContent, THandler>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler) where THandler : class
-        {
-            if (routemethod.ConsumerWithContext != null)
-            {
-                return routemethod.ConsumerWithContext(content, handler, context);
-            }
-            else
-            {
-                return routemethod.Consumer?.Invoke(content, handler);
-            }
-        }
-
-        public Task Consume<TContent, THandler, TData>(MessageContext context, TContent content, RouteMethod<TContent, THandler> routemethod, THandler handler, TData data) where THandler : class
-            where TData : class, new()
-        {
-            if (routemethod.ConsumerWithContext != null)
-            {
-                return routemethod.ConsumerWithContext(content, handler, context);
-            }
-            else
-            {
-                if (routemethod.Consumer != null)
-                {
-                    return routemethod.Consumer(content, handler);
-                }
-                else
-                {
-                    if (routemethod.ConsumerWithDataAndContext != null)
-                    {
-                        return routemethod.ConsumerWithDataAndContext(content, handler, context, data);
-                    }
-                    else
-                    {
-                        return routemethod.ConsumerWithData?.Invoke(content, handler, data);
-                    }
-                }
-            }
-        }
     }
 }

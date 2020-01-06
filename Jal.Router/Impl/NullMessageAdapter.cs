@@ -8,22 +8,17 @@ namespace Jal.Router.Impl
 
     public class NullMessageAdapter : IMessageAdapter
     {
-        public Task<object> WriteMetadataAndContent(MessageContext context, EndPoint endpoint)
+        public Task<object> WritePhysicalMessage(MessageContext context)
         {
             return Task.FromResult(default(object));
         }
 
-        public MessageContext ReadMetadata(object message)
+        public MessageContext ReadMetadataFromPhysicalMessage(object message)
         {
             return default(MessageContext);
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromRoute(object message, Route route)
-        {
-            return Task.FromResult(default(MessageContext));
-        }
-
-        public Task<MessageContext> ReadMetadataAndContentFromEndpoint(object message, EndPoint endpoint)
+        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck)
         {
             return Task.FromResult(default(MessageContext));
         }

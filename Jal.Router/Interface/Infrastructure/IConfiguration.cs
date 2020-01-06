@@ -34,8 +34,8 @@ namespace Jal.Router.Interface
         Type MessageStorageType { get; }
         IList<Type> InboundMiddlewareTypes { get; }
         IList<Type> OutboundMiddlewareTypes { get; }
-        IConfiguration EnableEntityStorage(bool ignoreexceptions = true);
-        IConfiguration DisableEntityStorage();
+        IConfiguration EnableStorage(bool ignoreexceptions = true);
+        IConfiguration DisableStorage();
         IConfiguration SetChannelProviderName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;

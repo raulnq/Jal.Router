@@ -53,7 +53,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _subscriptionclient.RegisterSessionHandler(async (ms, message, token) => {
 
-                    var context = adapter.ReadMetadata(message);
+                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -61,7 +61,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
                             var clone = message.Clone();
 
@@ -92,7 +92,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _subscriptionclient.RegisterMessageHandler(async (message, token) =>
                 {
-                    var context = adapter.ReadMetadata(message);
+                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -100,7 +100,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var handlers = new List<Task>();
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.RuntimeHandler))
+                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
                             var clone = message.Clone();
 
@@ -189,7 +189,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public async Task<string> Send(SenderContext sendercontext, object message)
         {
-            var sbmessage = message as Message;
+            var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
             if (sbmessage != null)
             {

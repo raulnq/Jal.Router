@@ -1,12 +1,30 @@
 ﻿using Jal.Router.Interface;
+using Jal.Router.Model;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractConsumerMiddleware : AbstractMessageHandler
+    public abstract class AbstractConsumerMiddleware : AbstractMiddleware
     {
-        protected AbstractConsumerMiddleware(IConfiguration configuration, IComponentFactoryGateway factory) : base(configuration, factory)
-        {
+        private readonly IConsumer _consumer;
 
+        protected AbstractConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory)
+        {
+            _consumer = consumer;
+        }
+
+        protected async Task Consume(MessageContext messagecontext)
+        {
+            messagecontext.TrackingContext.AddEntry();
+
+            try
+            {
+                await _consumer.Consume(messagecontext).ConfigureAwait(false);
+            }
+            finally
+            {
+                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
+            }
         }
     }
 }

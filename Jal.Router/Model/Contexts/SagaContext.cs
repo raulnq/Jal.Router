@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
     public class SagaContext
     {
-        public SagaData SagaData { get; private set; }
+        public SagaData Data { get; private set; }
 
         public MessageContext Context { get; private set; }
 
@@ -22,18 +23,22 @@ namespace Jal.Router.Model
 
         }
 
-        public void UpdateSagaData(SagaData sagadata)
+        public void Load(SagaData sagadata)
         {
-            SagaData = sagadata;
-            UpdateId(sagadata.Id);
+            Data = sagadata;
         }
 
-        public void UpdateId(string id)
+        public bool IsLoaded()
+        {
+            return Data!=null;
+        }
+
+        public void SetId(string id)
         {
             Id = id;
         }
 
-        public SagaData CreateSagaData(string status)
+        public SagaData Create(string status)
         {
             var data = Activator.CreateInstance(Context.Saga.DataType);
 
@@ -44,7 +49,7 @@ namespace Jal.Router.Model
 
         public SagaContextEntity ToEntity()
         {
-            return new SagaContextEntity(SagaData);
+            return new SagaContextEntity(Data);
         }
     }
 }

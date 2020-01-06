@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer
     {
         public void Compose(IServiceRegistry serviceRegistry)
         {
-            serviceRegistry.Register<IMessageAdapter, MessageAdapter>(typeof(MessageAdapter).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IMessageAdapter, AzureServiceBusMessageAdapter>(typeof(AzureServiceBusMessageAdapter).FullName, new PerContainerLifetime());
 
             serviceRegistry.Register<IChannelResource, AzureServiceBusChannelResource>(typeof(AzureServiceBusChannelResource).FullName, new PerContainerLifetime());
 

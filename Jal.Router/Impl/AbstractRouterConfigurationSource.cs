@@ -72,21 +72,16 @@ namespace Jal.Router.Impl
         }
 
 
-        public IListenerRouteBuilder<THandler> RegisterHandler<THandler>(string name)
+        public IListenerRouteBuilder RegisterHandler(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var builder = new NameRouteBuilder<THandler>(_routes, name);
+            var builder = new NameRouteBuilder(_routes, name);
 
             return builder;
-        }
-
-        public IListenerRouteBuilder<THandler> RegisterHandler<THandler>()
-        {
-            return RegisterHandler<THandler>(typeof(THandler).Name.ToLower());
         }
 
         public void RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)

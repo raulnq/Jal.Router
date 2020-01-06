@@ -6,6 +6,6 @@ namespace Jal.Router.Interface
 {
     public interface IRouteErrorMessageHandler
     {
-        Task<bool> OnException(MessageContext context, Exception ex, ErrorHandler metadata);
+        Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata);
     }
 }

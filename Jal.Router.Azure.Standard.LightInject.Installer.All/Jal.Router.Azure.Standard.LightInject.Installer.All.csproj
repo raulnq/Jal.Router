@@ -1,19 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.8.2</Version>
+    <Version>1.8.6</Version>
     <Authors>Raul Naupari</Authors>
     <Company>Raul Naupari</Company>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <Description>LightInject installer for the Azure stack of the Jal.Router library</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jal.ChainOfResponsability.LightInject.Installer" Version="1.0.4" />
-    <PackageReference Include="Jal.Locator.LightInject" Version="1.1.1" />
+    <PackageReference Include="Jal.ChainOfResponsability.LightInject.Installer" Version="1.0.5" />
+    <PackageReference Include="Jal.Locator.LightInject" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Raul Naupari</Authors>
+    <Version>1.0.4</Version>
+    <Company>Raul Naupari</Company>
+    <Description>Jal.Router integration with Serilog</Description>
+    <Copyright />
+    <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageTags />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jal.ChainOfResponsability" Version="1.0.5" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
+  </ItemGroup>
+
+</Project>

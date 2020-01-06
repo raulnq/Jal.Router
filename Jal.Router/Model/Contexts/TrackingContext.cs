@@ -20,11 +20,21 @@ namespace Jal.Router.Model
             return new TrackingContextEntity(Trackings);
         }
 
+        public Tracking[] GetTracksOfSaga(string sagaid)
+        {
+            if (!string.IsNullOrWhiteSpace(sagaid))
+            {
+                return Trackings.Where(x => x.SagaId == sagaid).ToArray();
+            }
+
+            return new Tracking[] { };
+        }
+
         public Tracking[] GetTracksOfTheCurrentSaga()
         {
-            if (!string.IsNullOrWhiteSpace(Context.SagaContext.SagaData.Id))
+            if (!string.IsNullOrWhiteSpace(Context.SagaContext.Data.Id))
             {
-                return Trackings.Where(x => x.SagaId == Context.SagaContext.SagaData.Id).ToArray();
+                return Trackings.Where(x => x.SagaId == Context.SagaContext.Data.Id).ToArray();
             }
 
             return new Tracking[] { };
@@ -50,13 +60,13 @@ namespace Jal.Router.Model
 
         public Tracking GetTrackOfTheSagaCaller()
         {
-            if (!string.IsNullOrWhiteSpace(Context.SagaContext.SagaData.Id))
+            if (!string.IsNullOrWhiteSpace(Context.SagaContext.Data.Id))
             {
                 var index = -1;
 
                 for (var i = 0; i < Trackings.Count; i++)
                 {
-                    if (Trackings[i].SagaId == Context.SagaContext.SagaData.Id)
+                    if (Trackings[i].SagaId == Context.SagaContext.Data.Id)
                     {
                         index = i - 1;
 
@@ -73,9 +83,9 @@ namespace Jal.Router.Model
             return null;
         }
 
-        public void Add()
+        public void AddEntry()
         {
-            var tracking = new Tracking(Context.Id, Context.SagaContext?.SagaData?.Id, Context.Origin?.From,
+            var tracking = new Tracking(Context.Id, Context.SagaContext?.Data?.Id, Context.Origin?.From,
                  Context.Origin?.Key, Context.Route?.Name, Context.Saga?.Name);
 
             Trackings.Add(tracking);

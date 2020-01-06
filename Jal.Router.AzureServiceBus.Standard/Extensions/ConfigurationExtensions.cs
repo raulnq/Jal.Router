@@ -22,7 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
                 .UseChannelResource<AzureServiceBusChannelResource>()
-                .UseMessageAdapter<MessageAdapter>()
+                .UseMessageAdapter<AzureServiceBusMessageAdapter>()
                 .AddParameter(p);
         }
 

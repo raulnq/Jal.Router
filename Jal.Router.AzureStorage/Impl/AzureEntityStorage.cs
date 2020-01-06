@@ -15,8 +15,6 @@ namespace Jal.Router.AzureStorage.Impl
     {
         private readonly IComponentFactoryGateway _factory;
 
-        private readonly IConfiguration _configuration;
-
         private readonly AzureStorageParameter _parameter;
 
         private readonly int _kilobyte = 1024;
@@ -33,11 +31,9 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageSagaReader;
 
-        public AzureEntityStorage(IComponentFactoryGateway factory, IConfiguration configuration, IParameterProvider provider)
+        public AzureEntityStorage(IComponentFactoryGateway factory, IParameterProvider provider)
         {
             _factory = factory;
-
-            _configuration = configuration;
 
             _parameter = provider.Get<AzureStorageParameter>();
 
@@ -65,7 +61,7 @@ namespace Jal.Router.AzureStorage.Impl
             return table;
         }
 
-        public override async Task<SagaData[]> GetSagaData(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
+        public override async Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
@@ -84,7 +80,7 @@ namespace Jal.Router.AzureStorage.Impl
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{saganame}";
 
-                var sagas = await GetSagaData(table, partitionkey, start, end, options).ConfigureAwait(false);
+                var sagas = await Get(table, partitionkey, start, end, options).ConfigureAwait(false);
 
                 list.AddRange(sagas);
 
@@ -94,7 +90,7 @@ namespace Jal.Router.AzureStorage.Impl
             return list.ToArray();
         }
 
-        private async Task<SagaData[]> GetSagaData(CloudTable table, string partitionkey, DateTime start, DateTime end, IDictionary<string, string> options = null)
+        private async Task<SagaData[]> Get(CloudTable table, string partitionkey, DateTime start, DateTime end, IDictionary<string, string> options = null)
         {
 
             var where = TableQuery.CombineFilters(
@@ -319,17 +315,17 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override async Task<SagaData> GetSagaData(string entityId)
+        public override async Task<SagaData> Get(string id)
         {
             try
             {
                 
 
-                var tablenamesufix = GetTableNameSufix(entityId);
+                var tablenamesufix = GetTableNameSufix(id);
 
-                var partitionkey = GetPartitionKey(entityId);
+                var partitionkey = GetPartitionKey(id);
 
-                var rowkey = GetRowKey(entityId);
+                var rowkey = GetRowKey(id);
 
                 if (!string.IsNullOrWhiteSpace(tablenamesufix) && !string.IsNullOrWhiteSpace(partitionkey) && !string.IsNullOrWhiteSpace(rowkey))
                 {
@@ -353,25 +349,25 @@ namespace Jal.Router.AzureStorage.Impl
                     }
                     else
                     {
-                        throw new ApplicationException($"Record not found for saga key {entityId}");
+                        throw new ApplicationException($"Record not found for saga key {id}");
                     }
                 }
                 else
                 {
-                    throw new ApplicationException($"Invalid saga key format {entityId}");
+                    throw new ApplicationException($"Invalid saga key format {id}");
                 }
             }
             catch (StorageException s)
             {
-                throw new ApplicationException($"Error during the saga record query for saga key {entityId}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the saga record query for saga key {id}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record query for saga key {entityId}", ex);
+                throw new ApplicationException($"Error during the saga record query for saga key {id}", ex);
             }
         }
 
-        public override async Task CreateSagaData(MessageContext context, SagaData sagadata)
+        public override async Task<string> Create(SagaData sagadata)
         {
             try
             {
@@ -402,19 +398,19 @@ namespace Jal.Router.AzureStorage.Impl
                     Id = id
                 };
 
-                sagadata.UpdateId(id);
-
                 WriteSaga(sagadata, record);
 
                 await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
+
+                return id;
             }
             catch (StorageException s)
             {
-                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name} and route {context.Route.Name}", ex);
+                throw new ApplicationException($"Error during the saga record creation for saga {sagadata.Name}", ex);
             }
         }
 
@@ -437,13 +433,13 @@ namespace Jal.Router.AzureStorage.Impl
             }
         }
 
-        public override async Task CreateMessageEntity(MessageContext context, MessageEntity messageentity)
+        public override async Task<string> Create(MessageEntity messageentity)
         {
             try
             {
                 var serializer = _factory.CreateMessageSerializer();
 
-                var partition = $"{context.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
+                var partition = $"{messageentity.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
 
                 var rowkey = $"{Guid.NewGuid()}";
 
@@ -455,8 +451,6 @@ namespace Jal.Router.AzureStorage.Impl
                 }
 
                 var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
-
-                messageentity.UpdateId(id);
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
@@ -481,6 +475,8 @@ namespace Jal.Router.AzureStorage.Impl
                 WriteMessage(messageentity, record);
 
                 await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
+
+                return id;
             }
             catch(StorageException s)
             {
@@ -546,7 +542,7 @@ namespace Jal.Router.AzureStorage.Impl
             return rv;
         }
 
-        public override async Task UpdateSagaData(MessageContext context, SagaData sagadata)
+        public override async Task Update(SagaData sagadata)
         {
             try
             {
@@ -564,43 +560,47 @@ namespace Jal.Router.AzureStorage.Impl
 
                     var record = result.Result as SagaRecord;
 
-                    if (record != null && record.Ended==null)
+                    if (record != null)
                     {
-                        record.Updated = sagadata.Updated;
-
-                        if (!string.IsNullOrWhiteSpace(sagadata.Status))
+                        if(record.Ended == null)
                         {
-                            record.Status = sagadata.Status;
+                            record.Updated = sagadata.Updated;
+
+                            if (!string.IsNullOrWhiteSpace(sagadata.Status))
+                            {
+                                record.Status = sagadata.Status;
+                            }
+
+                            record.Duration = sagadata.Duration;
+
+                            if (sagadata.Ended != null)
+                            {
+                                record.Ended = sagadata.Ended;
+                            }
+
+                            record.ETag = "*";
+
+                            record.Data = null;
+
+                            record.Data0 = null;
+
+                            record.Data1 = null;
+
+                            record.Data2 = null;
+
+                            record.Data3 = null;
+
+                            record.Data4 = null;
+
+                            record.NumberOfDataArrays = 0;
+
+                            record.SizeOfDataArraysOnKilobytes = 0;
+
+                            WriteSaga(sagadata, record);
+
+                            await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                         }
 
-                        record.Duration = sagadata.Duration;
-
-                        if (sagadata.Ended != null)
-                        {
-                            record.Ended = sagadata.Ended;
-                        }
-
-                        record.ETag = "*";
-
-                        record.Data = null;
-
-                        record.Data0 = null;
-
-                        record.Data1 = null;
-
-                        record.Data2 = null;
-
-                        record.Data3 = null;
-
-                        record.Data4 = null;
-
-                        record.NumberOfDataArrays = 0;
-
-                        record.SizeOfDataArraysOnKilobytes = 0;
-
-                        WriteSaga(sagadata, record);
-
-                        await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                     }
                     else
                     {
@@ -614,11 +614,11 @@ namespace Jal.Router.AzureStorage.Impl
             }
             catch (StorageException s)
             {
-                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name} and route {context.Route.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name} and route {context.Route.Name}", ex);
+                throw new ApplicationException($"Error during the saga update for saga {sagadata.Name}", ex);
             }
         }
 

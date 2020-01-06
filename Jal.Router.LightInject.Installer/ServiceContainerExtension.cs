@@ -62,17 +62,31 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ILogger, ConsoleLogger>(new PerContainerLifetime());
 
+            container.Register<IHasher, Hasher>(new PerContainerLifetime());
+
+            container.Register<IFileSystem, FileSystem>(new PerContainerLifetime());
+
+            container.Register<IListenerContextLoader, ListenerContextLoader>(new PerContainerLifetime());
+
+            container.Register<IRuntimeListenerContextLoader, RuntimeListenerContextLoader>(new PerContainerLifetime());
+
+            container.Register<ISenderContextLoader, SenderContextLoader>(new PerContainerLifetime());
+
+            container.Register<IRuntimeSenderContextLoader, RuntimeSenderContextLoader>(new PerContainerLifetime());
+
             container.Register<IParameterProvider, ParameterProvider>(new PerContainerLifetime());
 
             container.Register<IComponentFactoryGateway, ComponentFactoryGateway>(new PerContainerLifetime());
 
             container.Register<IHost, Host>(new PerContainerLifetime());
 
-            container.Register<ISender, Sender>(new PerContainerLifetime());
+            container.Register<IProducer, Producer>(new PerContainerLifetime());
 
             container.Register<IRouter, Impl.Router>(new PerContainerLifetime());
 
             container.Register<IConsumer, Consumer>(new PerContainerLifetime());
+
+            container.Register<ITypedConsumer, TypedConsumer>(new PerContainerLifetime());
 
             container.Register<IEndPointProvider, EndPointProvider>(new PerContainerLifetime());
 
@@ -126,7 +140,6 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRouteEntryMessageHandler, RouteEntryMessageHandler>(typeof(RouteEntryMessageHandler).FullName, new PerContainerLifetime());
 
-
             container.Register<IMonitor, Monitor>(new PerContainerLifetime());
 
             container.Register<IEntityStorageGateway, EntityStorageGateway>(new PerContainerLifetime());
@@ -145,19 +158,31 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMessageAdapter, NullMessageAdapter>(typeof (NullMessageAdapter).FullName,new PerContainerLifetime());
 
+            container.Register<IMessageAdapter, MessageAdapter>(typeof(MessageAdapter).FullName, new PerContainerLifetime());
+
             container.Register<IMessageStorage, NullMessageStorage>(typeof(NullMessageStorage).FullName, new PerContainerLifetime());
 
             container.Register<IRouterInterceptor, NullRouterInterceptor>(typeof (NullRouterInterceptor).FullName,new PerContainerLifetime());
 
             container.Register<IPointToPointChannel, NullPointToPointChannel>(typeof (NullPointToPointChannel).FullName);
 
+            container.Register<IPointToPointChannel, FileSystemPointToPointChannel>(typeof(FileSystemPointToPointChannel).FullName);
+
+            container.Register<IPublishSubscribeChannel, FileSystemPublishSubscribeChannel>(typeof(FileSystemPublishSubscribeChannel).FullName);
+            
             container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof (NullPublishSubscribeChannel).FullName);
 
             container.Register<IRequestReplyChannelFromPointToPointChannel, NullRequestReplyChannelFromPointToPointChannel>(typeof (NullRequestReplyChannelFromPointToPointChannel).FullName);
 
             container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(typeof(NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel).FullName);
 
+            container.Register<IRequestReplyChannelFromPointToPointChannel, FileSystemRequestReplyFromPointToPointChannel>(typeof(FileSystemRequestReplyFromPointToPointChannel).FullName);
+
+            container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>(typeof(FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName);
+
             container.Register<IChannelResource, NullChannelResource>(typeof (NullChannelResource).FullName,new PerContainerLifetime());
+
+            container.Register<IChannelResource, FileSystemChannelResource>(typeof(FileSystemChannelResource).FullName, new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 
@@ -173,7 +198,7 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, RouteMiddleware>(typeof (RouteMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, RouterMiddleware>(typeof (RouterMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, InitialConsumerMiddleware>(typeof (InitialConsumerMiddleware).FullName,new PerContainerLifetime());
 
@@ -181,13 +206,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IMiddlewareAsync<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.SenderMiddleware>(typeof (Impl.SenderMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IMiddlewareAsync<MessageContext>, Impl.ProducerMiddleware>(typeof (Impl.ProducerMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
-
-            container.Register<IValueFinder, AppSettingValueFinder>(typeof (AppSettingValueFinder).FullName, new PerContainerLifetime());
-
-            container.Register<IValueFinder, ConnectionStringValueFinder>(typeof (ConnectionStringValueFinder).FullName, new PerContainerLifetime());
 
             container.Register<IValueFinder, ConfigurationValueFinder>(typeof (ConfigurationValueFinder).FullName, new PerContainerLifetime());
 

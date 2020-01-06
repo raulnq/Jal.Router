@@ -36,7 +36,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
 
             await Send(message);
 
@@ -62,13 +62,13 @@ namespace Jal.Router.Impl
 
         private async Task Update(MessageContext context)
         {
-            if(context.SagaContext.SagaData!=null && context.SagaContext.SagaData.Data != null && !string.IsNullOrWhiteSpace(context.SagaContext.SagaData.Id))
+            if(context.SagaContext.Data!=null && context.SagaContext.Data.Data != null && !string.IsNullOrWhiteSpace(context.SagaContext.Data.Id))
             {
-                context.SagaContext.SagaData.UpdateUpdatedDateTime(context.DateTimeUtc);
+                context.SagaContext.Data.Update(context.DateTimeUtc);
 
                 var storage = _factory.CreateEntityStorage();
 
-                await storage.UpdateSagaData(context, context.SagaContext.SagaData).ConfigureAwait(false);
+                await storage.Update(context.SagaContext.Data).ConfigureAwait(false);
             }
         }
 
@@ -76,7 +76,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
 
             return Send(message);
         }
@@ -137,7 +137,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
 
             return Send(message);
         }
@@ -166,7 +166,7 @@ namespace Jal.Router.Impl
                         chain.UseAsync(type);
                     }
 
-                    await chain.UseAsync<SenderMiddleware>().RunAsync(message).ConfigureAwait(false);
+                    await chain.UseAsync<ProducerMiddleware>().RunAsync(message).ConfigureAwait(false);
                 }
                 else
                 {
@@ -192,7 +192,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, new ContentContext(content.GetType(), serializer.Serialize(content)));
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
 
             message.Origin.Key = string.Empty;
 

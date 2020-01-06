@@ -217,7 +217,7 @@ namespace Jal.Router.Extensions
 
             if (!string.IsNullOrEmpty(sagaid))
             {
-                options.SagaContext.UpdateId(sagaid);
+                options.SagaContext.SetId(sagaid);
             }
 
             return options;
@@ -229,7 +229,7 @@ namespace Jal.Router.Extensions
 
             if(!string.IsNullOrEmpty(sagaid))
             {
-                options.SagaContext.UpdateId(sagaid);
+                options.SagaContext.SetId(sagaid);
             }
 
             if (!string.IsNullOrEmpty(id))
