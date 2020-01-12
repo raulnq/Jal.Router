@@ -13,17 +13,18 @@ namespace Jal.Router.Impl
     {
         private readonly FileSystemParameter _parameter;
 
-        private readonly IFileSystem _filesystem;
+        private readonly IFileSystemTransport _transport;
 
         private FileSystemWatcher _watcher;
 
         private string _path;
 
-        public FileSystemPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystem filesystem)
+        public FileSystemPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
         : base(factory, logger)
         {
             _parameter = provider.Get<FileSystemParameter>();
-            _filesystem = filesystem;
+
+            _transport = transport;
         }
 
         public Task Close(ListenerContext listenercontext)
@@ -60,7 +61,7 @@ namespace Jal.Router.Impl
                 {
                     Thread.Sleep(500);
 
-                    var message = _filesystem.ReadFile(e.FullPath);
+                    var message = _transport.ReadFile(e.FullPath);
 
                     var context = adapter.ReadMetadataFromPhysicalMessage(message);
 
@@ -77,7 +78,7 @@ namespace Jal.Router.Impl
 
                         await Task.WhenAll(handlers.ToArray());
 
-                        _filesystem.DeleteFile(e.FullPath);
+                        _transport.DeleteFile(e.FullPath);
                     }
                     catch (Exception ex)
                     {
@@ -95,17 +96,17 @@ namespace Jal.Router.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            var path = _filesystem.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath, listenercontext.Channel.ToSubscription);
+            var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath, listenercontext.Channel.ToSubscription);
 
             _watcher = new FileSystemWatcher(path);
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _path = _filesystem.CreatePublishSubscribeChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _transport.CreatePublishSubscribeChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
         }
 
-        public Task<string> Send(SenderContext sendercontext, object message)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
             var m = message as Message;
 
@@ -117,11 +118,11 @@ namespace Jal.Router.Impl
 
                 foreach (var endpoint in sendercontext.Endpoints)
                 {
-                    if (_parameter.Mocks.ContainsKey(endpoint.Name))
+                    if (_parameter.Handlers.ContainsKey(endpoint.Name))
                     {
                         var serializer = Factory.CreateMessageSerializer();
 
-                        _parameter.Mocks[endpoint.Name](_filesystem, serializer, m, filename);
+                        await _parameter.Handlers[endpoint.Name](serializer, m);
 
                         handledbymock = true;
                     }
@@ -129,20 +130,20 @@ namespace Jal.Router.Impl
 
                 if (!handledbymock)
                 {
-                    var folders = _filesystem.GetDirectories(_path);
+                    var folders = _transport.GetDirectories(_path);
 
                     foreach (var folder in folders)
                     {
                         var fullpath = Path.Combine(_path, folder);
 
-                        _filesystem.CreateFile(fullpath, filename, m);
+                        _transport.CreateFile(fullpath, filename, m);
                     }
                 }
 
-                return Task.FromResult(m.Id);
+                return m.Id;
             }
 
-            return Task.FromResult(string.Empty);
+            return string.Empty;
         }
     }
 }

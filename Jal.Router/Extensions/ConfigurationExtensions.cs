@@ -11,7 +11,7 @@ namespace Jal.Router.Extensions
             return configuration.AddShutdownWatcher<FileShutdownWatcher, ShutdownFileWatcherParameter>(new ShutdownFileWatcherParameter() { File = filepath });
         }
 
-        public static IConfiguration UseFileSystem(this IConfiguration configuration, FileSystemParameter parameter = null)
+        public static IConfiguration UseFileSystemAsTransport(this IConfiguration configuration, FileSystemParameter parameter = null)
         {
             var p = new FileSystemParameter();
 
@@ -31,16 +31,24 @@ namespace Jal.Router.Extensions
                 .AddParameter(p);
         }
 
-        public static IConfiguration UseInMemory(this IConfiguration configuration)
+        public static IConfiguration UseInMemoryAsTransport(this IConfiguration configuration, InMemoryParameter parameter = null)
         {
+            var p = new InMemoryParameter();
+
+            if (parameter != null)
+            {
+                p = parameter;
+            }
+
             return configuration
-                .SetChannelProviderName("In-Memory")
+                .SetChannelProviderName("Memory")
                 .UsePointToPointChannel<InMemoryPointToPointChannel>()
-                .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
-                //.UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
-                //.UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
+                .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
+                .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()
+                .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>()
                 .UseChannelResource<InMemoryChannelResource>()
-                .UseMessageAdapter<MessageAdapter>();
+                .UseMessageAdapter<MessageAdapter>()
+                .AddParameter(p);
         }
     }
 }

@@ -9,24 +9,24 @@ namespace Jal.Router.Impl
     {
         protected readonly FileSystemParameter _parameter;
 
-        protected readonly IFileSystem _filesystem;
+        protected readonly IFileSystemTransport _transport;
 
         private string _path;
 
-        protected AbstractFileSystemRequestReply(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystem filesystem)
+        protected AbstractFileSystemRequestReply(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
             : base(factory, logger)
         {
             _parameter = provider.Get<FileSystemParameter>();
 
-            _filesystem = filesystem;
+            _transport = transport;
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _path = _filesystem.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
         }
 
-        public Task<string> Send(SenderContext sendercontext, object message)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
             var m = message as Message;
 
@@ -38,11 +38,11 @@ namespace Jal.Router.Impl
 
                 foreach (var endpoint in sendercontext.Endpoints)
                 {
-                    if (_parameter.Mocks.ContainsKey(endpoint.Name))
+                    if (_parameter.Handlers.ContainsKey(endpoint.Name))
                     {
                         var serializer = Factory.CreateMessageSerializer();
 
-                        _parameter.Mocks[endpoint.Name](_filesystem, serializer, m, filename);
+                        await _parameter.Handlers[endpoint.Name](serializer, m);
 
                         handledbymock = true;
                     }
@@ -50,13 +50,13 @@ namespace Jal.Router.Impl
 
                 if (!handledbymock)
                 {
-                    _filesystem.CreateFile(_path, filename, m);
+                    _transport.CreateFile(_path, filename, m);
                 }
 
-                return Task.FromResult(m.Id);
+                return m.Id;
             }
 
-            return Task.FromResult(string.Empty);
+            return string.Empty;
         }
 
         public bool IsActive(SenderContext sendercontext)

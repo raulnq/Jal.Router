@@ -2,7 +2,7 @@
 
 namespace Jal.Router.Interface
 {
-    public interface IFileSystem
+    public interface IFileSystemTransport
     {
         string CreatePointToPointChannelPath(FileSystemParameter parameter, string connectionstring, string path);
 

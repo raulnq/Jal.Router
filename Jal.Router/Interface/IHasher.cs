@@ -2,7 +2,7 @@
 {
     public interface IHasher
     {
-        string Hash(string inputString);
+        string Hash(string input);
     }
 
 }

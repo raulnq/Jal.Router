@@ -24,24 +24,24 @@ namespace Jal.Router.Impl
 
                 var policy = metadata.Parameters["policy"] as IRetryPolicy;
 
-                var countname = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
+                var countername = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
 
                 var count = 0;
 
-                if (context.Headers.ContainsKey(countname))
+                if (context.Headers.ContainsKey(countername))
                 {
-                    count = Convert.ToInt32(context.Headers[countname]);
+                    count = Convert.ToInt32(context.Headers[countername]);
                 }
                 else
                 {
-                    context.Headers.Add(countname, count.ToString());
+                    context.Headers.Add(countername, count.ToString());
                 }
 
                 count++;
 
                 if (policy.CanRetry(count))
                 {
-                    context.Headers[countname] = count.ToString();
+                    context.Headers[countername] = count.ToString();
 
                     var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version, DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
 

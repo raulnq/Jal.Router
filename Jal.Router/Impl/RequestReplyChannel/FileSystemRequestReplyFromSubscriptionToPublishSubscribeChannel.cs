@@ -7,8 +7,8 @@ namespace Jal.Router.Impl
 {
     public class FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel : AbstractFileSystemRequestReply, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
     {
-        public FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystem filesystem)
-            : base(factory, logger, provider, filesystem)
+        public FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
+            : base(factory, logger, provider, transport)
         {
         }
 
@@ -16,9 +16,9 @@ namespace Jal.Router.Impl
         {
             Thread.Sleep(500);
 
-            var path = _filesystem.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, sendercontext.Channel.ToReplyConnectionString, sendercontext.Channel.ToReplyPath, sendercontext.Channel.ToSubscription);
+            var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, sendercontext.Channel.ToReplyConnectionString, sendercontext.Channel.ToReplyPath, sendercontext.Channel.ToSubscription);
 
-            var message = _filesystem.ReadFile(path);
+            var message = _transport.ReadFile(path);
 
             var outputcontext = adapter.ReadMetadataFromPhysicalMessage(message);
 

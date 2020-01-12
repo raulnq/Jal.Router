@@ -21,17 +21,17 @@ namespace Jal.Router.Impl
             return Task.FromResult(false);
         }
 
-        public Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannelResource channel)
+        public virtual Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannelResource channel)
         {
             return Task.FromResult(false);
         }
 
-        public Task<bool> DeleteIfExist(PublishSubscribeChannelResource channel)
+        public virtual Task<bool> DeleteIfExist(PublishSubscribeChannelResource channel)
         {
             return Task.FromResult(false);
         }
 
-        public Task<bool> DeleteIfExist(PointToPointChannelResource channel)
+        public virtual Task<bool> DeleteIfExist(PointToPointChannelResource channel)
         {
             return Task.FromResult(false);
         }

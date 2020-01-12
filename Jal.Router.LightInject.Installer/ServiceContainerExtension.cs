@@ -64,7 +64,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IHasher, Hasher>(new PerContainerLifetime());
 
-            container.Register<IFileSystem, FileSystem>(new PerContainerLifetime());
+            container.Register<IInMemoryTransport, InMemoryTransport>(new PerContainerLifetime());
+
+            container.Register<IFileSystemTransport, FileSystemTransport>(new PerContainerLifetime());
 
             container.Register<IListenerContextLoader, ListenerContextLoader>(new PerContainerLifetime());
 
@@ -169,7 +171,11 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IPointToPointChannel, FileSystemPointToPointChannel>(typeof(FileSystemPointToPointChannel).FullName);
 
             container.Register<IPublishSubscribeChannel, FileSystemPublishSubscribeChannel>(typeof(FileSystemPublishSubscribeChannel).FullName);
-            
+
+            container.Register<IPointToPointChannel, InMemoryPointToPointChannel>(typeof(InMemoryPointToPointChannel).FullName);
+
+            container.Register<IPublishSubscribeChannel, InMemoryPublishSubscribeChannel>(typeof(InMemoryPublishSubscribeChannel).FullName);
+
             container.Register<IPublishSubscribeChannel, NullPublishSubscribeChannel>(typeof (NullPublishSubscribeChannel).FullName);
 
             container.Register<IRequestReplyChannelFromPointToPointChannel, NullRequestReplyChannelFromPointToPointChannel>(typeof (NullRequestReplyChannelFromPointToPointChannel).FullName);
@@ -180,9 +186,15 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>(typeof(FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName);
 
+            container.Register<IRequestReplyChannelFromPointToPointChannel, InMemoryRequestReplyFromPointToPointChannel>(typeof(InMemoryRequestReplyFromPointToPointChannel).FullName);
+
+            container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>(typeof(InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName);
+
             container.Register<IChannelResource, NullChannelResource>(typeof (NullChannelResource).FullName,new PerContainerLifetime());
 
             container.Register<IChannelResource, FileSystemChannelResource>(typeof(FileSystemChannelResource).FullName, new PerContainerLifetime());
+
+            container.Register<IChannelResource, InMemoryChannelResource>(typeof(InMemoryChannelResource).FullName, new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 

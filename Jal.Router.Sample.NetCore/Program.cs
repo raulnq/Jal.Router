@@ -67,22 +67,28 @@ namespace Jal.Router.Sample.NetCore
             var host = container.GetInstance<IHost>();
             var bus = container.GetInstance<IBus>();
             var parameter = new FileSystemParameter() { Path = appRoot };
-            parameter.AddEndpointHandler("sendtoqueue1", (fs, ms, me, fn) =>
+            var messagecontext = new MessageContext(bus);
+            parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
              {
-                 var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
+                 //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
 
-                 fs.CreateFile(path, fn, me);
+                 //fs.CreateFile(path, fn, me);
+
+                 var m = ms.Deserialize<Message>(me.Content);
+
+                 return messagecontext.Send(m, "sendtotopic1");
+                 
              });
-            parameter.AddEndpointHandler("sendtoqueue2", (fs, ms, me, fn) =>
+            parameter.AddEndpointHandler("sendtoqueue2", (ms, me) =>
             {
-                var path = fs.CreatePointToPointChannelPath(parameter, "connectionstring", "queue3");
+                var m = ms.Deserialize<Message>(me.Content);
 
-                fs.CreateFile(path, fn, me);
+                return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
                 //.UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
-                .UseFileSystem(parameter)
-                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .UseInMemoryAsTransport(parameter)
+                //.UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 .UseNewtonsoft()
                 //.AddMonitoringTask<ListenerMonitor>(30)
@@ -95,7 +101,9 @@ namespace Jal.Router.Sample.NetCore
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            host.RunAndBlock();
+            
+
+            host.RunAndBlock(()=> messagecontext.Send(new Message(), "sendtoqueuea"));
 
             //var bus = container.GetInstance<IBus>();
 
@@ -143,6 +151,10 @@ namespace Jal.Router.Sample.NetCore
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
 
+            RegisterEndPoint("sendtoqueuea")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel("connectionstring", "queuea"));
+
             RegisterEndPoint("sendtoqueue1")
                 .ForMessage<Message>()
                 .To(x => x.AddPointToPointChannel("connectionstring", "queue1"));
@@ -156,6 +168,20 @@ namespace Jal.Router.Sample.NetCore
             RegisterPointToPointChannel("queue3", "connectionstring", new Dictionary<string, string>());
 
             RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topic1", "connectionstring", new Dictionary<string, string>());
+
+            ////////////////////////
+
+            RegisterEndPoint("sendtotopic1")
+                .ForMessage<Message>()
+                .To(x => x.AddPublishSubscribeChannel("connectionstring", "topic1"));
+
+            RegisterEndPoint("sendtoqueue3")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel("connectionstring", "queue3"));
+
+            RegisterPublishSubscribeChannel("topic1", "connectionstring", new Dictionary<string, string>());
+
+            RegisterPointToPointChannel("queue3", "connectionstring", new Dictionary<string, string>());
         }
     }
 

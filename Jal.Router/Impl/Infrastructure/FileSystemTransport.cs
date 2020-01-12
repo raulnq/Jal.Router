@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Jal.Router.Impl
 {
-    public class FileSystem : IFileSystem
+    public class FileSystemTransport : IFileSystemTransport
     {
         private IHasher _hasher;
 
         private IComponentFactoryGateway _factory;
 
-        public FileSystem(IHasher hasher, IComponentFactoryGateway factory)
+        public FileSystemTransport(IHasher hasher, IComponentFactoryGateway factory)
         {
             _hasher = hasher;
             _factory = factory;
