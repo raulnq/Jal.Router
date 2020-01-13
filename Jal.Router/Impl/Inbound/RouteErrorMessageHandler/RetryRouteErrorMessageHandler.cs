@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -43,15 +44,13 @@ namespace Jal.Router.Impl
                 {
                     context.Headers[countername] = count.ToString();
 
-                    var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version, DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
-
                     var serializer = _factory.CreateMessageSerializer();
 
                     var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
 
                     _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 
-                    await context.Send(content, context.Origin, options);
+                    await context.Send(content, endpointname, scheduledenqueuedatetimeutc: DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
 
                     return metadata.StopAfterHandle;
                 }

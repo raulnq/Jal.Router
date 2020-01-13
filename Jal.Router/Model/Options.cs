@@ -6,23 +6,16 @@ namespace Jal.Router.Model
     public class Options
     {
         public Options(string endpointname, Dictionary<string, string> headers, 
-            SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, Saga saga, string version)
+            SagaContext sagacontext, TrackingContext trackingcontext, IdentityContext identitycontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
         {
             EndPointName = endpointname;
             Headers= headers;
             SagaContext = sagacontext;
-            TrackingContext = tracks;
+            TrackingContext = trackingcontext;
             IdentityContext = identitycontext;
             Route = route;
             Saga = saga;
             Version = version;
-        }
-
-        public Options(string endpointname, Dictionary<string, string> headers,
-    SagaContext sagacontext, TrackingContext tracks, IdentityContext identitycontext, Route route, 
-    Saga saga, string version, DateTime scheduledenqueuedatetimeutc)
-            :this(endpointname, headers, sagacontext, tracks, identitycontext, route, saga, version)
-        {
             ScheduledEnqueueDateTimeUtc = scheduledenqueuedatetimeutc;
         }
 

@@ -666,7 +666,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_end", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_end", operationid: context.IdentityContext.OperationId);
 
             return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
         }
@@ -684,7 +684,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
 
             return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
         }
@@ -702,7 +702,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
 
             return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
         }
@@ -857,10 +857,10 @@ namespace Jal.Router.Sample.NetCore
         {
             for (int i = 0; i < 5; i++)
             {
-                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext($"1-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()),"X");
-                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext($"2-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext($"3-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext($"4-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"1-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"2-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"3-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"4-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
             }
         }
     }

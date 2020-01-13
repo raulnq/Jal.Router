@@ -10,11 +10,14 @@ namespace Jal.Router.Tests
 {
     public static class Builder
     {
-        public static MessageContext CreateMessageContext(Route route=null)
+        public static MessageContext CreateMessageContext(Route route=null, Mock<IBus> busmock = null)
         {
-            var mock = new Mock<IBus>();
+            if(busmock==null)
+            {
+                busmock = new Mock<IBus>();
+            }
 
-            var messagecontext = new MessageContext(mock.Object);
+            var messagecontext = new MessageContext(busmock.Object);
 
             if(route==null)
             {

@@ -7,21 +7,16 @@ namespace Jal.Router.Impl
 {
     public class RouteEntryMessageHandler : IRouteEntryMessageHandler
     {
-        private readonly IComponentFactoryGateway _factory;
-
         private readonly ILogger _logger;
 
-        public RouteEntryMessageHandler(IComponentFactoryGateway factory, ILogger logger)
+        public RouteEntryMessageHandler(ILogger logger)
         {
-            _factory = factory;
             _logger = logger;
         }
         public async Task Handle(MessageContext context, Handler metadata)
         {
-            if (metadata.Parameters.ContainsKey("init"))
+            if (metadata.Parameters.ContainsKey("init") && metadata.Parameters["init"] is Func<MessageContext, Handler, Task> fallback && fallback!=null)
             {
-                var fallback = metadata.Parameters["init"] as Func<MessageContext, Handler, Task>;
-
                 _logger.Log($"Message {context.Id}, initiator executed by route {context.Name}");
 
                 await fallback(context, metadata);

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -22,27 +24,19 @@ namespace Jal.Router.Impl
             {
                 var endpointname = metadata.Parameters["endpoint"] as string;
 
-                var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
+                var headers = new Dictionary<string, string>();
 
                 if (ex != null)
                 {
-                    options.Headers.Remove("exceptionmessage");
+                    headers.Add("exceptionmessage", ex.Message);
 
-                    options.Headers.Remove("exceptionstacktrace");
-
-                    options.Headers.Remove("innerexceptionmessage");
-
-                    options.Headers.Remove("innerexceptionstacktrace");
-
-                    options.Headers["exceptionmessage"] = ex.Message;
-
-                    options.Headers["exceptionstacktrace"] = ex.StackTrace;
+                    headers.Add("exceptionstacktrace", ex.StackTrace);
 
                     if (ex.InnerException != null)
                     {
-                        options.Headers["innerexceptionmessage"] = ex.InnerException.Message;
+                        headers.Add("innerexceptionmessage", ex.InnerException.Message);
 
-                        options.Headers["innerexceptionstacktrace"] = ex.InnerException.StackTrace;
+                        headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
                     }
                 }
 
@@ -52,7 +46,7 @@ namespace Jal.Router.Impl
 
                 _logger.Log($"Message {context.Id}, sending the message to the error endpoint {endpointname} by route {context.Name}");
 
-                await context.Send(content, context.Origin, options);
+                await context.Send(content, endpointname, headers: headers);
 
                 return metadata.StopAfterHandle;
             }

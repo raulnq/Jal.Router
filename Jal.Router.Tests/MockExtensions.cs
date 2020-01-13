@@ -26,6 +26,25 @@ namespace Jal.Router.Tests
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Once());
         }
 
+        public static void CreateMessageSerializerWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        {
+            factorymock.Verify(x => x.CreateMessageSerializer(), Times.Once());
+        }
+
+        public static void SendWasExecuted<T>(this Mock<IBus> busmock)
+        {
+            busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<Options>()), Times.Once());
+
+            //busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<Origin>(), It.IsAny<Options>()), Times.AtMostOnce());
+
+            //busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<EndPoint>(), It.IsAny<Origin>(), It.IsAny<Options>()), Times.AtMostOnce());
+        }
+
+        public static void CreateMessageSerializerWasNotExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        {
+            factorymock.Verify(x => x.CreateMessageSerializer(), Times.Never());
+        }
+
         public static void CreateMessageEntityWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
             entitystoragemock.Verify(x => x.Create(It.IsAny<MessageEntity>()), Times.Once());
