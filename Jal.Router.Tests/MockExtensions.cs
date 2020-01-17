@@ -1,6 +1,8 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
+using System;
+using System.Linq.Expressions;
 
 namespace Jal.Router.Tests
 {
@@ -38,6 +40,16 @@ namespace Jal.Router.Tests
             //busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<Origin>(), It.IsAny<Options>()), Times.AtMostOnce());
 
             //busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<EndPoint>(), It.IsAny<Origin>(), It.IsAny<Options>()), Times.AtMostOnce());
+        }
+
+        public static void SendWasNotExecuted<T>(this Mock<IBus> busmock)
+        {
+            busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.IsAny<Options>()), Times.Never());
+        }
+
+        public static void SendWasExecuted<T>(this Mock<IBus> busmock, Expression<Func<Options, bool>> match)
+        {
+            busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.Is<Options>(match)), Times.Once());
         }
 
         public static void CreateMessageSerializerWasNotExecuted(this Mock<IComponentFactoryGateway> factorymock)

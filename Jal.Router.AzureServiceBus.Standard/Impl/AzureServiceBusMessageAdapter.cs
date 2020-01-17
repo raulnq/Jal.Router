@@ -178,9 +178,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(SagaId, context.SagaContext.Id);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ContentContext.Id))
+            if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                brokeredmessage.UserProperties.Add(ContentId, context.ContentContext.Id);
+                brokeredmessage.UserProperties.Add(ContentId, context.ContentContext.ClaimCheckId);
             }
 
             if (context.TrackingContext != null)

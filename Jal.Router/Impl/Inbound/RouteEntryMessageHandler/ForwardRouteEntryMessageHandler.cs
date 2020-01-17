@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
             _factory = factory;
             _logger = logger;
         }
-        public async Task Handle(MessageContext context, Handler metadata)
+        public Task Handle(MessageContext context, Handler metadata)
         {
             if (metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname))
             {
@@ -27,8 +27,10 @@ namespace Jal.Router.Impl
 
                 _logger.Log($"Message {context.Id}, forwarding the message to the endpoint {endpointname} by route {context.Name}");
 
-                await context.Send(content, endpointname);
+                return context.Send(content, endpointname);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

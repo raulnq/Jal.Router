@@ -120,7 +120,9 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
             {
+#pragma warning disable CS0618 // 'TelemetryConfiguration.Active' is obsolete: 'We do not recommend using TelemetryConfiguration.Active on .NET Core. See https://github.com/microsoft/ApplicationInsights-dotnet/issues/1152 for more details'
                 TelemetryConfiguration.Active.InstrumentationKey = _parameter.ApplicationInsightsKey;
+#pragma warning restore CS0618 // 'TelemetryConfiguration.Active' is obsolete: 'We do not recommend using TelemetryConfiguration.Active on .NET Core. See https://github.com/microsoft/ApplicationInsights-dotnet/issues/1152 for more details'
             }
 
             if (_parameter.UseAzureStorage)

@@ -19,12 +19,9 @@ namespace Jal.Router.Impl
         }
         public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
-            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters.ContainsKey("policy"))
+            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname)
+                && metadata.Parameters.ContainsKey("policy") && metadata.Parameters["policy"] is IRetryPolicy policy)
             {
-                var endpointname = metadata.Parameters["endpoint"] as string;
-
-                var policy = metadata.Parameters["policy"] as IRetryPolicy;
-
                 var countername = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
 
                 var count = 0;
@@ -58,10 +55,8 @@ namespace Jal.Router.Impl
                 {
                     _logger.Log($"Message {context.Id}, no more retries by route {context.Name}");
 
-                    if (metadata.Parameters.ContainsKey("fallback"))
+                    if (metadata.Parameters.ContainsKey("fallback") && metadata.Parameters["fallback"] is Func<MessageContext, Exception, ErrorHandler, Task> fallback)
                     {
-                        var fallback = metadata.Parameters["fallback"] as Func<MessageContext, Exception, ErrorHandler, Task>;
-
                         _logger.Log($"Message {context.Id}, fallback executed by route {context.Name}");
 
                         await fallback(context, ex, metadata);

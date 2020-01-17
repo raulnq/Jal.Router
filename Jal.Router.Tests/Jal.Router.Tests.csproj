@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Outbound\" />
+  </ItemGroup>
+
 </Project>

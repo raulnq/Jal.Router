@@ -8,7 +8,7 @@ namespace Jal.Router.Model
 
         public string Data { get; private set; }
 
-        public string Id { get; private set; }
+        public string ClaimCheckId { get; private set; }
 
         public MessageContext Context { get; private set; }
 
@@ -16,14 +16,14 @@ namespace Jal.Router.Model
 
         public object Response { get; private set; }
 
-        public ContentContext(MessageContext context, string id, bool isClaimCheck)
+        public ContentContext(MessageContext context, string claimcheckid, bool isclaimcheck)
         {
-            Id = id;
+            ClaimCheckId = claimcheckid;
             Context = context;
-            IsClaimCheck = isClaimCheck;
+            IsClaimCheck = isclaimcheck;
         }
 
-        public ContentContext(MessageContext context, string id, bool isClaimCheck, Type type, string data):this(context, id, isClaimCheck)
+        public ContentContext(MessageContext context, string claimcheckid, bool isclaimcheck, Type type, string data):this(context, claimcheckid, isclaimcheck)
         {
             Data = data;
             Type = type;
@@ -34,14 +34,14 @@ namespace Jal.Router.Model
             Response = response;
         }
 
-        public void GenerateId()
+        public void GenerateClaimCheckId()
         {
-            Id = Guid.NewGuid().ToString();
+            ClaimCheckId = Guid.NewGuid().ToString();
         }
 
         public ContentContextEntity ToEntity()
         {
-            return new ContentContextEntity(Type, Data, Id);
+            return new ContentContextEntity(Type, Data, ClaimCheckId);
         }
     }
 }

@@ -91,9 +91,9 @@ namespace Jal.Router.Impl
                 filemessage.SagaId = context.SagaContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ContentContext.Id))
+            if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                filemessage.ContentId = context.ContentContext.Id;
+                filemessage.ContentId = context.ContentContext.ClaimCheckId;
             }
 
             if (context.TrackingContext != null)

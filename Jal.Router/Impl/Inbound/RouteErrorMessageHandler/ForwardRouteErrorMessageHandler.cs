@@ -20,24 +20,20 @@ namespace Jal.Router.Impl
         }
         public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
-            if(metadata.Parameters.ContainsKey("endpoint"))
+            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname) && ex!=null)
             {
-                var endpointname = metadata.Parameters["endpoint"] as string;
-
-                var headers = new Dictionary<string, string>();
-
-                if (ex != null)
+                var headers = new Dictionary<string, string>
                 {
-                    headers.Add("exceptionmessage", ex.Message);
+                    { "exceptionmessage", ex.Message },
 
-                    headers.Add("exceptionstacktrace", ex.StackTrace);
+                    { "exceptionstacktrace", ex.StackTrace }
+                };
 
-                    if (ex.InnerException != null)
-                    {
-                        headers.Add("innerexceptionmessage", ex.InnerException.Message);
+                if (ex.InnerException != null)
+                {
+                    headers.Add("innerexceptionmessage", ex.InnerException.Message);
 
-                        headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
-                    }
+                    headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
                 }
 
                 var serializer = _factory.CreateMessageSerializer();

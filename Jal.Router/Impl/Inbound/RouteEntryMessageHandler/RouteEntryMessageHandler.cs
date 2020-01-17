@@ -13,14 +13,16 @@ namespace Jal.Router.Impl
         {
             _logger = logger;
         }
-        public async Task Handle(MessageContext context, Handler metadata)
+        public Task Handle(MessageContext context, Handler metadata)
         {
             if (metadata.Parameters.ContainsKey("init") && metadata.Parameters["init"] is Func<MessageContext, Handler, Task> fallback && fallback!=null)
             {
                 _logger.Log($"Message {context.Id}, initiator executed by route {context.Name}");
 
-                await fallback(context, metadata);
+                return fallback(context, metadata);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

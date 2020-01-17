@@ -39,18 +39,18 @@ namespace Jal.Router.Impl
         {
             string data;
 
-            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentContext.Id))
+            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
                 var storage = Factory.CreateMessageStorage();
 
-                data = await storage.Read(context.ContentContext.Id).ConfigureAwait(false);
+                data = await storage.Read(context.ContentContext.ClaimCheckId).ConfigureAwait(false);
             }
             else
             {
                 data = ReadContent(message);
             }
 
-            var contentcontext = new ContentContext(context,  context.ContentContext.Id, useclaimcheck, contenttype, data);
+            var contentcontext = new ContentContext(context,  context.ContentContext.ClaimCheckId, useclaimcheck, contenttype, data);
 
             context.SetContent(contentcontext);
 
@@ -70,9 +70,9 @@ namespace Jal.Router.Impl
             {
                 var storage = Factory.CreateMessageStorage();
 
-                context.ContentContext.GenerateId();
+                context.ContentContext.GenerateClaimCheckId();
 
-                await storage.Write(context.ContentContext.Id, context.ContentContext.Data).ConfigureAwait(false);
+                await storage.Write(context.ContentContext.ClaimCheckId, context.ContentContext.Data).ConfigureAwait(false);
             }
 
             var serializer = Factory.CreateMessageSerializer();

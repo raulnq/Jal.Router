@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
 {
+
     [TestClass]
     public class ForwardRouteEntryMessageHandlerTests
     {
@@ -26,7 +27,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() {  } ));
+            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { }));
 
             factorymock.CreateMessageSerializerWasNotExecuted();
         }
@@ -64,7 +65,7 @@ namespace Jal.Router.Tests
 
             factorymock.CreateMessageSerializerWasExecuted();
 
-            busmock.SendWasExecuted<object>();
+            busmock.SendWasExecuted<object>(op => op.EndPointName == "queue");
         }
     }
 }

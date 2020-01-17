@@ -46,7 +46,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             properties.Add("saga_name", context.Saga?.Name);
 
             properties.Add("version", context.Version);
-            properties.Add("contentid", context.ContentContext.Id);
+            properties.Add("contentid", context.ContentContext.ClaimCheckId);
 
             properties.Add("route_name", context.Route?.Name);
             properties.Add("endpoint_name", context.EndPoint?.Name);

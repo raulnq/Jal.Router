@@ -48,7 +48,7 @@ namespace Jal.Router.Model
             Evaluator = evaluator;
         }
 
-        public void UpdateEvaluatorWithContext(Func<TContent, TConsumer, MessageContext, bool> evaluatorwithcontext)
+        public void UpdateEvaluator(Func<TContent, TConsumer, MessageContext, bool> evaluatorwithcontext)
         {
             EvaluatorWithContext = evaluatorwithcontext;
         }
