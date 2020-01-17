@@ -16,7 +16,9 @@ namespace Jal.Router.Impl
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
         public IList<TaskMetadata> MonitoringTaskTypes { get; }
-        public Type ChannelResourceType { get; private set; }
+        public Type PointToPointChannelResourceType { get; private set; }
+        public Type PublishSubscribeChannelResourceType { get; private set; }
+        public Type SubscriptionToPublishSubscribeChannelResourceType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
         public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
@@ -86,9 +88,21 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UseChannelResource<TChannelResource>() where TChannelResource : IChannelResource
+        public IConfiguration UsePublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
         {
-            ChannelResourceType = typeof(TChannelResource);
+            PublishSubscribeChannelResourceType = typeof(TChannel);
+            return this;
+        }
+
+        public IConfiguration UsePointToPointChannelResource<TChannel>() where TChannel : IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>
+        {
+            PointToPointChannelResourceType = typeof(TChannel);
+            return this;
+        }
+
+        public IConfiguration UseSubscriptionToPublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+        {
+            SubscriptionToPublishSubscribeChannelResourceType = typeof(TChannel);
             return this;
         }
 
@@ -208,7 +222,9 @@ namespace Jal.Router.Impl
             UseBusInterceptor<NullBusInterceptor>();
             UseStorage<NullStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UseChannelResource<NullChannelResource>();
+            UsePointToPointChannelResource<NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>();
+            UsePublishSubscribeChannelResource<NullChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>();
+            UseSubscriptionToPublishSubscribeChannelResource<NullChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();

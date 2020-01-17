@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
 
         public void Open(SenderContext sendercontext)
         {
-            _name = _transport.CreateName(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _name = _transport.CreateName(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

@@ -6,7 +6,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static IConfiguration UseAzureServiceBus(this IConfiguration configuration, AzureServiceBusParameter parameter=null)
+        public static IConfiguration UseAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusParameter parameter=null, bool useazureservicemanagemet = true)
         {
             var p = new AzureServiceBusParameter();
 
@@ -15,15 +15,37 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 p = parameter;
             }
 
-            return configuration
-                .SetChannelProviderName("Azure Service Bus")
-                .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
-                .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
-                .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
-                .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UseChannelResource<AzureServiceBusChannelResource>()
-                .UseMessageAdapter<AzureServiceBusMessageAdapter>()
-                .AddParameter(p);
+            if (useazureservicemanagemet)
+            {
+                return configuration
+                    .SetChannelProviderName("Azure Service Bus")
+                    .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
+                    .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
+                    .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
+                    .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
+                    .UsePointToPointChannelResource<AzureManagementPointToPointChannelResource>()
+                    .UsePublishSubscribeChannelResource<AzureManagementPublishSubscribeChannelResource>()
+                    .UseSubscriptionToPublishSubscribeChannelResource<AzureManagementSubscriptionToPublishSubscribeChannelResource>()
+                    .UseMessageAdapter<AzureServiceBusMessageAdapter>()
+                    .AddParameter(p);
+            }
+            else
+            {
+                return configuration
+                    .SetChannelProviderName("Azure Service Bus")
+                    .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
+                    .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
+                    .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
+                    .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
+                    .UsePointToPointChannelResource<AzureServiceBusPointToPointChannelResource>()
+                    .UsePublishSubscribeChannelResource<AzureServiceBusPublishSubscribeChannelResource>()
+                    .UseSubscriptionToPublishSubscribeChannelResource<AzureServiceBusSubscriptionToPublishSubscribeChannelResource>()
+                    .UseMessageAdapter<AzureServiceBusMessageAdapter>()
+                    .AddParameter(p);
+            }
+
+
+
         }
 
 

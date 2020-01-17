@@ -16,7 +16,7 @@ namespace Jal.Router.Impl
         {
             Thread.Sleep(500);
 
-            var path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToReplyConnectionString, sendercontext.Channel.ToReplyPath);
+            var path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
 
             var message = _transport.ReadFile(path);
 

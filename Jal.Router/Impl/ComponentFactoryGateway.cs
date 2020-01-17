@@ -24,9 +24,19 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public IChannelResource CreateChannelResource()
+        public IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResource()
         {
-            return _factory.Create<IChannelResource>(_configuration.ChannelResourceType);
+            return _factory.Create<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>(_configuration.PointToPointChannelResourceType);
+        }
+
+        public IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResource()
+        {
+            return _factory.Create<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(_configuration.PublishSubscribeChannelResourceType);
+        }
+
+        public IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResource()
+        {
+            return _factory.Create<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(_configuration.SubscriptionToPublishSubscribeChannelResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()

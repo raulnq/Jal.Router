@@ -1,4 +1,6 @@
-﻿using Jal.Router.Impl;
+﻿using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
@@ -108,12 +110,44 @@ namespace Jal.Router.Tests
             return route;
         }
 
+        public static Mock<IPipeline> CreatePipelineMock(bool throwexception = false)
+        {
+            var pipelinemock = new Mock<IPipeline>();
+
+            if (throwexception)
+            {
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Throws(new System.Exception());
+            }
+            else
+            {
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Returns(Task.CompletedTask);
+            }
+
+            return pipelinemock;
+        }
+
+        public static Mock<IEndPointProvider> CreateEnpointProvider(string endpointname = "endpointname", ChannelType channel= ChannelType.PointToPoint)
+        {
+            var endpointprovidermock = new Mock<IEndPointProvider>();
+
+            var endpoint = new EndPoint(endpointname);
+
+            endpoint.SetOrigin(new Origin());
+
+            endpoint.Channels.Add(new Channel(channel, null, null, null));
+
+            endpointprovidermock.Setup(x => x.Provide(It.IsAny<string>(), It.IsAny<Type>())).Returns(endpoint);
+
+            return endpointprovidermock;
+        }
 
         public static Mock<IComponentFactoryGateway> CreateFactoryMock()
         {
             var factorymock = new Mock<IComponentFactoryGateway>();
 
             factorymock.Setup(m => m.CreateRouterInterceptor()).Returns(new NullRouterInterceptor());
+
+            factorymock.Setup(m => m.CreateBusInterceptor()).Returns(new NullBusInterceptor());
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
 

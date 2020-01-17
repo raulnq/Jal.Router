@@ -1,67 +1,61 @@
-﻿using Jal.Router.Interface;
+﻿using System;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
     public class SenderContextLoader : ISenderContextLoader
     {
+        private readonly ISenderContextCreator _loader;
+
         private IComponentFactoryGateway _factory;
 
-        private ILogger _logger;
-
-        public SenderContextLoader(IComponentFactoryGateway factory, ILogger logger)
+        public SenderContextLoader(ISenderContextCreator loader, IComponentFactoryGateway factory)
         {
+            _loader = loader;
             _factory = factory;
-            _logger = logger;
         }
 
-        public SenderContext Create(Channel channel)
+        public void AddPointToPointChannel<TMessage>(string name, string connectionstring, string path)
         {
-            var senderchannel = default(ISenderChannel);
+            var newendpoint = new EndPoint(name);
 
-            var readerchannel = default(IReaderChannel);
+            newendpoint.SetContentType(typeof(TMessage));
 
-            if (channel.Type == ChannelType.PointToPoint)
-            {
-                senderchannel = _factory.CreatePointToPointChannel();
-            }
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            if (channel.Type == ChannelType.PublishSubscribe)
-            {
-                senderchannel = _factory.CreatePublishSubscribeChannel();
-            }
+            var newchannel = new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), provider, path);
 
-            if (channel.Type == ChannelType.RequestReplyToPointToPoint)
-            {
-                var requestresplychannel = _factory.CreateRequestReplyChannelFromPointToPointChannel();
+            newendpoint.Channels.Add(newchannel);
 
-                readerchannel = requestresplychannel;
+            var sendercontext = _loader.Create(newchannel);
 
-                senderchannel = requestresplychannel;
-            }
+            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 
-            if (channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
-            {
-                var requestresplychannel = _factory.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
+            sendercontext.Endpoints.Add(newendpoint);
 
-                readerchannel = requestresplychannel;
-
-                senderchannel = requestresplychannel;
-            }
-
-            var sendercontext = new SenderContext(channel, senderchannel, readerchannel);
-
-            return sendercontext;
+            _loader.Open(sendercontext);
         }
 
-        public void Open(SenderContext sendercontext)
+        public void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path)
         {
-            if (sendercontext.SenderChannel != null)
-            {
-                sendercontext.SenderChannel.Open(sendercontext);
+            var newendpoint = new EndPoint(name);
 
-                _logger.Log($"Opening {sendercontext.Id}");
-            }
+            newendpoint.SetContentType(typeof(TMessage));
+
+            Func<IValueFinder, string> provider = x => connectionstring;
+
+            var newchannel = new Channel(ChannelType.PublishSubscribe, typeof(NullValueFinder), provider, path);
+
+            newendpoint.Channels.Add(newchannel);
+
+            var sendercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
+
+            sendercontext.Endpoints.Add(newendpoint);
+
+            _loader.Open(sendercontext);
         }
     }
 }

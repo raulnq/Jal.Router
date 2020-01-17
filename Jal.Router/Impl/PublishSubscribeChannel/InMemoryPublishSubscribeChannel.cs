@@ -78,12 +78,12 @@ namespace Jal.Router.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            _listenername = _transport.CreateName(listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
+            _listenername = _transport.CreateName(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path);
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _sendername = _transport.CreateName(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _sendername = _transport.CreateName(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

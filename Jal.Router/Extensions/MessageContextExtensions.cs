@@ -35,36 +35,6 @@ namespace Jal.Router.Extensions
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            return context.FireAndForget(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
-        }
-
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id = null, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            return context.FireAndForget(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
-        }
-
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(endpointname);
-            }
-
-            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
-        }
-
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, string sagaid=null,  Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(endpointname);
-            }
-
-            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
-        }
-
         public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string,string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));

@@ -142,7 +142,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             var host = _parameter.Container.GetInstance<IHost>();
 
-            host.Configuration.UseAzureServiceBus(_parameter.AzureServiceBusParameter);
+            host.Configuration.UseAzureServiceBusAsTransport(_parameter.AzureServiceBusParameter);
 
             if (_parameter.Log != null)
             {
@@ -163,7 +163,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 host.Configuration.UseApplicationInsights();
             }
 
-            host.Configuration.UseNewtonsoft();
+            host.Configuration.UseNewtonsoftAsSerializer();
 
             if (_parameter.RouterInterceptorType != null)
             {

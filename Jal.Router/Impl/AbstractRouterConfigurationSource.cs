@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
         {
             foreach (var endPoint in _enpoints)
             {
-                endPoint.UpdateOrigin(_origin);
+                endPoint.SetOrigin(_origin);
             }
             return _enpoints.ToArray();
         }

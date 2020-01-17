@@ -62,7 +62,7 @@ namespace Jal.Router.Model
 
         }
 
-        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string contentid)
+        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid)
         {
             _bus = bus;
             Headers = new Dictionary<string, string>();
@@ -72,13 +72,12 @@ namespace Jal.Router.Model
             TrackingContext = new TrackingContext(this, tracks);
             IdentityContext = identitycontext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, contentid, !string.IsNullOrEmpty(contentid));
+            ContentContext = new ContentContext(this, claimcheckid, !string.IsNullOrEmpty(claimcheckid));
             Host = Environment.MachineName;
         }
 
-        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, Type contenttype, string data, bool isclaimcheck)
+        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, Type contenttype, string content)
         {
-            Headers = new Dictionary<string, string>();
             Origin = origin;
             EndPoint = endpoint;
             IdentityContext = options.IdentityContext;
@@ -90,7 +89,7 @@ namespace Jal.Router.Model
             Saga = options.Saga;
             TrackingContext = options.TrackingContext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, string.Empty, isclaimcheck, contenttype, data);
+            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, endpoint.UseClaimCheck, contenttype, content);
             Host = Environment.MachineName;
         }
 
@@ -134,21 +133,6 @@ namespace Jal.Router.Model
         public Dictionary<string, string> CreateCopyOfHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
-        }
-
-        public Task FireAndForget<TContent>(TContent content, Options options)
-        {
-            return _bus.FireAndForget(content, options);
-        }
-
-        public Task FireAndForget<TContent>(TContent content, Origin origin, Options options)
-        {
-            return _bus.FireAndForget(content, Origin, options);
-        }
-
-        public Task FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
-        {
-            return _bus.FireAndForget(content, endpoint, origin, options);
         }
 
         public Task Send<TContent>(TContent content, Options options)

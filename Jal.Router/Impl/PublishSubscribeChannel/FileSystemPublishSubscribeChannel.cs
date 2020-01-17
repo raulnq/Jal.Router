@@ -96,14 +96,14 @@ namespace Jal.Router.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath, listenercontext.Channel.ToSubscription);
+            var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, listenercontext.Channel.ConnectionString, listenercontext.Channel.Path, listenercontext.Channel.Subscription);
 
             _watcher = new FileSystemWatcher(path);
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _path = _transport.CreatePublishSubscribeChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _transport.CreatePublishSubscribeChannelPath(_parameter, sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

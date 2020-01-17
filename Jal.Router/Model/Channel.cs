@@ -5,22 +5,22 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
-        public Channel(ChannelType channeltype, Type connectionstringvaluefindertype, Func<IValueFinder, string> toconnectionstringprovider, string topath)
+        public Channel(ChannelType channeltype, Type connectionstringvaluefindertype, Func<IValueFinder, string> connectionstringprovider, string path)
         {
             Type = channeltype;
 
             ConnectionStringValueFinderType = connectionstringvaluefindertype;
 
-            ToConnectionStringProvider = toconnectionstringprovider;
+            ConnectionStringProvider = connectionstringprovider;
 
-            ToPath = topath;
+            Path = path;
         }
 
         public Channel(ChannelType channeltype, Type connectionstringvaluefindertype,
-            Func<IValueFinder, string> toconnectionstringprovider, string topath, string tosubscription)
-            :this(channeltype, connectionstringvaluefindertype, toconnectionstringprovider, topath)
+            Func<IValueFinder, string> connectionstringprovider, string path, string subscription)
+            :this(channeltype, connectionstringvaluefindertype, connectionstringprovider, path)
         {
-            ToSubscription = tosubscription;
+            Subscription = subscription;
         }
 
         public ChannelType Type { get; private set; }
@@ -29,7 +29,7 @@ namespace Jal.Router.Model
         {
             get
             {
-                return ToPath + ToSubscription + ToConnectionString;
+                return Path + Subscription + ConnectionString;
             }
         }
 
@@ -65,24 +65,24 @@ namespace Jal.Router.Model
                 {
                 var description = string.Empty;
 
-                if (!string.IsNullOrWhiteSpace(ToPath))
+                if (!string.IsNullOrWhiteSpace(Path))
                 {
-                    description = $"{description}/{ToPath}";
+                    description = $"{description}/{Path}";
                 }
 
-                if (!string.IsNullOrWhiteSpace(ToSubscription))
+                if (!string.IsNullOrWhiteSpace(Subscription))
                 {
-                    description = $"{description}/{ToSubscription}";
+                    description = $"{description}/{Subscription}";
                 }
 
-                if (!string.IsNullOrWhiteSpace(ToReplyPath))
+                if (!string.IsNullOrWhiteSpace(ReplyPath))
                 {
-                    description = $"{description}/{ToReplyPath}";
+                    description = $"{description}/{ReplyPath}";
                 }
 
-                if (!string.IsNullOrWhiteSpace(ToReplySubscription))
+                if (!string.IsNullOrWhiteSpace(ReplySubscription))
                 {
-                    description = $"{description}/{ToReplySubscription}";
+                    description = $"{description}/{ReplySubscription}";
                 }
 
                 return description;
@@ -92,60 +92,60 @@ namespace Jal.Router.Model
 
         public Type ConnectionStringValueFinderType { get; private set; }
 
-        public Func<IValueFinder, string> ToConnectionStringProvider { get; private set; }
+        public Func<IValueFinder, string> ConnectionStringProvider { get; private set; }
 
-        public string ToConnectionString { get; private set; }
+        public string ConnectionString { get; private set; }
 
-        public string ToPath { get; private set; }
+        public string Path { get; private set; }
 
-        public string ToSubscription { get; private set; }
+        public string Subscription { get; private set; }
 
-        public string ToReplyPath { get; private set; }
+        public string ReplyPath { get; private set; }
 
-        public int ToReplyTimeOut { get; private set; }
+        public int ReplyTimeOut { get; private set; }
 
-        public string ToReplySubscription { get; private set; }
+        public string ReplySubscription { get; private set; }
 
         public Type ReplyConnectionStringValueFinderType { get; private set; }
 
-        public Func<IValueFinder, string> ToReplyConnectionStringProvider { get; private set; }
+        public Func<IValueFinder, string> ReplyConnectionStringProvider { get; private set; }
 
-        public string ToReplyConnectionString { get; private set; }
+        public string ReplyConnectionString { get; private set; }
 
         public ChannelEntity ToEntity()
         {
-            return new ChannelEntity(ToPath, ToSubscription, Type);
+            return new ChannelEntity(Path, Subscription, Type);
         }
 
-        public void UpdateToConnectionString(string toconnectionstring)
+        public void UpdateConnectionString(string connectionstring)
         {
-            ToConnectionString = toconnectionstring;
+            ConnectionString = connectionstring;
         }
 
-        public void UpdateToReplyConnectionString(string toreplyconnectionstring)
+        public void UpdateReplyConnectionString(string replyconnectionstring)
         {
-            ToReplyConnectionString = toreplyconnectionstring;
+            ReplyConnectionString = replyconnectionstring;
         }
 
-        public void UpdateReplyFromPointToPointChannel(string toreplypath, int toreplytimeout, 
-            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> toreplyconnectionstringprovider)
+        public void UpdateReplyFromPointToPointChannel(string replypath, int replytimeout, 
+            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> replyconnectionstringprovider)
         {
-            ToReplyPath = toreplypath;
-            ToReplyTimeOut = toreplytimeout;
+            ReplyPath = replypath;
+            ReplyTimeOut = replytimeout;
             Type = ChannelType.RequestReplyToPointToPoint;
             ReplyConnectionStringValueFinderType = replyconnectionstringvaluefindertype;
-            ToReplyConnectionStringProvider = toreplyconnectionstringprovider;
+            ReplyConnectionStringProvider = replyconnectionstringprovider;
         }
 
-        public void UpdateReplyFromSubscriptionToPublishSubscribeChannel(string toreplypath, int toreplytimeout, string toreplysubscription,
-            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> toreplyconnectionstringprovider)
+        public void UpdateReplyFromSubscriptionToPublishSubscribeChannel(string replypath, int replytimeout, string replysubscription,
+            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> replyconnectionstringprovider)
         {
-            ToReplySubscription = toreplysubscription;
-            ToReplyPath = toreplypath;
-            ToReplyTimeOut = toreplytimeout;
+            ReplySubscription = replysubscription;
+            ReplyPath = replypath;
+            ReplyTimeOut = replytimeout;
             Type = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
             ReplyConnectionStringValueFinderType = replyconnectionstringvaluefindertype;
-            ToReplyConnectionStringProvider = toreplyconnectionstringprovider;
+            ReplyConnectionStringProvider = replyconnectionstringprovider;
         }
     }
 }

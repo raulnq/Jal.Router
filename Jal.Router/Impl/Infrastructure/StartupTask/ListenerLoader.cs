@@ -6,9 +6,9 @@ namespace Jal.Router.Impl
 {
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IListenerContextLoader _loader;
+        private readonly IListenerContextCreator _loader;
 
-        public ListenerLoader(IComponentFactoryGateway factory, ILogger logger, IListenerContextLoader loader)
+        public ListenerLoader(IComponentFactoryGateway factory, ILogger logger, IListenerContextCreator loader)
             :base(factory, logger)
         {
             _loader = loader;

@@ -79,19 +79,19 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     sagaid = sbmessage.UserProperties[SagaId].ToString();
                 }
 
-                var contentid = string.Empty;
+                var claimcheckid = string.Empty;
 
-                if (sbmessage.UserProperties.ContainsKey(ContentId))
+                if (sbmessage.UserProperties.ContainsKey(ClaimCheckId))
                 {
-                    contentid = sbmessage.UserProperties[ContentId].ToString();
+                    claimcheckid = sbmessage.UserProperties[ClaimCheckId].ToString();
                 }
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, contentid);
+                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid);
 
                 if (sbmessage.UserProperties != null)
                 {
                     foreach (var property in sbmessage.UserProperties.Where(x => x.Key != From && x.Key != Origin && x.Key != Version 
-                    &&  x.Key != SagaId && x.Key!=Trackings && x.Key!= ContentId && x.Key != ParentId && x.Key != OperationId))
+                    &&  x.Key != SagaId && x.Key!=Trackings && x.Key!= ClaimCheckId && x.Key != ParentId && x.Key != OperationId))
                     {
                         context.Headers.Add(property.Key, property.Value?.ToString());
                     }
@@ -180,7 +180,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                brokeredmessage.UserProperties.Add(ContentId, context.ContentContext.ClaimCheckId);
+                brokeredmessage.UserProperties.Add(ClaimCheckId, context.ContentContext.ClaimCheckId);
             }
 
             if (context.TrackingContext != null)

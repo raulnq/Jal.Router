@@ -1,6 +1,4 @@
 using Jal.ChainOfResponsability.Fluent.Impl;
-using Jal.ChainOfResponsability.Fluent.Interfaces;
-using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Impl;
 using Jal.Router.Model;
@@ -21,7 +19,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var pipelinemock = CreatePipelineMock();
+            var pipelinemock = Builder.CreatePipelineMock();
 
             var messagecontext = Builder.CreateMessageContext();
 
@@ -43,7 +41,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var pipelinemock = CreatePipelineMock();
+            var pipelinemock = Builder.CreatePipelineMock();
 
             var messagecontext = Builder.CreateMessageContext();
 
@@ -61,7 +59,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var pipelinemock = CreatePipelineMock(true);
+            var pipelinemock = Builder.CreatePipelineMock(true);
 
             var messagecontext = Builder.CreateMessageContext();
 
@@ -70,22 +68,6 @@ namespace Jal.Router.Tests
             await Should.ThrowAsync<Exception>(sut.Route<NullMiddleware>(messagecontext));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Once());
-        }
-
-        private static Mock<IPipeline> CreatePipelineMock(bool throwexception = false)
-        {
-            var pipelinemock = new Mock<IPipeline>();
-
-            if (throwexception)
-            {
-                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Throws(new System.Exception());
-            }
-            else
-            {
-                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Returns(Task.CompletedTask);
-            }
-
-            return pipelinemock;
         }
 
 

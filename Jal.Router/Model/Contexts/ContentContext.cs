@@ -14,7 +14,7 @@ namespace Jal.Router.Model
 
         public bool IsClaimCheck { get; private set; }
 
-        public object Response { get; private set; }
+        public object Result { get; private set; }
 
         public ContentContext(MessageContext context, string claimcheckid, bool isclaimcheck)
         {
@@ -29,14 +29,9 @@ namespace Jal.Router.Model
             Type = type;
         }
 
-        public void UpdateResponse(object response)
+        public void SetResult(object result)
         {
-            Response = response;
-        }
-
-        public void GenerateClaimCheckId()
-        {
-            ClaimCheckId = Guid.NewGuid().ToString();
+            Result = result;
         }
 
         public ContentContextEntity ToEntity()

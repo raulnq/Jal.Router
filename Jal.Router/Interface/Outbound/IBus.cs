@@ -18,12 +18,6 @@ namespace Jal.Router.Interface
 
         Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
 
-        Task FireAndForget<TContent>(TContent content, Options options);
-
-        Task FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options);
-
-        Task FireAndForget<TContent>(TContent content, Origin origin, Options options);
-
         Task Publish<TContent>(TContent content, Options options);
 
         Task Publish<TContent>(TContent content, Origin origin, Options options);

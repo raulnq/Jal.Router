@@ -26,7 +26,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UseChannelResource<FileSystemChannelResource>()
+                .UsePointToPointChannelResource<FileSystemPointToPointChannelResource>()
+                .UsePublishSubscribeChannelResource<FileSystemPublishSubscribeChannelResource>()
+                .UseSubscriptionToPublishSubscribeChannelResource<FileSystemSubscriptionToPublishSubscribeChannelResource>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }
@@ -46,7 +48,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UseChannelResource<InMemoryChannelResource>()
+                .UsePointToPointChannelResource<InMemoryPointToPointChannelResource>()
+                .UsePublishSubscribeChannelResource<InMemoryPublishSubscribeChannelResource>()
+                .UseSubscriptionToPublishSubscribeChannelResource<InMemorySubscriptionToPublishSubscribeChannelResource>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }

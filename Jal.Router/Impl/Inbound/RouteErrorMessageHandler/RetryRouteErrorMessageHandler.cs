@@ -47,7 +47,7 @@ namespace Jal.Router.Impl
 
                     _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 
-                    await context.Send(content, endpointname, scheduledenqueuedatetimeutc: DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
+                    await context.Send(content, endpointname, scheduledenqueuedatetimeutc: DateTime.UtcNow.Add(policy.NextRetryInterval(count))).ConfigureAwait(false);
 
                     return metadata.StopAfterHandle;
                 }
@@ -59,7 +59,7 @@ namespace Jal.Router.Impl
                     {
                         _logger.Log($"Message {context.Id}, fallback executed by route {context.Name}");
 
-                        await fallback(context, ex, metadata);
+                        await fallback(context, ex, metadata).ConfigureAwait(false);
 
                         return metadata.StopAfterHandle;
                     }

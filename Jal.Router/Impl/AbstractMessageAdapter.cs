@@ -11,7 +11,7 @@ namespace Jal.Router.Impl
 
         protected readonly IBus Bus;
 
-        public const string ContentId = "contentid";
+        public const string ClaimCheckId = "claimcheckid";
 
         public const string OperationId = "operationid";
 
@@ -69,8 +69,6 @@ namespace Jal.Router.Impl
             if(context.ContentContext.IsClaimCheck)
             {
                 var storage = Factory.CreateMessageStorage();
-
-                context.ContentContext.GenerateClaimCheckId();
 
                 await storage.Write(context.ContentContext.ClaimCheckId, context.ContentContext.Data).ConfigureAwait(false);
             }

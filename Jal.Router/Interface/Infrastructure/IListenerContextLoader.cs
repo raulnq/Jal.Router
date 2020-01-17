@@ -1,11 +1,9 @@
-﻿using Jal.Router.Model;
-
-namespace Jal.Router.Interface
+﻿namespace Jal.Router.Interface
 {
     public interface IListenerContextLoader
     {
-        ListenerContext Create(Channel channel);
+        void AddPointToPointChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path);
 
-        void Open(ListenerContext listenercontext);
+        void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription);
     }
 }

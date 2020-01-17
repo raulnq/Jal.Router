@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -6,37 +7,56 @@ namespace Jal.Router.Impl
 {
     public class ListenerContextLoader : IListenerContextLoader
     {
+        private readonly IListenerContextCreator _loader;
+
         private IComponentFactoryGateway _factory;
 
-        private ILogger _logger;
-
-        public ListenerContextLoader(IComponentFactoryGateway factory, ILogger logger)
+        public ListenerContextLoader(IListenerContextCreator loader, IComponentFactoryGateway factory)
         {
+            _loader = loader;
             _factory = factory;
-            _logger = logger;
         }
 
-        public ListenerContext Create(Channel channel)
+        public void AddPointToPointChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path)
         {
-            var listenerchannel = _factory.CreateListenerChannel(channel.Type);
+            var channels = new List<Channel>();
 
-            var partition = _factory.Configuration.Runtime.Partitions.FirstOrDefault(x => x.Channel.Id == channel.Id);
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-            var listenercontext = new ListenerContext(channel, listenerchannel, partition);
+            var newchannel = new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), provider, path);
 
-            return listenercontext;
+            channels.Add(newchannel);
+
+            var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
+
+            var listenercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
+
+            listenercontext.Routes.Add(newroute);
+
+            _loader.Open(listenercontext);
         }
 
-        public void Open(ListenerContext listenercontext)
+        public void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription)
         {
-            if (listenercontext.ListenerChannel != null)
-            {
-                listenercontext.ListenerChannel.Open(listenercontext);
+            var channels = new List<Channel>();
 
-                listenercontext.ListenerChannel.Listen(listenercontext);
+            Func<IValueFinder, string> provider = x => connectionstring;
 
-                _logger.Log($"Listening {listenercontext.Id}");
-            }
+            var newchannel = new Channel(ChannelType.PublishSubscribe, typeof(NullValueFinder), provider, path, subscription);
+
+            channels.Add(newchannel);
+
+            var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
+
+            var listenercontext = _loader.Create(newchannel);
+
+            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
+
+            listenercontext.Routes.Add(newroute);
+
+            _loader.Open(listenercontext);
         }
     }
 }

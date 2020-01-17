@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.Impl
 {
-    public class NullChannelResource : AbstractChannelResource
+    public class NullChannelResource<T, S> : AbstractChannelResource<T, S>
     {
 
     }

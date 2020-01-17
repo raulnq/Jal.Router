@@ -94,14 +94,14 @@ namespace Jal.Router.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            var path = _transport.CreatePointToPointChannelPath(_parameter, listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
+            var path = _transport.CreatePointToPointChannelPath(_parameter, listenercontext.Channel.ConnectionString, listenercontext.Channel.Path);
 
             _watcher = new FileSystemWatcher(path);
         }
 
         public void Open(SenderContext sendercontext)
         {
-            _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public Task<string> Send(SenderContext sendercontext, object message)

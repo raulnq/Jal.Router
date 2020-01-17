@@ -17,7 +17,9 @@ namespace Jal.Router.Interface
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
         IList<TaskMetadata> MonitoringTaskTypes { get; }
-        Type ChannelResourceType { get; }
+        Type PublishSubscribeChannelResourceType { get; }
+        Type PointToPointChannelResourceType { get; }
+        Type SubscriptionToPublishSubscribeChannelResourceType { get; }
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
@@ -44,7 +46,12 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UseChannelResource<TChannelManager>() where TChannelManager : IChannelResource;
+        IConfiguration UsePointToPointChannelResource<TChannel>() where TChannel : IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>;
+
+        IConfiguration UsePublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>;
+
+        IConfiguration UseSubscriptionToPublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>;
+
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;

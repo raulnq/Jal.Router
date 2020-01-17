@@ -23,9 +23,9 @@ namespace Jal.Router.Impl
             {
                 var finder = Factory.CreateValueFinder(partition.Channel.ConnectionStringValueFinderType);
 
-                partition.Channel.UpdateToConnectionString(partition.Channel.ToConnectionStringProvider?.Invoke(finder));
+                partition.Channel.UpdateConnectionString(partition.Channel.ConnectionStringProvider?.Invoke(finder));
 
-                if (string.IsNullOrWhiteSpace(partition.Channel.ToConnectionString))
+                if (string.IsNullOrWhiteSpace(partition.Channel.ConnectionString))
                 {
                     var error = $"Empty connection string, partition {partition.Name}";
 
@@ -35,7 +35,7 @@ namespace Jal.Router.Impl
                 }
 
 
-                if (string.IsNullOrWhiteSpace(partition.Channel.ToPath))
+                if (string.IsNullOrWhiteSpace(partition.Channel.Path))
                 {
                     var error = $"Empty path, partition {partition.Name}";
 
@@ -53,9 +53,9 @@ namespace Jal.Router.Impl
                     {
                         var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
-                        channel.UpdateToConnectionString(channel.ToConnectionStringProvider?.Invoke(finder));
+                        channel.UpdateConnectionString(channel.ConnectionStringProvider?.Invoke(finder));
 
-                        if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                        if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                         {
                             var error = $"Empty connection string, Handler {route.Name}";
 
@@ -65,7 +65,7 @@ namespace Jal.Router.Impl
                         }
 
 
-                        if (string.IsNullOrWhiteSpace(channel.ToPath))
+                        if (string.IsNullOrWhiteSpace(channel.Path))
                         {
                             var error = $"Empty path, Handler {route.Name}";
 

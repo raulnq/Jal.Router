@@ -18,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            _subscriptionclient = new SubscriptionClient(listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath, listenercontext.Channel.ToSubscription);
+            _subscriptionclient = new SubscriptionClient(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path, listenercontext.Channel.Subscription);
         }
 
         public bool IsActive(ListenerContext listenercontext)
@@ -179,7 +179,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public void Open(SenderContext sendercontext)
         {
-            _topicclient = new TopicClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _topicclient = new TopicClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
 
             if (_parameter.TimeoutInSeconds > 0)
             {

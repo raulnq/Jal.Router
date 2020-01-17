@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
 
                 var loggers = loggertypes.Select(x => Factory.CreateLogger<PointToPointChannelStatistics>(x)).ToArray();
 
-                var manager = Factory.CreateChannelResource();
+                var manager = Factory.CreatePointToPointChannelResource();
 
                 foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
                 {

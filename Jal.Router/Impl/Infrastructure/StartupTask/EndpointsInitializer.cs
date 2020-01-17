@@ -30,12 +30,12 @@ namespace Jal.Router.Impl
                         {
                             var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
 
-                            if (channel.ToConnectionStringProvider!=null)
+                            if (channel.ConnectionStringProvider!=null)
                             {
-                                channel.UpdateToConnectionString(channel.ToConnectionStringProvider(finder));
+                                channel.UpdateConnectionString(channel.ConnectionStringProvider(finder));
                             }
 
-                            if (string.IsNullOrWhiteSpace(channel.ToConnectionString))
+                            if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                             {
                                 var error = $"Empty connection string, Endpoint {endpoint.Name}";
 
@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
                                 Logger.Log(error);
                             }
 
-                            if (string.IsNullOrWhiteSpace(channel.ToPath))
+                            if (string.IsNullOrWhiteSpace(channel.Path))
                             {
                                 var error = $"Empty path, Endpoint {endpoint.Name}";
 
@@ -54,16 +54,16 @@ namespace Jal.Router.Impl
                             }
                         }
 
-                        if (channel.ToReplyConnectionStringProvider != null)
+                        if (channel.ReplyConnectionStringProvider != null)
                         {
                             var finder = Factory.CreateValueFinder(channel.ReplyConnectionStringValueFinderType);
 
-                            if (channel.ToReplyConnectionStringProvider!=null)
+                            if (channel.ReplyConnectionStringProvider!=null)
                             {
-                                channel.UpdateToReplyConnectionString(channel.ToReplyConnectionStringProvider(finder));
+                                channel.UpdateReplyConnectionString(channel.ReplyConnectionStringProvider(finder));
                             }
 
-                            if (string.IsNullOrWhiteSpace(channel.ToReplyConnectionString))
+                            if (string.IsNullOrWhiteSpace(channel.ReplyConnectionString))
                             {
                                 var error = $"Empty reply connection string, Endpoint {endpoint.Name}";
 
@@ -72,7 +72,7 @@ namespace Jal.Router.Impl
                                 Logger.Log(error);
                             }
 
-                            if (string.IsNullOrWhiteSpace(channel.ToReplyPath))
+                            if (string.IsNullOrWhiteSpace(channel.ReplyPath))
                             {
                                 var error = $"Empty reply path, Endpoint {endpoint.Name}";
 

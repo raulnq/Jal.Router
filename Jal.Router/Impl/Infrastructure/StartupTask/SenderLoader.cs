@@ -6,9 +6,9 @@ namespace Jal.Router.Impl
 {
     public class SenderLoader : AbstractStartupTask, IStartupTask
     {
-        private ISenderContextLoader _loader;
+        private ISenderContextCreator _loader;
 
-        public SenderLoader(IComponentFactoryGateway factory, ISenderContextLoader loader, ILogger logger)
+        public SenderLoader(IComponentFactoryGateway factory, ISenderContextCreator loader, ILogger logger)
             : base(factory, logger)
         {
             _loader = loader;

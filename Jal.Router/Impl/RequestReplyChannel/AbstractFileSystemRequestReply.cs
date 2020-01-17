@@ -23,7 +23,7 @@ namespace Jal.Router.Impl
 
         public void Open(SenderContext sendercontext)
         {
-            _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

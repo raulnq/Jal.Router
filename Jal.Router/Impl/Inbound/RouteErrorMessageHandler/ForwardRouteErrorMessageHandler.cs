@@ -42,7 +42,7 @@ namespace Jal.Router.Impl
 
                 _logger.Log($"Message {context.Id}, sending the message to the error endpoint {endpointname} by route {context.Name}");
 
-                await context.Send(content, endpointname, headers: headers);
+                await context.Send(content, endpointname, headers: headers).ConfigureAwait(false);
 
                 return metadata.StopAfterHandle;
             }
