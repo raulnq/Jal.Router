@@ -8,6 +8,16 @@ namespace Jal.Router.Tests
 {
     public static class MockExtensions
     {
+        public static void WasExecuted(this Mock<IProducer> producermock)
+        {
+            producermock.Verify(x => x.Produce(It.IsAny<MessageContext>()), Times.Once());
+        }
+
+        public static void WasNotExecuted(this Mock<IProducer> producermock)
+        {
+            producermock.Verify(x => x.Produce(It.IsAny<MessageContext>()), Times.Never());
+        }
+
         public static void WasExecuted(this Mock<IConsumer> consumermock)
         {
             consumermock.Verify(x => x.Consume(It.IsAny<MessageContext>()), Times.Once());
@@ -26,6 +36,16 @@ namespace Jal.Router.Tests
         public static void CreateEntityStorageWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
         {
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Once());
+        }
+
+        public static void CreateMessageAdapterWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        {
+            factorymock.Verify(x => x.CreateMessageAdapter(), Times.Once());
+        }
+
+        public static void WasExecuted(this Mock<ISenderChannel> sendermock)
+        {
+            sendermock.Verify(x => x.Send(It.IsAny<SenderContext>(), It.IsAny<object>()), Times.Once());
         }
 
         public static void CreateMessageSerializerWasExecuted(this Mock<IComponentFactoryGateway> factorymock)

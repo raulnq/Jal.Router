@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             
             try
             {
-                await _producer.Send(context.Data).ConfigureAwait(false);
+                await _producer.Produce(context.Data).ConfigureAwait(false);
             }
             finally
             {

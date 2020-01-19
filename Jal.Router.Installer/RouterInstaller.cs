@@ -27,6 +27,26 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<FileSystemRequestReplyFromPointToPointChannel>().Named(typeof(FileSystemRequestReplyFromPointToPointChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>().Named(typeof(FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<InMemoryRequestReplyFromPointToPointChannel>().Named(typeof(InMemoryRequestReplyFromPointToPointChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>().Named(typeof(InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IPointToPointChannel>().ImplementedBy<FileSystemPointToPointChannel>().Named(typeof(FileSystemPointToPointChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<FileSystemPublishSubscribeChannel>().Named(typeof(FileSystemPublishSubscribeChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IPointToPointChannel>().ImplementedBy<InMemoryPointToPointChannel>().Named(typeof(InMemoryPointToPointChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<InMemoryPublishSubscribeChannel>().Named(typeof(InMemoryPublishSubscribeChannel).FullName).LifestyleSingleton());
+
+            container.Register(Component.For<IInMemoryTransport>().ImplementedBy<InMemoryTransport>().LifestyleSingleton());
+
+            container.Register(Component.For<IFileSystemTransport>().ImplementedBy<FileSystemTransport>().LifestyleSingleton());
+
             container.Register(Component.For<IListenerContextCreator>().ImplementedBy<ListenerContextCreator>().LifestyleSingleton());
 
             container.Register(Component.For<IListenerContextLoader>().ImplementedBy<ListenerContextLoader>().LifestyleSingleton());
@@ -144,6 +164,18 @@ namespace Jal.Router.Installer
             container.Register(Component.For<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<NullChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().LifestyleSingleton().Named(typeof(NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>).FullName));
 
             container.Register(Component.For<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<NullChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().LifestyleSingleton().Named(typeof(NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>).FullName));
+
+            container.Register(Component.For<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<FileSystemPointToPointChannelResource>().LifestyleSingleton().Named(typeof(FileSystemPointToPointChannelResource).FullName));
+
+            container.Register(Component.For<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<FileSystemPublishSubscribeChannelResource>().LifestyleSingleton().Named(typeof(FileSystemPublishSubscribeChannelResource).FullName));
+
+            container.Register(Component.For<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<FileSystemSubscriptionToPublishSubscribeChannelResource>().LifestyleSingleton().Named(typeof(FileSystemSubscriptionToPublishSubscribeChannelResource).FullName));
+
+            container.Register(Component.For<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<InMemoryPointToPointChannelResource>().LifestyleSingleton().Named(typeof(InMemoryPointToPointChannelResource).FullName));
+
+            container.Register(Component.For<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<InMemoryPublishSubscribeChannelResource>().LifestyleSingleton().Named(typeof(InMemoryPublishSubscribeChannelResource).FullName));
+
+            container.Register(Component.For<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<InMemorySubscriptionToPublishSubscribeChannelResource>().LifestyleSingleton().Named(typeof(InMemorySubscriptionToPublishSubscribeChannelResource).FullName));
 
             container.Register(Component.For(typeof(ILogger<PointToPointChannelStatistics>)).ImplementedBy(typeof(Impl.PointToPointChannelStatisticsLogger)).Named(typeof(Impl.PointToPointChannelStatisticsLogger).FullName).LifestyleSingleton());
 

@@ -12,7 +12,7 @@ namespace Jal.Router.Tests
 {
     public static class Builder
     {
-        public static MessageContext CreateMessageContext(Route route=null, Mock<IBus> busmock = null)
+        public static MessageContext CreateMessageContext(Route route=null, EndPoint endpoint=null,  Mock<IBus> busmock = null)
         {
             if(busmock==null)
             {
@@ -28,6 +28,15 @@ namespace Jal.Router.Tests
             else
             {
                 messagecontext.SetRoute(route);
+            }
+
+            if (endpoint == null)
+            {
+                messagecontext.SetEndPoint(new EndPoint("endpoint"));
+            }
+            else
+            {
+                messagecontext.SetEndPoint(endpoint);
             }
 
             return messagecontext;
@@ -150,6 +159,8 @@ namespace Jal.Router.Tests
             factorymock.Setup(m => m.CreateBusInterceptor()).Returns(new NullBusInterceptor());
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
+
+            factorymock.Setup(x => x.CreateMessageAdapter()).Returns(new NullMessageAdapter());
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

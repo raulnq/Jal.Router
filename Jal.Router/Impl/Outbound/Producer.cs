@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
 
         private readonly ILogger _logger;
 
-        public async Task Send(MessageContext context)
+        public async Task Produce(MessageContext context)
         {
             var id = string.Empty;
 
