@@ -47,7 +47,7 @@ namespace Jal.Router.Impl
 
         public Task Startup()
         {
-            return _startup.Start();
+            return _startup.Run();
         }
 
         private void Watch()
@@ -72,12 +72,12 @@ namespace Jal.Router.Impl
 
         private void Monitor()
         {
-            _monitor.Start();
+            _monitor.Run();
         }
 
         public Task Shutdown()
         {
-            return _shutdown.Stop();
+            return _shutdown.Run();
         }
 
         private void Stop()

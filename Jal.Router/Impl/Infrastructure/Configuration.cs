@@ -15,7 +15,7 @@ namespace Jal.Router.Impl
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
-        public IList<TaskMetadata> MonitoringTaskTypes { get; }
+        public IList<MonitorTask> MonitoringTaskTypes { get; }
         public Type PointToPointChannelResourceType { get; private set; }
         public Type PublishSubscribeChannelResourceType { get; private set; }
         public Type SubscriptionToPublishSubscribeChannelResourceType { get; private set; }
@@ -188,7 +188,7 @@ namespace Jal.Router.Impl
 
         public IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
         {
-            MonitoringTaskTypes.Add(new TaskMetadata(typeof(TMonitoringTask), intervalinseconds * 1000));
+            MonitoringTaskTypes.Add(new MonitorTask(typeof(TMonitoringTask), intervalinseconds * 1000));
             return this;
         }
         public IConfiguration AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
@@ -233,7 +233,7 @@ namespace Jal.Router.Impl
             UseMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
-            MonitoringTaskTypes = new List<TaskMetadata>();
+            MonitoringTaskTypes = new List<MonitorTask>();
             StartupTaskTypes = new List<Type>();
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();

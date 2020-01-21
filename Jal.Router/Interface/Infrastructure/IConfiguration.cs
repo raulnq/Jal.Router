@@ -16,7 +16,7 @@ namespace Jal.Router.Interface
         IDictionary<string, object> Parameters { get; }
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
-        IList<TaskMetadata> MonitoringTaskTypes { get; }
+        IList<MonitorTask> MonitoringTaskTypes { get; }
         Type PublishSubscribeChannelResourceType { get; }
         Type PointToPointChannelResourceType { get; }
         Type SubscriptionToPublishSubscribeChannelResourceType { get; }

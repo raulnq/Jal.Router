@@ -4,6 +4,6 @@ namespace Jal.Router.Interface
 {
     public interface IShutdown
     {
-        Task Stop();
+        Task Run();
     }
 }

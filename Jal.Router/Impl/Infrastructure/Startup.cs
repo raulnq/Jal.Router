@@ -18,7 +18,7 @@ namespace Jal.Router.Impl
         }
 
 
-        public async Task Start()
+        public async Task Run()
         {
             foreach (var type in _factory.Configuration.StartupTaskTypes)
             {

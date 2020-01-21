@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public void Start()
+        public void Run()
         {
             foreach (var type in _factory.Configuration.MonitoringTaskTypes)
             {
@@ -25,7 +25,7 @@ namespace Jal.Router.Impl
 
                 Task.Factory.StartNew(async () =>
                 {
-                    await Task.Delay(type.Interval).ConfigureAwait(false);
+                    await Task.Delay(type.IntervalInMilliSeconds).ConfigureAwait(false);
 
                     while (true)
                     {
@@ -38,7 +38,7 @@ namespace Jal.Router.Impl
                             _logger.Log($"Monitor exception {ex}");
                         }
 
-                        await Task.Delay(type.Interval).ConfigureAwait(false);
+                        await Task.Delay(type.IntervalInMilliSeconds).ConfigureAwait(false);
                     }
                 });
             }
