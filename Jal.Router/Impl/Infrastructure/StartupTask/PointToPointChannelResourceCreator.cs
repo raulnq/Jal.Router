@@ -20,7 +20,7 @@ namespace Jal.Router.Impl
 
             var manager = Factory.CreatePointToPointChannelResource();
 
-            foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
+            foreach (var channel in Factory.Configuration.Runtime.PointToPointChannelResources)
             {
                 if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
                 {

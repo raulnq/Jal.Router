@@ -24,7 +24,7 @@ namespace Jal.Router.Impl
 
                 var manager = Factory.CreateSubscriptionToPublishSubscribeChannelResource();
 
-                foreach (var subscription in Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels)
+                foreach (var subscription in Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources)
                 {
                     var message = await manager.Get(subscription).ConfigureAwait(false);
 

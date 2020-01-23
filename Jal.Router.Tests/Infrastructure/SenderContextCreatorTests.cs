@@ -21,7 +21,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var sut = new SenderContextCreator(factory, new NullLogger());
 
-            sut.Open(new Model.SenderContext(new Model.Channel(Model.ChannelType.PointToPoint, null, null, "path"), sendermock.Object, null));
+            sut.Open(Builder.CreateSenderContext(Builder.CreateChannel(), sendermock.Object));
 
             sendermock.Verify(x => x.Open(It.IsAny<Model.SenderContext>()), Times.Once);
         }
@@ -37,7 +37,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var sut = new SenderContextCreator(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Create(new Channel(ChannelType.PointToPoint, null, null, "path"));
+            var sendercontext = sut.Create(Builder.CreateChannel(ChannelType.PointToPoint));
 
             factorymock.Verify(x => x.CreatePointToPointChannel(), Times.Once);
 
@@ -65,7 +65,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var sut = new SenderContextCreator(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Create(new Channel(ChannelType.PublishSubscribe, null, null, "path", "subscription"));
+            var sendercontext = sut.Create(Builder.CreateChannel(ChannelType.PublishSubscribe));
 
             factorymock.Verify(x => x.CreatePublishSubscribeChannel(), Times.Once);
 
@@ -95,7 +95,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var sut = new SenderContextCreator(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Create(new Channel(ChannelType.RequestReplyToPointToPoint, null, null, "path"));
+            var sendercontext = sut.Create(Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
 
             factorymock.Verify(x => x.CreateRequestReplyChannelFromPointToPointChannel(), Times.Once);
 
@@ -125,7 +125,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var sut = new SenderContextCreator(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Create(new Channel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe, null, null, "path"));
+            var sendercontext = sut.Create(Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
 
             factorymock.Verify(x => x.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel(), Times.Once);
 

@@ -49,7 +49,7 @@ namespace Jal.Router.Impl
             return _enpoints.ToArray();
         }
 
-        public SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResources()
+        public SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResource()
         {
             foreach (var subscription in _subscriptions)
             {

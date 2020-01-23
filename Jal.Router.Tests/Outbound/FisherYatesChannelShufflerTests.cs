@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
         {
             var sut = new FisherYatesChannelShuffler();
 
-            var channels = sut.Shuffle(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null), new Channel(ChannelType.PublishSubscribe, typeof(object), null, null, null) });
+            var channels = sut.Shuffle(new Channel[] { Builder.CreateChannel(), Builder.CreateChannel(ChannelType.PublishSubscribe, subscription: "subscription") });
 
             channels.ShouldNotBeNull();
 

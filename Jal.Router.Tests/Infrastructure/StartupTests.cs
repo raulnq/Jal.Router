@@ -1,10 +1,10 @@
 ﻿using Jal.Router.Impl;
 using Jal.Router.Interface;
+using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -83,70 +83,72 @@ namespace Jal.Router.Tests.Infrastructure
     [TestClass]
     public class RoutesInitializerTests
     {
-    }
-    [TestClass]
-    public class RuntimeConfigurationLoaderTests
-    {
-    }
-    [TestClass]
-    public class SenderLoaderTests
-    {
-    }
-    [TestClass]
-    public class StartupBeatLoggerTests
-    {
-    }
-    [TestClass]
-    public class SubscriptionToPublishSubscribeChannelResourceCreatorTests
-    {
-    }
-    [TestClass]
-    public class ListenerContextCreatorTests
-    {
-        [TestMethod]
-        public void Open_With_ShouldBeOpened()
+        [DataTestMethod]
+        [DataRow("","","","")]
+        [DataRow("partitionconnectionstring", "", "", "")]
+        [DataRow("", "partitionpath", "", "")]
+        [DataRow("", "", "connectionstring", "")]
+        [DataRow("", "", "", "path")]
+        public async Task Run_WithMissingData_ShouldThrowException(string partitionconnectionstring, string partitionpath, string connectionstring, string path)
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var listenermock = new Mock<IListenerChannel>();
-
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextCreator(factory, new NullLogger());
+            var route = Builder.CreateRoute();
 
-            sut.Open(new Model.ListenerContext(new Model.Channel(Model.ChannelType.PointToPoint, null, null, "path"), listenermock.Object, null));
+            route.Channels.Add(Builder.CreateChannel(connectionstring: partitionconnectionstring, path: partitionpath));
 
-            listenermock.Verify(x => x.Listen(It.IsAny<Model.ListenerContext>()), Times.Once);
+            factory.Configuration.Runtime.Routes.Add(route);
 
-            listenermock.Verify(x => x.Open(It.IsAny<Model.ListenerContext>()), Times.Once);
+            var partition = new Partition("name");
+
+            partition.UpdateChannel(Builder.CreateChannel(connectionstring: connectionstring, path: path));
+
+            factory.Configuration.Runtime.Partitions.Add(partition);
+
+            var sut = new RoutesInitializer(factory, new NullLogger());
+
+            var exception = false;
+
+            try
+            {
+                await sut.Run();
+            }
+            catch (ApplicationException)
+            {
+                exception = true;
+            }
+
+            exception.ShouldBeTrue();
+
+            factorymock.Verify(x => x.CreateValueFinder(It.IsAny<Type>()), Times.AtLeastOnce);
         }
 
         [TestMethod]
-        public void Create_With_ShouldBeCreated()
+        public async Task Run_WithRouteAndPartition_ShouldBeInitialized()
         {
-            var listenermock = new Mock<IListenerChannel>();
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>())).Returns(listenermock.Object);
 
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextCreator(factory, new NullLogger());
+            var route = Builder.CreateRoute();
 
-            var listenercontext = sut.Create(new Model.Channel(Model.ChannelType.PointToPoint, null, null, "path"));
+            route.Channels.Add(Builder.CreateChannel());
 
-            factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>()), Times.Once);
+            factory.Configuration.Runtime.Routes.Add(route);
 
-            listenercontext.Channel.ShouldNotBeNull();
+            var partition = new Partition("name");
 
-            listenercontext.ListenerChannel.ShouldNotBeNull();
+            partition.UpdateChannel(Builder.CreateChannel());
 
-            listenercontext.ListenerChannel.ShouldBeAssignableTo<IListenerChannel>();
+            factory.Configuration.Runtime.Partitions.Add(partition);
 
-            listenercontext.Channel.Path.ShouldBe("path");
+            var sut = new RoutesInitializer(factory, new NullLogger());
 
-            listenercontext.Partition.ShouldBeNull();
+            await sut.Run();
+
+            factorymock.Verify(x => x.CreateValueFinder(It.IsAny<Type>()), Times.AtLeastOnce);
         }
     }
 

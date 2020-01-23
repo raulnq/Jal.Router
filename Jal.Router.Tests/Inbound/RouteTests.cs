@@ -1,6 +1,8 @@
 using Jal.ChainOfResponsability.Fluent.Impl;
+using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using Jal.Router.Impl;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -14,6 +16,11 @@ namespace Jal.Router.Tests
     [TestClass]
     public class RouterTests
     {
+        private Impl.Router Build(IComponentFactoryGateway factory, IPipeline pipeline)
+        {
+            return new Impl.Router(factory, new PipelineBuilder(pipeline), new NullLogger());
+        }
+
         [TestMethod]
         public async Task Route_WithoutWhen_ShouldBeExecuted()
         {
@@ -29,7 +36,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.InboundMiddlewareTypes.Add(typeof(string));
 
-            var sut = new Impl.Router(factory, new PipelineBuilder(pipelinemock.Object), new NullLogger());
+            var sut = Build(factory, pipelinemock.Object);
 
             await sut.Route<NullMiddleware>(messagecontext);
 
@@ -47,7 +54,7 @@ namespace Jal.Router.Tests
 
             messagecontext.Route.UpdateWhen(x => false);
 
-            var sut = new Impl.Router(factorymock.Object, new PipelineBuilder(pipelinemock.Object), new NullLogger());
+            var sut = Build(factorymock.Object, pipelinemock.Object);
 
             await sut.Route<NullMiddleware>(messagecontext);
 
@@ -63,7 +70,7 @@ namespace Jal.Router.Tests
 
             var messagecontext = Builder.CreateMessageContext();
 
-            var sut = new Impl.Router(factorymock.Object, new PipelineBuilder(pipelinemock.Object), new NullLogger());
+            var sut = Build(factorymock.Object, pipelinemock.Object);
 
             await Should.ThrowAsync<Exception>(sut.Route<NullMiddleware>(messagecontext));
 

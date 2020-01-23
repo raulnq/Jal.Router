@@ -28,11 +28,11 @@ namespace Jal.Router.Impl
 
                 Factory.Configuration.Runtime.Partitions.AddRange(source.GetPartitions());
 
-                Factory.Configuration.Runtime.PointToPointChannels.AddRange(source.GetPointToPointChannelResources());
+                Factory.Configuration.Runtime.PointToPointChannelResources.AddRange(source.GetPointToPointChannelResources());
 
-                Factory.Configuration.Runtime.PublishSubscribeChannels.AddRange(source.GetPublishSubscribeChannelResources());
+                Factory.Configuration.Runtime.PublishSubscribeChannelResources.AddRange(source.GetPublishSubscribeChannelResources());
 
-                Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannels.AddRange(source.GetSubscriptionsToPublishSubscribeChannelResources());
+                Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.AddRange(source.GetSubscriptionsToPublishSubscribeChannelResource());
 
                 Factory.Configuration.Runtime.Sagas.AddRange(source.GetSagas());
 

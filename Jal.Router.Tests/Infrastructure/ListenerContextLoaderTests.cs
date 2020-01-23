@@ -15,7 +15,7 @@ namespace Jal.Router.Tests.Infrastructure
         {
             var creatormock = new Mock<IListenerContextCreator>();
 
-            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(new ListenerContext(null, null, null));
+            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -33,7 +33,7 @@ namespace Jal.Router.Tests.Infrastructure
         {
             var creatormock = new Mock<IListenerContextCreator>();
 
-            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(new ListenerContext(null, null, null));
+            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
 
             var factorymock = Builder.CreateFactoryMock();
 

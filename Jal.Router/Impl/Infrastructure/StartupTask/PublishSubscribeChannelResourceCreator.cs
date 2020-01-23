@@ -20,7 +20,7 @@ namespace Jal.Router.Impl
 
             var manager = Factory.CreatePublishSubscribeChannelResource();
 
-            foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannels)
+            foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannelResources)
             {
 
                 if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)

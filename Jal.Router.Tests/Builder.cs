@@ -59,7 +59,7 @@ namespace Jal.Router.Tests
 
         public static Route<object, Handler> CreateRoute()
         {
-            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>());
+            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>() { });
 
             return route;
         }
@@ -150,6 +150,31 @@ namespace Jal.Router.Tests
             return endpointprovidermock;
         }
 
+        public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription")
+        {
+            return new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), _=> connectionstring, path, subscription);
+        }
+
+        public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null )
+        {
+            if(channel==null)
+            {
+                channel = CreateChannel();
+            }
+
+            return new SenderContext(channel, senderchannel, readerchannel);
+        }
+
+        public static ListenerContext CreateListenerContext(Channel channel = null, IListenerChannel listenerchannel = null, Partition partition= null)
+        {
+            if (channel == null)
+            {
+                channel = CreateChannel();
+            }
+
+            return new ListenerContext(channel, listenerchannel, partition);
+        }
+
         public static Mock<IComponentFactoryGateway> CreateFactoryMock()
         {
             var factorymock = new Mock<IComponentFactoryGateway>();
@@ -157,6 +182,8 @@ namespace Jal.Router.Tests
             factorymock.Setup(m => m.CreateRouterInterceptor()).Returns(new NullRouterInterceptor());
 
             factorymock.Setup(m => m.CreateBusInterceptor()).Returns(new NullBusInterceptor());
+
+            factorymock.Setup(m => m.CreateValueFinder(It.IsAny<Type>())).Returns(new NullValueFinder());
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
 

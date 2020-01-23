@@ -24,7 +24,7 @@ namespace Jal.Router.Tests
         {
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -54,7 +54,7 @@ namespace Jal.Router.Tests
         {
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -98,7 +98,7 @@ namespace Jal.Router.Tests
 
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -146,7 +146,7 @@ namespace Jal.Router.Tests
 
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -186,7 +186,7 @@ namespace Jal.Router.Tests
 
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -230,7 +230,7 @@ namespace Jal.Router.Tests
 
             var shuffermock = new Mock<IChannelShuffler>();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { new Channel(ChannelType.PointToPoint, typeof(object), null, null, null) });
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var factorymock = Builder.CreateFactoryMock();
 

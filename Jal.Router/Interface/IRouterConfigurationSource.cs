@@ -12,7 +12,7 @@ namespace Jal.Router.Interface
 
         Partition[] GetPartitions();
 
-        SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResources();
+        SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResource();
 
         PublishSubscribeChannelResource[] GetPublishSubscribeChannelResources();
 

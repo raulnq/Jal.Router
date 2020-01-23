@@ -26,11 +26,11 @@ namespace Jal.Router.Tests
 
             var senderchannelmock = new Mock<ISenderChannel>();
 
-            messagecontext.SetChannel(new Channel(ChannelType.PointToPoint, null, null, null));
+            messagecontext.SetChannel(Builder.CreateChannel());
 
             var factory = factorymock.Object;
 
-            factory.Configuration.Runtime.SenderContexts.Add(new SenderContext(new Channel(ChannelType.PointToPoint, null, null, null), senderchannelmock.Object, null));
+            factory.Configuration.Runtime.SenderContexts.Add(new SenderContext(Builder.CreateChannel(), senderchannelmock.Object, null));
 
             var sut = Build(factory, creatormock.Object);
 
