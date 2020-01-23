@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class RuntimeConfigurationLoader : AbstractStartupTask, IStartupTask
+    public class RuntimeLoader : AbstractStartupTask, IStartupTask
     {
         private readonly IRouterConfigurationSource[] _sources;
 
         private readonly IRouter _router;
 
-        public RuntimeConfigurationLoader(IComponentFactoryGateway factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
+        public RuntimeLoader(IComponentFactoryGateway factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
             :base(factory, logger)
         {
             _sources = sources;

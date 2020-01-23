@@ -42,11 +42,13 @@ namespace Jal.Router.Interface
 
         TComponent CreateComponent<TComponent>(Type type) where TComponent : class;
 
-        IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResource();
+        IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResourceManager();
 
-        IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResource();
+        IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResourceManager();
 
-        IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResource();
+        IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResourceManager();
+
+        IChannelResourceManager<R, S> CreateChannelResourceManager<R, S>();
 
         ILogger<T> CreateLogger<T>(Type type);
 

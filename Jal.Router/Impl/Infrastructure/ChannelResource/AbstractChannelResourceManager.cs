@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractChannelResource<T, S> : IChannelResource<T, S>
+    public abstract class AbstractChannelResourceManager<T, S> : IChannelResourceManager<T, S>
     {
         public virtual Task<bool> CreateIfNotExist(T channel)
         {

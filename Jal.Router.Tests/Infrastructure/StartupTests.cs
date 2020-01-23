@@ -81,33 +81,32 @@ namespace Jal.Router.Tests.Infrastructure
     {
     }
     [TestClass]
-    public class RoutesInitializerTests
+    public class RouteValidatorTests
     {
-        [DataTestMethod]
-        [DataRow("","","","")]
-        [DataRow("partitionconnectionstring", "", "", "")]
-        [DataRow("", "partitionpath", "", "")]
-        [DataRow("", "", "connectionstring", "")]
-        [DataRow("", "", "", "path")]
-        public async Task Run_WithMissingData_ShouldThrowException(string partitionconnectionstring, string partitionpath, string connectionstring, string path)
+        [TestMethod]
+        public async Task Run_WithMissingData_ShouldThrowException()
         {
+            var validatormock = new Mock<IChannelValidator>();
+
+            validatormock.Setup(x => x.Validate(It.IsAny<Channel>(), It.IsAny<string>(), It.IsAny<string>())).Returns("error");
+
             var factorymock = Builder.CreateFactoryMock();
 
             var factory = factorymock.Object;
 
             var route = Builder.CreateRoute();
 
-            route.Channels.Add(Builder.CreateChannel(connectionstring: partitionconnectionstring, path: partitionpath));
+            route.Channels.Add(Builder.CreateChannel());
 
             factory.Configuration.Runtime.Routes.Add(route);
 
             var partition = new Partition("name");
 
-            partition.UpdateChannel(Builder.CreateChannel(connectionstring: connectionstring, path: path));
+            partition.UpdateChannel(Builder.CreateChannel());
 
             factory.Configuration.Runtime.Partitions.Add(partition);
 
-            var sut = new RoutesInitializer(factory, new NullLogger());
+            var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
 
             var exception = false;
 
@@ -126,6 +125,8 @@ namespace Jal.Router.Tests.Infrastructure
         [TestMethod]
         public async Task Run_WithRouteAndPartition_ShouldBeInitialized()
         {
+            var validatormock = new Mock<IChannelValidator>();
+
             var factorymock = Builder.CreateFactoryMock();
 
             var factory = factorymock.Object;
@@ -142,7 +143,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             factory.Configuration.Runtime.Partitions.Add(partition);
 
-            var sut = new RoutesInitializer(factory, new NullLogger());
+            var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
 
             await sut.Run();
         }

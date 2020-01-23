@@ -88,19 +88,19 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UsePublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
+        public IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
         {
             PublishSubscribeChannelResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UsePointToPointChannelResource<TChannel>() where TChannel : IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>
+        public IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
         {
             PointToPointChannelResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UseSubscriptionToPublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+        public IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
         {
             SubscriptionToPublishSubscribeChannelResourceType = typeof(TChannel);
             return this;
@@ -128,7 +128,7 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UseStorage<TSagaStorage>() where TSagaStorage : IEntityStorage
+        public IConfiguration UseEntityStorage<TSagaStorage>() where TSagaStorage : IEntityStorage
         {
             StorageType = typeof(TSagaStorage);
             return this;
@@ -220,11 +220,11 @@ namespace Jal.Router.Impl
             UseChannelShuffler<DefaultChannelShuffler>();
             UseRouterInterceptor<NullRouterInterceptor>();
             UseBusInterceptor<NullBusInterceptor>();
-            UseStorage<NullStorage>();
+            UseEntityStorage<NullEntityStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UsePointToPointChannelResource<NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>();
-            UsePublishSubscribeChannelResource<NullChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>();
-            UseSubscriptionToPublishSubscribeChannelResource<NullChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
+            UsePointToPointChannelResourceManager<NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>();
+            UsePublishSubscribeChannelResourceManager<NullChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>();
+            UseSubscriptionToPublishSubscribeChannelResourceManager<NullChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
@@ -245,9 +245,12 @@ namespace Jal.Router.Impl
             AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
             AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
             AddStartupTask<StartupBeatLogger>();
-            AddStartupTask<RuntimeConfigurationLoader>();
-            AddStartupTask<EndpointsInitializer>();
-            AddStartupTask<RoutesInitializer>();
+            AddStartupTask<RuntimeLoader>();
+            AddStartupTask<EndpointValidator>();
+            AddStartupTask<RouteValidator>();
+            AddStartupTask<PointToPointChannelResourceValidator>();
+            AddStartupTask<PublishSubscribeChannelResourceValidator>();
+            AddStartupTask<SubscriptionToPublishSubscribeChannelResourceValidator>();
             AddStartupTask<PointToPointChannelResourceCreator>();
             AddStartupTask<PublishSubscribeChannelResourceCreator>();
             AddStartupTask<SubscriptionToPublishSubscribeChannelResourceCreator>();

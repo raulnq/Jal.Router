@@ -3,13 +3,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class AbstractFileSystemChannelResource<T, S> : AbstractChannelResource<T, S>
+    public class AbstractFileSystemChannelResourceManager<T, S> : AbstractChannelResourceManager<T, S>
     {
         protected readonly FileSystemParameter _parameter;
 
         protected readonly IFileSystemTransport _transport;
 
-        public AbstractFileSystemChannelResource(IParameterProvider provider, IFileSystemTransport transport)
+        public AbstractFileSystemChannelResourceManager(IParameterProvider provider, IFileSystemTransport transport)
         {
             _parameter = provider.Get<FileSystemParameter>();
 

@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public abstract class AbstractAzureManagementChannelResource<T,S> : AbstractChannelResource<T, S>
+    public abstract class AbstractAzureManagementChannelResourceManager<T,S> : AbstractChannelResourceManager<T, S>
     {
         public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
 
@@ -32,7 +32,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         protected readonly IComponentFactoryGateway _factory;
 
-        public AbstractAzureManagementChannelResource(IComponentFactoryGateway factory)
+        public AbstractAzureManagementChannelResourceManager(IComponentFactoryGateway factory)
         {
             _factory = factory;
 

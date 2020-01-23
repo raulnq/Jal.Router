@@ -24,7 +24,7 @@ namespace Jal.Router.Impl
 
             _logger.Log("Deleting publish subscribe channels");
 
-            var manager = _factory.CreatePublishSubscribeChannelResource();
+            var manager = _factory.CreatePublishSubscribeChannelResourceManager();
 
             foreach (var channel in _factory.Configuration.Runtime.PublishSubscribeChannelResources)
             {

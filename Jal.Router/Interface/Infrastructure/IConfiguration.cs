@@ -46,15 +46,15 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UsePointToPointChannelResource<TChannel>() where TChannel : IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>;
+        IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>;
 
-        IConfiguration UsePublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>;
+        IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>;
 
-        IConfiguration UseSubscriptionToPublishSubscribeChannelResource<TChannel>() where TChannel : IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>;
+        IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>;
 
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
-        IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;
+        IConfiguration UseEntityStorage<TStorage>() where TStorage : IEntityStorage;
         IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
         IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;

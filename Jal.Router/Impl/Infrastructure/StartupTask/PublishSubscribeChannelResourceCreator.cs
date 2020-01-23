@@ -18,32 +18,10 @@ namespace Jal.Router.Impl
 
             Logger.Log("Creating publish subscribe channels");
 
-            var manager = Factory.CreatePublishSubscribeChannelResource();
+            var manager = Factory.CreatePublishSubscribeChannelResourceManager();
 
             foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannelResources)
             {
-                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
-                {
-                    var error = $"Empty connection string, publish subscribe channel {channel.Path}";
-
-                    errors.AppendLine(error);
-
-                    Logger.Log(error);
-
-                    break;
-                }
-
-                if (string.IsNullOrWhiteSpace(channel.Path))
-                {
-                    var error = $"Empty path, publish subscribe channel {channel.Path}";
-
-                    errors.AppendLine(error);
-
-                    Logger.Log(error);
-
-                    break;
-                }
-
                 try
                 {
                     var created = await manager.CreateIfNotExist(channel).ConfigureAwait(false);

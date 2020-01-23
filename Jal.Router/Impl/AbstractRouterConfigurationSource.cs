@@ -55,7 +55,7 @@ namespace Jal.Router.Impl
             {
                 if(subscription.Rules.Count==0)
                 {
-                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelRule($"origin='{_origin.Key}'", "$Default", true));
+                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelResourceRule($"origin='{_origin.Key}'", "$Default", true));
                 }
             }
             return _subscriptions.ToArray();
@@ -84,7 +84,7 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
+        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelResourceRule rule = null)
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {

@@ -11,11 +11,11 @@ namespace Jal.Router.Model
             :base(path, connectionstring, properties)
         {
             Subscription = subscription;
-            Rules = new List<SubscriptionToPublishSubscribeChannelRule>();
+            Rules = new List<SubscriptionToPublishSubscribeChannelResourceRule>();
         }
 
         public string Subscription { get; }
 
-        public List<SubscriptionToPublishSubscribeChannelRule> Rules { get; }
+        public List<SubscriptionToPublishSubscribeChannelResourceRule> Rules { get; }
     }
 }

@@ -25,17 +25,17 @@ namespace Jal.Router.Tests.Infrastructure
         [DataRow("", "", "connectionstring")]
         public async Task Run_WithMissingData_ShouldThrowException(string subscription, string path, string connectionstring)
         {
-            var channelresource = new Mock<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
+            var channelresource = new Mock<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResource()).Returns(channelresource.Object);
+            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager()).Returns(channelresource.Object);
 
             var factory = factorymock.Object;
 
             var resource = new SubscriptionToPublishSubscribeChannelResource(subscription, path, connectionstring, new Dictionary<string, string>());
 
-            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelRule("", "", true));
+            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelResourceRule("", "", true));
 
             factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.Add(resource);
 
@@ -43,7 +43,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             await Should.ThrowAsync<ApplicationException>(()=>sut.Run());
 
-            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResource(), Times.Once);
+            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager(), Times.Once);
 
             channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Never);
         }
@@ -51,17 +51,17 @@ namespace Jal.Router.Tests.Infrastructure
         [TestMethod]
         public async Task Run_WithValidResource_ShouldBeCreated()
         {
-            var channelresource = new Mock<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
+            var channelresource = new Mock<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResource()).Returns(channelresource.Object);
+            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager()).Returns(channelresource.Object);
 
             var factory = factorymock.Object;
 
             var resource = new SubscriptionToPublishSubscribeChannelResource("subscription", "path", "connectionstring", new Dictionary<string, string>());
 
-            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelRule("", "", true));
+            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelResourceRule("", "", true));
 
             factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.Add(resource);
 
@@ -69,7 +69,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             await sut.Run();
 
-            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResource(), Times.Once);
+            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager(), Times.Once);
 
             channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
         }
@@ -77,17 +77,17 @@ namespace Jal.Router.Tests.Infrastructure
         [TestMethod]
         public async Task Run_WithProvider_ShouldBeCreated()
         {
-            var channelresource = new Mock<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
+            var channelresource = new Mock<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResource()).Returns(channelresource.Object);
+            factorymock.Setup(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager()).Returns(channelresource.Object);
 
             var factory = factorymock.Object;
 
             var resource = new SubscriptionToPublishSubscribeChannelResource("subscription", "path", "connectionstring", new Dictionary<string, string>());
 
-            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelRule("", "", true));
+            resource.Rules.Add(new SubscriptionToPublishSubscribeChannelResourceRule("", "", true));
 
             factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.Add(resource);
 
@@ -95,7 +95,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             await sut.Run();
 
-            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResource(), Times.Once);
+            factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager(), Times.Once);
 
             channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
         }

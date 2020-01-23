@@ -24,19 +24,24 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResource()
+        public IChannelResourceManager<R, S> CreateChannelResourceManager<R, S>()
         {
-            return _factory.Create<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>(_configuration.PointToPointChannelResourceType);
+            return _factory.Create<IChannelResourceManager<R, S>>(_configuration.PointToPointChannelResourceType);
         }
 
-        public IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResource()
+        public IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResourceManager()
         {
-            return _factory.Create<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(_configuration.PublishSubscribeChannelResourceType);
+            return _factory.Create<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>(_configuration.PointToPointChannelResourceType);
         }
 
-        public IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResource()
+        public IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResourceManager()
         {
-            return _factory.Create<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(_configuration.SubscriptionToPublishSubscribeChannelResourceType);
+            return _factory.Create<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(_configuration.PublishSubscribeChannelResourceType);
+        }
+
+        public IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResourceManager()
+        {
+            return _factory.Create<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(_configuration.SubscriptionToPublishSubscribeChannelResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()

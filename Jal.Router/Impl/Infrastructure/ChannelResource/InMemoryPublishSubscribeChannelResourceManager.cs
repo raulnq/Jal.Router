@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class InMemoryPointToPointChannelResource : AbstractInMemoryChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>
+    public class InMemoryPublishSubscribeChannelResourceManager : AbstractInMemoryChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
     {
-        public InMemoryPointToPointChannelResource(IInMemoryTransport transport) : base(transport)
+        public InMemoryPublishSubscribeChannelResourceManager(IInMemoryTransport transport) : base(transport)
         {
         }
 
-        public override Task<bool> CreateIfNotExist(PointToPointChannelResource channel)
+        public override Task<bool> CreateIfNotExist(PublishSubscribeChannelResource channel)
         {
             var name = _transport.CreateName(channel.ConnectionString, channel.Path);
 

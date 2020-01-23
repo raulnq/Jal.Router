@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class FileSystemSubscriptionToPublishSubscribeChannelResource : AbstractFileSystemChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+    public class FileSystemSubscriptionToPublishSubscribeChannelResourceManager : AbstractFileSystemChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
     {
-        public FileSystemSubscriptionToPublishSubscribeChannelResource(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
+        public FileSystemSubscriptionToPublishSubscribeChannelResourceManager(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
         {
         }
 

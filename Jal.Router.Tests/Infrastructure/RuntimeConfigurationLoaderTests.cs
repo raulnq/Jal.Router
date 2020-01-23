@@ -44,7 +44,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var factory = factorymock.Object;
 
-            var sut = new RuntimeConfigurationLoader(factory, new IRouterConfigurationSource[] { configurationmock.Object }, routermock.Object, new NullLogger());
+            var sut = new RuntimeLoader(factory, new IRouterConfigurationSource[] { configurationmock.Object }, routermock.Object, new NullLogger());
 
             await sut.Run();
 

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class FileSystemPointToPointChannelResource : AbstractFileSystemChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>
+    public class FileSystemPointToPointChannelResourceManager : AbstractFileSystemChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
     {
-        public FileSystemPointToPointChannelResource(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
+        public FileSystemPointToPointChannelResourceManager(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
         {
         }
 

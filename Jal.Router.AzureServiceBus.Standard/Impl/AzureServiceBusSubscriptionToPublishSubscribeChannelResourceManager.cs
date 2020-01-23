@@ -8,9 +8,9 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusSubscriptionToPublishSubscribeChannelResource : AbstractAzureServiceBusChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+    public class AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
     {
-        public AzureServiceBusSubscriptionToPublishSubscribeChannelResource(IComponentFactoryGateway factory) : base(factory)
+        public AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryGateway factory) : base(factory)
         {
         }
 

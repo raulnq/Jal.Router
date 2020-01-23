@@ -153,7 +153,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (_parameter.UseAzureStorage)
             {
-                host.Configuration.UseAzureStorage(_parameter.AzureStorageParameter);
+                host.Configuration.UseAzureStorageAsStorage(_parameter.AzureStorageParameter);
             }
 
             host.Configuration.Storage.IgnoreExceptions = true;

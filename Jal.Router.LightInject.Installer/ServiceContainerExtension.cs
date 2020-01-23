@@ -97,17 +97,25 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IShutdown, Shutdown>(new PerContainerLifetime());
 
+            container.Register<IChannelValidator, ChannelValidator>(new PerContainerLifetime());
+
+            container.Register<IStartupTask, PointToPointChannelResourceValidator>(typeof(PointToPointChannelResourceValidator).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, PublishSubscribeChannelResourceValidator>(typeof(PublishSubscribeChannelResourceValidator).FullName, new PerContainerLifetime());
+
+            container.Register<IStartupTask, SubscriptionToPublishSubscribeChannelResourceValidator>(typeof(SubscriptionToPublishSubscribeChannelResourceValidator).FullName, new PerContainerLifetime());
+
             container.Register<IStartupTask, SubscriptionToPublishSubscribeChannelResourceCreator>(typeof (SubscriptionToPublishSubscribeChannelResourceCreator).FullName,new PerContainerLifetime());
 
             container.Register<IStartupTask, StartupBeatLogger>(typeof (StartupBeatLogger).FullName, new PerContainerLifetime());
 
             container.Register<IShutdownTask, ShutdownTask>(typeof (ShutdownTask).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, EndpointsInitializer>(typeof (EndpointsInitializer).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, EndpointValidator>(typeof (EndpointValidator).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, RoutesInitializer>(typeof(RoutesInitializer).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, RouteValidator>(typeof(RouteValidator).FullName, new PerContainerLifetime());
 
-            container.Register<IStartupTask, RuntimeConfigurationLoader>(typeof(RuntimeConfigurationLoader).FullName, new PerContainerLifetime());
+            container.Register<IStartupTask, RuntimeLoader>(typeof(RuntimeLoader).FullName, new PerContainerLifetime());
 
             container.Register<IStartupTask, PointToPointChannelResourceCreator>(typeof(PointToPointChannelResourceCreator).FullName, new PerContainerLifetime());
 
@@ -185,23 +193,23 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>(typeof(InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName);
 
-            container.Register<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>, NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>(typeof (NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>).FullName,new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>(typeof (NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>).FullName,new PerContainerLifetime());
 
-            container.Register<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, NullChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(typeof(NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, NullChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(typeof(NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, NullChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(typeof(NullChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, NullChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(typeof(NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>, FileSystemPointToPointChannelResource>(typeof(FileSystemPointToPointChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, FileSystemPointToPointChannelResourceManager>(typeof(FileSystemPointToPointChannelResourceManager).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, FileSystemPublishSubscribeChannelResource>(typeof(FileSystemPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, FileSystemPublishSubscribeChannelResourceManager>(typeof(FileSystemPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, FileSystemSubscriptionToPublishSubscribeChannelResource>(typeof(FileSystemSubscriptionToPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, FileSystemSubscriptionToPublishSubscribeChannelResourceManager>(typeof(FileSystemSubscriptionToPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>, InMemoryPointToPointChannelResource>(typeof(InMemoryPointToPointChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, InMemoryPointToPointChannelResourceManager>(typeof(InMemoryPointToPointChannelResourceManager).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, InMemoryPublishSubscribeChannelResource>(typeof(InMemoryPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, InMemoryPublishSubscribeChannelResourceManager>(typeof(InMemoryPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            container.Register<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, InMemorySubscriptionToPublishSubscribeChannelResource>(typeof(InMemorySubscriptionToPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            container.Register<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, InMemorySubscriptionToPublishSubscribeChannelResourceManager>(typeof(InMemorySubscriptionToPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
             container.Register<IBusInterceptor, NullBusInterceptor>(typeof (NullBusInterceptor).FullName,new PerContainerLifetime());
 
@@ -213,7 +221,9 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ILogger<SubscriptionToPublishSubscribeChannelStatistics>, SubscriptionToPublishSubscribeChannelStatisticsLogger>(typeof(SubscriptionToPublishSubscribeChannelStatisticsLogger).FullName, new PerContainerLifetime());
 
-            container.Register<IEntityStorage, NullStorage>(typeof (NullStorage).FullName, new PerContainerLifetime());
+            container.Register<IEntityStorage, NullEntityStorage>(typeof (NullEntityStorage).FullName, new PerContainerLifetime());
+
+            container.Register<IEntityStorage, InMemoryEntityStorage>(typeof(InMemoryEntityStorage).FullName, new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
 

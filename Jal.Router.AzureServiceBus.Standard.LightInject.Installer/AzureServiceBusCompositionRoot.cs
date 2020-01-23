@@ -11,17 +11,17 @@ namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer
         {
             serviceRegistry.Register<IMessageAdapter, AzureServiceBusMessageAdapter>(typeof(AzureServiceBusMessageAdapter).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>, AzureManagementPointToPointChannelResource>(typeof(AzureManagementPointToPointChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, AzureManagementPointToPointChannelResourceManager>(typeof(AzureManagementPointToPointChannelResourceManager).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, AzureServiceBusPublishSubscribeChannelResource>(typeof(AzureServiceBusPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, AzureServiceBusPublishSubscribeChannelResourceManager>(typeof(AzureServiceBusPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, AzureServiceBusSubscriptionToPublishSubscribeChannelResource>(typeof(AzureServiceBusSubscriptionToPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager>(typeof(AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, AzureManagementPublishSubscribeChannelResource>(typeof(AzureManagementPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, AzureManagementPublishSubscribeChannelResourceManager>(typeof(AzureManagementPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, AzureManagementSubscriptionToPublishSubscribeChannelResource>(typeof(AzureManagementSubscriptionToPublishSubscribeChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, AzureManagementSubscriptionToPublishSubscribeChannelResourceManager>(typeof(AzureManagementSubscriptionToPublishSubscribeChannelResourceManager).FullName, new PerContainerLifetime());
 
-            serviceRegistry.Register<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>, AzureServiceBusPointToPointChannelResource>(typeof(AzureServiceBusPointToPointChannelResource).FullName, new PerContainerLifetime());
+            serviceRegistry.Register<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, AzureServiceBusPointToPointChannelResourceManager>(typeof(AzureServiceBusPointToPointChannelResourceManager).FullName, new PerContainerLifetime());
 
             serviceRegistry.Register<IPointToPointChannel, AzureServiceBusQueue>(typeof(AzureServiceBusQueue).FullName);
 

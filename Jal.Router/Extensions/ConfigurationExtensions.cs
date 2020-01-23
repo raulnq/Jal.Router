@@ -6,6 +6,12 @@ namespace Jal.Router.Extensions
 {
     public static class ConfigurationExtensions
     {
+        public static IConfiguration UseMemoryAsStorage(this IConfiguration configuration)
+        {
+            return configuration
+                .UseEntityStorage<InMemoryEntityStorage>();
+        }
+
         public static IConfiguration AddShutdownFileWatcher(this IConfiguration configuration, string filepath)
         {
             return configuration.AddShutdownWatcher<FileShutdownWatcher, ShutdownFileWatcherParameter>(new ShutdownFileWatcherParameter() { File = filepath });
@@ -26,14 +32,14 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointChannelResource<FileSystemPointToPointChannelResource>()
-                .UsePublishSubscribeChannelResource<FileSystemPublishSubscribeChannelResource>()
-                .UseSubscriptionToPublishSubscribeChannelResource<FileSystemSubscriptionToPublishSubscribeChannelResource>()
+                .UsePointToPointChannelResourceManager<FileSystemPointToPointChannelResourceManager>()
+                .UsePublishSubscribeChannelResourceManager<FileSystemPublishSubscribeChannelResourceManager>()
+                .UseSubscriptionToPublishSubscribeChannelResourceManager<FileSystemSubscriptionToPublishSubscribeChannelResourceManager>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }
 
-        public static IConfiguration UseInMemoryAsTransport(this IConfiguration configuration, InMemoryParameter parameter = null)
+        public static IConfiguration UseMemoryAsTransport(this IConfiguration configuration, InMemoryParameter parameter = null)
         {
             var p = new InMemoryParameter();
 
@@ -48,9 +54,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointChannelResource<InMemoryPointToPointChannelResource>()
-                .UsePublishSubscribeChannelResource<InMemoryPublishSubscribeChannelResource>()
-                .UseSubscriptionToPublishSubscribeChannelResource<InMemorySubscriptionToPublishSubscribeChannelResource>()
+                .UsePointToPointChannelResourceManager<InMemoryPointToPointChannelResourceManager>()
+                .UsePublishSubscribeChannelResourceManager<InMemoryPublishSubscribeChannelResourceManager>()
+                .UseSubscriptionToPublishSubscribeChannelResourceManager<InMemorySubscriptionToPublishSubscribeChannelResourceManager>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }

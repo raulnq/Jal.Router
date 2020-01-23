@@ -19,17 +19,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Installer
 
             container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>().Named(typeof(AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName).LifestyleTransient());
 
-            container.Register(Component.For<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<AzureManagementPointToPointChannelResource>().Named(typeof(AzureManagementPointToPointChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<AzureManagementPointToPointChannelResourceManager>().Named(typeof(AzureManagementPointToPointChannelResourceManager).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<AzureManagementPublishSubscribeChannelResource>().Named(typeof(AzureManagementPublishSubscribeChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<AzureManagementPublishSubscribeChannelResourceManager>().Named(typeof(AzureManagementPublishSubscribeChannelResourceManager).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<AzureManagementSubscriptionToPublishSubscribeChannelResource>().Named(typeof(AzureManagementSubscriptionToPublishSubscribeChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<AzureManagementSubscriptionToPublishSubscribeChannelResourceManager>().Named(typeof(AzureManagementSubscriptionToPublishSubscribeChannelResourceManager).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<AzureServiceBusPointToPointChannelResource>().Named(typeof(AzureServiceBusPointToPointChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>().ImplementedBy<AzureServiceBusPointToPointChannelResourceManager>().Named(typeof(AzureServiceBusPointToPointChannelResourceManager).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IChannelResource<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<AzureServiceBusPublishSubscribeChannelResource>().Named(typeof(AzureServiceBusPublishSubscribeChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>().ImplementedBy<AzureServiceBusPublishSubscribeChannelResourceManager>().Named(typeof(AzureServiceBusPublishSubscribeChannelResourceManager).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IChannelResource<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<AzureServiceBusSubscriptionToPublishSubscribeChannelResource>().Named(typeof(AzureServiceBusSubscriptionToPublishSubscribeChannelResource).FullName).LifestyleSingleton());
+            container.Register(Component.For<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>().ImplementedBy<AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager>().Named(typeof(AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IMessageAdapter>().ImplementedBy<AzureServiceBusMessageAdapter>().Named(typeof(AzureServiceBusMessageAdapter).FullName).LifestyleSingleton());
         }

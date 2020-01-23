@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementPointToPointChannelResource : AbstractAzureManagementChannelResource<PointToPointChannelResource, PointToPointChannelStatistics>
+    public class AzureManagementPointToPointChannelResourceManager : AbstractAzureManagementChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
     {
-        public AzureManagementPointToPointChannelResource(IComponentFactoryGateway factory) : base(factory)
+        public AzureManagementPointToPointChannelResourceManager(IComponentFactoryGateway factory) : base(factory)
         {
         }
 
