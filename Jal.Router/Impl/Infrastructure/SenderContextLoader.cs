@@ -22,9 +22,7 @@ namespace Jal.Router.Impl
 
             newendpoint.SetContentType(typeof(TMessage));
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var newchannel = new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), provider, path);
+            var newchannel = new Channel(ChannelType.PointToPoint, connectionstring, path);
 
             newendpoint.Channels.Add(newchannel);
 
@@ -43,9 +41,7 @@ namespace Jal.Router.Impl
 
             newendpoint.SetContentType(typeof(TMessage));
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var newchannel = new Channel(ChannelType.PublishSubscribe, typeof(NullValueFinder), provider, path);
+            var newchannel = new Channel(ChannelType.PublishSubscribe, connectionstring, path);
 
             newendpoint.Channels.Add(newchannel);
 

@@ -11,10 +11,5 @@ namespace Jal.Router.Model
             :base(path, connectionstring, properties)
         {
         }
-
-        public PointToPointChannelResource(string path, Dictionary<string, string> properties, Type type, Func<IValueFinder, string> provider)
-            :base(path, properties, type, provider)
-        {
-        }
     }
 }

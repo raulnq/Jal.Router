@@ -121,8 +121,6 @@ namespace Jal.Router.Tests.Infrastructure
             }
 
             exception.ShouldBeTrue();
-
-            factorymock.Verify(x => x.CreateValueFinder(It.IsAny<Type>()), Times.AtLeastOnce);
         }
 
         [TestMethod]
@@ -147,8 +145,6 @@ namespace Jal.Router.Tests.Infrastructure
             var sut = new RoutesInitializer(factory, new NullLogger());
 
             await sut.Run();
-
-            factorymock.Verify(x => x.CreateValueFinder(It.IsAny<Type>()), Times.AtLeastOnce);
         }
     }
 

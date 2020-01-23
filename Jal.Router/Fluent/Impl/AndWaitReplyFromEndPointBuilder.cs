@@ -13,36 +13,36 @@ namespace Jal.Router.Fluent.Impl
             _channel = channel;
         }
 
-        public void AndWaitReplyFromPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, int timeout = 60) where TValueFinder : IValueFinder
+        public void AndWaitReplyFromPointToPointChannel(string path, string connectionstring, int timeout = 60)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
-            _channel.UpdateReplyFromPointToPointChannel(path, timeout, typeof(TValueFinder), connectionstringprovider);
+            _channel.UpdateReplyFromPointToPointChannel(path, timeout, connectionstring);
         }
 
-        public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription,
-            Func<IValueFinder, string> connectionstringprovider, int timeout = 60) where TValueFinder : IValueFinder
+        public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel(string path, string subscription,
+            string connectionstring, int timeout = 60)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
-            if (subscription == null)
+            if (string.IsNullOrWhiteSpace(subscription))
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channel.UpdateReplyFromSubscriptionToPublishSubscribeChannel(path, timeout, subscription, typeof(TValueFinder), connectionstringprovider);
+            _channel.UpdateReplyFromSubscriptionToPublishSubscribeChannel(path, timeout, subscription, connectionstring);
         }
     }
 }

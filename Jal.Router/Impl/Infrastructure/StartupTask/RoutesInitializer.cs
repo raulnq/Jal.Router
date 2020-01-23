@@ -21,10 +21,6 @@ namespace Jal.Router.Impl
 
             foreach (var partition in Factory.Configuration.Runtime.Partitions)
             {
-                var finder = Factory.CreateValueFinder(partition.Channel.ConnectionStringValueFinderType);
-
-                partition.Channel.UpdateConnectionString(partition.Channel.ConnectionStringProvider?.Invoke(finder));
-
                 if (string.IsNullOrWhiteSpace(partition.Channel.ConnectionString))
                 {
                     var error = $"Empty connection string, partition {partition.Name}";
@@ -51,10 +47,6 @@ namespace Jal.Router.Impl
                 {
                     foreach (var channel in route.Channels)
                     {
-                        var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
-
-                        channel.UpdateConnectionString(channel.ConnectionStringProvider?.Invoke(finder));
-
                         if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                         {
                             var error = $"Empty connection string, Handler {route.Name}";

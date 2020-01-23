@@ -22,13 +22,6 @@ namespace Jal.Router.Impl
 
             foreach (var channel in Factory.Configuration.Runtime.PointToPointChannelResources)
             {
-                if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
-                {
-                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
-
-                    channel.UpdateConnectionString(channel.ConnectionStringProvider(finder));
-                }
-
                 if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                 {
                     var error = $"Empty connection string, point to point channel {channel.Path}";

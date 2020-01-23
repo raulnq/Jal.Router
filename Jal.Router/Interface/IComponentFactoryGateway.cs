@@ -38,8 +38,6 @@ namespace Jal.Router.Interface
 
         IChannelShuffler CreateChannelShuffler();
 
-        IValueFinder CreateValueFinder(Type type);
-
         IEntityStorage CreateEntityStorage();
 
         TComponent CreateComponent<TComponent>(Type type) where TComponent : class;

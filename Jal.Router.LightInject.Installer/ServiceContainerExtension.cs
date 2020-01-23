@@ -38,11 +38,6 @@ namespace Jal.Router.LightInject.Installer
                         {
                             container.Register(typeof(AbstractRouterConfigurationSource), exportedType, exportedType.FullName, new PerContainerLifetime());
                         }
-
-                        if (typeof(IValueFinder).IsAssignableFrom(exportedType))
-                        {
-                            container.Register(typeof(IValueFinder), exportedType, exportedType.FullName, new PerContainerLifetime());
-                        }
                     }
                 }
             }
@@ -233,12 +228,6 @@ namespace Jal.Router.LightInject.Installer
             container.Register<IMiddlewareAsync<MessageContext>, Impl.ProducerMiddleware>(typeof (Impl.ProducerMiddleware).FullName,new PerContainerLifetime());
 
             container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
-
-            container.Register<IValueFinder, ConfigurationValueFinder>(typeof (ConfigurationValueFinder).FullName, new PerContainerLifetime());
-
-            container.Register<IValueFinder, NullValueFinder>(typeof(NullValueFinder).FullName, new PerContainerLifetime());
-
-            container.Register<IValueFinder, EnvironmentValueFinder>(typeof(EnvironmentValueFinder).FullName, new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof (EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
         }

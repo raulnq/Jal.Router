@@ -205,12 +205,6 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
 
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(ConfigurationValueFinder)).Named(typeof(ConfigurationValueFinder).FullName).LifestyleSingleton());
-
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(NullValueFinder)).Named(typeof(NullValueFinder).FullName).LifestyleSingleton());
-
-            container.Register(Component.For(typeof(IValueFinder)).ImplementedBy(typeof(EnvironmentValueFinder)).Named(typeof(EnvironmentValueFinder).FullName).LifestyleSingleton());
-
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IHost)).ImplementedBy(typeof(Host)).Named(typeof(Host).FullName).LifestyleSingleton());
@@ -221,7 +215,6 @@ namespace Jal.Router.Installer
                 {
                     var assemblyDescriptor = Classes.FromAssembly(assembly);
                     container.Register(assemblyDescriptor.BasedOn<AbstractRouterConfigurationSource>().WithServiceAllInterfaces());
-                    container.Register(assemblyDescriptor.BasedOn<IValueFinder>().WithServiceAllInterfaces());
                 }
             }
 

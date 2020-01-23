@@ -94,11 +94,6 @@ namespace Jal.Router.Impl
             return _factory.Create<IEntityStorage>(_configuration.StorageType);
         }
 
-        public IValueFinder CreateValueFinder(Type type)
-        {
-            return _factory.Create<IValueFinder>(type);
-        }
-
         public IStartupTask CreateStartupTask(Type type)
         {
             return _factory.Create<IStartupTask>(type);

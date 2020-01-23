@@ -14,13 +14,6 @@ namespace Jal.Router.Model
             Rules = new List<SubscriptionToPublishSubscribeChannelRule>();
         }
 
-        public SubscriptionToPublishSubscribeChannelResource(string subscription, string path, Dictionary<string, string> properties, Type type, Func<IValueFinder, string> provider)
-            :base(path, properties, type, provider)
-        {
-            Subscription = subscription;
-            Rules = new List<SubscriptionToPublishSubscribeChannelRule>();
-        }
-
         public string Subscription { get; }
 
         public List<SubscriptionToPublishSubscribeChannelRule> Rules { get; }

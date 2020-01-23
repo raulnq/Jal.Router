@@ -21,9 +21,7 @@ namespace Jal.Router.Impl
         {
             var channels = new List<Channel>();
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var newchannel = new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), provider, path);
+            var newchannel = new Channel(ChannelType.PointToPoint, connectionstring, path);
 
             channels.Add(newchannel);
 
@@ -42,9 +40,7 @@ namespace Jal.Router.Impl
         {
             var channels = new List<Channel>();
 
-            Func<IValueFinder, string> provider = x => connectionstring;
-
-            var newchannel = new Channel(ChannelType.PublishSubscribe, typeof(NullValueFinder), provider, path, subscription);
+            var newchannel = new Channel(ChannelType.PublishSubscribe, connectionstring, path, subscription);
 
             channels.Add(newchannel);
 

@@ -64,8 +64,6 @@ namespace Jal.Router.Tests.Infrastructure
 
             factory.Configuration.Runtime.ListenerContexts[0].Routes[0].ContentType.ShouldBe(typeof(object));
 
-            factory.Configuration.Runtime.ListenerContexts[0].Routes[0].Channels[0].ConnectionStringProvider.ShouldNotBeNull();
-
             factory.Configuration.Runtime.ListenerContexts[0].Routes[0].Channels[0].Type.ShouldBe(channeltype);
 
             factory.Configuration.Runtime.ListenerContexts[0].Routes[0].Channels[0].Path.ShouldBe("path");

@@ -16,14 +16,5 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
         {
             return builder.ForSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring);
         }
-
-        public static void ForQueue<TValueFinder>(this IPartitionForChannelBuilder builder, string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
-        {
-            builder.ForPointToPointChannel<TValueFinder>(path, connectionstringprovider);
-        }
-        public static void ForSubscriptionToTopic<TValueFinder>(this IPartitionForChannelBuilder builder, string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
-        {
-            builder.ForSubscriptionToPublishSubscribeChannel<TValueFinder>(path, subscription, connectionstringprovider);
-        }
     }
 }

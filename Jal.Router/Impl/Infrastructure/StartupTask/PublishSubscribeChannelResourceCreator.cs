@@ -22,14 +22,6 @@ namespace Jal.Router.Impl
 
             foreach (var channel in Factory.Configuration.Runtime.PublishSubscribeChannelResources)
             {
-
-                if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
-                {
-                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
-
-                    channel.UpdateConnectionString(channel.ConnectionStringProvider(finder));
-                }
-
                 if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                 {
                     var error = $"Empty connection string, publish subscribe channel {channel.Path}";

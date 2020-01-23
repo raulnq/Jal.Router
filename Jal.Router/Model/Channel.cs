@@ -5,20 +5,17 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
-        public Channel(ChannelType channeltype, Type connectionstringvaluefindertype, Func<IValueFinder, string> connectionstringprovider, string path)
+        public Channel(ChannelType channeltype, string connectionstring, string path)
         {
             Type = channeltype;
 
-            ConnectionStringValueFinderType = connectionstringvaluefindertype;
-
-            ConnectionStringProvider = connectionstringprovider;
+            ConnectionString = connectionstring;
 
             Path = path;
         }
 
-        public Channel(ChannelType channeltype, Type connectionstringvaluefindertype,
-            Func<IValueFinder, string> connectionstringprovider, string path, string subscription)
-            :this(channeltype, connectionstringvaluefindertype, connectionstringprovider, path)
+        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription)
+            :this(channeltype, connectionstring, path)
         {
             Subscription = subscription;
         }
@@ -90,10 +87,6 @@ namespace Jal.Router.Model
 
         }
 
-        public Type ConnectionStringValueFinderType { get; private set; }
-
-        public Func<IValueFinder, string> ConnectionStringProvider { get; private set; }
-
         public string ConnectionString { get; private set; }
 
         public string Path { get; private set; }
@@ -106,10 +99,6 @@ namespace Jal.Router.Model
 
         public string ReplySubscription { get; private set; }
 
-        public Type ReplyConnectionStringValueFinderType { get; private set; }
-
-        public Func<IValueFinder, string> ReplyConnectionStringProvider { get; private set; }
-
         public string ReplyConnectionString { get; private set; }
 
         public ChannelEntity ToEntity()
@@ -117,35 +106,23 @@ namespace Jal.Router.Model
             return new ChannelEntity(Path, Subscription, Type);
         }
 
-        public void UpdateConnectionString(string connectionstring)
-        {
-            ConnectionString = connectionstring;
-        }
-
-        public void UpdateReplyConnectionString(string replyconnectionstring)
-        {
-            ReplyConnectionString = replyconnectionstring;
-        }
-
         public void UpdateReplyFromPointToPointChannel(string replypath, int replytimeout, 
-            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> replyconnectionstringprovider)
+            string replyconnectionstring)
         {
             ReplyPath = replypath;
             ReplyTimeOut = replytimeout;
             Type = ChannelType.RequestReplyToPointToPoint;
-            ReplyConnectionStringValueFinderType = replyconnectionstringvaluefindertype;
-            ReplyConnectionStringProvider = replyconnectionstringprovider;
+            ReplyConnectionString = replyconnectionstring;
         }
 
         public void UpdateReplyFromSubscriptionToPublishSubscribeChannel(string replypath, int replytimeout, string replysubscription,
-            Type replyconnectionstringvaluefindertype, Func<IValueFinder, string> replyconnectionstringprovider)
+            string replyconnectionstring)
         {
             ReplySubscription = replysubscription;
             ReplyPath = replypath;
             ReplyTimeOut = replytimeout;
             Type = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
-            ReplyConnectionStringValueFinderType = replyconnectionstringvaluefindertype;
-            ReplyConnectionStringProvider = replyconnectionstringprovider;
+            ReplyConnectionString = replyconnectionstring;
         }
     }
 }

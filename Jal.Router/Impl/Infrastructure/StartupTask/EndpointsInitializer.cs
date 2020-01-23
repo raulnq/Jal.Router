@@ -26,43 +26,26 @@ namespace Jal.Router.Impl
                 {
                     foreach (var channel in endpoint.Channels)
                     {
-                        if (channel.ConnectionStringValueFinderType != null)
+                        if (string.IsNullOrWhiteSpace(channel.ConnectionString))
                         {
-                            var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
+                            var error = $"Empty connection string, Endpoint {endpoint.Name}";
 
-                            if (channel.ConnectionStringProvider!=null)
-                            {
-                                channel.UpdateConnectionString(channel.ConnectionStringProvider(finder));
-                            }
+                            errors.AppendLine(error);
 
-                            if (string.IsNullOrWhiteSpace(channel.ConnectionString))
-                            {
-                                var error = $"Empty connection string, Endpoint {endpoint.Name}";
-
-                                errors.AppendLine(error);
-
-                                Logger.Log(error);
-                            }
-
-                            if (string.IsNullOrWhiteSpace(channel.Path))
-                            {
-                                var error = $"Empty path, Endpoint {endpoint.Name}";
-
-                                errors.AppendLine(error);
-
-                                Logger.Log(error);
-                            }
+                            Logger.Log(error);
                         }
 
-                        if (channel.ReplyConnectionStringProvider != null)
+                        if (string.IsNullOrWhiteSpace(channel.Path))
                         {
-                            var finder = Factory.CreateValueFinder(channel.ReplyConnectionStringValueFinderType);
+                            var error = $"Empty path, Endpoint {endpoint.Name}";
 
-                            if (channel.ReplyConnectionStringProvider!=null)
-                            {
-                                channel.UpdateReplyConnectionString(channel.ReplyConnectionStringProvider(finder));
-                            }
+                            errors.AppendLine(error);
 
+                            Logger.Log(error);
+                        }
+
+                        if (channel.Type == Model.ChannelType.RequestReplyToPointToPoint || channel.Type == Model.ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+                        {
                             if (string.IsNullOrWhiteSpace(channel.ReplyConnectionString))
                             {
                                 var error = $"Empty reply connection string, Endpoint {endpoint.Name}";

@@ -152,7 +152,7 @@ namespace Jal.Router.Tests
 
         public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription")
         {
-            return new Channel(ChannelType.PointToPoint, typeof(NullValueFinder), _=> connectionstring, path, subscription);
+            return new Channel(channeltype, connectionstring, path, subscription);
         }
 
         public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null )
@@ -182,8 +182,6 @@ namespace Jal.Router.Tests
             factorymock.Setup(m => m.CreateRouterInterceptor()).Returns(new NullRouterInterceptor());
 
             factorymock.Setup(m => m.CreateBusInterceptor()).Returns(new NullBusInterceptor());
-
-            factorymock.Setup(m => m.CreateValueFinder(It.IsAny<Type>())).Returns(new NullValueFinder());
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
 

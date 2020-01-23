@@ -85,7 +85,7 @@ namespace Jal.Router.Tests.Infrastructure
 
             var factory = factorymock.Object;
 
-            var resource = new SubscriptionToPublishSubscribeChannelResource("subscription", "path", new Dictionary<string, string>(), typeof(NullValueFinder), _=>"connectionstring");
+            var resource = new SubscriptionToPublishSubscribeChannelResource("subscription", "path", "connectionstring", new Dictionary<string, string>());
 
             resource.Rules.Add(new SubscriptionToPublishSubscribeChannelRule("", "", true));
 
@@ -96,8 +96,6 @@ namespace Jal.Router.Tests.Infrastructure
             await sut.Run();
 
             factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResource(), Times.Once);
-
-            factorymock.Verify(x => x.CreateValueFinder(It.IsAny<Type>()), Times.Once);
 
             channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
         }
