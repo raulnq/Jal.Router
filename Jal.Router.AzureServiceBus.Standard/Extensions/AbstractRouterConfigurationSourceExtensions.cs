@@ -20,7 +20,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             RegisterQueue(configuration, new AzureServiceBusQueue(queue), connectionstring);
         }
 
-
         public static void RegisterQueue(this AbstractRouterConfigurationSource configuration, AzureServiceBusQueue queue, AzureServiceBusConfiguration servicebusconfiguration)
         {
             var dictionary = new Dictionary<string, string>();
@@ -208,6 +207,5 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 
             configuration.RegisterSubscriptionToPublishSubscribeChannel(subscription.Name, subscription.Topic, connectionstring, dictionary, r);
         }
-
     }
 }

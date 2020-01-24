@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class Configuration : IConfiguration
     {
         public RuntimeContext Runtime { get; }
-        public string ChannelProviderName { get; private set; }
+        public string TransportName { get; private set; }
         public Storage Storage { get; set; }
         public string ApplicationName { get; private set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
@@ -203,9 +203,9 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration SetChannelProviderName(string name)
+        public IConfiguration SetTransportName(string name)
         {
-            ChannelProviderName = name;
+            TransportName = name;
             return this;
         }
 
@@ -263,7 +263,7 @@ namespace Jal.Router.Impl
             Storage = new Storage();
             Runtime = new RuntimeContext();
             ApplicationName = "Empty app name";
-            ChannelProviderName = "Empty channel provider name";
+            TransportName = "Empty channel provider name";
         }
     }
 }

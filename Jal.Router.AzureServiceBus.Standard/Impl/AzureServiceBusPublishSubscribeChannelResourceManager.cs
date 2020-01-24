@@ -56,10 +56,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (!await client.TopicExistsAsync(channel.Path).ConfigureAwait(false))
             {
-                var description = new TopicDescription(channel.Path);
+                var description = new TopicDescription(channel.Path)
+                {
+                    SupportOrdering = true
+                };
 
-                description.SupportOrdering = true;
-                
                 var messagettl = 14;
 
                 if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))

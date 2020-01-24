@@ -36,7 +36,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 Data = context.Data.ContentContext.Data,
 
-                Type = Configuration.ChannelProviderName,
+                Type = Configuration.TransportName,
             };
 
             PopulateContext(telemetry.Context, context.Data);

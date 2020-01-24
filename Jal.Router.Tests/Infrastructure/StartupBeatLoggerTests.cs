@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
     public class StartupBeatLoggerTests

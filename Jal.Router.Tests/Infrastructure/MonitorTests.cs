@@ -6,7 +6,7 @@ using System;
 using System.Threading;
 using Monitor = Jal.Router.Impl.Monitor;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
     public class MonitorTests

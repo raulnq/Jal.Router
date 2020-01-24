@@ -6,7 +6,7 @@ using Moq;
 using Shouldly;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
     public class SenderLoaderTests

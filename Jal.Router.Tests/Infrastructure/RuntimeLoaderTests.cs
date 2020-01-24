@@ -6,10 +6,10 @@ using Shouldly;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
-    public class RuntimeConfigurationLoaderTests
+    public class RuntimeLoaderTests
     {
         [TestMethod]
         public async Task Run_WithType_ShouldRun()

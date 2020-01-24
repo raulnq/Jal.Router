@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     {
         private readonly IListenerContextCreator _loader;
 
-        private IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryGateway _factory;
 
         public ListenerContextLoader(IListenerContextCreator loader, IComponentFactoryGateway factory)
         {

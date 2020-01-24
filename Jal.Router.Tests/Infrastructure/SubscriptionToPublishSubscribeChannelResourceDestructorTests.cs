@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace Jal.Router.Tests
 {
     [TestClass]
-    public class SubscriptionToPublishSubscribeChannelResourceCreatorTests
+    public class SubscriptionToPublishSubscribeChannelResourceDestructorTests
     {
-        private SubscriptionToPublishSubscribeChannelResourceCreator Build(IComponentFactoryGateway factory)
+        private SubscriptionToPublishSubscribeChannelResourceDestructor Build(IComponentFactoryGateway factory)
         {
-            return new SubscriptionToPublishSubscribeChannelResourceCreator(factory, new NullLogger());
+            return new SubscriptionToPublishSubscribeChannelResourceDestructor(factory, new NullLogger());
         }
 
         [TestMethod]
@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
         {
             var channelresource = new Mock<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
 
-            channelresource.Setup(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>())).Throws(new Exception());
+            channelresource.Setup(x => x.DeleteIfExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>())).Throws(new Exception());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -39,11 +39,11 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            await Should.ThrowAsync<ApplicationException>(()=>sut.Run());
+            await Should.ThrowAsync<ApplicationException>(() => sut.Run());
 
             factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager(), Times.Once);
 
-            channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
+            channelresource.Verify(x => x.DeleteIfExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
         }
 
         [TestMethod]
@@ -69,7 +69,7 @@ namespace Jal.Router.Tests
 
             factorymock.Verify(x => x.CreateSubscriptionToPublishSubscribeChannelResourceManager(), Times.Once);
 
-            channelresource.Verify(x => x.CreateIfNotExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
+            channelresource.Verify(x => x.DeleteIfExist(It.IsAny<SubscriptionToPublishSubscribeChannelResource>()), Times.Once);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Jal.Router.Extensions
             }
 
             return configuration
-                .SetChannelProviderName("File System")
+                .SetTransportName("File System")
                 .UsePointToPointChannel<FileSystemPointToPointChannel>()
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
@@ -49,7 +49,7 @@ namespace Jal.Router.Extensions
             }
 
             return configuration
-                .SetChannelProviderName("Memory")
+                .SetTransportName("Memory")
                 .UsePointToPointChannel<InMemoryPointToPointChannel>()
                 .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()

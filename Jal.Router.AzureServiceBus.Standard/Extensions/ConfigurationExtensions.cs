@@ -6,7 +6,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static IConfiguration UseAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusParameter parameter=null, bool useazureservicemanagemet = true)
+        public static IConfiguration UseAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusParameter parameter=null, bool useazureservicemanagement = true)
         {
             var p = new AzureServiceBusParameter();
 
@@ -15,10 +15,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
                 p = parameter;
             }
 
-            if (useazureservicemanagemet)
+            if (useazureservicemanagement)
             {
                 return configuration
-                    .SetChannelProviderName("Azure Service Bus")
+                    .SetTransportName("Azure Service Bus")
                     .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
@@ -32,7 +32,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Extensions
             else
             {
                 return configuration
-                    .SetChannelProviderName("Azure Service Bus")
+                    .SetTransportName("Azure Service Bus")
                     .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()

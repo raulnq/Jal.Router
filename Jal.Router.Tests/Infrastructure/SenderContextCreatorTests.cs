@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
     public class SenderContextCreatorTests

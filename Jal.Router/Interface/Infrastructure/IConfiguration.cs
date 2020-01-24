@@ -11,7 +11,7 @@ namespace Jal.Router.Interface
         RuntimeContext Runtime { get; }
         Storage Storage { get; }
         string ApplicationName { get; }
-        string ChannelProviderName { get; }
+        string TransportName { get; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IDictionary<string, object> Parameters { get; }
         IList<Type> StartupTaskTypes { get; }
@@ -38,7 +38,7 @@ namespace Jal.Router.Interface
         IList<Type> OutboundMiddlewareTypes { get; }
         IConfiguration EnableStorage(bool ignoreexceptions = true);
         IConfiguration DisableStorage();
-        IConfiguration SetChannelProviderName(string name);
+        IConfiguration SetTransportName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
         IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel;

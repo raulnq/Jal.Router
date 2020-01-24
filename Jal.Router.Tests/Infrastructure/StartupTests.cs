@@ -1,6 +1,5 @@
 ﻿using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
@@ -8,7 +7,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Tests.Infrastructure
+namespace Jal.Router.Tests
 {
     [TestClass]
     public class ComponentFactoryTests
@@ -45,108 +44,12 @@ namespace Jal.Router.Tests.Infrastructure
     {
     }
     [TestClass]
-    public class PointToPointChannelResourceDestructorTests
-    {
-    }
-    [TestClass]
-    public class PublishSubscribeChannelResourceDestructorTests
-    {
-    }
-    [TestClass]
     public class SenderShutdownTaskTests
     {
     }
     [TestClass]
     public class ShutdownTaskTests
     {
-    }
-    [TestClass]
-    public class SubscriptionToPublishSubscribeChannelResourceDestructorTests
-    {
-    }
-    [TestClass]
-    public class EndpointsInitializerTests
-    {
-    }
-    [TestClass]
-    public class ListenerLoaderTests
-    {
-    }
-    [TestClass]
-    public class PointToPointChannelResourceCreatorTests
-    {
-    }
-    [TestClass]
-    public class PublishSubscribeChannelResourceCreatorTests
-    {
-    }
-    [TestClass]
-    public class RouteValidatorTests
-    {
-        [TestMethod]
-        public async Task Run_WithMissingData_ShouldThrowException()
-        {
-            var validatormock = new Mock<IChannelValidator>();
-
-            validatormock.Setup(x => x.Validate(It.IsAny<Channel>(), It.IsAny<string>(), It.IsAny<string>())).Returns("error");
-
-            var factorymock = Builder.CreateFactoryMock();
-
-            var factory = factorymock.Object;
-
-            var route = Builder.CreateRoute();
-
-            route.Channels.Add(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Routes.Add(route);
-
-            var partition = new Partition("name");
-
-            partition.UpdateChannel(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Partitions.Add(partition);
-
-            var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
-
-            var exception = false;
-
-            try
-            {
-                await sut.Run();
-            }
-            catch (ApplicationException)
-            {
-                exception = true;
-            }
-
-            exception.ShouldBeTrue();
-        }
-
-        [TestMethod]
-        public async Task Run_WithRouteAndPartition_ShouldBeInitialized()
-        {
-            var validatormock = new Mock<IChannelValidator>();
-
-            var factorymock = Builder.CreateFactoryMock();
-
-            var factory = factorymock.Object;
-
-            var route = Builder.CreateRoute();
-
-            route.Channels.Add(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Routes.Add(route);
-
-            var partition = new Partition("name");
-
-            partition.UpdateChannel(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Partitions.Add(partition);
-
-            var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
-
-            await sut.Run();
-        }
     }
 
     [TestClass]
