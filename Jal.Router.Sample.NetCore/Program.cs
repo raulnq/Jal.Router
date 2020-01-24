@@ -22,6 +22,7 @@ using Jal.Router.Newtonsoft.LightInject.Installer;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using Jal.Router.Azure.Standard.LightInject.Installer.All;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -31,9 +32,7 @@ namespace Jal.Router.Sample.NetCore
         {
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
-            container.RegisterFrom<ServiceLocatorCompositionRoot>();
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
-            container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
             container.RegisterFrom<AzureStorageCompositionRoot>();
             container.RegisterFrom<NewtonsoftCompositionRoot>();
 
@@ -97,6 +96,11 @@ namespace Jal.Router.Sample.NetCore
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
                 //.EnableEntityStorage()
                 .AddShutdownWatcher<SignTermShutdownWatcher>();
+
+            //var h = HostBuilder.Create(container, "")
+            //    .UseAzureServiceBus(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() })
+            //    .Build();
+                
 
             //var facade = container.GetInstance<IEntityStorageGateway>();
 

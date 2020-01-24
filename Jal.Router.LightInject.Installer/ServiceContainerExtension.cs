@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.LightInject.Installer;
+using Jal.Locator.LightInject.Installer;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -11,6 +13,10 @@ namespace Jal.Router.LightInject.Installer
     {
         public static void RegisterRouter(this IServiceContainer container, IRouterConfigurationSource[] sources)
         {
+            container.RegisterFrom<ServiceLocatorCompositionRoot>();
+
+            container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
+
             RegisterRouter(container);
 
             if (sources != null)
@@ -19,26 +25,6 @@ namespace Jal.Router.LightInject.Installer
                 {
                     container.Register(typeof(IRouterConfigurationSource) , source.GetType(), source.GetType().FullName, new PerContainerLifetime());
 
-                }
-            }
-        }
-
-
-        public static void RegisterRouter(this IServiceContainer container, Assembly[] sourceassemblies)
-        {
-            RegisterRouter(container);
-
-            if (sourceassemblies != null)
-            {
-                foreach (var assemblysource in sourceassemblies)
-                {
-                    foreach (var exportedType in assemblysource.ExportedTypes)
-                    {
-                        if (exportedType.IsSubclassOf(typeof(AbstractRouterConfigurationSource)))
-                        {
-                            container.Register(typeof(AbstractRouterConfigurationSource), exportedType, exportedType.FullName, new PerContainerLifetime());
-                        }
-                    }
                 }
             }
         }
