@@ -8,7 +8,6 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-
     public class RouterMiddleware : IMiddlewareAsync<MessageContext>
     {
         private readonly IComponentFactoryGateway _factory;

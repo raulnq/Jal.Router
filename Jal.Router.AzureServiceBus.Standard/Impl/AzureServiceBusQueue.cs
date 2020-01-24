@@ -16,7 +16,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public void Open(SenderContext sendercontext)
         {
-            _client = new QueueClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _client = new QueueClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
 
             if(_parameter.TimeoutInSeconds>0)
             {
@@ -40,7 +40,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public void Open(ListenerContext listenercontext)
         {
-            _client = new QueueClient(listenercontext.Channel.ToConnectionString, listenercontext.Channel.ToPath);
+            _client = new QueueClient(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path);
         }
 
         public bool IsActive(ListenerContext listenercontext)

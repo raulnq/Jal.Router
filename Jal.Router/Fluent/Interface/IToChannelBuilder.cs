@@ -5,10 +5,8 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IToChannelBuilder
     {
-        void AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path)
-    where TValueFinder : IValueFinder;
+        void AddPointToPointChannel(string connectionstring, string path);
 
-        void AddPublishSubscribeChannel<TValue>(Func<IValueFinder, string> connectionstringprovider, string path)
-    where TValue : IValueFinder;
+        void AddPublishSubscribeChannel(string connectionstring, string path);
     }
 }

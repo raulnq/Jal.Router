@@ -5,6 +5,6 @@ namespace Jal.Router.Interface
 {
     public interface IProducer
     {
-        Task Send(MessageContext context);
+        Task Produce(MessageContext context);
     }
 }

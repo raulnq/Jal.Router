@@ -16,18 +16,16 @@ namespace Jal.Router.Fluent.Impl
 
         public IToEndPointBuilder ForMessage<TMessage>()
         {
-            _endpoint.UpdateContentType(typeof (TMessage));
+            _endpoint.SetContentType(typeof (TMessage));
 
             return this;
         }
 
-        public void AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public void AddPointToPointChannel(string connectionstring, string path)
         {
-            
-
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
 
             if (string.IsNullOrWhiteSpace(path))
@@ -35,38 +33,38 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
 
             _endpoint.Channels.Add(channel);
         }
 
-        IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) //where TValueFinder : IValueFinder
+        IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel(string connectionstring, string path) 
         {
-            
 
-            if (connectionstringprovider == null)
+
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
 
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            var channel = new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
 
             _endpoint.Channels.Add(channel);
 
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public void AddPublishSubscribeChannel<TValueFinder>(Func<IValueFinder, string> connectionstringprovider, string path) where TValueFinder : IValueFinder
+        public void AddPublishSubscribeChannel(string connectionstring, string path)
         {
-            
 
-            if (connectionstringprovider == null)
+
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
 
             if (string.IsNullOrWhiteSpace(path))
@@ -74,7 +72,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PublishSubscribe, typeof(TValueFinder), connectionstringprovider, path);
+            var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path);
 
             _endpoint.Channels.Add(channel);
         }
@@ -112,7 +110,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(channelbuilder));
             }
 
-            _endpoint.UpdateReplyContentType(typeof(TReply));
+            _endpoint.SetReplyContentType(typeof(TReply));
 
             channelbuilder(this);
 

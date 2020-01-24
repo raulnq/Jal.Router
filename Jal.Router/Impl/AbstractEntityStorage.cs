@@ -7,6 +7,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
+
     public abstract class AbstractEntityStorage : IEntityStorage
     {
         public virtual Task<string> Create(MessageEntity messageentity)

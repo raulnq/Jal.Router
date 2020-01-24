@@ -1,4 +1,6 @@
-﻿using Jal.Router.Impl;
+﻿using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability.Model;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
@@ -10,11 +12,14 @@ namespace Jal.Router.Tests
 {
     public static class Builder
     {
-        public static MessageContext CreateMessageContext(Route route=null)
+        public static MessageContext CreateMessageContext(Route route=null, EndPoint endpoint=null,  Mock<IBus> busmock = null)
         {
-            var mock = new Mock<IBus>();
+            if(busmock==null)
+            {
+                busmock = new Mock<IBus>();
+            }
 
-            var messagecontext = new MessageContext(mock.Object);
+            var messagecontext = new MessageContext(busmock.Object);
 
             if(route==null)
             {
@@ -23,6 +28,15 @@ namespace Jal.Router.Tests
             else
             {
                 messagecontext.SetRoute(route);
+            }
+
+            if (endpoint == null)
+            {
+                messagecontext.SetEndPoint(new EndPoint("endpoint"));
+            }
+            else
+            {
+                messagecontext.SetEndPoint(endpoint);
             }
 
             return messagecontext;
@@ -45,7 +59,7 @@ namespace Jal.Router.Tests
 
         public static Route<object, Handler> CreateRoute()
         {
-            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>());
+            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>() { });
 
             return route;
         }
@@ -105,6 +119,61 @@ namespace Jal.Router.Tests
             return route;
         }
 
+        public static Mock<IPipeline> CreatePipelineMock(bool throwexception = false)
+        {
+            var pipelinemock = new Mock<IPipeline>();
+
+            if (throwexception)
+            {
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Throws(new System.Exception());
+            }
+            else
+            {
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Returns(Task.CompletedTask);
+            }
+
+            return pipelinemock;
+        }
+
+        public static Mock<IEndPointProvider> CreateEnpointProvider(string endpointname = "endpointname", ChannelType channel= ChannelType.PointToPoint)
+        {
+            var endpointprovidermock = new Mock<IEndPointProvider>();
+
+            var endpoint = new EndPoint(endpointname);
+
+            endpoint.SetOrigin(new Origin());
+
+            endpoint.Channels.Add(new Channel(channel, null, null, null));
+
+            endpointprovidermock.Setup(x => x.Provide(It.IsAny<string>(), It.IsAny<Type>())).Returns(endpoint);
+
+            return endpointprovidermock;
+        }
+
+        public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription")
+        {
+            return new Channel(channeltype, connectionstring, path, subscription);
+        }
+
+        public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null )
+        {
+            if(channel==null)
+            {
+                channel = CreateChannel();
+            }
+
+            return new SenderContext(channel, senderchannel, readerchannel);
+        }
+
+        public static ListenerContext CreateListenerContext(Channel channel = null, IListenerChannel listenerchannel = null, Partition partition= null)
+        {
+            if (channel == null)
+            {
+                channel = CreateChannel();
+            }
+
+            return new ListenerContext(channel, listenerchannel, partition);
+        }
 
         public static Mock<IComponentFactoryGateway> CreateFactoryMock()
         {
@@ -112,7 +181,11 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(m => m.CreateRouterInterceptor()).Returns(new NullRouterInterceptor());
 
+            factorymock.Setup(m => m.CreateBusInterceptor()).Returns(new NullBusInterceptor());
+
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
+
+            factorymock.Setup(x => x.CreateMessageAdapter()).Returns(new NullMessageAdapter());
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

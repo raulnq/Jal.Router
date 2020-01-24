@@ -30,7 +30,7 @@ namespace Jal.Router.Sample.NetCore
         static void Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
+            container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
             container.RegisterFrom<ServiceLocatorCompositionRoot>();
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
@@ -67,24 +67,31 @@ namespace Jal.Router.Sample.NetCore
             var host = container.GetInstance<IHost>();
             var bus = container.GetInstance<IBus>();
             var parameter = new FileSystemParameter() { Path = appRoot };
-            parameter.AddEndpointHandler("sendtoqueue1", (fs, ms, me, fn) =>
+            var messagecontext = new MessageContext(bus);
+            parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
              {
-                 var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
+                 //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
 
-                 fs.CreateFile(path, fn, me);
+                 //fs.CreateFile(path, fn, me);
+
+                 var m = ms.Deserialize<Message>(me.Content);
+
+                 return messagecontext.Send(m, "sendtotopic1");
+                 
              });
-            parameter.AddEndpointHandler("sendtoqueue2", (fs, ms, me, fn) =>
+            parameter.AddEndpointHandler("sendtoqueue2", (ms, me) =>
             {
-                var path = fs.CreatePointToPointChannelPath(parameter, "connectionstring", "queue3");
+                var m = ms.Deserialize<Message>(me.Content);
 
-                fs.CreateFile(path, fn, me);
+                return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                //.UseAzureServiceBus(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 })
-                .UseFileSystem(parameter)
-                .UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
+                //.UseFileSystemAsTransport(parameter)
+                //.UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
-                .UseNewtonsoft()
+                .UseNewtonsoftAsSerializer()
+                .UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
@@ -95,7 +102,9 @@ namespace Jal.Router.Sample.NetCore
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            host.RunAndBlock();
+            
+
+            host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
 
             //var bus = container.GetInstance<IBus>();
 
@@ -111,12 +120,14 @@ namespace Jal.Router.Sample.NetCore
     {
         public FileRouterConfigurationSmokeTest()
         {
+            var connectionstring = "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=";
+
             RegisterOrigin("smoketestapp", "123");
 
             RegisterHandler("handler1")
             .ToListen(x =>
             {
-                x.AddPointToPointChannel("queuea", "connectionstring");
+                x.AddPointToPointChannel("queuea", connectionstring);
             })
             .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerQueueA>(x =>
             {
@@ -126,7 +137,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler("handler2")
             .ToListen(x =>
             {
-                x.AddSubscriptionToPublishSubscribeChannel("topic1", "subscription1", "connectionstring");
+                x.AddSubscriptionToPublishSubscribeChannel("topic1", "subscription1", connectionstring);
             })
             .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerTopic1Subscription1>(x =>
             {
@@ -136,26 +147,44 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler("handler3")
             .ToListen(x =>
             {
-                x.AddPointToPointChannel("queue3", "connectionstring");
+                x.AddPointToPointChannel("queue3", connectionstring);
             })
             .ForMessage<Message>().Use<IMessageHandler<Message>, HandlerQueue3>(x =>
             {
                 x.With((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
             });
 
+            RegisterEndPoint("sendtoqueuea")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel(connectionstring, "queuea"));
+
             RegisterEndPoint("sendtoqueue1")
                 .ForMessage<Message>()
-                .To(x => x.AddPointToPointChannel("connectionstring", "queue1"));
+                .To(x => x.AddPointToPointChannel(connectionstring, "queue1"));
 
             RegisterEndPoint("sendtoqueue2")
                 .ForMessage<Message>()
-                .To(x => x.AddPointToPointChannel("connectionstring", "queue2"));
+                .To(x => x.AddPointToPointChannel(connectionstring, "queue2"));
 
-            RegisterPointToPointChannel("queuea", "connectionstring", new Dictionary<string, string>());
+            RegisterPointToPointChannel("queuea", connectionstring, new Dictionary<string, string>());
 
-            RegisterPointToPointChannel("queue3", "connectionstring", new Dictionary<string, string>());
+            RegisterPointToPointChannel("queue3", connectionstring, new Dictionary<string, string>());
 
-            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topic1", "connectionstring", new Dictionary<string, string>());
+            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topic1", connectionstring, new Dictionary<string, string>());
+
+            ////////////////////////
+
+            RegisterEndPoint("sendtotopic1")
+                .ForMessage<Message>()
+                .To(x => x.AddPublishSubscribeChannel(connectionstring, "topic1"));
+
+            RegisterEndPoint("sendtoqueue3")
+                .ForMessage<Message>()
+                .To(x => x.AddPointToPointChannel(connectionstring, "queue3"));
+
+            RegisterPublishSubscribeChannel("topic1", connectionstring, new Dictionary<string, string>());
+
+            RegisterPointToPointChannel("queue1", connectionstring, new Dictionary<string, string>());
         }
     }
 
@@ -306,61 +335,61 @@ namespace Jal.Router.Sample.NetCore
 
             RegisterOrigin("smoketestapp", "123");
 
-            this.RegisterQueue(new AzureServiceBusQueue(_sendersessionqueue) { }, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_sendersessionqueue) { }, config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_sessionqueue) { SessionEnabled = true }, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_sessionqueue) { SessionEnabled = true }, config.ConnectionString);
 
-            this.RegisterTopic(new AzureServiceBusTopic(_sessiontopic) { }, config);
+            this.RegisterTopic(new AzureServiceBusTopic(_sessiontopic) { }, config.ConnectionString);
 
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _sessiontopic) { SessionEnabled = true }, config, "1=1");
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _sessiontopic) { SessionEnabled = true }, config.ConnectionString, "1=1");
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetosend), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetosend), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetoread), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetoread), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_replyqueue) { SessionEnabled = true }, config);
+            this.RegisterQueue(new AzureServiceBusQueue(_replyqueue) { SessionEnabled = true }, config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_fromreplyqueue), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_fromreplyqueue), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_toreplyqueue), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_toreplyqueue), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandler), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandler), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuetopublishtopic), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuetopublishtopic), config.ConnectionString);
 
-            this.RegisterTopic(new AzureServiceBusTopic(_topicpublishedfromqueue), config);
+            this.RegisterTopic(new AzureServiceBusTopic(_topicpublishedfromqueue), config.ConnectionString);
 
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topicpublishedfromqueue), config, "1=1");
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topicpublishedfromqueue), config.ConnectionString, "1=1");
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_alternativequeuestart), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_alternativequeuestart), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queueend), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queueend), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_errorqueue), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_errorqueue), config.ConnectionString);
             
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_forwardqueue), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_forwardqueue), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithwhen), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithwhen), config.ConnectionString);
             
-            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlera), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlera), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlerb), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlerb), config.ConnectionString);
 
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbytwohandlers), config);
+            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbytwohandlers), config.ConnectionString);
 
-            this.RegisterTopic(new AzureServiceBusTopic(_topiclistenbyonehandler),  config);
+            this.RegisterTopic(new AzureServiceBusTopic(_topiclistenbyonehandler),  config.ConnectionString);
 
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topiclistenbyonehandler), config, "1=1");
+            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topiclistenbyonehandler), config.ConnectionString, "1=1");
 
 
             RegisterHandler(_queueperformancetoread + "_handler")
@@ -640,7 +669,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_end", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_end", operationid: context.IdentityContext.OperationId);
 
             return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
         }
@@ -658,7 +687,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
 
             return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
         }
@@ -676,7 +705,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(context.IdentityContext.Id + "_continue", context.IdentityContext.OperationId);
+            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
 
             return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
         }
@@ -831,10 +860,10 @@ namespace Jal.Router.Sample.NetCore
         {
             for (int i = 0; i < 5; i++)
             {
-                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext($"1-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()),"X");
-                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext($"2-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext($"3-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext($"4-{i}", context.IdentityContext.OperationId, context.IdentityContext.Id, i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"1-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"2-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"3-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"4-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
             }
         }
     }

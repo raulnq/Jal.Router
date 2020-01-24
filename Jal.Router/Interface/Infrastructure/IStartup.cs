@@ -4,6 +4,6 @@ namespace Jal.Router.Interface
 {
     public interface IStartup
     {
-        Task Start();
+        Task Run();
     }
 }

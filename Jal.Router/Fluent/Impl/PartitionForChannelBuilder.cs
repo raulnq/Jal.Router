@@ -14,40 +14,39 @@ namespace Jal.Router.Fluent.Impl
             _partition = partition;
         }
 
-        public IPartitionUntilBuilder ForPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public IPartitionUntilBuilder ForPointToPointChannel(string path, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            _partition.UpdateChannel(new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path));
+            _partition.UpdateChannel(new Channel(ChannelType.PointToPoint, connectionstring, path));
 
             return this;
         }
 
-        public IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
-            if (subscription == null)
+            if (string.IsNullOrWhiteSpace(subscription))
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _partition.UpdateChannel(new Channel(ChannelType.SubscriptionToPublishSubscribe, typeof(TValueFinder), 
-                connectionstringprovider, path, subscription));
+            _partition.UpdateChannel(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription));
 
             return this;
         }

@@ -16,7 +16,7 @@ namespace Jal.Router.Extensions
 
             var options = context.CreateOptions(endpointname, id, sagaid, headers);
 
-            options.IdentityContext.UpdateReplyToRequestId(Guid.NewGuid().ToString());
+            options.IdentityContext.SetReplyToRequestId(Guid.NewGuid().ToString());
 
             return context.Reply<TContent, TResult>(content, options);
         }
@@ -30,99 +30,69 @@ namespace Jal.Router.Extensions
 
             var options = context.CreateOptions(endpointname, identitycontext, sagaid, headers, version);
 
-            options.IdentityContext.UpdateReplyToRequestId(Guid.NewGuid().ToString());
+            options.IdentityContext.SetReplyToRequestId(Guid.NewGuid().ToString());
 
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string,string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            return context.FireAndForget(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
+            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id = null, string sagaid = null, Dictionary<string, string> headers = null, string version = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            return context.FireAndForget(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers, version));
+            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, identitycontext, sagaid, headers));
+            return context.Send(content, context.CreateOptions(endpointname, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task FireAndForget<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, string sagaid=null,  Dictionary<string, string> headers = null, string version = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, string id=null, string sagaid=null, Dictionary<string, string> headers = null, string version=null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.FireAndForget(content, context.CreateOrigin(), context.CreateOptions(endpointname, id, sagaid, headers, version));
+            return context.Send(content, context.CreateOptions(endpointname, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string,string> headers = null)
-        {
-            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers));
-        }
-
-        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null)
-        {
-            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers, version));
-        }
-
-        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid=null, string key=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.Send(content, context.CreateOptions(endpointname, identitycontext, sagaid, headers, version));
+            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, string id=null, string sagaid=null, Dictionary<string, string> headers = null, string version=null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        {
+            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
+        }
+
+        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.Send(content, context.CreateOptions(endpointname, id, sagaid, headers, version));
+            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid=null, string key=null, Dictionary<string, string> headers = null, string version = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id = null, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(endpointname);
-            }
-
-            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers, version));
-        }
-
-        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null)
-        {
-            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version));
-        }
-
-        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null)
-        {
-            if (string.IsNullOrWhiteSpace(endpointname))
-            {
-                throw new ArgumentNullException(endpointname);
-            }
-
-            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, id, sagaid, headers, version));
-        }
-
-        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id = null, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null)
-        {
-            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, id, sagaid, headers, version));
+            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
         public static Origin CreateOrigin(this MessageContext context, string key = null)
@@ -130,28 +100,31 @@ namespace Jal.Router.Extensions
             return new Origin() { Key = key};
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, IDictionary<string, string> headers = null, string version = null)
+        private static Options CreateOptions(this MessageContext context, string endpointname, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null)
         {
-            var identitycontext = context.IdentityContext.CreateCopy();
+            var identitycontext = context.IdentityContext.Clone();
 
             if (string.IsNullOrWhiteSpace(identitycontext.Id))
             {
                 throw new ArgumentNullException(identitycontext.Id);
             }
 
-            identitycontext.UpdateParentId(identitycontext.Id);
-
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
+            if(!string.IsNullOrWhiteSpace(identitycontext.ParentId))
             {
-                identitycontext.UpdateRequestId(context.IdentityContext.ReplyToRequestId);
+                identitycontext.SetParentId(identitycontext.Id);
             }
 
-            if(string.IsNullOrEmpty(version))
+            if (!string.IsNullOrWhiteSpace(identitycontext.OperationId))
+            {
+                identitycontext.SetOperationId(identitycontext.Id);
+            }
+
+            if (string.IsNullOrEmpty(version))
             {
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version);
+            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
@@ -171,7 +144,7 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null, string version = null)
+        private static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
 
             if (string.IsNullOrWhiteSpace(identitycontext.Id))
@@ -181,9 +154,7 @@ namespace Jal.Router.Extensions
 
             if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
             {
-                identitycontext.UpdateRequestId(context.IdentityContext.ReplyToRequestId);
-
-                identitycontext.UpdateReplyToRequestId(context.IdentityContext.ReplyToRequestId);
+                identitycontext.SetRequestId(context.IdentityContext.ReplyToRequestId);
             }
 
             if (string.IsNullOrEmpty(version))
@@ -191,7 +162,7 @@ namespace Jal.Router.Extensions
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version);
+            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
@@ -211,9 +182,9 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        public static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext indentitycontext, string sagaid=null, Dictionary<string, string> headers = null, string version = null)
+        public static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext indentitycontext, string sagaid=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            var options = CreateOptions(context, endpointname, indentitycontext, headers, version);
+            var options = CreateOptions(context, endpointname, indentitycontext, headers, version, scheduledenqueuedatetimeutc);
 
             if (!string.IsNullOrEmpty(sagaid))
             {
@@ -223,9 +194,9 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        public static Options CreateOptions(this MessageContext context, string endpointname, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null)
+        public static Options CreateOptions(this MessageContext context, string endpointname, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            var options = CreateOptions(context, endpointname, headers, version);
+            var options = CreateOptions(context, endpointname, headers, version, scheduledenqueuedatetimeutc);
 
             if(!string.IsNullOrEmpty(sagaid))
             {
@@ -234,7 +205,7 @@ namespace Jal.Router.Extensions
 
             if (!string.IsNullOrEmpty(id))
             {
-                options.IdentityContext.UpdateId(id);
+                options.IdentityContext.SetId(id);
             }
 
             return options;

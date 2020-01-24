@@ -6,18 +6,37 @@ namespace Jal.Router.Impl
 {
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IListenerContextLoader _loader;
+        private readonly IListenerContextCreator _creator;
 
-        public ListenerLoader(IComponentFactoryGateway factory, ILogger logger, IListenerContextLoader loader)
+        public ListenerLoader(IComponentFactoryGateway factory, ILogger logger, IListenerContextCreator creator)
             :base(factory, logger)
         {
-            _loader = loader;
+            _creator = creator;
         }
 
         public Task Run()
         {
             Logger.Log("Loading listeners");
 
+            Create();
+
+            Open();
+
+            Logger.Log("Listeners loaded");
+
+            return Task.CompletedTask;
+        }
+
+        private void Open()
+        {
+            foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
+            {
+                _creator.Open(listenercontext);
+            }
+        }
+
+        private void Create()
+        {
             foreach (var route in Factory.Configuration.Runtime.Routes)
             {
                 foreach (var channel in route.Channels)
@@ -26,7 +45,7 @@ namespace Jal.Router.Impl
 
                     if (listenercontext == null)
                     {
-                        listenercontext = _loader.Create(channel);
+                        listenercontext = _creator.Create(channel);
 
                         Factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
                     }
@@ -34,15 +53,6 @@ namespace Jal.Router.Impl
                     listenercontext.Routes.Add(route);
                 }
             }
-
-            foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
-            {
-                _loader.Open(listenercontext);
-            }
-
-            Logger.Log("Listeners loaded");
-
-            return Task.CompletedTask;
         }
     }
 }

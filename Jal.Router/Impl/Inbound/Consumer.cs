@@ -34,7 +34,7 @@ namespace Jal.Router.Impl
 
                     var task = genericroutemethod?.Invoke(this, new object[] { context, context.Route }) as Task;
 
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
                 else
                 {
@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
 
                     var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.Data.Data }) as Task;
 
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
 
             }

@@ -28,7 +28,7 @@ namespace Jal.Router.Impl
 
             var shuffler = _factory.CreateChannelShuffler();
 
-            var channels = shuffler.Shuffle(context.Data.EndPoint.Channels.ToArray());
+            var channels = shuffler.Shuffle(messagecontext.EndPoint.Channels.ToArray());
 
             var numberofchannels = channels.Length;
 

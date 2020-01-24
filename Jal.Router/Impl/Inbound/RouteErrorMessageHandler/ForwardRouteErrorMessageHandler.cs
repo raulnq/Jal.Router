@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -18,32 +20,20 @@ namespace Jal.Router.Impl
         }
         public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
-            if(metadata.Parameters.ContainsKey("endpoint"))
+            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname) && ex!=null)
             {
-                var endpointname = metadata.Parameters["endpoint"] as string;
-
-                var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version);
-
-                if (ex != null)
+                var headers = new Dictionary<string, string>
                 {
-                    options.Headers.Remove("exceptionmessage");
+                    { "exceptionmessage", ex.Message },
 
-                    options.Headers.Remove("exceptionstacktrace");
+                    { "exceptionstacktrace", ex.StackTrace }
+                };
 
-                    options.Headers.Remove("innerexceptionmessage");
+                if (ex.InnerException != null)
+                {
+                    headers.Add("innerexceptionmessage", ex.InnerException.Message);
 
-                    options.Headers.Remove("innerexceptionstacktrace");
-
-                    options.Headers["exceptionmessage"] = ex.Message;
-
-                    options.Headers["exceptionstacktrace"] = ex.StackTrace;
-
-                    if (ex.InnerException != null)
-                    {
-                        options.Headers["innerexceptionmessage"] = ex.InnerException.Message;
-
-                        options.Headers["innerexceptionstacktrace"] = ex.InnerException.StackTrace;
-                    }
+                    headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
                 }
 
                 var serializer = _factory.CreateMessageSerializer();
@@ -52,7 +42,7 @@ namespace Jal.Router.Impl
 
                 _logger.Log($"Message {context.Id}, sending the message to the error endpoint {endpointname} by route {context.Name}");
 
-                await context.Send(content, context.Origin, options);
+                await context.Send(content, endpointname, headers: headers).ConfigureAwait(false);
 
                 return metadata.StopAfterHandle;
             }

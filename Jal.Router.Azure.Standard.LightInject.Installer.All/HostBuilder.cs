@@ -120,7 +120,9 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
             {
+#pragma warning disable CS0618 // 'TelemetryConfiguration.Active' is obsolete: 'We do not recommend using TelemetryConfiguration.Active on .NET Core. See https://github.com/microsoft/ApplicationInsights-dotnet/issues/1152 for more details'
                 TelemetryConfiguration.Active.InstrumentationKey = _parameter.ApplicationInsightsKey;
+#pragma warning restore CS0618 // 'TelemetryConfiguration.Active' is obsolete: 'We do not recommend using TelemetryConfiguration.Active on .NET Core. See https://github.com/microsoft/ApplicationInsights-dotnet/issues/1152 for more details'
             }
 
             if (_parameter.UseAzureStorage)
@@ -140,7 +142,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             var host = _parameter.Container.GetInstance<IHost>();
 
-            host.Configuration.UseAzureServiceBus(_parameter.AzureServiceBusParameter);
+            host.Configuration.UseAzureServiceBusAsTransport(_parameter.AzureServiceBusParameter);
 
             if (_parameter.Log != null)
             {
@@ -151,7 +153,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (_parameter.UseAzureStorage)
             {
-                host.Configuration.UseAzureStorage(_parameter.AzureStorageParameter);
+                host.Configuration.UseAzureStorageAsStorage(_parameter.AzureStorageParameter);
             }
 
             host.Configuration.Storage.IgnoreExceptions = true;
@@ -161,7 +163,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
                 host.Configuration.UseApplicationInsights();
             }
 
-            host.Configuration.UseNewtonsoft();
+            host.Configuration.UseNewtonsoftAsSerializer();
 
             if (_parameter.RouterInterceptorType != null)
             {

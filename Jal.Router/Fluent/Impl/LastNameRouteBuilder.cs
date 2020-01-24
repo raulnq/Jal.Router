@@ -36,38 +36,37 @@ namespace Jal.Router.Fluent.Impl
             return builder;
         }
 
-        public void AddPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public void AddPointToPointChannel(string path, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            _channels.Add(new Channel(ChannelType.PointToPoint, typeof(TValueFinder), connectionstringprovider, path));
+            _channels.Add(new Channel(ChannelType.PointToPoint, connectionstring, path));
         }
 
-        public void AddSubscriptionToPublishSubscribeChannel<TValueFinder>(string path, string subscription, Func<IValueFinder, string> connectionstringprovider) where TValueFinder : IValueFinder
+        public void AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (connectionstringprovider == null)
+            if (string.IsNullOrWhiteSpace(connectionstring))
             {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
+                throw new ArgumentNullException(nameof(connectionstring));
             }
-            if (subscription == null)
+            if (string.IsNullOrWhiteSpace(subscription))
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe, typeof(TValueFinder),
-                connectionstringprovider, path, subscription));
+            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription));
         }
 
         public ILastNameRouteBuilder<TData> ToListen(Action<IListenerChannelBuilder> channelbuilder)

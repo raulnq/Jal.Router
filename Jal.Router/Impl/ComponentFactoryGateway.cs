@@ -24,9 +24,24 @@ namespace Jal.Router.Impl
             _configuration = configuration;
         }
 
-        public IChannelResource CreateChannelResource()
+        public IChannelResourceManager<R, S> CreateChannelResourceManager<R, S>()
         {
-            return _factory.Create<IChannelResource>(_configuration.ChannelResourceType);
+            return _factory.Create<IChannelResourceManager<R, S>>(_configuration.PointToPointChannelResourceType);
+        }
+
+        public IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics> CreatePointToPointChannelResourceManager()
+        {
+            return _factory.Create<IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>(_configuration.PointToPointChannelResourceType);
+        }
+
+        public IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics> CreatePublishSubscribeChannelResourceManager()
+        {
+            return _factory.Create<IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>(_configuration.PublishSubscribeChannelResourceType);
+        }
+
+        public IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics> CreateSubscriptionToPublishSubscribeChannelResourceManager()
+        {
+            return _factory.Create<IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>(_configuration.SubscriptionToPublishSubscribeChannelResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()
@@ -82,11 +97,6 @@ namespace Jal.Router.Impl
         public IEntityStorage CreateEntityStorage()
         {
             return _factory.Create<IEntityStorage>(_configuration.StorageType);
-        }
-
-        public IValueFinder CreateValueFinder(Type type)
-        {
-            return _factory.Create<IValueFinder>(type);
         }
 
         public IStartupTask CreateStartupTask(Type type)

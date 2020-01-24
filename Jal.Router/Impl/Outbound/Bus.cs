@@ -13,15 +13,12 @@ namespace Jal.Router.Impl
 
         private readonly IComponentFactoryGateway _factory;
 
-        private readonly IConfiguration _configuration;
-
         private readonly IPipelineBuilder _pipeline;
 
-        public Bus(IEndPointProvider provider, IComponentFactoryGateway factory, IConfiguration configuration, IPipelineBuilder pipeline)
+        public Bus(IEndPointProvider provider, IComponentFactoryGateway factory, IPipelineBuilder pipeline)
         {
             _provider = provider;
             _factory = factory;
-            _configuration = configuration;
             _pipeline = pipeline;
         }
 
@@ -36,11 +33,11 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
 
             await Send(message);
 
-            return message.ContentContext.Response as TResult;
+            return message.ContentContext.Result as TResult;
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
@@ -76,7 +73,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
 
             return Send(message);
         }
@@ -85,9 +82,7 @@ namespace Jal.Router.Impl
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var origin = endpoint.Origin;
-
-            return Send(content, endpoint, origin, options);
+            return Send(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Send<TContent>(TContent content, Origin origin, Options options)
@@ -111,9 +106,7 @@ namespace Jal.Router.Impl
         {
             var endpoint = _provider.Provide(options.EndPointName, content.GetType());
 
-            var origin = endpoint.Origin;
-
-            return Publish(content, endpoint, origin, options);
+            return Publish(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
@@ -137,7 +130,7 @@ namespace Jal.Router.Impl
         {
             var serializer = _factory.CreateMessageSerializer();
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
+            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
 
             return Send(message);
         }
@@ -156,7 +149,7 @@ namespace Jal.Router.Impl
                 {
                     var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
 
-                    foreach (var type in _configuration.OutboundMiddlewareTypes)
+                    foreach (var type in _factory.Configuration.OutboundMiddlewareTypes)
                     {
                         chain.UseAsync(type);
                     }
@@ -186,41 +179,6 @@ namespace Jal.Router.Impl
             {
                 interceptor.OnExit(message);
             }
-        }
-
-        public Task FireAndForget<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
-        {
-            var serializer = _factory.CreateMessageSerializer();
-
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content), endpoint.UseClaimCheck);
-
-            message.Origin.Key = string.Empty;
-
-            return Send(message);
-        }
-
-        public Task FireAndForget<TContent>(TContent content, Options options)
-        {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
-
-            return FireAndForget(content, endpoint, new Origin() { Key = endpoint.Origin.Key, From = endpoint.Origin.From }, options);
-        }
-
-        public Task FireAndForget<TContent>(TContent content, Origin origin, Options options)
-        {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
-
-            if (string.IsNullOrWhiteSpace(origin.From))
-            {
-                origin.From = endpoint.Origin.From;
-            }
-
-            if (string.IsNullOrWhiteSpace(origin.Key))
-            {
-                origin.Key = endpoint.Origin.Key;
-            }
-
-            return FireAndForget(content, endpoint, origin, options);
         }
     }
 }

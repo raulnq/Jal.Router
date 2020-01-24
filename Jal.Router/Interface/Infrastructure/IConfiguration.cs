@@ -11,13 +11,15 @@ namespace Jal.Router.Interface
         RuntimeContext Runtime { get; }
         Storage Storage { get; }
         string ApplicationName { get; }
-        string ChannelProviderName { get; }
+        string TransportName { get; }
         IDictionary<Type, IList<Type>> LoggerTypes { get; }
         IDictionary<string, object> Parameters { get; }
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
-        IList<TaskMetadata> MonitoringTaskTypes { get; }
-        Type ChannelResourceType { get; }
+        IList<MonitorTask> MonitoringTaskTypes { get; }
+        Type PublishSubscribeChannelResourceType { get; }
+        Type PointToPointChannelResourceType { get; }
+        Type SubscriptionToPublishSubscribeChannelResourceType { get; }
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
@@ -36,7 +38,7 @@ namespace Jal.Router.Interface
         IList<Type> OutboundMiddlewareTypes { get; }
         IConfiguration EnableStorage(bool ignoreexceptions = true);
         IConfiguration DisableStorage();
-        IConfiguration SetChannelProviderName(string name);
+        IConfiguration SetTransportName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
         IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel;
@@ -44,10 +46,15 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UseChannelResource<TChannelManager>() where TChannelManager : IChannelResource;
+        IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>;
+
+        IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>;
+
+        IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>;
+
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
-        IConfiguration UseStorage<TStorage>() where TStorage : IEntityStorage;
+        IConfiguration UseEntityStorage<TStorage>() where TStorage : IEntityStorage;
         IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
         IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
         IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;

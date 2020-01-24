@@ -9,14 +9,16 @@ namespace Jal.Router.Impl
     public class Configuration : IConfiguration
     {
         public RuntimeContext Runtime { get; }
-        public string ChannelProviderName { get; private set; }
+        public string TransportName { get; private set; }
         public Storage Storage { get; set; }
         public string ApplicationName { get; private set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
-        public IList<TaskMetadata> MonitoringTaskTypes { get; }
-        public Type ChannelResourceType { get; private set; }
+        public IList<MonitorTask> MonitoringTaskTypes { get; }
+        public Type PointToPointChannelResourceType { get; private set; }
+        public Type PublishSubscribeChannelResourceType { get; private set; }
+        public Type SubscriptionToPublishSubscribeChannelResourceType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
         public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
@@ -86,9 +88,21 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UseChannelResource<TChannelResource>() where TChannelResource : IChannelResource
+        public IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
         {
-            ChannelResourceType = typeof(TChannelResource);
+            PublishSubscribeChannelResourceType = typeof(TChannel);
+            return this;
+        }
+
+        public IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
+        {
+            PointToPointChannelResourceType = typeof(TChannel);
+            return this;
+        }
+
+        public IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+        {
+            SubscriptionToPublishSubscribeChannelResourceType = typeof(TChannel);
             return this;
         }
 
@@ -114,7 +128,7 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UseStorage<TSagaStorage>() where TSagaStorage : IEntityStorage
+        public IConfiguration UseEntityStorage<TSagaStorage>() where TSagaStorage : IEntityStorage
         {
             StorageType = typeof(TSagaStorage);
             return this;
@@ -174,7 +188,7 @@ namespace Jal.Router.Impl
 
         public IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
         {
-            MonitoringTaskTypes.Add(new TaskMetadata(typeof(TMonitoringTask), intervalinseconds * 1000));
+            MonitoringTaskTypes.Add(new MonitorTask(typeof(TMonitoringTask), intervalinseconds * 1000));
             return this;
         }
         public IConfiguration AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask
@@ -189,9 +203,9 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration SetChannelProviderName(string name)
+        public IConfiguration SetTransportName(string name)
         {
-            ChannelProviderName = name;
+            TransportName = name;
             return this;
         }
 
@@ -206,9 +220,11 @@ namespace Jal.Router.Impl
             UseChannelShuffler<DefaultChannelShuffler>();
             UseRouterInterceptor<NullRouterInterceptor>();
             UseBusInterceptor<NullBusInterceptor>();
-            UseStorage<NullStorage>();
+            UseEntityStorage<NullEntityStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UseChannelResource<NullChannelResource>();
+            UsePointToPointChannelResourceManager<NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>();
+            UsePublishSubscribeChannelResourceManager<NullChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>();
+            UseSubscriptionToPublishSubscribeChannelResourceManager<NullChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
@@ -217,7 +233,7 @@ namespace Jal.Router.Impl
             UseMessageAdapter<NullMessageAdapter>();
             InboundMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
-            MonitoringTaskTypes = new List<TaskMetadata>();
+            MonitoringTaskTypes = new List<MonitorTask>();
             StartupTaskTypes = new List<Type>();
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
@@ -229,9 +245,12 @@ namespace Jal.Router.Impl
             AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
             AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
             AddStartupTask<StartupBeatLogger>();
-            AddStartupTask<RuntimeConfigurationLoader>();
-            AddStartupTask<EndpointsInitializer>();
-            AddStartupTask<RoutesInitializer>();
+            AddStartupTask<RuntimeLoader>();
+            AddStartupTask<EndpointValidator>();
+            AddStartupTask<RouteValidator>();
+            AddStartupTask<PointToPointChannelResourceValidator>();
+            AddStartupTask<PublishSubscribeChannelResourceValidator>();
+            AddStartupTask<SubscriptionToPublishSubscribeChannelResourceValidator>();
             AddStartupTask<PointToPointChannelResourceCreator>();
             AddStartupTask<PublishSubscribeChannelResourceCreator>();
             AddStartupTask<SubscriptionToPublishSubscribeChannelResourceCreator>();
@@ -244,7 +263,7 @@ namespace Jal.Router.Impl
             Storage = new Storage();
             Runtime = new RuntimeContext();
             ApplicationName = "Empty app name";
-            ChannelProviderName = "Empty channel provider name";
+            TransportName = "Empty channel provider name";
         }
     }
 }

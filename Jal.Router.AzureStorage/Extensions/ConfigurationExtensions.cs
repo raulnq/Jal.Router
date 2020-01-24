@@ -6,10 +6,10 @@ namespace Jal.Router.AzureStorage.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static IConfiguration UseAzureStorage(this IConfiguration configuration, AzureStorageParameter parameter)
+        public static IConfiguration UseAzureStorageAsStorage(this IConfiguration configuration, AzureStorageParameter parameter)
         {
             return configuration
-                .UseStorage<AzureEntityStorage>()
+                .UseEntityStorage<AzureEntityStorage>()
                 .AddStartupTask<AzureEntityStorageStartupTask>()
                 .UseMessageStorage<AzureMessageStorage>()
                 .AddStartupTask<AzureMessageStorageStartupTask>()

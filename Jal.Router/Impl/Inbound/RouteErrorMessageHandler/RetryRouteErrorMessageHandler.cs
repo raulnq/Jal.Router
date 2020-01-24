@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -18,32 +19,27 @@ namespace Jal.Router.Impl
         }
         public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
-            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters.ContainsKey("policy"))
+            if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname)
+                && metadata.Parameters.ContainsKey("policy") && metadata.Parameters["policy"] is IRetryPolicy policy)
             {
-                var endpointname = metadata.Parameters["endpoint"] as string;
-
-                var policy = metadata.Parameters["policy"] as IRetryPolicy;
-
-                var countname = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
+                var countername = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
 
                 var count = 0;
 
-                if (context.Headers.ContainsKey(countname))
+                if (context.Headers.ContainsKey(countername))
                 {
-                    count = Convert.ToInt32(context.Headers[countname]);
+                    count = Convert.ToInt32(context.Headers[countername]);
                 }
                 else
                 {
-                    context.Headers.Add(countname, count.ToString());
+                    context.Headers.Add(countername, count.ToString());
                 }
 
                 count++;
 
                 if (policy.CanRetry(count))
                 {
-                    context.Headers[countname] = count.ToString();
-
-                    var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, context.IdentityContext, context.Route, context.Saga, context.Version, DateTime.UtcNow.Add(policy.NextRetryInterval(count)));
+                    context.Headers[countername] = count.ToString();
 
                     var serializer = _factory.CreateMessageSerializer();
 
@@ -51,7 +47,7 @@ namespace Jal.Router.Impl
 
                     _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 
-                    await context.Send(content, context.Origin, options);
+                    await context.Send(content, endpointname, scheduledenqueuedatetimeutc: DateTime.UtcNow.Add(policy.NextRetryInterval(count))).ConfigureAwait(false);
 
                     return metadata.StopAfterHandle;
                 }
@@ -59,13 +55,11 @@ namespace Jal.Router.Impl
                 {
                     _logger.Log($"Message {context.Id}, no more retries by route {context.Name}");
 
-                    if (metadata.Parameters.ContainsKey("fallback"))
+                    if (metadata.Parameters.ContainsKey("fallback") && metadata.Parameters["fallback"] is Func<MessageContext, Exception, ErrorHandler, Task> fallback)
                     {
-                        var fallback = metadata.Parameters["fallback"] as Func<MessageContext, Exception, ErrorHandler, Task>;
-
                         _logger.Log($"Message {context.Id}, fallback executed by route {context.Name}");
 
-                        await fallback(context, ex, metadata);
+                        await fallback(context, ex, metadata).ConfigureAwait(false);
 
                         return metadata.StopAfterHandle;
                     }

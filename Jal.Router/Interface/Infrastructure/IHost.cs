@@ -5,7 +5,7 @@ namespace Jal.Router.Interface
 {
     public interface IHost
     {
-        void RunAndBlock(Action poststartedaction = null);
+        void RunAndBlock(Action poststartupaction = null);
 
         void Run();
 

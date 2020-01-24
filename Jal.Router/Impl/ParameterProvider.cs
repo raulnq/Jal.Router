@@ -4,7 +4,7 @@ namespace Jal.Router.Impl
 {
     public class ParameterProvider : IParameterProvider
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         public ParameterProvider(IConfiguration configuration)
         {
             _configuration = configuration;

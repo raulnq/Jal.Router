@@ -39,21 +39,22 @@ namespace Jal.Router.Model
             return new EndpointEntity(Name, ContentType);
         }
 
-        public void UpdateOrigin(Origin origin)
+        public void SetOrigin(Origin origin)
         {
             Origin = origin;
         }
 
-        public void UpdateContentType(Type contenttype)
+        public void SetContentType(Type contenttype)
         {
             ContentType = contenttype;
         }
-        public void UpdateReplyContentType(Type contenttype)
+
+        public void SetReplyContentType(Type contenttype)
         {
             ReplyContentType = contenttype;
         }
 
-        public void UpdateUseClaimCheck(bool useclaimcheck)
+        public void SetUseClaimCheck(bool useclaimcheck)
         {
             UseClaimCheck = useclaimcheck;
         }

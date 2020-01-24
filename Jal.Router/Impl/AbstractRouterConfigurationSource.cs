@@ -44,18 +44,18 @@ namespace Jal.Router.Impl
         {
             foreach (var endPoint in _enpoints)
             {
-                endPoint.UpdateOrigin(_origin);
+                endPoint.SetOrigin(_origin);
             }
             return _enpoints.ToArray();
         }
 
-        public SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResources()
+        public SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResource()
         {
             foreach (var subscription in _subscriptions)
             {
                 if(subscription.Rules.Count==0)
                 {
-                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelRule($"origin='{_origin.Key}'", "$Default", true));
+                    subscription.Rules.Add(new SubscriptionToPublishSubscribeChannelResourceRule($"origin='{_origin.Key}'", "$Default", true));
                 }
             }
             return _subscriptions.ToArray();
@@ -84,33 +84,7 @@ namespace Jal.Router.Impl
             return builder;
         }
 
-        public void RegisterSubscriptionToPublishSubscribeChannel<TValueFinder>(string subscription, string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
-            where TValueFinder : IValueFinder
-        {
-            if (string.IsNullOrWhiteSpace(subscription))
-            {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstringprovider == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
-            }
-
-            var channel = new SubscriptionToPublishSubscribeChannelResource(subscription, path, properties, typeof(TValueFinder), connectionstringprovider);
-
-            if(rule!=null)
-            {
-                channel.Rules.Add(rule);
-            }
-
-            _subscriptions.Add(channel);
-        }
-
-        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelRule rule = null)
+        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, SubscriptionToPublishSubscribeChannelResourceRule rule = null)
         {
             if (string.IsNullOrWhiteSpace(subscription))
             {
@@ -127,29 +101,12 @@ namespace Jal.Router.Impl
 
             var channel = new SubscriptionToPublishSubscribeChannelResource(subscription, path, connectionstring, properties);
 
-            if (rule != null)
+            if(rule!=null)
             {
                 channel.Rules.Add(rule);
             }
 
             _subscriptions.Add(channel);
-        }
-
-        public void RegisterPointToPointChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties)
-            where TValueFinder : IValueFinder
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstringprovider == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
-            }
-
-            var channel = new PointToPointChannelResource(path, properties, typeof(TValueFinder), connectionstringprovider);
-
-            _pointtopointchannels.Add(channel);
         }
 
         public void RegisterPointToPointChannel(string path, string connectionstring, Dictionary<string, string> properties)
@@ -166,23 +123,6 @@ namespace Jal.Router.Impl
             var channel = new PointToPointChannelResource(path, connectionstring, properties);
 
             _pointtopointchannels.Add(channel);
-        }
-
-        public void RegisterPublishSubscribeChannel<TValueFinder>(string path, Func<IValueFinder, string> connectionstringprovider, Dictionary<string, string> properties)
-            where TValueFinder : IValueFinder
-        { 
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (connectionstringprovider == null)
-            {
-                throw new ArgumentNullException(nameof(connectionstringprovider));
-            }
-
-            var channel = new PublishSubscribeChannelResource(path, properties, typeof(TValueFinder), connectionstringprovider);
-
-            _publishsubscribechannels.Add(channel);
         }
 
         public void RegisterPublishSubscribeChannel(string path, string connectionstring, Dictionary<string, string> properties)

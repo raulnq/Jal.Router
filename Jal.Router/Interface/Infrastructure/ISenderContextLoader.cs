@@ -1,11 +1,9 @@
-﻿using Jal.Router.Model;
-
-namespace Jal.Router.Interface
+﻿namespace Jal.Router.Interface
 {
     public interface ISenderContextLoader
     {
-        SenderContext Create(Channel channel);
+        void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path);
 
-        void Open(SenderContext sendercontext);
+        void AddPointToPointChannel<TMessage>(string name, string connectionstring, string path);
     }
 }

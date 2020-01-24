@@ -36,7 +36,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(method));
             }
 
-            _routemethod.UpdateEvaluatorWithContext(method);
+            _routemethod.UpdateEvaluator(method);
         }
     }
 }

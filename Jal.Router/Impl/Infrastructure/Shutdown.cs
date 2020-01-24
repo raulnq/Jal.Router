@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public async Task Stop()
+        public async Task Run()
         {
             foreach (var type in _factory.Configuration.ShutdownTaskTypes)
             {

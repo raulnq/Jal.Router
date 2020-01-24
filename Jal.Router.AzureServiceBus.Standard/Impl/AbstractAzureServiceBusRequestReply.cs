@@ -18,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public void Open(SenderContext sendercontext)
         {
-            _client = new QueueClient(sendercontext.Channel.ToConnectionString, sendercontext.Channel.ToPath);
+            _client = new QueueClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

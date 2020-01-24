@@ -13,62 +13,42 @@
 
         }
 
-        public IdentityContext(string id)
-        {
-            Id = id;
-        }
-
-        public IdentityContext(string id, string operationid):this(id)
-        {
-            OperationId = operationid;
-        }
-
-        public IdentityContext(string id, string operationid, string parentid) :this(id, operationid)
-        {
-            ParentId = parentid;
-        }
-
-        public IdentityContext(string id, string operationid, string parentid, string partitionid):this(id, operationid, parentid)
-        {
-            PartitionId = partitionid;
-        }
-
-        public IdentityContext(string id, string operationid, string parentid, string partitionid, string replytorequestid, string requestid) : this(id, operationid, parentid, partitionid)
+        public IdentityContext(string id, string operationid=null, string parentid=null, string partitionid=null, string replytorequestid=null, string requestid=null)
         {
             ReplyToRequestId = replytorequestid;
             RequestId = requestid;
+            PartitionId = partitionid;
+            ParentId = parentid;
+            OperationId = operationid;
+            Id = id;
         }
 
-        public IdentityContext CreateCopy()
+        public IdentityContext Clone()
         {
-            return new IdentityContext(Id, OperationId, ParentId, PartitionId)
-            {
-                RequestId = RequestId,
-                ReplyToRequestId = ReplyToRequestId
-            };
+            return new IdentityContext(Id, OperationId, ParentId, PartitionId, ReplyToRequestId, RequestId);
         }
 
-        public void UpdateParentId(string parentid)
+        public void SetParentId(string parentid)
         {
             ParentId = parentid;
         }
 
-        public void UpdateOperationId(string operationid)
+        public void SetOperationId(string operationid)
         {
             OperationId = operationid;
         }
 
-        public void UpdateId(string id)
+        public void SetId(string id)
         {
             Id = id;
         }
 
-        public void UpdateRequestId(string requestid)
+        public void SetRequestId(string requestid)
         {
             RequestId = requestid;
         }
 
-        public void UpdateReplyToRequestId(string replytorequestid)
+        public void SetReplyToRequestId(string replytorequestid)
         {
             ReplyToRequestId = replytorequestid;
         }

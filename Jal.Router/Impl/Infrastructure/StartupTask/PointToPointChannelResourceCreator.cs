@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
@@ -10,6 +11,7 @@ namespace Jal.Router.Impl
         public PointToPointChannelResourceCreator(IComponentFactoryGateway factory, ILogger logger) 
             : base(factory, logger)
         {
+
         }
 
         public async Task Run()
@@ -18,39 +20,10 @@ namespace Jal.Router.Impl
 
             Logger.Log("Creating point to point channels");
 
-            var manager = Factory.CreateChannelResource();
+            var manager = Factory.CreatePointToPointChannelResourceManager();
 
-            foreach (var channel in Factory.Configuration.Runtime.PointToPointChannels)
+            foreach (var channel in Factory.Configuration.Runtime.PointToPointChannelResources)
             {
-                if (channel.ConnectionStringValueFinderType != null && channel.ConnectionStringProvider!=null)
-                {
-                    var finder = Factory.CreateValueFinder(channel.ConnectionStringValueFinderType);
-
-                    channel.UpdateConnectionString(channel.ConnectionStringProvider(finder));
-                }
-
-                if (string.IsNullOrWhiteSpace(channel.ConnectionString))
-                {
-                    var error = $"Empty connection string, point to point channel {channel.Path}";
-
-                    errors.AppendLine(error);
-
-                    Logger.Log(error);
-
-                    break;
-                }
-
-                if (string.IsNullOrWhiteSpace(channel.Path))
-                {
-                    var error = $"Empty path, point to point channel {channel.Path}";
-
-                    errors.AppendLine(error);
-
-                    Logger.Log(error);
-
-                    break;
-                }
-
                 try
                 {
                     var created = await manager.CreateIfNotExist(channel).ConfigureAwait(false);

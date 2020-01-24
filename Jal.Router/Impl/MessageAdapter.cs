@@ -31,7 +31,7 @@ namespace Jal.Router.Impl
 
                 var parentid = fmessage.ParentId;
 
-                var identitycontext = new IdentityContext(fmessage.Id, operationid, parentid, fmessage.PartitionId, fmessage.ReplyToRequestId, fmessage.RequestId);
+                var identitycontext = new IdentityContext(id: fmessage.Id, operationid: operationid, parentid: parentid, partitionid: fmessage.PartitionId, replytorequestid: fmessage.ReplyToRequestId, requestid: fmessage.RequestId);
 
                 var trackings = fmessage.Trackings;
 
@@ -91,9 +91,9 @@ namespace Jal.Router.Impl
                 filemessage.SagaId = context.SagaContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.ContentContext.Id))
+            if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                filemessage.ContentId = context.ContentContext.Id;
+                filemessage.ContentId = context.ContentContext.ClaimCheckId;
             }
 
             if (context.TrackingContext != null)
