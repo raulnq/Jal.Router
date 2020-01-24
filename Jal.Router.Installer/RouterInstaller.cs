@@ -2,7 +2,9 @@
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
+using Jal.ChainOfResponsability.Installer;
 using Jal.ChainOfResponsability.Intefaces;
+using Jal.Locator.CastleWindsor.Installer;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -11,14 +13,7 @@ namespace Jal.Router.Installer
 {
     public class RouterInstaller : IWindsorInstaller
     {
-        private readonly Assembly[] _sourceassemblies;
-
         private readonly IRouterConfigurationSource[] _sources;
-
-        public RouterInstaller(Assembly[] sourceassemblies)
-        {
-            _sourceassemblies = sourceassemblies;
-        }
 
         public RouterInstaller(IRouterConfigurationSource[] sources)
         {
@@ -27,6 +22,10 @@ namespace Jal.Router.Installer
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
+            container.Install(new ChainOfResponsabilityInstaller());
+
+            container.Install(new ServiceLocatorInstaller());
+
             container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<FileSystemRequestReplyFromPointToPointChannel>().Named(typeof(FileSystemRequestReplyFromPointToPointChannel).FullName).LifestyleSingleton());
 
             container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>().Named(typeof(FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel).FullName).LifestyleSingleton());
@@ -218,15 +217,6 @@ namespace Jal.Router.Installer
             container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(typeof(EmptyRouterConfigurationSource)).Named(typeof(EmptyRouterConfigurationSource).FullName).LifestyleSingleton());
 
             container.Register(Component.For(typeof(IHost)).ImplementedBy(typeof(Host)).Named(typeof(Host).FullName).LifestyleSingleton());
-
-            if (_sourceassemblies != null)
-            {
-                foreach (var assembly in _sourceassemblies)
-                {
-                    var assemblyDescriptor = Classes.FromAssembly(assembly);
-                    container.Register(assemblyDescriptor.BasedOn<AbstractRouterConfigurationSource>().WithServiceAllInterfaces());
-                }
-            }
 
             if (_sources != null)
             {
