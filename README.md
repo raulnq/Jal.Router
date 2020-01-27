@@ -33,17 +33,17 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
 {
     public RouterConfigurationSource()
     {
-    RegisterHandler("handler")
-        .ToListen(x=>x.AddPointToPointChannel("path","connectionstring"))
-    .ForMessage<Message>().Use<IMessageHandler, MessageHandler>(x =>
-    {
-        x.With((request, handler) => handler.Handle(request));
-    });               
+        RegisterHandler("handler")
+            .ToListen(x=>x.AddPointToPointChannel("path","connectionstring"))
+            .ForMessage<Message>().Use<IMessageHandler, MessageHandler>(x =>
+            {
+                x.With((request, handler) => handler.Handle(request));
+            });  
+            
+        RegisterEndPoint("endpoint")
+            .ForMessage<Message>()
+            .To(x => x.AddPointToPointChannel("connectionstring", "path"));
     }
-
-    RegisterEndPoint("endpoint")
-    .ForMessage<Message>()
-    .To(x => x.AddPointToPointChannel("connectionstring", "path"));
 }
 ```
 And on the Program.cs file setup the host
