@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.LightInject.Inst
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{740FCE48-14CF-4CA5-9145-1780B1567D55}"
 	ProjectSection(SolutionItems) = preProject
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -54,7 +56,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Serilog.LightInj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Serilog.Installer", "Jal.Router.Serilog.Installer\Jal.Router.Serilog.Installer.csproj", "{4F8491B7-A003-4271-94A7-662D2FAFD619}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Tests", "Jal.Router.Tests\Jal.Router.Tests.csproj", "{5589F65A-AD7C-46DD-8EEB-29C4E385E3FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Tests", "Jal.Router.Tests\Jal.Router.Tests.csproj", "{5589F65A-AD7C-46DD-8EEB-29C4E385E3FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.Patterns", "Jal.Router.Patterns\Jal.Router.Patterns.csproj", "{AD9960D6-BD35-415C-93E9-E22CEC96193D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -158,6 +162,10 @@ Global
 		{5589F65A-AD7C-46DD-8EEB-29C4E385E3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5589F65A-AD7C-46DD-8EEB-29C4E385E3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5589F65A-AD7C-46DD-8EEB-29C4E385E3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

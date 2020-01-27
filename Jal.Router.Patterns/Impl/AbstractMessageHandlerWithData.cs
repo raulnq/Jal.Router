@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using Jal.Router.Interface.Patterns;
+using Jal.Router.Patterns.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Patterns
+namespace Jal.Router.Patterns.Impl
 {
     public abstract class AbstractMessageHandlerWithData<TMessage, TData> : AbstractMessageHandler<TMessage>, IMessageHandlerWithData<TMessage, TData>
     {
