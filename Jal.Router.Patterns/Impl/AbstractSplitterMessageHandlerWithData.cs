@@ -2,13 +2,13 @@ using System;
 using System.Threading.Tasks;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Patterns
+namespace Jal.Router.Patterns.Impl
 {
     public abstract class AbstractSplitterMessageHandlerWithData<TMessage, TSplittedMessage, TData> : AbstractMessageHandlerWithData<TMessage, TData>
     {
         public abstract TSplittedMessage[] CreateSplittedMessages(TMessage message, MessageContext context, TData data);
 
-        public abstract Task Send(TSplittedMessage message, MessageContext context, TData data, int messages);
+        public abstract Task Send(TSplittedMessage message, MessageContext context, TData data, int length, int index);
 
         public virtual void OnNoSplittedMessages(TMessage message, MessageContext context, TData data)
         {
@@ -26,11 +26,11 @@ namespace Jal.Router.Impl.Patterns
 
                 if (messages.Length > 0)
                 {
-                    var counter = messages.Length;
-
+                    var length = messages.Length;
+                    var index = 0;
                     foreach (var m in messages)
                     {
-                        await Send(m, context, data, counter).ConfigureAwait(false);
+                        await Send(m, context, data, length, index).ConfigureAwait(false);
                     }
                 }
                 else

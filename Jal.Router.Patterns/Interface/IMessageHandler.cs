@@ -1,7 +1,7 @@
 using Jal.Router.Model;
 using System.Threading.Tasks;
 
-namespace Jal.Router.Interface.Patterns
+namespace Jal.Router.Patterns.Interface
 {
     public interface IMessageHandler<in TMessage>
     {

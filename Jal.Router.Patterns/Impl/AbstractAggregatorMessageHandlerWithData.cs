@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Jal.Router.Model;
 
-namespace Jal.Router.Impl.Patterns
+namespace Jal.Router.Patterns.Impl
 {
     public abstract class AbstractAggregatorMessageHandlerWithData<TMessage, TAggregatedMessage, TData> : AbstractMessageHandlerWithData<TMessage, TData>
     {

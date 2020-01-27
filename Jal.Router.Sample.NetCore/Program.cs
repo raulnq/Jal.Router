@@ -12,8 +12,8 @@ using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.AzureStorage.LightInject.Installer;
 using Jal.ChainOfResponsability.LightInject.Installer;
-using Jal.Router.Impl.Patterns;
-using Jal.Router.Interface.Patterns;
+using Jal.Router.Patterns.Impl;
+using Jal.Router.Patterns.Interface;
 using Jal.ChainOfResponsability.Intefaces;
 using Jal.ChainOfResponsability.Model;
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ namespace Jal.Router.Sample.NetCore
         static void Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() });
+            container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
             container.RegisterFrom<AzureServiceBusCompositionRoot>();
             container.RegisterFrom<AzureStorageCompositionRoot>();
             container.RegisterFrom<NewtonsoftCompositionRoot>();
@@ -85,8 +85,8 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
-                //.UseFileSystemAsTransport(parameter)
+                //.UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
+                .UseFileSystemAsTransport(parameter)
                 //.UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 .UseNewtonsoftAsSerializer()
@@ -95,20 +95,27 @@ namespace Jal.Router.Sample.NetCore
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
                 //.EnableEntityStorage()
-                .AddShutdownWatcher<SignTermShutdownWatcher>();
+                //.AddShutdownWatcher<SignTermShutdownWatcher>()
+                ;
 
             //var h = HostBuilder.Create(container, "")
             //    .UseAzureServiceBus(new IRouterConfigurationSource[] { new RouterConfigurationSmokeTest() })
             //    .Build();
-                
+
 
             //var facade = container.GetInstance<IEntityStorageGateway>();
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            
+            host.Startup();
 
-            host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
+            messagecontext.Send(new Message(), "sendtoqueuea");
+
+            Console.ReadLine();
+
+            host.Shutdown();
+
+            //host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
 
             //var bus = container.GetInstance<IBus>();
 
