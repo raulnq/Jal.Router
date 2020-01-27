@@ -55,6 +55,8 @@ container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurat
 container.RegisterFrom<NewtonsoftCompositionRoot>();
 container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
 
+var bus = container.GetInstance<IBus>();
+
 var host = container.GetInstance<IHost>();
 
 host.Configuration
@@ -63,6 +65,8 @@ host.Configuration
     .UseMemoryAsStorage();
 
 host.Startup();
+
+var messagecontext = new MessageContext(bus);
 
 messagecontext.Send(new Message(), "endpoint");
 
