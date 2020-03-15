@@ -28,7 +28,7 @@ namespace Jal.Router.Sample.NetCore
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var container = new ServiceContainer();
             container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
@@ -107,13 +107,13 @@ namespace Jal.Router.Sample.NetCore
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            host.Startup();
+            await host.Startup();
 
-            messagecontext.Send(new Message(), "sendtoqueuea");
+            await messagecontext.Send(new Message(), "sendtoqueuea");
 
             Console.ReadLine();
 
-            host.Shutdown();
+            await host.Shutdown();
 
             //host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
 
