@@ -35,9 +35,9 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterHandler("handler")
             .ToListen(x=>x.AddPointToPointChannel("path","connectionstring"))
-            .ForMessage<Message>().Use<IMessageHandler, MessageHandler>(x =>
+            .ForMessage<Message>().Use(x =>
             {
-                x.With((request, handler) => handler.Handle(request));
+                x.With<MessageHandler, MessageHandler>((request, handler, context) => handler.Handle(request));
             });  
             
         RegisterEndPoint("endpoint")
@@ -64,15 +64,15 @@ host.Configuration
     .UseNewtonsoftAsSerializer()
     .UseMemoryAsStorage();
 
-host.Startup();
+await host.Startup();
 
 var messagecontext = new MessageContext(bus);
 
-messagecontext.Send(new Message(), "endpoint");
+await messagecontext.Send(new Message(), "endpoint");
 
 Console.ReadLine();
 
-host.Shutdown();
+await host.Shutdown();
 ```
 ## Documentation
 Documentation can be found on the project [Wiki](https://github.com/raulnq/Jal.Router/wiki/10.-Home).
