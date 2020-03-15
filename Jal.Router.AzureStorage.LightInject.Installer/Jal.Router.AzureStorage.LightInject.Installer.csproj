@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>2.0.0</Version>
+    <Version>3.0.0</Version>
     <Company>Raul Naupari</Company>
     <Description>LightInject installer for the Jal.Router.AzureStorage library</Description>
     <Copyright />

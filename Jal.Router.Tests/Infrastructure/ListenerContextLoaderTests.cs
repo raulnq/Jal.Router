@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
 
             var sut = new ListenerContextLoader(creatormock.Object, factory);
 
-            sut.AddPointToPointChannel<object, object, object>("name", "connectionstring", "path");
+            sut.AddPointToPointChannel<object>("name", "connectionstring", "path");
 
             Verify(creatormock, factory, ChannelType.PointToPoint);
         }
@@ -41,7 +41,7 @@ namespace Jal.Router.Tests
 
             var sut = new ListenerContextLoader(creatormock.Object, factory);
 
-            sut.AddPublishSubscribeChannel<object, object, object>("name", "connectionstring", "path", "subscription");
+            sut.AddPublishSubscribeChannel<object>("name", "connectionstring", "path", "subscription");
 
             Verify(creatormock, factory, ChannelType.PublishSubscribe);
 

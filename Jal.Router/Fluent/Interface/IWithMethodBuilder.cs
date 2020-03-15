@@ -4,29 +4,17 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IWithMethodBuilder<out TContent, out THandler>
+    public interface IWithMethodBuilder<out TContent>
     {
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method);
+        IWhenMethodBuilder<TContent> With(Func<TContent, MessageContext, Task> method);
 
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method);
+        IWhenMethodBuilder<TContent, THandler> With<THandler, TConcreteHandler>(Func<TContent, THandler, MessageContext, Task> method) where TConcreteHandler : THandler;
     }
 
-    public interface IWithMethodBuilder<out TContent, out THandler, out TData>
+    public interface IWithMethodBuilder<out TContent, out TData>
     {
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method);
+        IWhenMethodBuilderWithData<TContent, TData> With(Func<TContent, MessageContext, TData, Task> method, string status = null);
 
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, TData, Task> method);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, TData, Task> method);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, Task> method, string status);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, TData, Task> method, string status);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, Task> method, string status);
-
-        IWhenMethodBuilder<TContent, THandler> With(Func<TContent, THandler, MessageContext, TData, Task> method, string status);
+        IWhenMethodBuilderWithData<TContent, THandler, TData> With<THandler, TConcreteHandler>(Func<TContent, THandler, MessageContext, TData, Task> method, string status = null) where TConcreteHandler : THandler;
     }
 }

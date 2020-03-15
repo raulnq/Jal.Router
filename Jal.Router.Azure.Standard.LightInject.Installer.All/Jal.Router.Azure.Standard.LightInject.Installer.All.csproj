@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>2.1.0</Version>
+    <Version>3.0.0</Version>
     <Authors>Raul Naupari</Authors>
     <Company>Raul Naupari</Company>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -19,10 +19,11 @@
     <ProjectReference Include="..\Jal.Router.AzureStorage.LightInject.Installer\Jal.Router.AzureStorage.LightInject.Installer.csproj" />
     <ProjectReference Include="..\Jal.Router.AzureStorage\Jal.Router.AzureStorage.csproj" />
     <ProjectReference Include="..\Jal.Router.LightInject.Installer\Jal.Router.LightInject.Installer.csproj" />
-    <ProjectReference Include="..\Jal.Router.Logger.LightInject.Installer\Jal.Router.Logger.LightInject.Installer.csproj" />
-    <ProjectReference Include="..\Jal.Router.Logger\Jal.Router.Logger.csproj" />
     <ProjectReference Include="..\Jal.Router.Newtonsoft.LightInject.Installer\Jal.Router.Newtonsoft.LightInject.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Newtonsoft\Jal.Router.Newtonsoft.csproj" />
     <ProjectReference Include="..\Jal.Router.Patterns\Jal.Router.Patterns.csproj" />
+    <ProjectReference Include="..\Jal.Router.Serilog.Installer\Jal.Router.Serilog.Installer.csproj" />
+    <ProjectReference Include="..\Jal.Router.Serilog.LightInject.Installer\Jal.Router.Serilog.LightInject.Installer.csproj" />
     <ProjectReference Include="..\Jal.Router\Jal.Router.csproj" />
   </ItemGroup>
 

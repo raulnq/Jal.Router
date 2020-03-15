@@ -6,19 +6,19 @@ namespace Jal.Router.Model
 {
     public class Route
     {
-        public Route(string name, Type contenttype, Type consumerinterfacetype, List<Channel> channels)
+        public Route(string name, Type contenttype, List<Channel> channels)
         {
             ContentType = contenttype;
-            ConsumerInterfaceType = consumerinterfacetype;
             MiddlewareTypes = new List<Type>();
             Name = name;
             Channels = channels;
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
+            RouteMethods = new List<RouteMethod>();
         }
 
-        public Route(Saga saga, string name, Type contenttype, Type consumerinterfacetype, List<Channel> channels) : this(name, contenttype, consumerinterfacetype, channels)
+        public Route(Saga saga, string name, Type contenttype, List<Channel> channels) : this(name, contenttype, channels)
         {
             Saga = saga;
         }
@@ -34,8 +34,6 @@ namespace Jal.Router.Model
         public Func<object, Channel, Task> Consumer { get; private set; }
 
         public List<Channel> Channels { get; }
-
-        public Type ConsumerInterfaceType { get; }
 
         public string Name { get; private set; }
 
@@ -66,31 +64,12 @@ namespace Jal.Router.Model
         {
             When = when;
         }
-    }
 
-    public class Route<TContent, TConsumer> : Route
-    {
-        public List<RouteMethod<TContent, TConsumer>> RouteMethods { get; }
+        public List<RouteMethod> RouteMethods { get; }
 
         public bool AnyRouteMethods()
         {
-            return RouteMethods!=null && RouteMethods.Count>0;
-        }
-
-        public Type ConsumerType { get; private set; }
-
-        public Route(string name, Type consumertype, List<Channel> channels) : base(name, typeof(TContent), typeof(TConsumer), channels)
-        {
-            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
-
-            ConsumerType = consumertype;
-        }
-
-        public Route(Saga saga, string name, Type consumertype, List<Channel> channels) : base(saga, name, typeof(TContent), typeof(TConsumer), channels)
-        {
-            RouteMethods = new List<RouteMethod<TContent, TConsumer>>();
-
-            ConsumerType = consumertype;
+            return RouteMethods != null && RouteMethods.Count > 0;
         }
     }
 }

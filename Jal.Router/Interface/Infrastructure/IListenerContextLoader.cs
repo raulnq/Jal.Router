@@ -2,8 +2,8 @@
 {
     public interface IListenerContextLoader
     {
-        void AddPointToPointChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path);
+        void AddPointToPointChannel<TContent>(string name, string connectionstring, string path);
 
-        void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription);
+        void AddPublishSubscribeChannel<TContent>(string name, string connectionstring, string path, string subscription);
     }
 }

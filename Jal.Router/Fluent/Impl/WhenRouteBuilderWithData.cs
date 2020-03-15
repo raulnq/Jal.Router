@@ -4,11 +4,11 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class WhenRouteBuilder<TContent, THandler> : IWhenMethodBuilder<TContent, THandler>
+    public class WhenRouteBuilderWithData<TContent, THandler, TData> : IWhenMethodBuilderWithData<TContent, THandler, TData>
     {
-        private readonly RouteMethod<TContent, THandler> _routemethod;
+        private readonly RouteMethodWithData<TContent, THandler, TData> _routemethod;
 
-        public WhenRouteBuilder(RouteMethod<TContent, THandler> routemethod)
+        public WhenRouteBuilderWithData(RouteMethodWithData<TContent, THandler, TData> routemethod)
         {
             if (routemethod == null)
             {
@@ -18,7 +18,7 @@ namespace Jal.Router.Fluent.Impl
             _routemethod = routemethod;
         }
 
-        public void When(Func<TContent, THandler, MessageContext, bool> method)
+        public void When(Func<TContent, THandler, MessageContext, TData, bool> method)
         {
             if (method == null)
             {
@@ -29,11 +29,11 @@ namespace Jal.Router.Fluent.Impl
         }
     }
 
-    public class WhenRouteBuilder<TContent> : IWhenMethodBuilder<TContent>
+    public class WhenRouteBuilderWithData<TContent, TData> : IWhenMethodBuilderWithData<TContent, TData>
     {
-        private readonly RouteMethod<TContent> _routemethod;
+        private readonly RouteMethodWithData<TContent, TData> _routemethod;
 
-        public WhenRouteBuilder(RouteMethod<TContent> routemethod)
+        public WhenRouteBuilderWithData(RouteMethodWithData<TContent, TData> routemethod)
         {
             if (routemethod == null)
             {
@@ -43,7 +43,7 @@ namespace Jal.Router.Fluent.Impl
             _routemethod = routemethod;
         }
 
-        public void When(Func<TContent, MessageContext, bool> method)
+        public void When(Func<TContent, MessageContext, TData, bool> method)
         {
             if (method == null)
             {

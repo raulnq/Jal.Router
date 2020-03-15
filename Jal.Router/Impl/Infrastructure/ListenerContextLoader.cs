@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
             _factory = factory;
         }
 
-        public void AddPointToPointChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path)
+        public void AddPointToPointChannel<TContent>(string name, string connectionstring, string path)
         {
             var channels = new List<Channel>();
 
@@ -25,7 +25,7 @@ namespace Jal.Router.Impl
 
             channels.Add(newchannel);
 
-            var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
+            var newroute = new Route(name, typeof(TContent), channels);
 
             var listenercontext = _loader.Create(newchannel);
 
@@ -36,7 +36,7 @@ namespace Jal.Router.Impl
             _loader.Open(listenercontext);
         }
 
-        public void AddPublishSubscribeChannel<TContent, THandler, TConcreteConsumer>(string name, string connectionstring, string path, string subscription)
+        public void AddPublishSubscribeChannel<TContent>(string name, string connectionstring, string path, string subscription)
         {
             var channels = new List<Channel>();
 
@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
 
             channels.Add(newchannel);
 
-            var newroute = new Route<TContent, THandler>(name, typeof(TConcreteConsumer), channels);
+            var newroute = new Route(name, typeof(TContent), channels);
 
             var listenercontext = _loader.Create(newchannel);
 

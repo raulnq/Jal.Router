@@ -18,6 +18,8 @@ namespace Jal.Router.Tests
 
             typeconsumer.Setup(m => m.Select(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>())).Returns(select);
 
+            typeconsumer.Setup(m => m.Select(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>())).Returns(select);
+
             return typeconsumer;
         }
 
@@ -59,7 +61,7 @@ namespace Jal.Router.Tests
 
             factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Never());
 
-            typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
+            typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
         }
 
         [DataTestMethod]
@@ -114,7 +116,7 @@ namespace Jal.Router.Tests
             {
                 factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
 
-                typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Once());
+                typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Once());
 
                 messagecontext.SagaContext.Data.Status.ShouldBe("status");
             }
@@ -122,7 +124,7 @@ namespace Jal.Router.Tests
             {
                 factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
 
-                typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
+                typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
 
                 messagecontext.SagaContext.Data.Status.ShouldNotBe("status");
             }
