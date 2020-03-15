@@ -23,20 +23,20 @@ namespace Jal.Router.Fluent.Impl
             _channels = channels;
         }
 
-        public IWhenHandlerBuilder Use<THandler, TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler>> action) where TConcreteConsumer : THandler
+        public IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent>> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var route = new Route<TContent, THandler>(_name, typeof(TConcreteConsumer), _channels);
+            var route = new Route(_name, typeof(TContent), _channels);
 
             _routes.Add(route);
 
             _route = route;
 
-            var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler>(route);
+            var whitRouteBuilder = new WhitRouteBuilder<TContent>(route);
 
             action(whitRouteBuilder);
 
@@ -142,9 +142,6 @@ namespace Jal.Router.Fluent.Impl
             _channels = channels;
         }
 
-
-
-
         public IOnRouteOptionBuilder When(Func<MessageContext, bool> condition)
         {
             if (condition == null)
@@ -225,20 +222,20 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IWhenHandlerBuilder Use<THandler, TConcreteConsumer>(Action<IWithMethodBuilder<TContent, THandler, TData>> action) where TConcreteConsumer : THandler
+        public IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent, TData>> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var route = new Route<TContent, THandler>(_name, typeof(TConcreteConsumer), _channels);
+            var route = new Route(_name, typeof(TContent), _channels);
 
             _routes.Add(route);
 
             _route = route;
 
-            var whitRouteBuilder = new WhitRouteBuilder<TContent, THandler, TData>(route);
+            var whitRouteBuilder = new WhitRouteBuilder<TContent, TData>(route);
 
             action(whitRouteBuilder);
 

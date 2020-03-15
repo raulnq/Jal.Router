@@ -4,11 +4,11 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IHandlerBuilder<out TContent> 
     {
-        IWhenHandlerBuilder Use<THandler, TConcreteHandler>(Action<IWithMethodBuilder<TContent, THandler>> action) where TConcreteHandler : THandler;
+        IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent>> action);
     }
 
     public interface IHandlerBuilder<out TContent, out TData>
     {
-        IWhenHandlerBuilder Use<THandler, TConcreteHandler>(Action<IWithMethodBuilder<TContent, THandler, TData>> action) where TConcreteHandler : THandler;
+        IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent, TData>> action);
     }
 }

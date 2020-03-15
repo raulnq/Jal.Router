@@ -20,7 +20,7 @@ namespace Jal.Router.Tests
 
             var sut = Build();
 
-            var routedmethod = new RouteMethod<object, Handler>((ob, hd) => Task.CompletedTask);
+            var routedmethod = new RouteMethod<object, Handler>((ob, hd, mc) => Task.CompletedTask, typeof(Handler));
 
             var selected = sut.Select<object, Handler>(messagecontext, new object(), routedmethod, new Handler());
 
@@ -36,9 +36,9 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            var routedmethod = new RouteMethod<object, Handler>((ob, hd) => Task.CompletedTask);
+            var routedmethod = new RouteMethod<object, Handler>((ob, hd, mc) => Task.CompletedTask, typeof(Handler));
 
-            routedmethod.UpdateEvaluator((ob, hd) => { executed = true; return true; });
+            routedmethod.UpdateEvaluator((ob, hd, mc) => { executed = true; return true; });
 
             var selected = sut.Select<object, Handler>(messagecontext, new object(), routedmethod, new Handler());
 
@@ -56,7 +56,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            var routedmethod = new RouteMethod<object, Handler>((ob, hd) => Task.CompletedTask);
+            var routedmethod = new RouteMethod<object, Handler>((ob, hd, mc) => Task.CompletedTask, typeof(Handler));
 
             routedmethod.UpdateEvaluator((ob, hd, co) => { executed = true; return true; });
 
@@ -76,7 +76,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler>(messagecontext, new object(), new RouteMethod<object, Handler>((ob, hd)=> { executed = true; return Task.CompletedTask; }), new Handler());
+            await sut.Consume<object, Handler>(messagecontext, new object(), new RouteMethod<object, Handler>((ob, hd, mc)=> { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler());
 
             executed.ShouldBeTrue();
         }
@@ -90,7 +90,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler>(messagecontext, new object(), new RouteMethod<object, Handler>((object ob, Handler hd, MessageContext mc) => { executed = true; return Task.CompletedTask; }), new Handler());
+            await sut.Consume<object, Handler>(messagecontext, new object(), new RouteMethod<object, Handler>((object ob, Handler hd, MessageContext mc) => { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler());
 
             executed.ShouldBeTrue();
         }
@@ -104,7 +104,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethod<object, Handler>((ob, hd) => { executed = true; return Task.CompletedTask; }), new Handler(), new object());
+            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethodWithData<object, Handler, object>((ob, mc, hd, da) => { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler(), new object());
 
             executed.ShouldBeTrue();
         }
@@ -118,7 +118,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethod<object, Handler>((object ob, Handler hd, MessageContext mc) => { executed = true; return Task.CompletedTask; }), new Handler(), new object());
+            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethodWithData<object, Handler, object>((object ob, Handler hd, MessageContext mc, object data) => { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler(), new object());
 
             executed.ShouldBeTrue();
         }
@@ -132,7 +132,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethod<object, Handler>((ob, hd, da) => { executed = true; return Task.CompletedTask; }), new Handler(), new object());
+            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethodWithData<object, Handler, object>((ob, hd, mc, da) => { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler(), new object());
 
             executed.ShouldBeTrue();
         }
@@ -146,7 +146,7 @@ namespace Jal.Router.Tests
 
             var executed = false;
 
-            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethod<object, Handler>((ob, hd, mc, da) => { executed = true; return Task.CompletedTask; }), new Handler(), new object());
+            await sut.Consume<object, Handler, object>(messagecontext, new object(), new RouteMethodWithData<object, Handler, object>((ob, hd, mc, da) => { executed = true; return Task.CompletedTask; }, typeof(Handler)), new Handler(), new object());
 
             executed.ShouldBeTrue();
         }

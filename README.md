@@ -88,7 +88,6 @@ Jal.Router is licensed under the [Apache2 license](https://github.com/raulnq/Jal
 * Raul Naupari (raulnq@gmail.com)
 ## RoadMap
 * Feature: Compression/encryption (middleware).
-* Feature: Anonymous handlers.
 * Feature: Message consumption during scheduled periods of time.
 * Feature: Non native duplicate detection (middleware).
 * Feature: Non native message defering (middleware).

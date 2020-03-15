@@ -3,54 +3,62 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
-    public class RouteMethod<TContent, TConsumer>
+    public class RouteMethod
     {
-        public RouteMethod(Func<TContent, TConsumer, Task> consumer, string status=null)
+        public Type HandlerType { get; private set;  }
+
+        public bool IsAnonymous { get; private set; }
+
+        protected RouteMethod(Type handlertype)
+        {
+            HandlerType = handlertype;
+            IsAnonymous = false;
+        }
+
+        protected RouteMethod()
+        {
+            IsAnonymous = true;
+        }
+    }
+
+    public class RouteMethod<TContent> : RouteMethod
+    {
+        public Func<TContent, MessageContext, Task> Consumer { get; }
+
+        public Func<TContent, MessageContext, bool> Evaluator { get; private set; }
+
+        public RouteMethod(Func<TContent, MessageContext, Task> consumer) : base()
         {
             Consumer = consumer;
-            Status = status;
         }
 
-        public RouteMethod(Func<TContent, TConsumer, object, Task> consumer, string status = null)
-        {
-            ConsumerWithData = consumer;
-            Status = status;
-        }
-
-        public RouteMethod(Func<TContent, TConsumer, MessageContext, Task> consumer, string status = null)
-        {
-            ConsumerWithContext = consumer;
-            Status = status;
-        }
-
-        public RouteMethod(Func<TContent, TConsumer, MessageContext, object, Task> consumer, string status = null)
-        {
-            ConsumerWithDataAndContext = consumer;
-            Status = status;
-        }
-
-        public string Status { get; private set; }
-
-        public Func<TContent, TConsumer, Task> Consumer { get;  }
-
-        public Func<TContent, TConsumer, bool> Evaluator { get; private set; }
-
-        public Func<TContent, TConsumer, MessageContext, Task> ConsumerWithContext { get; }
-
-        public Func<TContent, TConsumer, object, Task> ConsumerWithData { get; }
-
-        public Func<TContent, TConsumer, MessageContext, object, Task> ConsumerWithDataAndContext { get; }
-
-        public Func<TContent, TConsumer, MessageContext, bool> EvaluatorWithContext { get; private set; }
-
-        public void UpdateEvaluator(Func<TContent, TConsumer, bool> evaluator)
+        public void UpdateEvaluator(Func<TContent, MessageContext, bool> evaluator)
         {
             Evaluator = evaluator;
         }
+    }
 
-        public void UpdateEvaluator(Func<TContent, TConsumer, MessageContext, bool> evaluatorwithcontext)
+    public class RouteMethod<TContent, THandler> : RouteMethod
+    {
+        public Type ConcreteHandlerType { get; }
+
+        protected RouteMethod(Type handlertype, Type concretehandlertype): base(handlertype)
         {
-            EvaluatorWithContext = evaluatorwithcontext;
+            ConcreteHandlerType = concretehandlertype;
+        }
+
+        public RouteMethod(Func<TContent, THandler, MessageContext, Task> consumer, Type concreteconsumertype) : this(typeof(THandler), concreteconsumertype)
+        {
+            Consumer = consumer;
+        }
+
+        public Func<TContent, THandler, MessageContext, Task> Consumer { get; }
+
+        public Func<TContent, THandler, MessageContext, bool> Evaluator { get; private set; }
+
+        public void UpdateEvaluator(Func<TContent, THandler, MessageContext, bool> evaluator)
+        {
+            Evaluator = evaluator;
         }
     }
 }

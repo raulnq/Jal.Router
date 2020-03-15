@@ -1,5 +1,4 @@
-﻿using Common.Logging;
-using Jal.Router.AzureServiceBus.Standard.Model;
+﻿using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using System;
@@ -9,7 +8,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
     public interface IHostBuilder
     {
         IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, Action<AzureServiceBusParameter> action=null);
-        IHostBuilder UseCommonLogging(ILog log);
+        IHostBuilder UseSerilog();
         IHostBuilder UseApplicationInsights(string applicationinsightskey="");
         IHostBuilder UseAzureStorage(Action<AzureStorageParameter> action = null);
         IHostBuilder UseHeartBeatMonitor(int frequency);

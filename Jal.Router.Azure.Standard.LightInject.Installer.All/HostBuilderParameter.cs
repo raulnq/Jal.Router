@@ -1,5 +1,5 @@
 ﻿using System;
-using Common.Logging;
+using Serilog;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
@@ -14,7 +14,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         public Action<IConfiguration> Setup { get; set; }
         public ServiceContainer Container { get; set; }
         public IRouterConfigurationSource[] Sources { get; set; }
-        public ILog Log { get; set; }
+        public bool UseSerilog { get; set; }
         public string ApplicationName { get; set; }
         public int HeartBeatFrequency { get; set; }
         public bool UseApplicationInsights { get; set; }

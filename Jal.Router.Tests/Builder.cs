@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
 
             if(route==null)
             {
-                messagecontext.SetRoute(new Route<object, Handler>("route", typeof(Handler), new List<Channel>()));
+                messagecontext.SetRoute(new Route("route", typeof(object), new List<Channel>()));
             }
             else
             {
@@ -57,62 +57,62 @@ namespace Jal.Router.Tests
             return messagecontext;
         }
 
-        public static Route<object, Handler> CreateRoute()
+        public static Route CreateRoute()
         {
-            var route = new Route<object, Handler>("route", typeof(Handler), new List<Channel>() { });
+            var route = new Route("route", typeof(object), new List<Channel>() { });
 
             return route;
         }
 
-        public static Route<object, Handler> CreateRouteWithConsumer(string status=null)
+        public static Route CreateRouteWithConsumer(string status)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>((o,h)=>Task.CompletedTask, status);
+            var method = new RouteMethodWithData<object, Handler, object>((o,h,m,d)=>Task.CompletedTask, typeof(Handler), status);
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, Task> consumer)
+        public static Route CreateRouteWithConsumer()
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer);
+            var method = new RouteMethod<object, Handler>((o, h, m) => Task.CompletedTask, typeof(Handler));
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, MessageContext, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, Task> consumer)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer);
+            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler));
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, object, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, object, Task> consumer)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer);
+            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler));
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route<object, Handler> CreateRouteWithConsumer(Func<object, Handler, MessageContext, object, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, object, Task> consumer)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer);
+            var method = new RouteMethodWithData<object, Handler, object>(consumer, typeof(Handler));
 
             route.RouteMethods.Add(method);
 
