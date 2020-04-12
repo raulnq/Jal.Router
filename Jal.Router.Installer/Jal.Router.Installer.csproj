@@ -15,9 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Windsor" Version="5.0.1" />
     <PackageReference Include="Jal.ChainOfResponsability.Installer" Version="3.2.0" />
-    <PackageReference Include="Jal.Locator.CastleWindsor" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
