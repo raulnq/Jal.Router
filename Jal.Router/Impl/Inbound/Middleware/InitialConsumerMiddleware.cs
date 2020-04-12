@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class InitialConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
+    public class InitialConsumerMiddleware : AbstractConsumerMiddleware, IAsyncMiddleware<MessageContext>
     {
         private const string DefaultStatus = "STARTED";
 
@@ -15,7 +14,7 @@ namespace Jal.Router.Impl
         {
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var messagecontext = context.Data;
 

@@ -91,22 +91,22 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
         public IHost Build()
         {
-            _parameter.Container.RegisterRouter(_parameter.Sources);
+            _parameter.Container.AddRouter(_parameter.Sources);
 
-            _parameter.Container.RegisterFrom<AzureServiceBusCompositionRoot>();
+            _parameter.Container.AddAzureServiceBusForRouter();
 
-            _parameter.Container.RegisterFrom<NewtonsoftCompositionRoot>();
+            _parameter.Container.AddNewtonsoftForRouter();
 
             if (_parameter.UseSerilog)
             {
-                _parameter.Container.RegisterFrom<SerilogCompositionRoot>();
+                _parameter.Container.AddSerilogForRouter();
             }
 
             if (_parameter.UseApplicationInsights)
             {
                 _parameter.Container.Register<TelemetryClient>(new PerContainerLifetime());
 
-                _parameter.Container.RegisterFrom<ApplicationInsightsCompositionRoot>();
+                _parameter.Container.AddApplicationInsightsForRouter();
             }
 
             if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
@@ -116,7 +116,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (_parameter.UseAzureStorage)
             {
-                _parameter.Container.RegisterFrom<AzureStorageCompositionRoot>();
+                _parameter.Container.AddAzureStorageForRouter();
             }
 
             if (_parameter.RouterInterceptorType != null)

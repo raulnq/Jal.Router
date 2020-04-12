@@ -1,5 +1,5 @@
 ﻿using System;
-using Jal.Locator.LightInject.Installer;
+using Jal.Locator.LightInject;
 using Jal.Router.AzureServiceBus.Standard.Extensions;
 using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.Impl;
@@ -14,8 +14,7 @@ using Jal.Router.AzureStorage.LightInject.Installer;
 using Jal.ChainOfResponsability.LightInject.Installer;
 using Jal.Router.Patterns.Impl;
 using Jal.Router.Patterns.Interface;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using System.Threading.Tasks;
 using Jal.Router.Newtonsoft.Extensions;
 using Jal.Router.Newtonsoft.LightInject.Installer;
@@ -31,10 +30,14 @@ namespace Jal.Router.Sample.NetCore
         static async Task Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
-            container.RegisterFrom<AzureServiceBusCompositionRoot>();
-            container.RegisterFrom<AzureStorageCompositionRoot>();
-            container.RegisterFrom<NewtonsoftCompositionRoot>();
+            container.AddRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() }, c=>
+            {
+                c.AddAzureServiceBusForRouter();
+                c.AddAzureStorageForRouter();
+                c.AddNewtonsoftForRouter();
+            });
+
+
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -44,7 +47,7 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueListenByOneHandlerWithException>(typeof(QueueListenByOneHandlerWithException).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToPublishHandler>(typeof(ToPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
-            container.Register<IMiddlewareAsync<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
@@ -727,9 +730,9 @@ namespace Jal.Router.Sample.NetCore
         }
     }
 
-    public class Middleware : IMiddlewareAsync<MessageContext>
+    public class Middleware : IAsyncMiddleware<MessageContext>
     {
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             Console.WriteLine("Start " + GetType().Name);
 

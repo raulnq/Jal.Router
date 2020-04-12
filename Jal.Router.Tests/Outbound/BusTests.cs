@@ -1,11 +1,11 @@
-﻿using Jal.ChainOfResponsability.Fluent.Impl;
-using Jal.ChainOfResponsability.Model;
+﻿using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
@@ -34,7 +34,7 @@ namespace Jal.Router.Tests
 
             await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.IdentityContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Once());
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace Jal.Router.Tests
 
             await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.IdentityContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Once());
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
     }
 }

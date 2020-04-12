@@ -2,13 +2,12 @@ using System;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class BasicAuthenticatorMiddleware : IMiddlewareAsync<MessageContext>
+    public class BasicAuthenticatorMiddleware : IAsyncMiddleware<MessageContext>
     {
         private readonly string _key;
 
@@ -20,7 +19,7 @@ namespace Jal.Router.Impl
             _secret = secret;
         }
 
-        public Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             if (!IsValid(context.Data))
             {

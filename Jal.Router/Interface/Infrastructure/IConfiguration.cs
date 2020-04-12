@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -56,8 +56,8 @@ namespace Jal.Router.Interface
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseEntityStorage<TStorage>() where TStorage : IEntityStorage;
         IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
-        IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
-        IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>;
+        IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
+        IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
         IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IConfiguration UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         IConfiguration UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;

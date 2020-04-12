@@ -1,11 +1,11 @@
-﻿using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+﻿using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
@@ -125,11 +125,11 @@ namespace Jal.Router.Tests
 
             if (throwexception)
             {
-                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Throws(new System.Exception());
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>())).Throws(new System.Exception());
             }
             else
             {
-                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>())).Returns(Task.CompletedTask);
+                pipelinemock.Setup(x => x.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             }
 
             return pipelinemock;

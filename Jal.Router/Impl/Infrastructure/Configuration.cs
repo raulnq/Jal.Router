@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -134,13 +134,13 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
+        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             InboundMiddlewareTypes.Add(typeof(TMiddleware));
             return this;
         }
 
-        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
+        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             OutboundMiddlewareTypes.Add(typeof(TMiddleware));
             return this;

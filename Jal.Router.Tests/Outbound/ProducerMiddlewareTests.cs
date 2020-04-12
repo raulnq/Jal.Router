@@ -1,4 +1,4 @@
-﻿using Jal.ChainOfResponsability.Model;
+﻿using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -28,7 +28,7 @@ namespace Jal.Router.Tests
 
             var sut = new ProducerMiddleware(producermock.Object, factorymock.Object);
 
-            await sut.ExecuteAsync(new Context<MessageContext>() { Data = messagecontext }, x=>Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, x=>Task.CompletedTask);
 
             producermock.WasExecuted();
         }
@@ -52,7 +52,7 @@ namespace Jal.Router.Tests
 
             var sut = new ProducerMiddleware(producermock.Object, factorymock.Object);
 
-            await sut.ExecuteAsync(new Context<MessageContext>() { Data = messagecontext }, x => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, x => Task.CompletedTask);
 
             producermock.WasExecuted();
 

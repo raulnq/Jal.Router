@@ -1,6 +1,5 @@
-﻿using Jal.ChainOfResponsability.Intefaces;
+﻿using Jal.ChainOfResponsability;
 using Jal.Router.Fluent.Interface;
-using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
@@ -13,7 +12,7 @@ namespace Jal.Router.Fluent.Impl
             _endpoint = endpoint;
         }
 
-        public void Add<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
+        public void Add<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             _endpoint.MiddlewareTypes.Add(typeof(TMiddleware));
         }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Jal.Locator.Interface;
+using Jal.Locator;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Impl

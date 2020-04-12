@@ -1,35 +1,31 @@
-﻿using System.Reflection;
-using Jal.ChainOfResponsability.Intefaces;
+﻿using Jal.ChainOfResponsability;
 using Jal.ChainOfResponsability.LightInject.Installer;
-using Jal.Locator.LightInject.Installer;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using LightInject;
+using System;
 
 namespace Jal.Router.LightInject.Installer
 {
     public static class ServiceContainerExtension
     {
-        public static void RegisterRouter(this IServiceContainer container, IRouterConfigurationSource[] sources)
+        public static void AddRouter(this IServiceContainer container, IRouterConfigurationSource[] sources, Action<IServiceContainer> action=null)
         {
-            container.RegisterFrom<ServiceLocatorCompositionRoot>();
+            container.AddChainOfResponsability();
 
-            container.RegisterFrom<ChainOfResponsabilityCompositionRoot>();
-
-            RegisterRouter(container);
+            AddRouter(container, action);
 
             if (sources != null)
             {
                 foreach (var source in sources)
                 {
                     container.Register(typeof(IRouterConfigurationSource) , source.GetType(), source.GetType().FullName, new PerContainerLifetime());
-
                 }
             }
         }
 
-        public static void RegisterRouter(this IServiceContainer container)
+        public static void AddRouter(this IServiceContainer container, Action<IServiceContainer> action = null)
         {
             container.Register<IShutdownTask, PointToPointChannelResourceDestructor>(typeof(PointToPointChannelResourceDestructor).FullName, new PerContainerLifetime());
 
@@ -211,21 +207,26 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<IEntityStorage, InMemoryEntityStorage>(typeof(InMemoryEntityStorage).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, Impl.ConsumerMiddleware>(typeof (Impl.ConsumerMiddleware).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, RouterMiddleware>(typeof (RouterMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, RouterMiddleware>(typeof (RouterMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, InitialConsumerMiddleware>(typeof (InitialConsumerMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, InitialConsumerMiddleware>(typeof (InitialConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, MiddleConsumerMiddleware>(typeof (MiddleConsumerMiddleware).FullName, new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, MiddleConsumerMiddleware>(typeof (MiddleConsumerMiddleware).FullName, new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, FinalConsumerMiddleware>(typeof (FinalConsumerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, Impl.ProducerMiddleware>(typeof (Impl.ProducerMiddleware).FullName,new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, Impl.ProducerMiddleware>(typeof (Impl.ProducerMiddleware).FullName,new PerContainerLifetime());
 
-            container.Register<IMiddlewareAsync<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, BusMiddleware>(typeof(BusMiddleware).FullName, new PerContainerLifetime());
 
             container.Register<IRouterConfigurationSource, EmptyRouterConfigurationSource>(typeof (EmptyRouterConfigurationSource).FullName, new PerContainerLifetime());
+
+            if(action!=null)
+            {
+                action(container);
+            }
         }
     }
 }

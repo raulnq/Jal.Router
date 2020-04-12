@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <Company>Raul Naupari</Company>
     <Description>Castle Windsor installer for the Jal.Router library</Description>
     <Copyright />
@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.0.1" />
-    <PackageReference Include="Jal.ChainOfResponsability.Installer" Version="1.0.5" />
-    <PackageReference Include="Jal.Locator.CastleWindsor" Version="1.1.2" />
+    <PackageReference Include="Jal.ChainOfResponsability.Installer" Version="3.2.0" />
+    <PackageReference Include="Jal.Locator.CastleWindsor" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>

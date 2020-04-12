@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
 
-    public class BusMiddleware : IMiddlewareAsync<MessageContext>
+    public class BusMiddleware : IAsyncMiddleware<MessageContext>
     {
         private readonly ILogger _logger;
 
@@ -22,7 +21,7 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var messagecontext = context.Data;
 

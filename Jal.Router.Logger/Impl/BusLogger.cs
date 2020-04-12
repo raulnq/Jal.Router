@@ -2,13 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Common.Logging;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
 namespace Jal.Router.Logger.Impl
 {
-    public class BusLogger : IMiddlewareAsync<MessageContext>
+    public class BusLogger : IAsyncMiddleware<MessageContext>
     {
         private readonly ILog _log;
 
@@ -17,7 +16,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 

@@ -1,13 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class ProducerMiddleware : AbstractProducerMiddleware, IMiddlewareAsync<MessageContext>
+    public class ProducerMiddleware : AbstractProducerMiddleware, IAsyncMiddleware<MessageContext>
     {
         private readonly IProducer _producer;
 
@@ -16,7 +15,7 @@ namespace Jal.Router.Impl
             _producer = producer;
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             
             try

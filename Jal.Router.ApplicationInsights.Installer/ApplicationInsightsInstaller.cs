@@ -1,7 +1,7 @@
 ﻿using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
-using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -20,9 +20,9 @@ namespace Jal.Router.ApplicationInsights.Installer
 
             container.Register(Component.For<ILogger<PublishSubscribeChannelStatistics>>().ImplementedBy<PublishSubscribeChannelStatisticsLogger>().Named(typeof(PublishSubscribeChannelStatisticsLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<RouterLogger>().Named(typeof(RouterLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For<IAsyncMiddleware<MessageContext>>().ImplementedBy<RouterLogger>().Named(typeof(RouterLogger).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusLogger>().Named(typeof(BusLogger).FullName).LifestyleSingleton());
+            container.Register(Component.For<IAsyncMiddleware<MessageContext>>().ImplementedBy<BusLogger>().Named(typeof(BusLogger).FullName).LifestyleSingleton());
         }
     }
 

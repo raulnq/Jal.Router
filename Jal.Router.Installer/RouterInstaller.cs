@@ -3,11 +3,12 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Jal.ChainOfResponsability.Installer;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.Locator.CastleWindsor.Installer;
+using Jal.ChainOfResponsability;
+using Jal.Locator.CastleWindsor;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
+using System;
 
 namespace Jal.Router.Installer
 {
@@ -15,16 +16,18 @@ namespace Jal.Router.Installer
     {
         private readonly IRouterConfigurationSource[] _sources;
 
-        public RouterInstaller(IRouterConfigurationSource[] sources)
+        private readonly Action<IWindsorContainer> _action;
+
+        public RouterInstaller(IRouterConfigurationSource[] sources, Action<IWindsorContainer> action)
         {
             _sources = sources;
+
+            _action = action;
         }
 
         public void Install(IWindsorContainer container, IConfigurationStore store)
         {
-            container.Install(new ChainOfResponsabilityInstaller());
-
-            container.Install(new ServiceLocatorInstaller());
+            container.AddChainOfResponsability();
 
             container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<FileSystemRequestReplyFromPointToPointChannel>().Named(typeof(FileSystemRequestReplyFromPointToPointChannel).FullName).LifestyleSingleton());
 
@@ -198,19 +201,19 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For(typeof(IEntityStorage)).ImplementedBy(typeof(InMemoryEntityStorage)).Named(typeof(InMemoryEntityStorage).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(Impl.ConsumerMiddleware)).Named(typeof(Impl.ConsumerMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IAsyncMiddleware<MessageContext>)).ImplementedBy(typeof(Impl.ConsumerMiddleware)).Named(typeof(Impl.ConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(RouterMiddleware)).Named(typeof(RouterMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IAsyncMiddleware<MessageContext>)).ImplementedBy(typeof(RouterMiddleware)).Named(typeof(RouterMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(InitialConsumerMiddleware)).Named(typeof(InitialConsumerMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IAsyncMiddleware<MessageContext>)).ImplementedBy(typeof(InitialConsumerMiddleware)).Named(typeof(InitialConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(MiddleConsumerMiddleware)).Named(typeof(MiddleConsumerMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IAsyncMiddleware<MessageContext>)).ImplementedBy(typeof(MiddleConsumerMiddleware)).Named(typeof(MiddleConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For(typeof(IMiddlewareAsync<MessageContext>)).ImplementedBy(typeof(FinalConsumerMiddleware)).Named(typeof(FinalConsumerMiddleware).FullName).LifestyleSingleton());
+            container.Register(Component.For(typeof(IAsyncMiddleware<MessageContext>)).ImplementedBy(typeof(FinalConsumerMiddleware)).Named(typeof(FinalConsumerMiddleware).FullName).LifestyleSingleton());
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<BusMiddleware>().LifestyleSingleton().Named(typeof(BusMiddleware).FullName));
+            container.Register(Component.For<IAsyncMiddleware<MessageContext>>().ImplementedBy<BusMiddleware>().LifestyleSingleton().Named(typeof(BusMiddleware).FullName));
 
-            container.Register(Component.For<IMiddlewareAsync<MessageContext>>().ImplementedBy<Impl.ProducerMiddleware>().LifestyleSingleton().Named(typeof(Impl.ProducerMiddleware).FullName));
+            container.Register(Component.For<IAsyncMiddleware<MessageContext>>().ImplementedBy<Impl.ProducerMiddleware>().LifestyleSingleton().Named(typeof(Impl.ProducerMiddleware).FullName));
 
             container.Register(Component.For<IComponentFactoryGateway>().ImplementedBy<ComponentFactoryGateway>().LifestyleSingleton().Named(typeof(ComponentFactoryGateway).FullName));
 
@@ -225,6 +228,11 @@ namespace Jal.Router.Installer
                     container.Register(Component.For(typeof(IRouterConfigurationSource)).ImplementedBy(source.GetType()).Named(source.GetType().FullName).LifestyleSingleton());
 
                 }
+            }
+
+            if(_action!=null)
+            {
+                _action(container);
             }
         }
     }

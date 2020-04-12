@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Fluent.Interfaces;
-using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -24,7 +23,7 @@ namespace Jal.Router.Impl
 
             _logger = logger;
         }
-        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddlewareAsync<MessageContext>
+        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             var interceptor = _factory.CreateRouterInterceptor();
 

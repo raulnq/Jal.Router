@@ -5,6 +5,7 @@ using LightInject;
 
 namespace Jal.Router.AzureServiceBus.Standard.LightInject.Installer
 {
+
     public class AzureServiceBusCompositionRoot : ICompositionRoot
     {
         public void Compose(IServiceRegistry serviceRegistry)

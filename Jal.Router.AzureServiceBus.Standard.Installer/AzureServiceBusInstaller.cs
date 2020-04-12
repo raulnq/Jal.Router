@@ -7,6 +7,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.AzureServiceBus.Standard.Installer
 {
+
     public class AzureServiceBusInstaller : IWindsorInstaller
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)
