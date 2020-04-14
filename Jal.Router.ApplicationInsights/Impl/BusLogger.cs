@@ -27,7 +27,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             {
                 Name = context.Data.Name,
 
-                Id = context.Data.IdentityContext.Id,
+                Id = context.Data.TracingContext.Id,
 
                 Timestamp = context.Data.DateTimeUtc,
 

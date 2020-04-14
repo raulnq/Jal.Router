@@ -20,8 +20,8 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateContext(TelemetryContext telemetrycontext, MessageContext context)
         {
-            telemetrycontext.Operation.Id = $"{context.IdentityContext.OperationId}";
-            telemetrycontext.Operation.ParentId = $"{context.IdentityContext.ParentId}";
+            telemetrycontext.Operation.Id = $"{context.TracingContext.OperationId}";
+            telemetrycontext.Operation.ParentId = $"{context.TracingContext.ParentId}";
 
             if (!string.IsNullOrWhiteSpace(Configuration.ApplicationName))
             {
@@ -31,12 +31,12 @@ namespace Jal.Router.ApplicationInsights.Impl
 
         public void PopulateProperties(IDictionary<string, string> properties, MessageContext context)
         {
-            properties.Add("identity_id", context?.Id);
-            properties.Add("identity_replytorequestid", context.IdentityContext?.ReplyToRequestId);
-            properties.Add("identity_requestid", context.IdentityContext?.RequestId);
-            properties.Add("identity_operationid", context.IdentityContext?.OperationId);
-            properties.Add("identity_parentid", context.IdentityContext?.ParentId);
-            properties.Add("identity_partitionid", context.IdentityContext?.PartitionId);
+            properties.Add("tracing_id", context?.Id);
+            properties.Add("tracing_replytorequestid", context.TracingContext?.ReplyToRequestId);
+            properties.Add("tracing_requestid", context.TracingContext?.RequestId);
+            properties.Add("tracing_operationid", context.TracingContext?.OperationId);
+            properties.Add("tracing_parentid", context.TracingContext?.ParentId);
+            properties.Add("tracing_partitionid", context.TracingContext?.PartitionId);
 
             properties.Add("origin_key", context.Origin?.Key);
             properties.Add("origin_from", context.Origin?.From);

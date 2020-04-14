@@ -6,20 +6,20 @@ namespace Jal.Router.Model
     public class Options
     {
         public Options(string endpointname, Dictionary<string, string> headers, 
-            SagaContext sagacontext, TrackingContext trackingcontext, IdentityContext identitycontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
+            SagaContext sagacontext, TrackingContext trackingcontext, TracingContext tracingcontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
         {
             EndPointName = endpointname;
             Headers= headers;
             SagaContext = sagacontext;
             TrackingContext = trackingcontext;
-            IdentityContext = identitycontext;
+            TracingContext = tracingcontext;
             Route = route;
             Saga = saga;
             Version = version;
             ScheduledEnqueueDateTimeUtc = scheduledenqueuedatetimeutc;
         }
 
-        public IdentityContext IdentityContext { get; private set; }
+        public TracingContext TracingContext { get; private set; }
 
         public SagaContext SagaContext { get; private set; }
 

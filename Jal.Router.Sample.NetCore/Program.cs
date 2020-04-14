@@ -688,9 +688,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_end", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_end", operationid: context.TracingContext.OperationId);
 
-            return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
+            return context.Send(new Message() { Name = message.Name }, "endendpoint", tracing);
         }
     }
 
@@ -706,9 +706,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
 
-            return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint", tracing);
         }
     }
 
@@ -724,9 +724,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
 
-            return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
+            return context.Send(new Message() { Name = message.Name }, "continueendpoint", tracing);
         }
     }
 
@@ -759,7 +759,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
+            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.TracingContext);
         }
     }
 
@@ -769,7 +769,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
+            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.TracingContext);
         }
     }
 
@@ -780,7 +780,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            return context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
+            return context.Publish(new Message() { }, "fromqueueendpoint", context.TracingContext, context.Origin.Key);
         }
     }
 
@@ -818,7 +818,7 @@ namespace Jal.Router.Sample.NetCore
     {
         public override Task HandleWithContext(Message message, MessageContext context)
         {
-            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.PartitionId);
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.TracingContext.PartitionId);
 
             return Task.CompletedTask;
         }
@@ -832,7 +832,7 @@ namespace Jal.Router.Sample.NetCore
 
             for (int i = 0; i < 100; i++)
             {
-                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
+                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.TracingContext);
             }
         }
     }
@@ -879,10 +879,10 @@ namespace Jal.Router.Sample.NetCore
         {
             for (int i = 0; i < 5; i++)
             {
-                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"1-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()),"X");
-                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"2-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"3-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"4-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new TracingContext(id: $"1-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new TracingContext(id: $"2-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new TracingContext(id: $"3-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new TracingContext(id: $"4-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
             }
         }
     }

@@ -104,14 +104,23 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             if (_parameter.UseApplicationInsights)
             {
-                _parameter.Container.Register<TelemetryClient>(new PerContainerLifetime());
+                _parameter.Container.Register<TelemetryClient>(x=> {
+
+                    var conf = TelemetryConfiguration.CreateDefault();
+
+                    if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
+                    {
+                        conf.InstrumentationKey = _parameter.ApplicationInsightsKey;
+                    }
+
+                    var client = new TelemetryClient(conf);
+
+                    client.Context.Cloud.RoleName = _parameter.ApplicationName;
+
+                    return client;
+                } ,new PerContainerLifetime());
 
                 _parameter.Container.AddApplicationInsightsForRouter();
-            }
-
-            if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
-            {
-                TelemetryConfiguration.Active.InstrumentationKey = _parameter.ApplicationInsightsKey;
             }
 
             if (_parameter.UseAzureStorage)

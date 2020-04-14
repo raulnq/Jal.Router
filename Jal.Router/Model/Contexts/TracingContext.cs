@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.Model
 {
-    public class IdentityContext
+    public class TracingContext
     {
         public string Id { get; private set; }
         public string OperationId { get; private set; }
@@ -8,12 +8,12 @@
         public string ReplyToRequestId { get; private set; }
         public string RequestId { get; private set;  }
         public string PartitionId { get; private set; }
-        private  IdentityContext()
+        private  TracingContext()
         {
 
         }
 
-        public IdentityContext(string id, string operationid=null, string parentid=null, string partitionid=null, string replytorequestid=null, string requestid=null)
+        public TracingContext(string id, string operationid=null, string parentid=null, string partitionid=null, string replytorequestid=null, string requestid=null)
         {
             ReplyToRequestId = replytorequestid;
             RequestId = requestid;
@@ -23,9 +23,9 @@
             Id = id;
         }
 
-        public IdentityContext Clone()
+        public TracingContext Clone()
         {
-            return new IdentityContext(Id, OperationId, ParentId, PartitionId, ReplyToRequestId, RequestId);
+            return new TracingContext(Id, OperationId, ParentId, PartitionId, ReplyToRequestId, RequestId);
         }
 
         public void SetParentId(string parentid)
@@ -53,9 +53,9 @@
             ReplyToRequestId = replytorequestid;
         }
 
-        public IdentityContextEntity ToEntity()
+        public TracingContextEntity ToEntity()
         {
-            return new IdentityContextEntity(Id, OperationId, ParentId, RequestId, PartitionId, ReplyToRequestId);
+            return new TracingContextEntity(Id, OperationId, ParentId, RequestId, PartitionId, ReplyToRequestId);
         }
     }
 }

@@ -17,14 +17,14 @@ namespace Jal.Router.Serilog.Impl
 
             var log = Log.Logger;
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.ParentId))
             {
-                log = log.ForContext("ParentId", context.Data.IdentityContext.ParentId);
+                log = log.ForContext("ParentId", context.Data.TracingContext.ParentId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.OperationId))
             {
-                log = log.ForContext("OperationId", context.Data.IdentityContext.OperationId);
+                log = log.ForContext("OperationId", context.Data.TracingContext.OperationId);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.Data?.Id))

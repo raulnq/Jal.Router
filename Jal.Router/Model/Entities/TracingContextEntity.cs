@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.Model
 {
-    public class IdentityContextEntity
+    public class TracingContextEntity
     {
         public string Id { get; private set; }
         public string OperationId { get; private set; }
@@ -9,12 +9,12 @@
         public string RequestId { get; private set; }
         public string PartitionId { get; private set; }
 
-        private IdentityContextEntity()
+        private TracingContextEntity()
         {
 
         }
 
-        public IdentityContextEntity(string id, string operationid, string parentid, string requestid, string partitionid, string replytorequestid)
+        public TracingContextEntity(string id, string operationid, string parentid, string requestid, string partitionid, string replytorequestid)
         {
             Id = id;
             OperationId = operationid;

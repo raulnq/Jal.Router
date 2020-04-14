@@ -31,7 +31,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             {
                 telemetry.Timestamp = context.Data.DateTimeUtc;
 
-                telemetry.Id = $"{context.Data.IdentityContext.Id}";
+                telemetry.Id = $"{context.Data.TracingContext.Id}";
 
                 telemetry.Name = context.Data.Name;
 

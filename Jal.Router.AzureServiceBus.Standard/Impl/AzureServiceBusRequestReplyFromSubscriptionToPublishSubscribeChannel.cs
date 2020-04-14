@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var client = new SessionClient(sendercontext.Channel.ReplyConnectionString, entity);
 
-            var messagesession = await client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).ConfigureAwait(false);
+            var messagesession = await client.AcceptMessageSessionAsync(context.TracingContext.ReplyToRequestId).ConfigureAwait(false);
 
             var message = sendercontext.Channel.ReplyTimeOut != 0 ? 
                 await messagesession.ReceiveAsync(TimeSpan.FromSeconds(sendercontext.Channel.ReplyTimeOut)).ConfigureAwait(false) : 

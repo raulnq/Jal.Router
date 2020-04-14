@@ -32,7 +32,7 @@ namespace Jal.Router.Tests
 
             var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object));
 
-            await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.IdentityContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
+            await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
@@ -50,7 +50,7 @@ namespace Jal.Router.Tests
 
             var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object));
 
-            await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.IdentityContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
+            await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }

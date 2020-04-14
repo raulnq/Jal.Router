@@ -31,7 +31,7 @@ namespace Jal.Router.Impl
 
                 var parentid = fmessage.ParentId;
 
-                var identitycontext = new IdentityContext(id: fmessage.Id, operationid: operationid, parentid: parentid, partitionid: fmessage.PartitionId, replytorequestid: fmessage.ReplyToRequestId, requestid: fmessage.RequestId);
+                var tracingcontext = new TracingContext(id: fmessage.Id, operationid: operationid, parentid: parentid, partitionid: fmessage.PartitionId, replytorequestid: fmessage.ReplyToRequestId, requestid: fmessage.RequestId);
 
                 var trackings = fmessage.Trackings;
 
@@ -45,7 +45,7 @@ namespace Jal.Router.Impl
 
                 var contentid = fmessage.ContentId;
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, contentid);
+                var context = new MessageContext(Bus, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, contentid);
 
                 if (fmessage.Headers != null)
                 {
@@ -111,34 +111,34 @@ namespace Jal.Router.Impl
                 filemessage.Origin = context.Origin.Key;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.Id))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.Id))
             {
-                filemessage.Id = context.IdentityContext.Id;
+                filemessage.Id = context.TracingContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.ReplyToRequestId))
             {
-                filemessage.ReplyToRequestId = context.IdentityContext.ReplyToRequestId;
+                filemessage.ReplyToRequestId = context.TracingContext.ReplyToRequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.RequestId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.RequestId))
             {
-                filemessage.RequestId = context.IdentityContext.RequestId;
+                filemessage.RequestId = context.TracingContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.PartitionId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.PartitionId))
             {
-                filemessage.PartitionId = context.IdentityContext.PartitionId;
+                filemessage.PartitionId = context.TracingContext.PartitionId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.OperationId))
             {
-                filemessage.OperationId = context.IdentityContext.OperationId;
+                filemessage.OperationId = context.TracingContext.OperationId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.ParentId))
             {
-                filemessage.ParentId = context.IdentityContext.ParentId;
+                filemessage.ParentId = context.TracingContext.ParentId;
             }
 
             return filemessage;

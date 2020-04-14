@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jal.ChainOfResponsability.LightInject.Installer" Version="3.2.0" />
+    <PackageReference Include="Jal.ChainOfResponsability.LightInject.Installer" Version="3.3.1" />
     <PackageReference Include="Jal.Locator.LightInject" Version="2.2.1" />
   </ItemGroup>
 

@@ -42,7 +42,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     parentid = sbmessage.UserProperties[ParentId].ToString();
                 }
 
-                var identitycontext = new IdentityContext(id: sbmessage.MessageId, operationid: operationid, parentid: parentid, partitionid: sbmessage.SessionId, replytorequestid: sbmessage.ReplyToSessionId, requestid: sbmessage.SessionId);
+                var tracingcontext = new TracingContext(id: sbmessage.MessageId, operationid: operationid, parentid: parentid, partitionid: sbmessage.SessionId, replytorequestid: sbmessage.ReplyToSessionId, requestid: sbmessage.SessionId);
 
                 var trackings = new List<Tracking>();
 
@@ -86,7 +86,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     claimcheckid = sbmessage.UserProperties[ClaimCheckId].ToString();
                 }
 
-                var context = new MessageContext(Bus, identitycontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid);
+                var context = new MessageContext(Bus, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid);
 
                 if (sbmessage.UserProperties != null)
                 {
@@ -203,34 +203,34 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 brokeredmessage.UserProperties.Add(Origin, context.Origin.Key);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.Id))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.Id))
             {
-                brokeredmessage.MessageId = context.IdentityContext.Id;
+                brokeredmessage.MessageId = context.TracingContext.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.ReplyToRequestId))
             {
-                brokeredmessage.ReplyToSessionId = context.IdentityContext.ReplyToRequestId;
+                brokeredmessage.ReplyToSessionId = context.TracingContext.ReplyToRequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.RequestId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.RequestId))
             {
-                brokeredmessage.SessionId = context.IdentityContext.RequestId;
+                brokeredmessage.SessionId = context.TracingContext.RequestId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.PartitionId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.PartitionId))
             {
-                brokeredmessage.SessionId = context.IdentityContext.PartitionId;
+                brokeredmessage.SessionId = context.TracingContext.PartitionId;
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.OperationId))
             {
-                brokeredmessage.UserProperties.Add(OperationId, context.IdentityContext.OperationId);
+                brokeredmessage.UserProperties.Add(OperationId, context.TracingContext.OperationId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.ParentId))
             {
-                brokeredmessage.UserProperties.Add(ParentId, context.IdentityContext.ParentId);
+                brokeredmessage.UserProperties.Add(ParentId, context.TracingContext.ParentId);
             }
 
             return brokeredmessage;

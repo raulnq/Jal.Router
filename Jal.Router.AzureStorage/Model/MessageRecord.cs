@@ -53,6 +53,6 @@ namespace Jal.Router.AzureStorage.Model
         public string ContentContextEntity { get; set; }
         public string SagaContextEntity { get; set; }
         public string TrackingContextEntity { get; set; }
-        public string IdentityContextEntity { get; set; }
+        public string TracingContextEntity { get; set; }
     }
 }
