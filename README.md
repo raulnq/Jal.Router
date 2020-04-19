@@ -51,8 +51,11 @@ And on the Program.cs file setup the host
 
 var container = new ServiceContainer();
 
-container.RegisterRouter(new IRouterConfigurationSource[] { new RouterConfigurationSource() });
-container.RegisterFrom<NewtonsoftCompositionRoot>();
+container.AddRouter(c=>{
+    c.AddSource<RouterConfigurationSource>();
+    c.AddNewtonsoft();
+});
+
 container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
 
 var bus = container.GetInstance<IBus>();
@@ -92,5 +95,9 @@ Jal.Router is licensed under the [Apache2 license](https://github.com/raulnq/Jal
 * Feature: Non native duplicate detection (middleware).
 * Feature: Non native message defering (middleware).
 * Feature: Non native partition listening/sending.
-* Feature: Return address, Message expiration (sagas timeout).
+* Feature: Message expiration.
 * Feature: Message polling.
+* Feature: Message translator (x.Translate<Translator>("sendto")).
+* Feature: Return address and Message reply to (context.ReplyToReturnAddress(...)).
+* Feature: Recipient list (x.SentTo(new []{"a","b"}))
+* Feature: Message resequencer (x.Resequence("sentto", batchsize, timeout, x => x.Sequence, allowduplicates)).

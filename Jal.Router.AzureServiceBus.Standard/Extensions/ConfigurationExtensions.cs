@@ -2,7 +2,7 @@ using Jal.Router.AzureServiceBus.Standard.Impl;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Interface;
 
-namespace Jal.Router.AzureServiceBus.Standard.Extensions
+namespace Jal.Router.AzureServiceBus.Standard
 {
     public static class ConfigurationExtensions
     {

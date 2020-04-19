@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
-using Jal.Router.Interface;
 using Jal.Router.Model;
 using Newtonsoft.Json;
 
-namespace Jal.Router.AzureServiceBus.Standard.Extensions
+namespace Jal.Router.AzureServiceBus.Standard
 {
     public static class AbstractRouterConfigurationSourceExtensions
     {

@@ -13,7 +13,7 @@ namespace Jal.Router.Impl
 
         private string _path;
 
-        protected AbstractFileSystemRequestReply(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
+        protected AbstractFileSystemRequestReply(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
             : base(factory, logger)
         {
             _parameter = provider.Get<FileSystemParameter>();

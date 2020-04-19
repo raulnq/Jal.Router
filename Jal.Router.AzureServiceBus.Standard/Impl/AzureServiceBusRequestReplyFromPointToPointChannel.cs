@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusRequestReplyFromPointToPointChannel : AbstractAzureServiceBusRequestReply, IRequestReplyChannelFromPointToPointChannel
     {
-        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactoryGateway factory, ILogger logger)
+        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactoryFacade factory, ILogger logger)
             : base(factory, logger)
         {
 
@@ -18,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             var client = new SessionClient(sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
 
-            var messagesession = await client.AcceptMessageSessionAsync(context.IdentityContext.ReplyToRequestId).ConfigureAwait(false);
+            var messagesession = await client.AcceptMessageSessionAsync(context.TracingContext.ReplyToRequestId).ConfigureAwait(false);
 
             var message = sendercontext.Channel.ReplyTimeOut != 0 ? 
                 await messagesession.ReceiveAsync(TimeSpan.FromSeconds(sendercontext.Channel.ReplyTimeOut)).ConfigureAwait(false) : 

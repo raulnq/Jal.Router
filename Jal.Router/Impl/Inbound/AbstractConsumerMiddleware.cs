@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
     {
         private readonly IConsumer _consumer;
 
-        protected AbstractConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory)
+        protected AbstractConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer) : base(factory)
         {
             _consumer = consumer;
         }

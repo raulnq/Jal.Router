@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class PublishSubscribeChannelResourceDestructorTests
     {
-        private PublishSubscribeChannelResourceDestructor Build(IComponentFactoryGateway factory)
+        private PublishSubscribeChannelResourceDestructor Build(IComponentFactoryFacade factory)
         {
             return new PublishSubscribeChannelResourceDestructor(factory, new NullLogger());
         }

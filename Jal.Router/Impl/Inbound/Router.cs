@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Fluent.Interfaces;
-using Jal.ChainOfResponsability.Intefaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -10,13 +9,13 @@ namespace Jal.Router.Impl
 {
     public class Router : IRouter
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly IPipelineBuilder _pipeline;
 
         private readonly ILogger _logger;
 
-        public Router(IComponentFactoryGateway factory, IPipelineBuilder pipeline, ILogger logger)
+        public Router(IComponentFactoryFacade factory, IPipelineBuilder pipeline, ILogger logger)
         {
             _factory = factory;
 
@@ -24,7 +23,7 @@ namespace Jal.Router.Impl
 
             _logger = logger;
         }
-        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IMiddlewareAsync<MessageContext>
+        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             var interceptor = _factory.CreateRouterInterceptor();
 

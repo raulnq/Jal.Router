@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jal.Router.Model;
+using System;
 
 namespace Jal.Router.Fluent.Interface
 {
@@ -11,6 +12,8 @@ namespace Jal.Router.Fluent.Interface
         IOnEndPointOptionBuilder OnEntry(Action<IOnEndPointEntryBuilder> action);
 
         IOnEndPointOptionBuilder OnExit(Action<IOnEndPointExitBuilder> action);
+
+        IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition);
 
         void With(Action<IOnEndPointWithBuilder> action);
 

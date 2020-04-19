@@ -16,28 +16,28 @@ namespace Jal.Router.Extensions
 
             var options = context.CreateOptions(endpointname, id, sagaid, headers);
 
-            options.IdentityContext.SetReplyToRequestId(Guid.NewGuid().ToString());
+            options.TracingContext.SetReplyToRequestId(Guid.NewGuid().ToString());
 
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null) where TResult : class
+        public static Task<TResult> Reply<TContent, TResult>(this MessageContext context, TContent content, string endpointname, TracingContext tracingcontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null) where TResult : class
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            var options = context.CreateOptions(endpointname, identitycontext, sagaid, headers, version);
+            var options = context.CreateOptions(endpointname, tracingcontext, sagaid, headers, version);
 
-            options.IdentityContext.SetReplyToRequestId(Guid.NewGuid().ToString());
+            options.TracingContext.SetReplyToRequestId(Guid.NewGuid().ToString());
 
             return context.Reply<TContent, TResult>(content, options);
         }
 
-        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, Dictionary<string,string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, TracingContext tracingcontext, string sagaid = null, Dictionary<string,string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
+            return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, tracingcontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
         public static Task Send<TContent>(this MessageContext context, TContent content, EndPoint endpoint, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
@@ -45,14 +45,14 @@ namespace Jal.Router.Extensions
             return context.Send(content, endpoint, context.CreateOrigin(), context.CreateOptions(string.Empty, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, TracingContext tracingcontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.Send(content, context.CreateOptions(endpointname, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
+            return context.Send(content, context.CreateOptions(endpointname, tracingcontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
         public static Task Send<TContent>(this MessageContext context, TContent content, string endpointname, string id=null, string sagaid=null, Dictionary<string, string> headers = null, string version=null, DateTime? scheduledenqueuedatetimeutc = null)
@@ -65,19 +65,19 @@ namespace Jal.Router.Extensions
             return context.Send(content, context.CreateOptions(endpointname, id, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, IdentityContext identitycontext, string sagaid=null, string key=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, TracingContext tracingcontext, string sagaid=null, string key=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrWhiteSpace(endpointname))
             {
                 throw new ArgumentNullException(endpointname);
             }
 
-            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
+            return context.Publish(content, context.CreateOrigin(key), context.CreateOptions(endpointname, tracingcontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
-        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, IdentityContext identitycontext, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Task Publish<TContent>(this MessageContext context, TContent content, EndPoint endpoint, TracingContext tracingcontext, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, identitycontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
+            return context.Publish(content, endpoint, context.CreateOrigin(key), context.CreateOptions(string.Empty, tracingcontext, sagaid, headers, version, scheduledenqueuedatetimeutc));
         }
 
         public static Task Publish<TContent>(this MessageContext context, TContent content, string endpointname, string id = null, string sagaid = null, string key = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
@@ -100,23 +100,33 @@ namespace Jal.Router.Extensions
             return new Origin() { Key = key};
         }
 
+        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext,string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        {
+            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+        }
+
+        public static Options CreateOptions(this MessageContext context, string endpointname, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        {
+            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, context.TracingContext.Clone(), context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+        }
+
         private static Options CreateOptions(this MessageContext context, string endpointname, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null)
         {
-            var identitycontext = context.IdentityContext.Clone();
+            var tracingcontext = context.TracingContext.Clone();
 
-            if (string.IsNullOrWhiteSpace(identitycontext.Id))
+            if (string.IsNullOrWhiteSpace(tracingcontext.Id))
             {
-                throw new ArgumentNullException(identitycontext.Id);
+                throw new ArgumentNullException(tracingcontext.Id);
             }
 
-            if(!string.IsNullOrWhiteSpace(identitycontext.ParentId))
+            if(!string.IsNullOrWhiteSpace(tracingcontext.ParentId))
             {
-                identitycontext.SetParentId(identitycontext.Id);
+                tracingcontext.SetParentId(tracingcontext.Id);
             }
 
-            if (!string.IsNullOrWhiteSpace(identitycontext.OperationId))
+            if (!string.IsNullOrWhiteSpace(tracingcontext.OperationId))
             {
-                identitycontext.SetOperationId(identitycontext.Id);
+                tracingcontext.SetOperationId(tracingcontext.Id);
             }
 
             if (string.IsNullOrEmpty(version))
@@ -124,13 +134,13 @@ namespace Jal.Router.Extensions
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
                 foreach (var header in headers)
                 {
-                    if (headers.ContainsKey(header.Key))
+                    if (options.Headers.ContainsKey(header.Key))
                     {
                         options.Headers[header.Key] = header.Value;
                     }
@@ -144,17 +154,17 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext identitycontext, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        private static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
 
-            if (string.IsNullOrWhiteSpace(identitycontext.Id))
+            if (string.IsNullOrWhiteSpace(tracingcontext.Id))
             {
-                throw new ArgumentNullException(identitycontext.Id);
+                throw new ArgumentNullException(tracingcontext.Id);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.IdentityContext.ReplyToRequestId))
+            if (!string.IsNullOrWhiteSpace(context.TracingContext.ReplyToRequestId))
             {
-                identitycontext.SetRequestId(context.IdentityContext.ReplyToRequestId);
+                tracingcontext.SetRequestId(context.TracingContext.ReplyToRequestId);
             }
 
             if (string.IsNullOrEmpty(version))
@@ -162,13 +172,13 @@ namespace Jal.Router.Extensions
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, identitycontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
                 foreach (var header in headers)
                 {
-                    if(headers.ContainsKey(header.Key))
+                    if(options.Headers.ContainsKey(header.Key))
                     {
                         options.Headers[header.Key]= header.Value;
                     }
@@ -182,7 +192,7 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        public static Options CreateOptions(this MessageContext context, string endpointname, IdentityContext indentitycontext, string sagaid=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext indentitycontext, string sagaid=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             var options = CreateOptions(context, endpointname, indentitycontext, headers, version, scheduledenqueuedatetimeutc);
 
@@ -205,7 +215,7 @@ namespace Jal.Router.Extensions
 
             if (!string.IsNullOrEmpty(id))
             {
-                options.IdentityContext.SetId(id);
+                options.TracingContext.SetId(id);
             }
 
             return options;

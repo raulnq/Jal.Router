@@ -6,12 +6,12 @@ namespace Jal.Router.Impl
 {
     public class SenderLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly ISenderContextCreator _loader;
+        private readonly ISenderContextLifecycle _lifecycle;
 
-        public SenderLoader(IComponentFactoryGateway factory, ISenderContextCreator loader, ILogger logger)
+        public SenderLoader(IComponentFactoryFacade factory, ISenderContextLifecycle lifecycle, ILogger logger)
             : base(factory, logger)
         {
-            _loader = loader;
+            _lifecycle = lifecycle;
         }
 
         public Task Run()
@@ -31,7 +31,10 @@ namespace Jal.Router.Impl
         {
             foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
             {
-                _loader.Open(sendercontext);
+                if(sendercontext.Open())
+                {
+                    Logger.Log($"Opening {sendercontext.Id}");
+                }
             }
         }
 
@@ -41,14 +44,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in endpoint.Channels)
                 {
-                    var sendercontext = Factory.Configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
-
-                    if (sendercontext == null)
-                    {
-                        sendercontext = _loader.Create(channel);
-
-                        Factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
-                    }
+                    var sendercontext = _lifecycle.AddOrGet(channel);
 
                     sendercontext.Endpoints.Add(endpoint);
                 }

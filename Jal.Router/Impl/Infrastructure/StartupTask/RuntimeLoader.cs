@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
 
         private readonly IRouter _router;
 
-        public RuntimeLoader(IComponentFactoryGateway factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
+        public RuntimeLoader(IComponentFactoryFacade factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
             :base(factory, logger)
         {
             _sources = sources;

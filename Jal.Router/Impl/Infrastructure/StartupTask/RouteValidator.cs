@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class RouteValidator : AbstractStartupTask, IStartupTask
     {
         private readonly IChannelValidator _validator;
-        public RouteValidator(IComponentFactoryGateway factory, ILogger logger, IChannelValidator validator)
+        public RouteValidator(IComponentFactoryFacade factory, ILogger logger, IChannelValidator validator)
             : base(factory, logger)
         {
             _validator = validator;

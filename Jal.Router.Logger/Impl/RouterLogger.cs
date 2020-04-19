@@ -2,13 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Common.Logging;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Logger.Impl
+namespace Jal.Router.Logger
 {
-    public class RouterLogger : IMiddlewareAsync<MessageContext>
+    public class RouterLogger : IAsyncMiddleware<MessageContext>
     {
         private readonly ILog _log;
 
@@ -17,7 +16,7 @@ namespace Jal.Router.Logger.Impl
             _log = log;
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -25,15 +24,15 @@ namespace Jal.Router.Logger.Impl
 
             try
             {
-                _log.Debug($"[Router.cs, Route, {context.Data.Id}] Start Call. Message arrived. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
+                _log.Debug($"[Router.cs, Route, {context.Data.Id}] Start Call. Message arrived. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}");
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
-                _log.Info($"[Router.cs, Route, {context.Data.Id}] Message routed. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
+                _log.Info($"[Router.cs, Route, {context.Data.Id}] Message routed. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}");
             }
             catch (Exception exception)
             {
-                _log.Error($"[Router.cs, Route, {context.Data.Id}] Exception. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}", exception);
+                _log.Error($"[Router.cs, Route, {context.Data.Id}] Exception. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}", exception);
 
                 throw;
             }
@@ -41,7 +40,7 @@ namespace Jal.Router.Logger.Impl
             {
                 stopwatch.Stop();
 
-                _log.Debug($"[Router.cs, Route, {context.Data.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.IdentityContext.OperationId} parentid: {context.Data.IdentityContext.ParentId}");
+                _log.Debug($"[Router.cs, Route, {context.Data.Id}] End Call. Took {stopwatch.ElapsedMilliseconds} ms. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} route: {context.Data.Route?.Name} saga: {context.Data.Saga?.Name} operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}");
             }
         }
     }

@@ -1,6 +1,4 @@
-using Jal.ChainOfResponsability.Fluent.Impl;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -8,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
@@ -16,7 +15,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class RouterTests
     {
-        private Impl.Router Build(IComponentFactoryGateway factory, IPipeline pipeline)
+        private Impl.Router Build(IComponentFactoryFacade factory, IPipeline pipeline)
         {
             return new Impl.Router(factory, new PipelineBuilder(pipeline), new NullLogger());
         }
@@ -40,7 +39,7 @@ namespace Jal.Router.Tests
 
             await sut.Route<NullMiddleware>(messagecontext);
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Once());
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [TestMethod]
@@ -58,7 +57,7 @@ namespace Jal.Router.Tests
 
             await sut.Route<NullMiddleware>(messagecontext);
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Never());
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Never());
         }
 
         [TestMethod]
@@ -74,7 +73,7 @@ namespace Jal.Router.Tests
 
             await Should.ThrowAsync<Exception>(sut.Route<NullMiddleware>(messagecontext));
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<MiddlewareMetadata<MessageContext>[]>(), It.IsAny<MessageContext>()), Times.Once());
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
 
 

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>Raul Naupari</Authors>
-    <Version>3.0.0</Version>
+    <Version>4.0.0</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with ApplicationInsights</Description>
     <Copyright />
@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jal.ChainOfResponsability" Version="1.0.5" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.11.0" />
+    <PackageReference Include="Jal.ChainOfResponsability" Version="3.1.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.13.1" />
   </ItemGroup>
 
   <ItemGroup>

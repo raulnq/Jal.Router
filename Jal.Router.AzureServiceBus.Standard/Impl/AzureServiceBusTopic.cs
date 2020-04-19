@@ -203,7 +203,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         private readonly AzureServiceBusParameter _parameter;
 
-        public AzureServiceBusTopic(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider)
+        public AzureServiceBusTopic(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
             : base(factory, logger)
         {
             _parameter = provider.Get<AzureServiceBusParameter>();

@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
             return typeconsumer;
         }
 
-        private Consumer Build(IComponentFactoryGateway factory, ITypedConsumer typedconsumer)
+        private Consumer Build(IComponentFactoryFacade factory, ITypedConsumer typedconsumer)
         {
             return new Consumer(factory, new NullLogger(), typedconsumer);
         }

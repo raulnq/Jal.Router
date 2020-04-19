@@ -9,11 +9,11 @@ namespace Jal.Router.Impl
 {
     public class ForwardRouteErrorMessageHandler : IRouteErrorMessageHandler
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public ForwardRouteErrorMessageHandler(IComponentFactoryGateway factory, ILogger logger)
+        public ForwardRouteErrorMessageHandler(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
             _logger = logger;

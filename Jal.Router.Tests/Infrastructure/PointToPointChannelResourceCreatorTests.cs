@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class PointToPointChannelResourceCreatorTests
     {
-        private PointToPointChannelResourceCreator Build(IComponentFactoryGateway factory)
+        private PointToPointChannelResourceCreator Build(IComponentFactoryFacade factory)
         {
             return new PointToPointChannelResourceCreator(factory, new NullLogger());
         }

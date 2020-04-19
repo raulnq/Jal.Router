@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Jal.Router.AzureStorage.Impl
+namespace Jal.Router.AzureStorage
 {
     public class AzureMessageStorage : IMessageStorage
     {

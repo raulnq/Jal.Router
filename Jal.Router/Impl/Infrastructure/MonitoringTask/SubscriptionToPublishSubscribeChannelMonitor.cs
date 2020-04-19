@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class SubscriptionToPublishSubscribeChannelMonitor : AbstractMonitoringTask, IMonitoringTask
     {
 
-        public SubscriptionToPublishSubscribeChannelMonitor(IComponentFactoryGateway factory, ILogger logger)
+        public SubscriptionToPublishSubscribeChannelMonitor(IComponentFactoryFacade factory, ILogger logger)
             :base(factory, logger)
         {
         }

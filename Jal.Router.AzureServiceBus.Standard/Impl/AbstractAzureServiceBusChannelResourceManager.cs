@@ -17,9 +17,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public const string ExpressMessageEnabled = "expressmessageenabled";
 
-        protected readonly IComponentFactoryGateway _factory;
+        protected readonly IComponentFactoryFacade _factory;
 
-        public AbstractAzureServiceBusChannelResourceManager(IComponentFactoryGateway factory)
+        public AbstractAzureServiceBusChannelResourceManager(IComponentFactoryFacade factory)
         {
             _factory = factory;
         }

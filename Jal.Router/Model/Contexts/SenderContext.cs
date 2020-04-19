@@ -1,6 +1,7 @@
 ﻿using Jal.Router.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
@@ -20,6 +21,55 @@ namespace Jal.Router.Model
             Endpoints = new List<EndPoint>();
             SenderChannel = senderchannel;
             ReaderChannel = readerchannel;
+        }
+
+        public async Task<bool> Close()
+        {
+            if (SenderChannel != null)
+            {
+                await SenderChannel.Close(this).ConfigureAwait(false);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public Task<MessageContext> Read(MessageContext context, IMessageAdapter adapter)
+        {
+            return ReaderChannel.Read(this, context, adapter);
+        }
+
+        public Task<string> Send(object message)
+        {
+            if (SenderChannel != null)
+            {
+                return SenderChannel.Send(this, message);
+            }
+
+            return Task.FromResult(string.Empty);
+        }
+
+        public bool IsActive()
+        {
+            if (SenderChannel != null)
+            {
+                return SenderChannel.IsActive(this);
+            }
+
+            return false;
+        }
+
+        public bool Open()
+        {
+            if (SenderChannel != null)
+            {
+                SenderChannel.Open(this);
+
+                return true;
+            }
+
+            return false;
         }
 
         public string Id

@@ -2,15 +2,14 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Serilog;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Serilog.Impl
+namespace Jal.Router.Serilog
 {
-    public class RouterLogger : IMiddlewareAsync<MessageContext>
+    public class RouterLogger : IAsyncMiddleware<MessageContext>
     {
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -18,14 +17,14 @@ namespace Jal.Router.Serilog.Impl
 
             var log = Log.Logger;
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.ParentId))
             {
-                log = log.ForContext("ParentId", context.Data.IdentityContext.ParentId);
+                log = log.ForContext("ParentId", context.Data.TracingContext.ParentId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.OperationId))
             {
-                log = log.ForContext("OperationId", context.Data.IdentityContext.OperationId);
+                log = log.ForContext("OperationId", context.Data.TracingContext.OperationId);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.Data?.Id))
@@ -47,7 +46,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 log.Debug("[Router, Route, {Id}] Start Call. Message arrived. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 log.ForContext("Type","message-consumer").Information("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
             }

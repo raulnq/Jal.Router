@@ -4,11 +4,11 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractMonitoringTask
     {
-        protected readonly IComponentFactoryGateway Factory;
+        protected readonly IComponentFactoryFacade Factory;
 
         protected readonly ILogger Logger;
 
-        protected AbstractMonitoringTask(IComponentFactoryGateway factory, ILogger logger)
+        protected AbstractMonitoringTask(IComponentFactoryFacade factory, ILogger logger)
         {
             Factory = factory;
             Logger = logger;

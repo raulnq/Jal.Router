@@ -28,17 +28,17 @@ namespace Jal.Router.Tests
             consumermock.Verify(x => x.Consume(It.IsAny<MessageContext>()), Times.Never());
         }
 
-        public static void CreateEntityStorageWasNotExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        public static void CreateEntityStorageWasNotExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Never());
         }
 
-        public static void CreateEntityStorageWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        public static void CreateEntityStorageWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Once());
         }
 
-        public static void CreateMessageAdapterWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        public static void CreateMessageAdapterWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateMessageAdapter(), Times.Once());
         }
@@ -48,7 +48,7 @@ namespace Jal.Router.Tests
             sendermock.Verify(x => x.Send(It.IsAny<SenderContext>(), It.IsAny<object>()), Times.Once());
         }
 
-        public static void CreateMessageSerializerWasExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        public static void CreateMessageSerializerWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateMessageSerializer(), Times.Once());
         }
@@ -72,7 +72,7 @@ namespace Jal.Router.Tests
             busmock.Verify(x => x.Send<T>(It.IsAny<T>(), It.Is<Options>(match)), Times.Once());
         }
 
-        public static void CreateMessageSerializerWasNotExecuted(this Mock<IComponentFactoryGateway> factorymock)
+        public static void CreateMessageSerializerWasNotExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateMessageSerializer(), Times.Never());
         }

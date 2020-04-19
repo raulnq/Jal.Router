@@ -1,17 +1,16 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Jal.Router.ApplicationInsights.Impl
+namespace Jal.Router.ApplicationInsights
 {
 
-    public class RouterLogger : AbstractApplicationInsightsLogger, IMiddlewareAsync<MessageContext>
+    public class RouterLogger : AbstractApplicationInsightsLogger, IAsyncMiddleware<MessageContext>
     {
 
         public RouterLogger(TelemetryClient client, IConfiguration configuration):base(client, configuration)
@@ -20,7 +19,7 @@ namespace Jal.Router.ApplicationInsights.Impl
         }
 
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var telemetry = new RequestTelemetry();
 
@@ -32,7 +31,7 @@ namespace Jal.Router.ApplicationInsights.Impl
             {
                 telemetry.Timestamp = context.Data.DateTimeUtc;
 
-                telemetry.Id = $"{context.Data.IdentityContext.Id}";
+                telemetry.Id = $"{context.Data.TracingContext.Id}";
 
                 telemetry.Name = context.Data.Name;
 
@@ -42,7 +41,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 PopulateContext(telemetry.Context, context.Data);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 telemetry.ResponseCode = "200";
 

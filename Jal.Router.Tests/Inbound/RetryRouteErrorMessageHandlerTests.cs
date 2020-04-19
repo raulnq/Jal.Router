@@ -14,7 +14,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class RetryRouteErrorMessageHandlerTests
     {
-        private RetryRouteErrorMessageHandler Build(IComponentFactoryGateway factory)
+        private RetryRouteErrorMessageHandler Build(IComponentFactoryFacade factory)
         {
             return new RetryRouteErrorMessageHandler(factory, new NullLogger());
         }

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Fluent.Interfaces;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -11,11 +11,11 @@ namespace Jal.Router.Impl
     {
         private readonly IEndPointProvider _provider;
 
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly IPipelineBuilder _pipeline;
 
-        public Bus(IEndPointProvider provider, IComponentFactoryGateway factory, IPipelineBuilder pipeline)
+        public Bus(IEndPointProvider provider, IComponentFactoryFacade factory, IPipelineBuilder pipeline)
         {
             _provider = provider;
             _factory = factory;
@@ -24,7 +24,7 @@ namespace Jal.Router.Impl
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             return Reply<TContent, TResult>(content, endpoint, endpoint.Origin, options);
         }
@@ -35,14 +35,14 @@ namespace Jal.Router.Impl
 
             var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
 
-            await Send(message);
+            await Send(message).ConfigureAwait(false);
 
             return message.ContentContext.Result as TResult;
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -80,14 +80,14 @@ namespace Jal.Router.Impl
 
         public Task Send<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             return Send(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Send<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -104,14 +104,14 @@ namespace Jal.Router.Impl
 
         public Task Publish<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             return Publish(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options.EndPointName, content.GetType());
+            var endpoint = _provider.Provide(options, content.GetType());
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -143,7 +143,7 @@ namespace Jal.Router.Impl
 
             try
             {
-                await Update(message);
+                await Update(message).ConfigureAwait(false);
 
                 if (message.EndPoint.Channels.Any())
                 {

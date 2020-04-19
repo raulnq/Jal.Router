@@ -20,12 +20,12 @@ namespace Jal.Router.Model
         public ContentContextEntity ContentContextEntity { get; private set; }
         public SagaContextEntity SagaContextEntity { get; private set; }
         public TrackingContextEntity TrackingContextEntity { get; private set; }
-        public IdentityContextEntity IdentityContextEntity { get; private set; }
+        public TracingContextEntity TracingContextEntity { get; private set; }
 
         public MessageEntity(string host, ChannelEntity channelentity, IDictionary<string, string> headers, string version, DateTime datetimeutc,
             DateTime? scheduledenqueuedatetimeutc, RouteEntity routeentity, EndpointEntity endpointentity, OriginEntity originentity,
             SagaEntity sagaentity, ContentContextEntity contentcontextentity, SagaContextEntity sagacontextentity,
-            TrackingContextEntity trackingcontextentity, IdentityContextEntity identitycontextentity, string name)
+            TrackingContextEntity trackingcontextentity, TracingContextEntity tracingcontextentity, string name)
         {
             Host = host;
             ChannelEntity = channelentity;
@@ -40,7 +40,7 @@ namespace Jal.Router.Model
             ContentContextEntity = contentcontextentity;
             SagaContextEntity = sagacontextentity;
             TrackingContextEntity = trackingcontextentity;
-            IdentityContextEntity = identitycontextentity;
+            TracingContextEntity = tracingcontextentity;
             Name = name;
         }
 
@@ -49,9 +49,9 @@ namespace Jal.Router.Model
             DateTime? scheduledenqueuedatetimeutc, RouteEntity routeentity, EndpointEntity endpointentity, 
             OriginEntity originentity,
             SagaEntity sagaentity, ContentContextEntity contentcontextentity, SagaContextEntity sagacontextentity,
-            TrackingContextEntity trackingcontextentity, IdentityContextEntity identitycontextentity, string name)
+            TrackingContextEntity trackingcontextentity, TracingContextEntity tracingcontextentity, string name)
             :this(host, channelentity, headers, version, datetimeutc, scheduledenqueuedatetimeutc, routeentity, endpointentity,
-                 originentity, sagaentity, contentcontextentity, sagacontextentity, trackingcontextentity, identitycontextentity,
+                 originentity, sagaentity, contentcontextentity, sagacontextentity, trackingcontextentity, tracingcontextentity,
                  name)
         {
             Id = id;

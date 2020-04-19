@@ -5,20 +5,24 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
-        public Channel(ChannelType channeltype, string connectionstring, string path)
+        public Channel(ChannelType channeltype, string connectionstring, string path, bool fromrouterconfigurationsource = true)
         {
             Type = channeltype;
 
             ConnectionString = connectionstring;
 
             Path = path;
+
+            RouterConfigurationSource = fromrouterconfigurationsource;
         }
 
-        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription)
-            :this(channeltype, connectionstring, path)
+        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, bool fromrouterconfigurationsource = true)
+            :this(channeltype, connectionstring, path, fromrouterconfigurationsource)
         {
             Subscription = subscription;
         }
+
+        public bool RouterConfigurationSource { get; set; }
 
         public ChannelType Type { get; private set; }
 

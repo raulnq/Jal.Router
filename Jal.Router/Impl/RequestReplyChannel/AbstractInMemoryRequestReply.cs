@@ -12,7 +12,7 @@ namespace Jal.Router.Impl
 
         private string _name;
 
-        protected AbstractInMemoryRequestReply(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
+        protected AbstractInMemoryRequestReply(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
             : base(factory, logger)
         {
             _parameter = provider.Get<InMemoryParameter>();

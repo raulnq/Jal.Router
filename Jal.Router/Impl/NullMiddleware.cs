@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class NullMiddleware : IMiddlewareAsync<MessageContext>
+    public class NullMiddleware : IAsyncMiddleware<MessageContext>
     {
-        public Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             return Task.CompletedTask;
         }

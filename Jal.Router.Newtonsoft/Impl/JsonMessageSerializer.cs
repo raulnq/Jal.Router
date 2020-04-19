@@ -1,9 +1,8 @@
 using System;
 using Jal.Router.Interface;
-using Jal.Router.Newtonsoft.Model;
 using Newtonsoft.Json;
 
-namespace Jal.Router.Newtonsoft.Impl
+namespace Jal.Router.Newtonsoft
 {
     public class JsonMessageSerializer : IMessageSerializer
     {

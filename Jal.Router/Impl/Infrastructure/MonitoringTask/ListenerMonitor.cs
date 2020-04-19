@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class ListenerMonitor : AbstractMonitoringTask, IMonitoringTask
     {
-        public ListenerMonitor(IComponentFactoryGateway factory, ILogger logger)
+        public ListenerMonitor(IComponentFactoryFacade factory, ILogger logger)
             : base(factory, logger)
         {
         }
@@ -17,17 +17,17 @@ namespace Jal.Router.Impl
 
             foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                if (listenercontext.ListenerChannel!=null && !listenercontext.ListenerChannel.IsActive(listenercontext))
+                if (!listenercontext.IsActive())
                 {
-                    await listenercontext.ListenerChannel.Close(listenercontext).ConfigureAwait(false);
+                    if(await listenercontext.Close().ConfigureAwait(false))
+                    {
+                        Logger.Log($"Shutdown {listenercontext.Id}");
+                    }
 
-                    Logger.Log($"Shutdown {listenercontext.Id}");
-
-                    listenercontext.ListenerChannel.Open(listenercontext);
-
-                    listenercontext.ListenerChannel.Listen(listenercontext);
-
-                    Logger.Log($"Listening {listenercontext.Id}");
+                    if(listenercontext.Open())
+                    {
+                        Logger.Log($"Listening {listenercontext.Id}");
+                    }
                 }
             }
 

@@ -2,15 +2,14 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Serilog;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Serilog.Impl
+namespace Jal.Router.Serilog
 {
-    public class BusLogger : IMiddlewareAsync<MessageContext>
+    public class BusLogger : IAsyncMiddleware<MessageContext>
     {
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var stopwatch = new Stopwatch();
 
@@ -18,14 +17,14 @@ namespace Jal.Router.Serilog.Impl
 
             var log = Log.Logger;
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.ParentId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.ParentId))
             {
-                log = log.ForContext("ParentId", context.Data.IdentityContext.ParentId);
+                log = log.ForContext("ParentId", context.Data.TracingContext.ParentId);
             }
 
-            if (!string.IsNullOrWhiteSpace(context.Data.IdentityContext.OperationId))
+            if (!string.IsNullOrWhiteSpace(context.Data.TracingContext.OperationId))
             {
-                log = log.ForContext("OperationId", context.Data.IdentityContext.OperationId);
+                log = log.ForContext("OperationId", context.Data.TracingContext.OperationId);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Data.SagaContext?.Data?.Id))
@@ -47,7 +46,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 log.Debug("[Bus, {Channel}, {Id}] Start Call. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 log.ForContext("Type","message-producer").Information("[Bus, {Channel}, {Id}] Message sent. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
             }

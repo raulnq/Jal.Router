@@ -1,4 +1,4 @@
-﻿using Jal.ChainOfResponsability.Intefaces;
+﻿using Jal.ChainOfResponsability;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Model;
 
@@ -12,7 +12,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public void Add<TMiddleware>() where TMiddleware : IMiddlewareAsync<MessageContext>
+        public void Add<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
             _route.MiddlewareTypes.Add(typeof(TMiddleware));
         }

@@ -3,7 +3,7 @@ using Common.Logging;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.Logger.Impl
+namespace Jal.Router.Logger
 {
     public class BeatLogger : ILogger<Beat>
     {

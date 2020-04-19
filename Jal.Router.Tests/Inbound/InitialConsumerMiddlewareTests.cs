@@ -12,7 +12,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class InitialConsumerMiddlewareTests
     {
-        private InitialConsumerMiddleware Build(IConsumer consumer, IComponentFactoryGateway factory)
+        private InitialConsumerMiddleware Build(IConsumer consumer, IComponentFactoryFacade factory)
         {
             return new InitialConsumerMiddleware(factory, consumer);
         }
@@ -38,7 +38,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 

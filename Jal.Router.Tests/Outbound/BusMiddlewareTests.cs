@@ -14,7 +14,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class BusMiddlewareTests
     {
-        private BusMiddleware Build(IComponentFactoryGateway factory)
+        private BusMiddleware Build(IComponentFactoryFacade factory)
         {
             return new BusMiddleware(new NullLogger(), factory);
         }
@@ -40,7 +40,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -70,7 +70,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -120,7 +120,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => throw new Exception());
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception());
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Once());
 
@@ -164,7 +164,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -208,7 +208,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -252,7 +252,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => throw new ApplicationException());
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new ApplicationException());
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 

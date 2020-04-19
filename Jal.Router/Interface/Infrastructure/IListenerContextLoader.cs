@@ -1,9 +1,12 @@
-﻿namespace Jal.Router.Interface
+﻿using Jal.Router.Model;
+using System.Threading.Tasks;
+
+namespace Jal.Router.Interface
 {
     public interface IListenerContextLoader
     {
-        void AddPointToPointChannel<TContent>(string name, string connectionstring, string path);
+        void Add(Route route);
 
-        void AddPublishSubscribeChannel<TContent>(string name, string connectionstring, string path, string subscription);
+        Task Remove(Route route);
     }
 }

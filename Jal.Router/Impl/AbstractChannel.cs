@@ -5,11 +5,11 @@ namespace Jal.Router.Impl
 
     public abstract class AbstractChannel
     {
-        protected readonly IComponentFactoryGateway Factory;
+        protected readonly IComponentFactoryFacade Factory;
 
         protected readonly ILogger Logger;
 
-        protected AbstractChannel(IComponentFactoryGateway factory, ILogger logger)
+        protected AbstractChannel(IComponentFactoryFacade factory, ILogger logger)
         {
             Factory = factory;
             Logger = logger;

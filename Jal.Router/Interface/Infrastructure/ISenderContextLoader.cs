@@ -1,9 +1,12 @@
-﻿namespace Jal.Router.Interface
+﻿using Jal.Router.Model;
+using System.Threading.Tasks;
+
+namespace Jal.Router.Interface
 {
     public interface ISenderContextLoader
     {
-        void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path);
+        Task Remove(EndPoint endpoint);
 
-        void AddPointToPointChannel<TMessage>(string name, string connectionstring, string path);
+        void Add(EndPoint endpoint);
     }
 }

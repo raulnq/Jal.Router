@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Jal.Router.AzureStorage.Impl
+namespace Jal.Router.AzureStorage
 {
     public class AzureEntityStorage : AbstractEntityStorage
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly AzureStorageParameter _parameter;
 
@@ -31,7 +30,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageSagaReader;
 
-        public AzureEntityStorage(IComponentFactoryGateway factory, IParameterProvider provider)
+        public AzureEntityStorage(IComponentFactoryFacade factory, IParameterProvider provider)
         {
             _factory = factory;
 
@@ -266,7 +265,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private MessageEntity RecordToEntity(MessageRecord record, IMessageSerializer serializer)
         {
-            var identity = !string.IsNullOrWhiteSpace(record.IdentityContextEntity) ? serializer.Deserialize<IdentityContextEntity>(record.IdentityContextEntity) : null;
+            var tracing = !string.IsNullOrWhiteSpace(record.TracingContextEntity) ? serializer.Deserialize<TracingContextEntity>(record.TracingContextEntity) : null;
             var channel = !string.IsNullOrWhiteSpace(record.ChannelEntity) ? serializer.Deserialize<ChannelEntity>(record.ChannelEntity) : null;
             var headers = !string.IsNullOrWhiteSpace(record.Headers) ? serializer.Deserialize<Dictionary<string, string>>(record.Headers) : null;
             var router = !string.IsNullOrWhiteSpace(record.RouteEntity) ? serializer.Deserialize<RouteEntity>(record.RouteEntity) : null;
@@ -277,7 +276,7 @@ namespace Jal.Router.AzureStorage.Impl
             var contentcontext = ReadContentContextEntity(record);
             var sagacontext = ReadSagaContextEntity(record);
             var entity = new MessageEntity(record.Id, record.Host, channel, headers, record.Version, record.DateTimeUtc, record.ScheduledEnqueueDateTimeUtc, router, endpoint,
-                origin, saga, contentcontext, sagacontext, tracking, identity, record.Name);
+                origin, saga, contentcontext, sagacontext, tracking, tracing, record.Name);
             return entity;
         }
 
@@ -457,7 +456,7 @@ namespace Jal.Router.AzureStorage.Impl
                 var record = new MessageRecord(partition, $"{Guid.NewGuid()}")
                 {
                     Host = messageentity.Host,
-                    IdentityContextEntity = messageentity.IdentityContextEntity!=null?serializer.Serialize(messageentity.IdentityContextEntity):null,
+                    TracingContextEntity = messageentity.TracingContextEntity!=null?serializer.Serialize(messageentity.TracingContextEntity):null,
                     Version = messageentity.Version,
                     OriginEntity = messageentity.OriginEntity!=null?serializer.Serialize(messageentity.OriginEntity):null,
                     Headers = messageentity.Headers!=null?serializer.Serialize(messageentity.Headers):null,

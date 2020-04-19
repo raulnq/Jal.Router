@@ -22,11 +22,23 @@ namespace Jal.Router.Tests
 
             ep.SetContentType(typeof(object));
 
+            ep.SetCondition((e, o, t) => true);
+
             mock.Setup(x => x.GetEndPoints()).Returns(new EndPoint[] { ep });
 
             var sut = new EndPointProvider(new Interface.IRouterConfigurationSource[] { mock.Object });
 
-            var endpoint = sut.Provide(endpointname, typeof(object));
+            var options = new Options(endpointname,
+            new System.Collections.Generic.Dictionary<string, string>(),
+            new SagaContext(null, string.Empty),
+            new TrackingContext(null, new System.Collections.Generic.List<Tracking>()),
+            new TracingContext(string.Empty),
+            null,
+            null,
+            string.Empty,
+            null);
+
+            var endpoint = sut.Provide(options, typeof(object));
 
             endpoint.ShouldNotBeNull();
 
@@ -40,7 +52,16 @@ namespace Jal.Router.Tests
 
             var sut = new EndPointProvider(new Interface.IRouterConfigurationSource[] { });
 
-            Should.Throw<ApplicationException>(()=>sut.Provide(endpointname, typeof(object)));
+            Should.Throw<ApplicationException>(() =>
+            sut.Provide(new Options(endpointname,
+            new System.Collections.Generic.Dictionary<string, string>(),
+            new SagaContext(null, string.Empty),
+            new TrackingContext(null, new System.Collections.Generic.List<Tracking>()),
+            new TracingContext(string.Empty),
+            null,
+            null, 
+            string.Empty,
+            null), typeof(object)));
         }
     }
 }

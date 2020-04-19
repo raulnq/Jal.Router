@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Jal.Router.Newtonsoft.Model
+namespace Jal.Router.Newtonsoft
 {
     public class NewtonsoftSerializerParameter
     {

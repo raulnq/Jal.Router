@@ -1,21 +1,20 @@
 using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class FinalConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
+    public class FinalConsumerMiddleware : AbstractConsumerMiddleware, IAsyncMiddleware<MessageContext>
     {
         private const string DefaultStatus = "ENDED";
 
-        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory, consumer)
+        public FinalConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer) : base(factory, consumer)
         {
         }
 
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             var messagecontext = context.Data;
 
@@ -29,7 +28,7 @@ namespace Jal.Router.Impl
                 {
                     messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                    await Consume(messagecontext);
+                    await Consume(messagecontext).ConfigureAwait(false);
 
                     messagecontext.SagaContext.Data.End(messagecontext.DateTimeUtc);
 

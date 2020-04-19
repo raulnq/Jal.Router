@@ -7,9 +7,9 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractMiddleware
     {
-        protected readonly IComponentFactoryGateway Factory;
+        protected readonly IComponentFactoryFacade Factory;
 
-        protected AbstractMiddleware(IComponentFactoryGateway factory)
+        protected AbstractMiddleware(IComponentFactoryFacade factory)
         {
             Factory = factory;
         }

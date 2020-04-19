@@ -6,11 +6,11 @@ namespace Jal.Router.Impl
 {
     public class Startup : IStartup
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public Startup(IComponentFactoryGateway factory, ILogger logger)
+        public Startup(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
 

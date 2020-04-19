@@ -8,11 +8,11 @@ namespace Jal.Router.Impl
 {
     public class RetryRouteErrorMessageHandler : IRouteErrorMessageHandler
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public RetryRouteErrorMessageHandler(IComponentFactoryGateway factory, ILogger logger)
+        public RetryRouteErrorMessageHandler(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
             _logger = logger;

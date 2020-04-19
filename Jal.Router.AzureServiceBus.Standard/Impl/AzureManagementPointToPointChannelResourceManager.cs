@@ -10,7 +10,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureManagementPointToPointChannelResourceManager : AbstractAzureManagementChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
     {
-        public AzureManagementPointToPointChannelResourceManager(IComponentFactoryGateway factory) : base(factory)
+        public AzureManagementPointToPointChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 

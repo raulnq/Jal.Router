@@ -22,11 +22,11 @@ namespace Jal.Router.Model
         public SagaContext SagaContext { get; private set; }
         public ContentContext ContentContext { get; private set; }
         public TrackingContext TrackingContext { get; private set; }
-        public IdentityContext IdentityContext { get; private set; }
+        public TracingContext TracingContext { get; private set; }
         public string Id {
             get
             {
-                return IdentityContext?.Id;
+                return TracingContext?.Id;
             }
         }
 
@@ -57,12 +57,12 @@ namespace Jal.Router.Model
         }
 
         public MessageContext(IBus bus, string id) 
-            :this(bus, new IdentityContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty)
+            :this(bus, new TracingContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty)
         {
 
         }
 
-        public MessageContext(IBus bus, IdentityContext identitycontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid)
+        public MessageContext(IBus bus, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid)
         {
             _bus = bus;
             Headers = new Dictionary<string, string>();
@@ -70,7 +70,7 @@ namespace Jal.Router.Model
             Origin = origin;
             SagaContext = new SagaContext(this, sagaid);
             TrackingContext = new TrackingContext(this, tracks);
-            IdentityContext = identitycontext;
+            TracingContext = tracingcontext;
             DateTimeUtc = datetimeutc;
             ContentContext = new ContentContext(this, claimcheckid, !string.IsNullOrEmpty(claimcheckid));
             Host = Environment.MachineName;
@@ -80,7 +80,7 @@ namespace Jal.Router.Model
         {
             Origin = origin;
             EndPoint = endpoint;
-            IdentityContext = options.IdentityContext;
+            TracingContext = options.TracingContext;
             Headers = options.Headers;
             Version = options.Version;
             ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
@@ -127,10 +127,10 @@ namespace Jal.Router.Model
         {
             return new MessageEntity(Host, Channel?.ToEntity(), Headers, Version, DateTimeUtc, ScheduledEnqueueDateTimeUtc, Route?.ToEntity(),
                 EndPoint?.ToEntity(), Origin?.ToEntity(), Saga?.ToEntity(), ContentContext?.ToEntity(), SagaContext?.ToEntity(),
-                TrackingContext?.ToEntity(), IdentityContext?.ToEntity(), Name);
+                TrackingContext?.ToEntity(), TracingContext?.ToEntity(), Name);
         }
 
-        public Dictionary<string, string> CreateCopyOfHeaders()
+        public Dictionary<string, string> CloneHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
         }

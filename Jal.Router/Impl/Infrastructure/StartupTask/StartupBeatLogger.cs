@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
 {
     public class StartupBeatLogger : AbstractStartupTask, IStartupTask
     {
-        public StartupBeatLogger(IComponentFactoryGateway factory, ILogger logger)
+        public StartupBeatLogger(IComponentFactoryFacade factory, ILogger logger)
             :base(factory, logger)
         {
         }

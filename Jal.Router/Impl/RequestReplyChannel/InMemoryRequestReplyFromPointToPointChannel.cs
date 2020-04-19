@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class InMemoryRequestReplyFromPointToPointChannel : AbstractInMemoryRequestReply, IRequestReplyChannelFromPointToPointChannel
     {
-        public InMemoryRequestReplyFromPointToPointChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
+        public InMemoryRequestReplyFromPointToPointChannel(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
             : base(factory, logger, provider, transport)
         {
         }

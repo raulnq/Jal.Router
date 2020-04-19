@@ -12,7 +12,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class ForwardRouteErrorMessageHandlerTests
     {
-        private ForwardRouteErrorMessageHandler Build(IComponentFactoryGateway factory)
+        private ForwardRouteErrorMessageHandler Build(IComponentFactoryFacade factory)
         {
             return new ForwardRouteErrorMessageHandler(factory, new NullLogger());
         }

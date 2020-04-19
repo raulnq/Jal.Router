@@ -1,8 +1,7 @@
 using Jal.Router.Interface;
-using Jal.Router.Logger.Impl;
 using Jal.Router.Model;
 
-namespace Jal.Router.Logger.Extensions
+namespace Jal.Router.Logger
 {
     public static class ConfigurationExtensions
     {

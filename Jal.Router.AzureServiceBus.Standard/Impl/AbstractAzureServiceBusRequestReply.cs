@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public abstract class AbstractAzureServiceBusRequestReply : AbstractChannel
     {
-        protected AbstractAzureServiceBusRequestReply(IComponentFactoryGateway factory,  ILogger logger)
+        protected AbstractAzureServiceBusRequestReply(IComponentFactoryFacade factory,  ILogger logger)
             : base(factory, logger)
         {
 

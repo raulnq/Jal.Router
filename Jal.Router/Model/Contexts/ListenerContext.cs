@@ -1,6 +1,7 @@
 using Jal.Router.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
@@ -20,6 +21,42 @@ namespace Jal.Router.Model
             Routes = new List<Route>();
             Partition = partition;
             ListenerChannel = listener;
+        }
+
+        public async Task<bool> Close()
+        {
+            if (ListenerChannel != null)
+            {
+                await ListenerChannel.Close(this).ConfigureAwait(false);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsActive()
+        {
+            if (ListenerChannel != null)
+            {
+                return ListenerChannel.IsActive(this);
+            }
+
+            return false;
+        }
+
+        public bool Open()
+        {
+            if (ListenerChannel != null)
+            {
+                ListenerChannel.Open(this);
+
+                ListenerChannel.Listen(this);
+
+                return true;
+            }
+
+            return false;
         }
 
         public string Id

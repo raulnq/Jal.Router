@@ -6,12 +6,12 @@ namespace Jal.Router.Impl
 {
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IListenerContextCreator _creator;
+        private readonly IListenerContextLifecycle _lifecycle;
 
-        public ListenerLoader(IComponentFactoryGateway factory, ILogger logger, IListenerContextCreator creator)
+        public ListenerLoader(IComponentFactoryFacade factory, ILogger logger, IListenerContextLifecycle lifecycle)
             :base(factory, logger)
         {
-            _creator = creator;
+            _lifecycle = lifecycle;
         }
 
         public Task Run()
@@ -31,7 +31,10 @@ namespace Jal.Router.Impl
         {
             foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                _creator.Open(listenercontext);
+                if (listenercontext.Open())
+                {
+                    Logger.Log($"Listening {listenercontext.Id}");
+                }
             }
         }
 
@@ -41,14 +44,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in route.Channels)
                 {
-                    var listenercontext = Factory.Configuration.Runtime.ListenerContexts.FirstOrDefault(x => x.Channel.Id == channel.Id);
-
-                    if (listenercontext == null)
-                    {
-                        listenercontext = _creator.Create(channel);
-
-                        Factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
-                    }
+                    var listenercontext = _lifecycle.AddOrGet(channel);
 
                     listenercontext.Routes.Add(route);
                 }

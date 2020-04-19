@@ -12,7 +12,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class FinalConsumerMiddlewareTests
     {
-        private FinalConsumerMiddleware Build(IConsumer consumer, IComponentFactoryGateway factory)
+        private FinalConsumerMiddleware Build(IConsumer consumer, IComponentFactoryFacade factory)
         {
             return new FinalConsumerMiddleware(factory, consumer);
         }
@@ -38,7 +38,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -82,7 +82,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             exception.Message.ShouldContain("No saga record type");
 
@@ -124,7 +124,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             exception.Message.ShouldContain("Empty/Invalid saga record data");
 

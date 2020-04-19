@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class ConsumerMiddleware : AbstractConsumerMiddleware, IMiddlewareAsync<MessageContext>
+    public class ConsumerMiddleware : AbstractConsumerMiddleware, IAsyncMiddleware<MessageContext>
     {
-        public ConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
+        public ConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer):base(factory, consumer)
         {
         }
 
-        public Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             return Consume(context.Data);
         }

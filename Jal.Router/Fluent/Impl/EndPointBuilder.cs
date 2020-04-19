@@ -40,8 +40,6 @@ namespace Jal.Router.Fluent.Impl
 
         IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel(string connectionstring, string path) 
         {
-
-
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
                 throw new ArgumentNullException(nameof(connectionstring));
@@ -169,6 +167,13 @@ namespace Jal.Router.Fluent.Impl
             var builder = new OnEndPointWithBuilder(_endpoint);
 
             action(builder);
+        }
+
+        public IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition)
+        {
+            _endpoint.SetCondition(condition);
+
+            return this;
         }
     }
 }

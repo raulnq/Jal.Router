@@ -1,7 +1,5 @@
 ﻿using System;
-using Jal.Locator.LightInject.Installer;
-using Jal.Router.AzureServiceBus.Standard.Extensions;
-using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
+using Jal.Router.AzureServiceBus.Standard;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.LightInject.Installer;
@@ -10,31 +8,31 @@ using LightInject;
 using Jal.Router.Extensions;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
-using Jal.Router.AzureStorage.LightInject.Installer;
-using Jal.ChainOfResponsability.LightInject.Installer;
 using Jal.Router.Patterns.Impl;
 using Jal.Router.Patterns.Interface;
-using Jal.ChainOfResponsability.Intefaces;
-using Jal.ChainOfResponsability.Model;
+using Jal.ChainOfResponsability;
 using System.Threading.Tasks;
 using Jal.Router.Newtonsoft.Extensions;
-using Jal.Router.Newtonsoft.LightInject.Installer;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Reflection;
-using Jal.Router.Azure.Standard.LightInject.Installer.All;
+using Jal.Router.Newtonsoft;
 
 namespace Jal.Router.Sample.NetCore
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.RegisterRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() });
-            container.RegisterFrom<AzureServiceBusCompositionRoot>();
-            container.RegisterFrom<AzureStorageCompositionRoot>();
-            container.RegisterFrom<NewtonsoftCompositionRoot>();
+            container.AddRouter( c=>
+            {
+                c.AddSource<FileRouterConfigurationSmokeTest>();
+                //c.AddAzureServiceBus();
+                //c.AddAzureStorage();
+                c.AddNewtonsoft();
+            });
+
+
 
             container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
@@ -44,7 +42,7 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, QueueListenByOneHandlerWithException>(typeof(QueueListenByOneHandlerWithException).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, ToPublishHandler>(typeof(ToPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
-            container.Register<IMiddlewareAsync<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
+            container.Register<IAsyncMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
@@ -86,9 +84,10 @@ namespace Jal.Router.Sample.NetCore
             });
             host.Configuration
                 //.UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
-                .UseFileSystemAsTransport(parameter)
-                //.UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                //.UseFileSystemAsTransport(parameter)
+                //.UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=testraul;AccountKey=zeI7y9ubW3IXtR4/9i1IBmKnFsWGjY0snh4fE2Hc2FXkC4q4iPJ2JPUjCWDwCps7C9T0sVZCU9YbV5j/MAgnqg==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
+                .UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
                 .UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
@@ -107,15 +106,15 @@ namespace Jal.Router.Sample.NetCore
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            await host.Startup();
+            //await host.Startup();
 
-            await messagecontext.Send(new Message(), "sendtoqueuea");
+            //await messagecontext.Send(new Message(), "sendtoqueuea");
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
-            await host.Shutdown();
+            //await host.Shutdown();
 
-            //host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
+            host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
 
             //var bus = container.GetInstance<IBus>();
 
@@ -596,9 +595,9 @@ namespace Jal.Router.Sample.NetCore
             })
             //.OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
             //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" } , { "parameter2", "value2" }, { "parameter3", "value3" } }))
-            //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }).For<ApplicationException>())
+            .OnError(x => x.RetryMessageTo("retryendpoint", new LinearRetryPolicy(5, 3)).For<ApplicationException>())
             //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }))
-            //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
+            //.OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
             //.OnEntry(x=>x.EnableEntityStorage(true))
             //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
             ;
@@ -685,9 +684,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_end", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_end", operationid: context.TracingContext.OperationId);
 
-            return context.Send(new Message() { Name = message.Name }, "endendpoint", identity);
+            return context.Send(new Message() { Name = message.Name }, "endendpoint", tracing);
         }
     }
 
@@ -703,9 +702,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
 
-            return context.Send( new Message() { Name=message.Name }, "continueendpoint", identity);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint", tracing);
         }
     }
 
@@ -721,15 +720,15 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var identity = new IdentityContext(id: context.IdentityContext.Id + "_continue", operationid: context.IdentityContext.OperationId);
+            var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
 
-            return context.Send(new Message() { Name = message.Name }, "continueendpoint", identity);
+            return context.Send(new Message() { Name = message.Name }, "continueendpoint", tracing);
         }
     }
 
-    public class Middleware : IMiddlewareAsync<MessageContext>
+    public class Middleware : IAsyncMiddleware<MessageContext>
     {
-        public async Task ExecuteAsync(Context<MessageContext> context, Func<Context<MessageContext>, Task> next)
+        public async Task ExecuteAsync(AsyncContext<MessageContext> context, Func<AsyncContext<MessageContext>, Task> next)
         {
             Console.WriteLine("Start " + GetType().Name);
 
@@ -756,7 +755,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.IdentityContext);
+            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.TracingContext);
         }
     }
 
@@ -766,7 +765,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.IdentityContext);
+            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.TracingContext);
         }
     }
 
@@ -777,7 +776,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            return context.Publish(new Message() { }, "fromqueueendpoint", context.IdentityContext, context.Origin.Key);
+            return context.Publish(new Message() { }, "fromqueueendpoint", context.TracingContext, context.Origin.Key);
         }
     }
 
@@ -815,7 +814,7 @@ namespace Jal.Router.Sample.NetCore
     {
         public override Task HandleWithContext(Message message, MessageContext context)
         {
-            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.IdentityContext.PartitionId);
+            Console.WriteLine("message handled by " + GetType().Name + " " + message.Name+ " groupid "+ context.TracingContext.PartitionId);
 
             return Task.CompletedTask;
         }
@@ -829,7 +828,7 @@ namespace Jal.Router.Sample.NetCore
 
             for (int i = 0; i < 100; i++)
             {
-                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.IdentityContext);
+                await context.Send(new Message() { Name = "Hi"+i }, "queueperformanceendpoint", context.TracingContext);
             }
         }
     }
@@ -876,10 +875,10 @@ namespace Jal.Router.Sample.NetCore
         {
             for (int i = 0; i < 5; i++)
             {
-                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"1-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()),"X");
-                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"2-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"3-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
-                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new IdentityContext(id: $"4-{i}", operationid: context.IdentityContext.OperationId, parentid: context.IdentityContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 1 " + i }, "sessiontopicendpoint", new TracingContext(id: $"1-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()),"X");
+                await context.Publish(new Message() { Name = "Hi 2 " + i }, "sessiontopicendpoint", new TracingContext(id: $"2-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 3 " + i }, "sessiontopicendpoint", new TracingContext(id: $"3-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
+                await context.Publish(new Message() { Name = "Hi 4 " + i }, "sessiontopicendpoint", new TracingContext(id: $"4-{i}", operationid: context.TracingContext.OperationId, parentid: context.TracingContext.Id, partitionid: i.ToString()), "X");
             }
         }
     }

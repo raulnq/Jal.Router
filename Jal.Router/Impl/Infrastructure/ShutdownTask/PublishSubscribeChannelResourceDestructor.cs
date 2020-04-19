@@ -7,11 +7,11 @@ namespace Jal.Router.Impl
 {
     public class PublishSubscribeChannelResourceDestructor : IShutdownTask
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public PublishSubscribeChannelResourceDestructor(IComponentFactoryGateway factory, ILogger logger)
+        public PublishSubscribeChannelResourceDestructor(IComponentFactoryFacade factory, ILogger logger)
         {
             _logger = logger;
 

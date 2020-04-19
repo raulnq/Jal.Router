@@ -19,10 +19,8 @@ namespace Jal.Router.Impl
         {
             foreach (var listenercontext in _configuration.Runtime.ListenerContexts)
             {
-                if (listenercontext.ListenerChannel != null)
+                if (await listenercontext.Close().ConfigureAwait(false))
                 {
-                    await listenercontext.ListenerChannel.Close(listenercontext).ConfigureAwait(false);
-
                     _logger.Log($"Shutdown {listenercontext.Id}");
                 }
             }

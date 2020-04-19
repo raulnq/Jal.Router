@@ -1,6 +1,6 @@
 ﻿using Jal.Router.Fluent.Interface;
 
-namespace Jal.Router.AzureServiceBus.Standard.Extensions
+namespace Jal.Router.AzureServiceBus.Standard
 {
 
     public static class EndpointBuilderExtensions

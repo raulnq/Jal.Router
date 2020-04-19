@@ -10,7 +10,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
     {
-        public AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryGateway factory) : base(factory)
+        public AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 

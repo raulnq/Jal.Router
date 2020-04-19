@@ -9,9 +9,9 @@ namespace Jal.Router.Impl
     {
         private IHasher _hasher;
 
-        private IComponentFactoryGateway _factory;
+        private IComponentFactoryFacade _factory;
 
-        public FileSystemTransport(IHasher hasher, IComponentFactoryGateway factory)
+        public FileSystemTransport(IHasher hasher, IComponentFactoryFacade factory)
         {
             _hasher = hasher;
             _factory = factory;

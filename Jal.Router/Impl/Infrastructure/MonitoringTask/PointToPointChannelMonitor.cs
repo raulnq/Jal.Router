@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
 {
     public class PointToPointChannelMonitor : AbstractMonitoringTask, IMonitoringTask
     {
-        public PointToPointChannelMonitor(IComponentFactoryGateway factory, ILogger logger)
+        public PointToPointChannelMonitor(IComponentFactoryFacade factory, ILogger logger)
             :base(factory, logger)
         {
 

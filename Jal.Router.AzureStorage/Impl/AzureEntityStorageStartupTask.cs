@@ -1,10 +1,9 @@
-using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Threading.Tasks;
 
-namespace Jal.Router.AzureStorage.Impl
+namespace Jal.Router.AzureStorage
 {
     public class AzureEntityStorageStartupTask : IStartupTask
     {

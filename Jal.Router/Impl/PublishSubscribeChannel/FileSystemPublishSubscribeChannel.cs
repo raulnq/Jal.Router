@@ -19,7 +19,7 @@ namespace Jal.Router.Impl
 
         private string _path;
 
-        public FileSystemPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
+        public FileSystemPublishSubscribeChannel(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
         : base(factory, logger)
         {
             _parameter = provider.Get<FileSystemParameter>();

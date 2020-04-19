@@ -7,7 +7,7 @@ namespace Jal.Router.Impl
 {
     public class FileSystemRequestReplyFromPointToPointChannel : AbstractFileSystemRequestReply, IRequestReplyChannelFromPointToPointChannel
     {
-        public FileSystemRequestReplyFromPointToPointChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport) 
+        public FileSystemRequestReplyFromPointToPointChannel(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport) 
             : base(factory, logger, provider, transport)
         {
         }

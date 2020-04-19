@@ -13,10 +13,13 @@ namespace Jal.Router.Model
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
+            Condition = ((e, o, t) => e.Name == o.EndPointName && e.ContentType == t);
         }
         public Origin Origin { get; private set; }
 
         public string Name { get; private set; }
+
+        public Func<EndPoint, Options, Type, bool> Condition { get; private set; }
 
         public Type ContentType { get; private set; }
 
@@ -47,6 +50,11 @@ namespace Jal.Router.Model
         public void SetContentType(Type contenttype)
         {
             ContentType = contenttype;
+        }
+
+        public void SetCondition(Func<EndPoint, Options, Type, bool> condition)
+        {
+            Condition = condition;
         }
 
         public void SetReplyContentType(Type contenttype)

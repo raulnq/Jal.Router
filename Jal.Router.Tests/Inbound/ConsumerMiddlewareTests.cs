@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class ConsumerMiddlewareTests
     {
-        private ConsumerMiddleware Build(IConsumer consumer, IComponentFactoryGateway factory)
+        private ConsumerMiddleware Build(IConsumer consumer, IComponentFactoryFacade factory)
         {
             return new ConsumerMiddleware(factory, consumer);
         }
@@ -33,7 +33,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -63,7 +63,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             consumermock.WasExecuted();
 
@@ -91,7 +91,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -123,7 +123,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -155,7 +155,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.Model.Context<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             consumermock.WasExecuted();
 

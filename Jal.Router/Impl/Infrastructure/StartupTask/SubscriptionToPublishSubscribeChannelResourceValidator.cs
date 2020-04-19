@@ -7,7 +7,7 @@ namespace Jal.Router.Impl
 {
     public class SubscriptionToPublishSubscribeChannelResourceValidator : AbstractStartupTask, IStartupTask
     {
-        public SubscriptionToPublishSubscribeChannelResourceValidator(IComponentFactoryGateway factory, ILogger logger)
+        public SubscriptionToPublishSubscribeChannelResourceValidator(IComponentFactoryFacade factory, ILogger logger)
         : base(factory, logger)
         {
         }
