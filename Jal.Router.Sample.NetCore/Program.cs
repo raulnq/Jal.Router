@@ -16,14 +16,12 @@ using Jal.Router.Newtonsoft.Extensions;
 using System.Collections.Generic;
 using System.Reflection;
 using Jal.Router.Newtonsoft;
-using Jal.Router.AzureStorage;
-using Jal.Router.AzureServiceBus.Standard;
 
 namespace Jal.Router.Sample.NetCore
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var container = new ServiceContainer();
             container.AddRouter( c=>
