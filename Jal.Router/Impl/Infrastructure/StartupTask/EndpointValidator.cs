@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class EndpointValidator : AbstractStartupTask, IStartupTask
     {
         private readonly IChannelValidator _validator;
-        public EndpointValidator(IComponentFactoryGateway factory, ILogger logger, IChannelValidator validator)
+        public EndpointValidator(IComponentFactoryFacade factory, ILogger logger, IChannelValidator validator)
             :base(factory, logger)
         {
             _validator = validator;

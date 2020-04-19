@@ -7,11 +7,11 @@ namespace Jal.Router.Impl
 {
     public class PointToPointChannelResourceDestructor : IShutdownTask
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public PointToPointChannelResourceDestructor(IComponentFactoryGateway factory, ILogger logger) 
+        public PointToPointChannelResourceDestructor(IComponentFactoryFacade factory, ILogger logger) 
         {
             _logger = logger;
 

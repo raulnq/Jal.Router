@@ -1,22 +1,18 @@
 ﻿using System;
-using Jal.Router.ApplicationInsights.Extensions;
-using Jal.Router.ApplicationInsights.LightInject.Installer;
-using Jal.Router.AzureServiceBus.Standard.Extensions;
-using Jal.Router.AzureStorage.LightInject.Installer;
+using Jal.Router.ApplicationInsights;
+using Jal.Router.AzureServiceBus.Standard;
 using Jal.Router.LightInject.Installer;
 using Jal.Router.AzureStorage.Extensions;
 using Jal.Router.Interface;
 using LightInject;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
 using Jal.Router.AzureServiceBus.Standard.Model;
-using Jal.Router.AzureStorage.Model;
-using Jal.Router.Newtonsoft.LightInject.Installer;
+using Jal.Router.AzureStorage;
 using Jal.Router.Newtonsoft.Extensions;
 using Jal.Router.Impl;
-using Jal.Router.Serilog.LightInject.Installer;
-using Jal.Router.Serilog.Extensions;
+using Jal.Router.Serilog;
+using Jal.Router.Newtonsoft;
 
 namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
@@ -38,9 +34,9 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return new HostBuilder(container, applicationname);
         }
 
-        public IHostBuilder UseAzureServiceBus(IRouterConfigurationSource[] sources, Action<AzureServiceBusParameter> action=null)
+        public IHostBuilder UseAzureServiceBus(Action<IRouterBuilder> builderaction, Action<AzureServiceBusParameter> action=null)
         {
-            _parameter.Sources = sources;
+            _parameter.Action = builderaction;
             action?.Invoke(_parameter.AzureServiceBusParameter);
             return this;
         }
@@ -71,18 +67,6 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return this;
         }
 
-        public IHostBuilder UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor
-        {
-            _parameter.RouterInterceptorType = typeof(TRouterInterceptor);
-            return this;
-        }
-
-        public IHostBuilder UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor
-        {
-            _parameter.BusInterceptorType = typeof(IBusInterceptor);
-            return this;
-        }
-
         public IHostBuilder Use(Action<IConfiguration> setup)
         {
             _parameter.Setup = setup;
@@ -91,52 +75,48 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
         public IHost Build()
         {
-            _parameter.Container.AddRouter(_parameter.Sources);
-
-            _parameter.Container.AddAzureServiceBusForRouter();
-
-            _parameter.Container.AddNewtonsoftForRouter();
-
-            if (_parameter.UseSerilog)
+            _parameter.Container.AddRouter(c=>
             {
-                _parameter.Container.AddSerilogForRouter();
-            }
+                if(_parameter.Action!=null)
+                {
+                    _parameter.Action(c);
+                }
 
-            if (_parameter.UseApplicationInsights)
-            {
-                _parameter.Container.Register<TelemetryClient>(x=> {
+                c.AddAzureServiceBus();
 
-                    var conf = TelemetryConfiguration.CreateDefault();
+                c.AddNewtonsoft();
 
-                    if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
-                    {
-                        conf.InstrumentationKey = _parameter.ApplicationInsightsKey;
-                    }
+                if (_parameter.UseSerilog)
+                {
+                    c.AddSerilog();
+                }
 
-                    var client = new TelemetryClient(conf);
+                if (_parameter.UseApplicationInsights)
+                {
+                    _parameter.Container.Register<TelemetryClient>(x => {
 
-                    client.Context.Cloud.RoleName = _parameter.ApplicationName;
+                        var conf = TelemetryConfiguration.CreateDefault();
 
-                    return client;
-                } ,new PerContainerLifetime());
+                        if (!string.IsNullOrWhiteSpace(_parameter.ApplicationInsightsKey))
+                        {
+                            conf.InstrumentationKey = _parameter.ApplicationInsightsKey;
+                        }
 
-                _parameter.Container.AddApplicationInsightsForRouter();
-            }
+                        var client = new TelemetryClient(conf);
 
-            if (_parameter.UseAzureStorage)
-            {
-                _parameter.Container.AddAzureStorageForRouter();
-            }
+                        client.Context.Cloud.RoleName = _parameter.ApplicationName;
 
-            if (_parameter.RouterInterceptorType != null)
-            {
-                _parameter.Container.Register(typeof(IRouterInterceptor), _parameter.RouterInterceptorType, _parameter.RouterInterceptorType.FullName, new PerContainerLifetime());
-            }
+                        return client;
+                    }, new PerContainerLifetime());
 
-            if (_parameter.BusInterceptorType != null)
-            {
-                _parameter.Container.Register(typeof(IBusInterceptor), _parameter.BusInterceptorType, _parameter.BusInterceptorType.FullName, new PerContainerLifetime());
-            }
+                    c.AddApplicationInsights();
+                }
+
+                if (_parameter.UseAzureStorage)
+                {
+                    c.AddAzureStorage();
+                }
+            });
 
             var host = _parameter.Container.GetInstance<IHost>();
 
@@ -162,17 +142,6 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             }
 
             host.Configuration.UseNewtonsoftAsSerializer();
-
-            if (_parameter.RouterInterceptorType != null)
-            {
-                host.Configuration.RouterInterceptorType = _parameter.RouterInterceptorType;
-            }
-
-
-            if (_parameter.BusInterceptorType != null)
-            {
-                host.Configuration.BusInterceptorType = _parameter.BusInterceptorType;
-            }
 
             host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
 

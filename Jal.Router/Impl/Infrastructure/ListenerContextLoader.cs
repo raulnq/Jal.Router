@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -7,52 +6,51 @@ namespace Jal.Router.Impl
 {
     public class ListenerContextLoader : IListenerContextLoader
     {
-        private readonly IListenerContextCreator _loader;
+        private readonly IListenerContextLifecycle _lifecycle;
 
-        private readonly IComponentFactoryGateway _factory;
+        private readonly ILogger _logger;
 
-        public ListenerContextLoader(IListenerContextCreator loader, IComponentFactoryGateway factory)
+        public ListenerContextLoader(IListenerContextLifecycle lifecycle, ILogger logger)
         {
-            _loader = loader;
-            _factory = factory;
+            _lifecycle = lifecycle;
+
+            _logger = logger;
         }
 
-        public void AddPointToPointChannel<TContent>(string name, string connectionstring, string path)
+        public void Add(Route route)
         {
-            var channels = new List<Channel>();
+            foreach (var channel in route.Channels)
+            {
+                var listenercontext = _lifecycle.Get(channel);
 
-            var newchannel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+                if (listenercontext == null)
+                {
+                    listenercontext = _lifecycle.Add(channel);
 
-            channels.Add(newchannel);
+                    if (listenercontext.Open())
+                    {
+                        _logger.Log($"Listening {listenercontext.Id}");
+                    }
+                }
 
-            var newroute = new Route(name, typeof(TContent), channels);
-
-            var listenercontext = _loader.Create(newchannel);
-
-            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
-
-            listenercontext.Routes.Add(newroute);
-
-            _loader.Open(listenercontext);
+                listenercontext.Routes.Add(route);
+            }
         }
 
-        public void AddPublishSubscribeChannel<TContent>(string name, string connectionstring, string path, string subscription)
+        public async Task Remove(Route route)
         {
-            var channels = new List<Channel>();
+            foreach (var channel in route.Channels)
+            {
+                var listenercontext = _lifecycle.Remove(channel);
 
-            var newchannel = new Channel(ChannelType.PublishSubscribe, connectionstring, path, subscription);
-
-            channels.Add(newchannel);
-
-            var newroute = new Route(name, typeof(TContent), channels);
-
-            var listenercontext = _loader.Create(newchannel);
-
-            _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
-
-            listenercontext.Routes.Add(newroute);
-
-            _loader.Open(listenercontext);
+                if (listenercontext != null)
+                {
+                    if (await listenercontext.Close().ConfigureAwait(false))
+                    {
+                        _logger.Log($"Shutdown {listenercontext.Id}");
+                    }
+                }
+            }
         }
     }
 }

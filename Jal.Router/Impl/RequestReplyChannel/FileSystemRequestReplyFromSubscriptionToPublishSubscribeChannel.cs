@@ -7,7 +7,7 @@ namespace Jal.Router.Impl
 {
     public class FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel : AbstractFileSystemRequestReply, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
     {
-        public FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
+        public FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IFileSystemTransport transport)
             : base(factory, logger, provider, transport)
         {
         }

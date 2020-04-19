@@ -12,9 +12,9 @@ namespace Jal.Router.Impl
     {
         private readonly ILogger _logger;
 
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
-        public BusMiddleware(ILogger logger, IComponentFactoryGateway factory)
+        public BusMiddleware(ILogger logger, IComponentFactoryFacade factory)
         {
             _factory = factory;
 
@@ -51,7 +51,7 @@ namespace Jal.Router.Impl
                     {
                         count++;
 
-                        await next(context);
+                        await next(context).ConfigureAwait(false);
 
                         return;
                     }

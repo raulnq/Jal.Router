@@ -18,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
     }
     public class AzureServiceBusMessageAdapter : AbstractMessageAdapter
     {
-        public AzureServiceBusMessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
+        public AzureServiceBusMessageAdapter(IComponentFactoryFacade factory, IBus bus) : base(factory, bus)
         {
         }
 

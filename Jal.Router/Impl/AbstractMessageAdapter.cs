@@ -7,7 +7,7 @@ namespace Jal.Router.Impl
 {
     public abstract class AbstractMessageAdapter : IMessageAdapter
     {
-        protected readonly IComponentFactoryGateway Factory;
+        protected readonly IComponentFactoryFacade Factory;
 
         protected readonly IBus Bus;
 
@@ -29,7 +29,7 @@ namespace Jal.Router.Impl
 
         public const string EnclosedType = "enclosedtype";
 
-        protected AbstractMessageAdapter(IComponentFactoryGateway factory, IBus bus)
+        protected AbstractMessageAdapter(IComponentFactoryFacade factory, IBus bus)
         {
             Factory = factory;
             Bus = bus;

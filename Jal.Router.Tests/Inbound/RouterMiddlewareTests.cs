@@ -14,7 +14,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class RouterMiddlewareTests
     {
-        private RouterMiddleware Build(IComponentFactoryGateway factory)
+        private RouterMiddleware Build(IComponentFactoryFacade factory)
         {
             return new RouterMiddleware(factory, new NullLogger());
         }

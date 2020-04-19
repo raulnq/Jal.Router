@@ -10,7 +10,7 @@ namespace Jal.Router.Impl
     {
         private const string DefaultStatus = "IN PROCESS";
 
-        public MiddleConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory, consumer)
+        public MiddleConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer) : base(factory, consumer)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Jal.Router.Impl
                 {
                     messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                    await Consume(messagecontext);
+                    await Consume(messagecontext).ConfigureAwait(false);
 
                     messagecontext.SagaContext.Data.Update(messagecontext.DateTimeUtc);
 

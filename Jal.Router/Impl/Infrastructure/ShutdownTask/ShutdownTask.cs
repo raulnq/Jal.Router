@@ -8,9 +8,9 @@ namespace Jal.Router.Impl
 {
     public class ShutdownTask : IShutdownTask
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
-        public ShutdownTask(IComponentFactoryGateway factory)
+        public ShutdownTask(IComponentFactoryFacade factory)
         {
             _factory = factory;
         }

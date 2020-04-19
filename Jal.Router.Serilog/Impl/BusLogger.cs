@@ -5,7 +5,7 @@ using Serilog;
 using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Serilog.Impl
+namespace Jal.Router.Serilog
 {
     public class BusLogger : IAsyncMiddleware<MessageContext>
     {
@@ -46,7 +46,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 log.Debug("[Bus, {Channel}, {Id}] Start Call. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 log.ForContext("Type","message-producer").Information("[Bus, {Channel}, {Id}] Message sent. endpoint: {Endpoint} path: {Path}", context.Data.Channel.ToString(), context.Data.Id, context.Data.EndPoint.Name, context.Data.Channel.FullPath);
             }

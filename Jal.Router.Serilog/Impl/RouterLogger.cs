@@ -5,7 +5,7 @@ using Serilog;
 using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Serilog.Impl
+namespace Jal.Router.Serilog
 {
     public class RouterLogger : IAsyncMiddleware<MessageContext>
     {
@@ -46,7 +46,7 @@ namespace Jal.Router.Serilog.Impl
             {
                 log.Debug("[Router, Route, {Id}] Start Call. Message arrived. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 log.ForContext("Type","message-consumer").Information("[Router, Route, {Id}] Message routed. route: {Route} saga: {Saga}", context.Data.Id, context.Data.Route?.Name, context.Data.Saga?.Name);
             }

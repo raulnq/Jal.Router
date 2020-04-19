@@ -6,11 +6,11 @@ namespace Jal.Router.Impl
 {
     public class Shutdown : IShutdown
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public Shutdown(IComponentFactoryGateway factory, ILogger logger)
+        public Shutdown(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
 

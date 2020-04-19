@@ -1,8 +1,7 @@
-using Jal.Router.ApplicationInsights.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
-namespace Jal.Router.ApplicationInsights.Extensions
+namespace Jal.Router.ApplicationInsights
 {
     public static class ConfigurationExtensions
     {

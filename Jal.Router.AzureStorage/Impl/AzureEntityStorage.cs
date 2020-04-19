@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jal.Router.AzureStorage.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Jal.Router.AzureStorage.Impl
+namespace Jal.Router.AzureStorage
 {
     public class AzureEntityStorage : AbstractEntityStorage
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly AzureStorageParameter _parameter;
 
@@ -31,7 +30,7 @@ namespace Jal.Router.AzureStorage.Impl
 
         private readonly Func<MessageRecord, byte[]>[] MessageSagaReader;
 
-        public AzureEntityStorage(IComponentFactoryGateway factory, IParameterProvider provider)
+        public AzureEntityStorage(IComponentFactoryFacade factory, IParameterProvider provider)
         {
             _factory = factory;
 

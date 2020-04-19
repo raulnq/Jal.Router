@@ -8,16 +8,16 @@ namespace Jal.Router.Impl
 {
     public class Producer : IProducer
     {
-        public Producer(IComponentFactoryGateway factory, ILogger logger, ISenderContextCreator creator)
+        public Producer(IComponentFactoryFacade factory, ILogger logger, ISenderContextLifecycle lifecycle)
         {
             _factory = factory;
             _logger = logger;
-            _creator = creator;
+            _lifecycle = lifecycle;
         }
 
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
-        private readonly ISenderContextCreator _creator;
+        private readonly ISenderContextLifecycle _lifecycle;
 
         private readonly ILogger _logger;
 
@@ -31,20 +31,19 @@ namespace Jal.Router.Impl
 
                 var message = await adapter.WritePhysicalMessage(context).ConfigureAwait(false);
 
-                var sendercontext = _factory.Configuration.Runtime.SenderContexts.FirstOrDefault(x => x.Channel.Id == context.Channel.Id);
+                var sendercontext = _lifecycle.Get(context.Channel);
 
                 if (sendercontext == null)
                 {
-                    sendercontext = _creator.Create(context.Channel);
+                    sendercontext = _lifecycle.Add(context.Channel);
 
-                    _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
-
-                    sendercontext.Endpoints.Add(context.EndPoint);
-
-                    _creator.Open(sendercontext);
+                    if (sendercontext.Open())
+                    {
+                        _logger.Log($"Opening {sendercontext.Id}");
+                    }
                 }
 
-                id = await sendercontext.SenderChannel.Send(sendercontext, message).ConfigureAwait(false);
+                id = await sendercontext.Send(message).ConfigureAwait(false);
 
                 if (sendercontext.ReaderChannel != null)
                 {
@@ -52,7 +51,7 @@ namespace Jal.Router.Impl
 
                     try
                     {
-                        outputcontext = await sendercontext.ReaderChannel.Read(sendercontext, context, adapter).ConfigureAwait(false);
+                        outputcontext = await sendercontext.Read(context, adapter).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

@@ -145,7 +145,7 @@ namespace Jal.Router.Tests
 
             endpoint.Channels.Add(new Channel(channel, null, null, null));
 
-            endpointprovidermock.Setup(x => x.Provide(It.IsAny<string>(), It.IsAny<Type>())).Returns(endpoint);
+            endpointprovidermock.Setup(x => x.Provide(It.IsAny<Options>(), It.IsAny<Type>())).Returns(endpoint);
 
             return endpointprovidermock;
         }
@@ -175,9 +175,9 @@ namespace Jal.Router.Tests
             return new ListenerContext(channel, listenerchannel, partition);
         }
 
-        public static Mock<IComponentFactoryGateway> CreateFactoryMock()
+        public static Mock<IComponentFactoryFacade> CreateFactoryMock()
         {
-            var factorymock = new Mock<IComponentFactoryGateway>();
+            var factorymock = new Mock<IComponentFactoryFacade>();
 
             factorymock.Setup(m => m.CreateRouterInterceptor()).Returns(new NullRouterInterceptor());
 
@@ -207,7 +207,7 @@ namespace Jal.Router.Tests
             return entitystoragemock;
         }
 
-        public static Mock<IComponentFactoryGateway> CreateFactoryMockWithHandler<T>() where T : class, new() 
+        public static Mock<IComponentFactoryFacade> CreateFactoryMockWithHandler<T>() where T : class, new() 
         {
             var factorymock = CreateFactoryMock();
 

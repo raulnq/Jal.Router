@@ -51,8 +51,9 @@ And on the Program.cs file setup the host
 
 var container = new ServiceContainer();
 
-container.AddRouter(new IRouterConfigurationSource[] { new RouterConfigurationSource() },c=>{
-    c.AddAzureStorageForRouter();
+container.AddRouter(c=>{
+    c.AddSource<RouterConfigurationSource>();
+    c.AddNewtonsoft();
 });
 
 container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());

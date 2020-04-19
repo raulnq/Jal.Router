@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Jal.Router.AzureStorage.Model
+namespace Jal.Router.AzureStorage
 {
     public class AzureStorageParameter
     {

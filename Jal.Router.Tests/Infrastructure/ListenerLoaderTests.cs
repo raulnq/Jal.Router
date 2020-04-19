@@ -14,9 +14,9 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Run_WithRoute_ShouldBeLoaded()
         {
-            var creatormock = new Mock<IListenerContextCreator>();
+            var lifecyclemock = new Mock<IListenerContextLifecycle>();
 
-            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
+            lifecyclemock.Setup(x => x.AddOrGet(It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -28,17 +28,11 @@ namespace Jal.Router.Tests
 
             factory.Configuration.Runtime.Routes.Add(router);
 
-            var sut = new ListenerLoader(factory, new NullLogger(), creatormock.Object);
+            var sut = new ListenerLoader(factory, new NullLogger(), lifecyclemock.Object);
 
             await sut.Run();
 
-            factory.Configuration.Runtime.ListenerContexts.Count.ShouldBe(1);
-
-            factory.Configuration.Runtime.ListenerContexts[0].Routes.Count.ShouldBe(1);
-
-            creatormock.Verify(x => x.Create(It.IsAny<Channel>()), Times.Once);
-
-            creatormock.Verify(x => x.Open(It.IsAny<ListenerContext>()), Times.Once);
+            lifecyclemock.Verify(x => x.AddOrGet(It.IsAny<Channel>()), Times.Once);
         }
     }
 }

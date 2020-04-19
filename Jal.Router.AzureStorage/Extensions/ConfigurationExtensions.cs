@@ -1,5 +1,3 @@
-using Jal.Router.AzureStorage.Impl;
-using Jal.Router.AzureStorage.Model;
 using Jal.Router.Interface;
 
 namespace Jal.Router.AzureStorage.Extensions

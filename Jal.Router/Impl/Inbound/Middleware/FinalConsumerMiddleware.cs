@@ -10,7 +10,7 @@ namespace Jal.Router.Impl
     {
         private const string DefaultStatus = "ENDED";
 
-        public FinalConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer) : base(factory, consumer)
+        public FinalConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer) : base(factory, consumer)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Jal.Router.Impl
                 {
                     messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
 
-                    await Consume(messagecontext);
+                    await Consume(messagecontext).ConfigureAwait(false);
 
                     messagecontext.SagaContext.Data.End(messagecontext.DateTimeUtc);
 

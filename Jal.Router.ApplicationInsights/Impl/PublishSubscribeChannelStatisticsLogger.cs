@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 
-namespace Jal.Router.ApplicationInsights.Impl
+namespace Jal.Router.ApplicationInsights
 {
     public class PublishSubscribeChannelStatisticsLogger : ILogger<PublishSubscribeChannelStatistics>
     {

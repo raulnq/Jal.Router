@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class SubscriptionToPublishSubscribeChannelResourceCreatorTests
     {
-        private SubscriptionToPublishSubscribeChannelResourceCreator Build(IComponentFactoryGateway factory)
+        private SubscriptionToPublishSubscribeChannelResourceCreator Build(IComponentFactoryFacade factory)
         {
             return new SubscriptionToPublishSubscribeChannelResourceCreator(factory, new NullLogger());
         }

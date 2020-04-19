@@ -7,7 +7,7 @@ namespace Jal.Router.Impl
 {
     public class PointToPointChannelResourceValidator : AbstractStartupTask, IStartupTask
     {
-        public PointToPointChannelResourceValidator(IComponentFactoryGateway factory, ILogger logger)
+        public PointToPointChannelResourceValidator(IComponentFactoryFacade factory, ILogger logger)
         : base(factory, logger)
         {
         }

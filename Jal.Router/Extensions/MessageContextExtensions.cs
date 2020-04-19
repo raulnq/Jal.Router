@@ -100,6 +100,16 @@ namespace Jal.Router.Extensions
             return new Origin() { Key = key};
         }
 
+        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext,string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        {
+            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+        }
+
+        public static Options CreateOptions(this MessageContext context, string endpointname, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        {
+            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, context.TracingContext.Clone(), context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+        }
+
         private static Options CreateOptions(this MessageContext context, string endpointname, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null)
         {
             var tracingcontext = context.TracingContext.Clone();
@@ -124,13 +134,13 @@ namespace Jal.Router.Extensions
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
                 foreach (var header in headers)
                 {
-                    if (headers.ContainsKey(header.Key))
+                    if (options.Headers.ContainsKey(header.Key))
                     {
                         options.Headers[header.Key] = header.Value;
                     }
@@ -162,13 +172,13 @@ namespace Jal.Router.Extensions
                 version = context.Version;
             }
 
-            var options = new Options(endpointname, context.CreateCopyOfHeaders(), context.SagaContext, context.TrackingContext, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
                 foreach (var header in headers)
                 {
-                    if(headers.ContainsKey(header.Key))
+                    if(options.Headers.ContainsKey(header.Key))
                     {
                         options.Headers[header.Key]= header.Value;
                     }

@@ -10,7 +10,7 @@ namespace Jal.Router.Impl
     {
         private readonly IProducer _producer;
 
-        public ProducerMiddleware(IProducer producer, IComponentFactoryGateway factory) : base(factory)
+        public ProducerMiddleware(IProducer producer, IComponentFactoryFacade factory) : base(factory)
         {
             _producer = producer;
         }

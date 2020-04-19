@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Model;
 using l = Serilog.Log;
 
-namespace Jal.Router.Serilog.Impl
+namespace Jal.Router.Serilog
 {
     public class BeatLogger : ILogger<Beat>
     {

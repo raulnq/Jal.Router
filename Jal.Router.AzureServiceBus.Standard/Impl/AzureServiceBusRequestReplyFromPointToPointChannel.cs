@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusRequestReplyFromPointToPointChannel : AbstractAzureServiceBusRequestReply, IRequestReplyChannelFromPointToPointChannel
     {
-        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactoryGateway factory, ILogger logger)
+        public AzureServiceBusRequestReplyFromPointToPointChannel(IComponentFactoryFacade factory, ILogger logger)
             : base(factory, logger)
         {
 

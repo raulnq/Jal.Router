@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
 {
     public class ConsumerMiddleware : AbstractConsumerMiddleware, IAsyncMiddleware<MessageContext>
     {
-        public ConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
+        public ConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer):base(factory, consumer)
         {
         }
 

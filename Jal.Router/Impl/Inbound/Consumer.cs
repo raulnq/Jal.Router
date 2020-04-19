@@ -9,13 +9,13 @@ namespace Jal.Router.Impl
 
     public class Consumer : IConsumer
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
         private readonly ITypedConsumer _typedconsumer;
 
-        public Consumer(IComponentFactoryGateway factory, ILogger logger, ITypedConsumer typedconsumer)
+        public Consumer(IComponentFactoryFacade factory, ILogger logger, ITypedConsumer typedconsumer)
         {
             _factory = factory;
             _logger = logger;
@@ -112,7 +112,7 @@ namespace Jal.Router.Impl
 
             if (_typedconsumer.Select(context, content, method, consumer))
             {
-                await _typedconsumer.Consume(context, content, method, consumer);
+                await _typedconsumer.Consume(context, content, method, consumer).ConfigureAwait(false);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Jal.Router.Impl
         {
             if (_typedconsumer.Select(context, content, method))
             {
-                await _typedconsumer.Consume(context, content, method);
+                await _typedconsumer.Consume(context, content, method).ConfigureAwait(false);
             }
         }
 
@@ -184,7 +184,7 @@ namespace Jal.Router.Impl
                     context.SagaContext.Data.SetStatus(method.Status);
                 }
 
-                await _typedconsumer.Consume(context, content, method, concretehandler, data);
+                await _typedconsumer.Consume(context, content, method, concretehandler, data).ConfigureAwait(false);
             }
         }
 
@@ -197,7 +197,7 @@ namespace Jal.Router.Impl
                     context.SagaContext.Data.SetStatus(method.Status);
                 }
 
-                await _typedconsumer.Consume(context, content, method, data);
+                await _typedconsumer.Consume(context, content, method, data).ConfigureAwait(false);
             }
         }
     }

@@ -1,18 +1,11 @@
 using System;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
-using Jal.Router.Model;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ServiceBus.Fluent;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Rest.Azure;
-using Newtonsoft.Json;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
@@ -30,9 +23,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         public const string ExpressMessageEnabled = "expressmessageenabled";
 
-        protected readonly IComponentFactoryGateway _factory;
+        protected readonly IComponentFactoryFacade _factory;
 
-        public AbstractAzureManagementChannelResourceManager(IComponentFactoryGateway factory)
+        public AbstractAzureManagementChannelResourceManager(IComponentFactoryFacade factory)
         {
             _factory = factory;
 

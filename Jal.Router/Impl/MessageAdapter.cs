@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class MessageAdapter : AbstractMessageAdapter
     {
-        public MessageAdapter(IComponentFactoryGateway factory, IBus bus) : base(factory, bus)
+        public MessageAdapter(IComponentFactoryFacade factory, IBus bus) : base(factory, bus)
         {
         }
 

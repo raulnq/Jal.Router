@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class ConsumerMiddlewareTests
     {
-        private ConsumerMiddleware Build(IConsumer consumer, IComponentFactoryGateway factory)
+        private ConsumerMiddleware Build(IConsumer consumer, IComponentFactoryFacade factory)
         {
             return new ConsumerMiddleware(factory, consumer);
         }

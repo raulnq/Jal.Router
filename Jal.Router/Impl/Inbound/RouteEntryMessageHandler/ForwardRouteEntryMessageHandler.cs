@@ -8,11 +8,11 @@ namespace Jal.Router.Impl
 
     public class ForwardRouteEntryMessageHandler : IRouteEntryMessageHandler
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public ForwardRouteEntryMessageHandler(IComponentFactoryGateway factory, ILogger logger)
+        public ForwardRouteEntryMessageHandler(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
             _logger = logger;

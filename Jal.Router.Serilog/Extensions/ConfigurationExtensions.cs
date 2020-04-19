@@ -1,8 +1,7 @@
 using Jal.Router.Interface;
-using Jal.Router.Serilog.Impl;
 using Jal.Router.Model;
 
-namespace Jal.Router.Serilog.Extensions
+namespace Jal.Router.Serilog
 {
     public static class ConfigurationExtensions
     {

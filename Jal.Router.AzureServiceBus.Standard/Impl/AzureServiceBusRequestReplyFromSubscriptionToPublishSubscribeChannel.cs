@@ -8,7 +8,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
     public class AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel : AbstractAzureServiceBusRequestReply, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
     {
-        public AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger)
+        public AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryFacade factory, ILogger logger)
             : base(factory, logger)
         {
 

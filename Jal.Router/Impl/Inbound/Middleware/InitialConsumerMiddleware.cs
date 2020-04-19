@@ -10,7 +10,7 @@ namespace Jal.Router.Impl
     {
         private const string DefaultStatus = "STARTED";
 
-        public InitialConsumerMiddleware(IComponentFactoryGateway factory, IConsumer consumer):base(factory, consumer)
+        public InitialConsumerMiddleware(IComponentFactoryFacade factory, IConsumer consumer):base(factory, consumer)
         {
         }
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Impl
 
             messagecontext.SagaContext.SetId(id);
 
-            await Consume(messagecontext);
+            await Consume(messagecontext).ConfigureAwait(false);
 
             await storage.Update(sagadata).ConfigureAwait(false);
         }

@@ -8,7 +8,7 @@ namespace Jal.Router.Impl
 {
     public class PointToPointChannelResourceCreator : AbstractStartupTask, IStartupTask
     {
-        public PointToPointChannelResourceCreator(IComponentFactoryGateway factory, ILogger logger) 
+        public PointToPointChannelResourceCreator(IComponentFactoryFacade factory, ILogger logger) 
             : base(factory, logger)
         {
 

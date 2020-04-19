@@ -14,9 +14,9 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Run_WithEndpoint_ShouldBeLoaded()
         {
-            var creatormock = new Mock<ISenderContextCreator>();
+            var creatormock = new Mock<ISenderContextLifecycle>();
 
-            creatormock.Setup(x => x.Create(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+            creatormock.Setup(x => x.AddOrGet(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -32,13 +32,7 @@ namespace Jal.Router.Tests
 
             await sut.Run();
 
-            factory.Configuration.Runtime.SenderContexts.Count.ShouldBe(1);
-
-            factory.Configuration.Runtime.SenderContexts[0].Endpoints.Count.ShouldBe(1);
-
-            creatormock.Verify(x => x.Create(It.IsAny<Channel>()), Times.Once);
-
-            creatormock.Verify(x => x.Open(It.IsAny<SenderContext>()), Times.Once);
+            creatormock.Verify(x => x.AddOrGet(It.IsAny<Channel>()), Times.Once);
         }
     }
 }

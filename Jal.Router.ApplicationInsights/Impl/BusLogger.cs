@@ -7,7 +7,7 @@ using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Jal.Router.ApplicationInsights.Impl
+namespace Jal.Router.ApplicationInsights
 {
     public class BusLogger : AbstractApplicationInsightsLogger, IAsyncMiddleware<MessageContext>
     {
@@ -44,7 +44,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
             try
             {
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 telemetry.Success = true;
 

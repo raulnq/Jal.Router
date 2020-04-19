@@ -4,7 +4,7 @@ using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Jal.Router.ApplicationInsights.Impl
+namespace Jal.Router.ApplicationInsights
 {
     public abstract class AbstractApplicationInsightsLogger
     {

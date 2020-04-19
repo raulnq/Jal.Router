@@ -5,7 +5,7 @@ using Common.Logging;
 using Jal.ChainOfResponsability;
 using Jal.Router.Model;
 
-namespace Jal.Router.Logger.Impl
+namespace Jal.Router.Logger
 {
     public class BusLogger : IAsyncMiddleware<MessageContext>
     {
@@ -26,7 +26,7 @@ namespace Jal.Router.Logger.Impl
             {
                 _log.Debug($"[Bus.cs, {context.Data.Channel.ToString()}, {context.Data.Id}] Start Call. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} endpoint: {context.Data.EndPoint.Name} path: {context.Data.Channel.FullPath} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key} operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}");
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 _log.Info($"[Bus.cs, {context.Data.Channel.ToString()}, {context.Data.Id}] Message sent. id: {context.Data.Id} sagaid: {context.Data.SagaContext?.Data?.Id} endpoint: {context.Data.EndPoint.Name} path: {context.Data.Channel.FullPath} from: {context.Data.Origin.From} origin: {context.Data.Origin.Key}  operationid: {context.Data.TracingContext.OperationId} parentid: {context.Data.TracingContext.ParentId}");
             }

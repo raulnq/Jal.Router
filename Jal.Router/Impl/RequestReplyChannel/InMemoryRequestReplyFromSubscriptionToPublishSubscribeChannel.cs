@@ -6,7 +6,7 @@ namespace Jal.Router.Impl
 {
     public class InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel : AbstractInMemoryRequestReply, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
     {
-        public InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryGateway factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
+        public InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider, IInMemoryTransport transport)
             : base(factory, logger, provider, transport)
         {
         }

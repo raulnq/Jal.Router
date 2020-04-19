@@ -6,9 +6,9 @@ namespace Jal.Router.Installer
 {
     public static class WindsorContainerExtensions
     {
-        public static void AddAzureStorageForRouter(this IWindsorContainer container, IRouterConfigurationSource[] sources, Action<IWindsorContainer> action=null)
+        public static void AddAzureStorageForRouter(this IWindsorContainer container, Action<IRouterBuilder> action=null)
         {
-            container.Install(new RouterInstaller(sources, action));
+            container.Install(new RouterInstaller(action));
         }
     }
 }

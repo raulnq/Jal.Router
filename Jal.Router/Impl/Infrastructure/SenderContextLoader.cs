@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -6,52 +6,51 @@ namespace Jal.Router.Impl
 {
     public class SenderContextLoader : ISenderContextLoader
     {
-        private readonly ISenderContextCreator _loader;
+        private readonly ISenderContextLifecycle _lifecycle;
 
-        private IComponentFactoryGateway _factory;
+        private readonly ILogger _logger;
 
-        public SenderContextLoader(ISenderContextCreator loader, IComponentFactoryGateway factory)
+        public SenderContextLoader(ISenderContextLifecycle lifecycle, ILogger logger)
         {
-            _loader = loader;
-            _factory = factory;
+            _lifecycle = lifecycle;
+
+            _logger = logger;
         }
 
-        public void AddPointToPointChannel<TMessage>(string name, string connectionstring, string path)
+        public void Add(EndPoint endpoint)
         {
-            var newendpoint = new EndPoint(name);
+            foreach (var channel in endpoint.Channels)
+            {
+                var sendercontext = _lifecycle.Get(channel);
 
-            newendpoint.SetContentType(typeof(TMessage));
+                if (sendercontext == null)
+                {
+                    sendercontext = _lifecycle.Add(channel);
 
-            var newchannel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+                    if (sendercontext.Open())
+                    {
+                        _logger.Log($"Opening {sendercontext.Id}");
+                    }
+                }
 
-            newendpoint.Channels.Add(newchannel);
-
-            var sendercontext = _loader.Create(newchannel);
-
-            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
-
-            sendercontext.Endpoints.Add(newendpoint);
-
-            _loader.Open(sendercontext);
+                sendercontext.Endpoints.Add(endpoint);
+            }
         }
 
-        public void AddPublishSubscribeChannel<TMessage>(string name, string connectionstring, string path)
+        public async Task Remove(EndPoint endpoint)
         {
-            var newendpoint = new EndPoint(name);
+            foreach (var channel in endpoint.Channels)
+            {
+                var sendercontext = _lifecycle.Remove(channel);
 
-            newendpoint.SetContentType(typeof(TMessage));
-
-            var newchannel = new Channel(ChannelType.PublishSubscribe, connectionstring, path);
-
-            newendpoint.Channels.Add(newchannel);
-
-            var sendercontext = _loader.Create(newchannel);
-
-            _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
-
-            sendercontext.Endpoints.Add(newendpoint);
-
-            _loader.Open(sendercontext);
+                if (sendercontext == null)
+                {
+                    if (await sendercontext.Close().ConfigureAwait(false))
+                    {
+                        _logger.Log($"Shutdown {sendercontext.Id}");
+                    }
+                }
+            }
         }
     }
 }

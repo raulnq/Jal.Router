@@ -29,8 +29,8 @@ namespace Jal.Router.Impl
         public Type ChannelShufflerType { get; private set; }
         public Type MessageStorageType { get; private set; }
         public IList<Type> RouterLoggerTypes { get; }
-        public Type RouterInterceptorType { get; set; }
-        public Type BusInterceptorType { get; set; }
+        public Type RouterInterceptorType { get; private set; }
+        public Type BusInterceptorType { get; private set; }
         public IList<Type> InboundMiddlewareTypes { get; }
         public IList<Type> OutboundMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }

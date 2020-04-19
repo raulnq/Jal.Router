@@ -17,7 +17,7 @@ namespace Jal.Router.Impl
 
         private string _sendername;
 
-        public InMemoryPointToPointChannel(IParameterProvider provider, IComponentFactoryGateway factory, ILogger logger, IInMemoryTransport inmemorysystem) : base(factory, logger)
+        public InMemoryPointToPointChannel(IParameterProvider provider, IComponentFactoryFacade factory, ILogger logger, IInMemoryTransport inmemorysystem) : base(factory, logger)
         {
             _parameter = provider.Get<InMemoryParameter>();
 

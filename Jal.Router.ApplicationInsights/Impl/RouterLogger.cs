@@ -7,7 +7,7 @@ using Jal.Router.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Jal.Router.ApplicationInsights.Impl
+namespace Jal.Router.ApplicationInsights
 {
 
     public class RouterLogger : AbstractApplicationInsightsLogger, IAsyncMiddleware<MessageContext>
@@ -41,7 +41,7 @@ namespace Jal.Router.ApplicationInsights.Impl
 
                 PopulateContext(telemetry.Context, context.Data);
 
-                await next(context);
+                await next(context).ConfigureAwait(false);
 
                 telemetry.ResponseCode = "200";
 

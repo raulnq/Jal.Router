@@ -1,7 +1,7 @@
 using System;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace Jal.Router.AzureStorage.Model
+namespace Jal.Router.AzureStorage
 {
     public class MessageRecord : TableEntity
     {

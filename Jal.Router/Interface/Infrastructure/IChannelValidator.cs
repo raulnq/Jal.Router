@@ -1,5 +1,4 @@
 ﻿using Jal.Router.Model;
-using System.Text;
 
 namespace Jal.Router.Interface
 {

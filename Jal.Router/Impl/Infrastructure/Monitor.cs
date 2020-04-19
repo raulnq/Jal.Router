@@ -6,11 +6,11 @@ namespace Jal.Router.Impl
 {
     public class Monitor : IMonitor
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public Monitor(IComponentFactoryGateway factory, ILogger logger)
+        public Monitor(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
 

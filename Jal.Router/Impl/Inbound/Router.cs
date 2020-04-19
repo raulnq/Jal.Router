@@ -9,13 +9,13 @@ namespace Jal.Router.Impl
 {
     public class Router : IRouter
     {
-        private readonly IComponentFactoryGateway _factory;
+        private readonly IComponentFactoryFacade _factory;
 
         private readonly IPipelineBuilder _pipeline;
 
         private readonly ILogger _logger;
 
-        public Router(IComponentFactoryGateway factory, IPipelineBuilder pipeline, ILogger logger)
+        public Router(IComponentFactoryFacade factory, IPipelineBuilder pipeline, ILogger logger)
         {
             _factory = factory;
 

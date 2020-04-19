@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class HeartBeatLogger : AbstractMonitoringTask, IMonitoringTask
     {
 
-        public HeartBeatLogger(IComponentFactoryGateway factory, ILogger logger)
+        public HeartBeatLogger(IComponentFactoryFacade factory, ILogger logger)
             : base(factory, logger)
         {
         }

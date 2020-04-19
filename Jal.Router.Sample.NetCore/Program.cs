@@ -1,7 +1,5 @@
 ﻿using System;
-using Jal.Locator.LightInject;
-using Jal.Router.AzureServiceBus.Standard.Extensions;
-using Jal.Router.AzureServiceBus.Standard.LightInject.Installer;
+using Jal.Router.AzureServiceBus.Standard;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.LightInject.Installer;
@@ -10,18 +8,16 @@ using LightInject;
 using Jal.Router.Extensions;
 using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.AzureStorage.Extensions;
-using Jal.Router.AzureStorage.LightInject.Installer;
-using Jal.ChainOfResponsability.LightInject.Installer;
 using Jal.Router.Patterns.Impl;
 using Jal.Router.Patterns.Interface;
 using Jal.ChainOfResponsability;
 using System.Threading.Tasks;
 using Jal.Router.Newtonsoft.Extensions;
-using Jal.Router.Newtonsoft.LightInject.Installer;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Reflection;
-using Jal.Router.Azure.Standard.LightInject.Installer.All;
+using Jal.Router.Newtonsoft;
+using Jal.Router.AzureStorage;
+using Jal.Router.AzureServiceBus.Standard;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -30,11 +26,12 @@ namespace Jal.Router.Sample.NetCore
         static async Task Main(string[] args)
         {
             var container = new ServiceContainer();
-            container.AddRouter(new IRouterConfigurationSource[] { new FileRouterConfigurationSmokeTest() }, c=>
+            container.AddRouter( c=>
             {
-                c.AddAzureServiceBusForRouter();
-                c.AddAzureStorageForRouter();
-                c.AddNewtonsoftForRouter();
+                c.AddSource<FileRouterConfigurationSmokeTest>();
+                //c.AddAzureServiceBus();
+                //c.AddAzureStorage();
+                c.AddNewtonsoft();
             });
 
 
@@ -89,9 +86,10 @@ namespace Jal.Router.Sample.NetCore
             });
             host.Configuration
                 //.UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
-                .UseFileSystemAsTransport(parameter)
-                //.UseAzureStorage(new AzureStorage.Model.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                //.UseFileSystemAsTransport(parameter)
+                //.UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=testraul;AccountKey=zeI7y9ubW3IXtR4/9i1IBmKnFsWGjY0snh4fE2Hc2FXkC4q4iPJ2JPUjCWDwCps7C9T0sVZCU9YbV5j/MAgnqg==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
+                .UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
                 .UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
@@ -110,15 +108,15 @@ namespace Jal.Router.Sample.NetCore
 
             //var messages = facade.GetMessages(new DateTime(2019, 7,9), new DateTime(2019, 7, 10), "queuelistenbyonehandler_handler", new Dictionary<string, string> { { "messagestoragename", "messagessmoke20190709" } }).GetAwaiter().GetResult();
 
-            await host.Startup();
+            //await host.Startup();
 
-            await messagecontext.Send(new Message(), "sendtoqueuea");
+            //await messagecontext.Send(new Message(), "sendtoqueuea");
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
-            await host.Shutdown();
+            //await host.Shutdown();
 
-            //host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
+            host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
 
             //var bus = container.GetInstance<IBus>();
 
@@ -599,9 +597,9 @@ namespace Jal.Router.Sample.NetCore
             })
             //.OnExceptionRetryFailedMessageTo("retryendpoint", x=>x.For<ApplicationException>()).With(new LinearRetryPolicy(5, 3))
             //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" } , { "parameter2", "value2" }, { "parameter3", "value3" } }))
-            //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }).For<ApplicationException>())
+            .OnError(x => x.RetryMessageTo("retryendpoint", new LinearRetryPolicy(5, 3)).For<ApplicationException>())
             //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }))
-            //OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
+            //.OnException(x=>x.OfType<ApplicationException>().Do<StoreLocally>(parameter));
             //.OnEntry(x=>x.EnableEntityStorage(true))
             //.OnErrorSendFailedMessageTo(_errorqueueendpoint)
             ;

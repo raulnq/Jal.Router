@@ -15,7 +15,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class RouterTests
     {
-        private Impl.Router Build(IComponentFactoryGateway factory, IPipeline pipeline)
+        private Impl.Router Build(IComponentFactoryFacade factory, IPipeline pipeline)
         {
             return new Impl.Router(factory, new PipelineBuilder(pipeline), new NullLogger());
         }

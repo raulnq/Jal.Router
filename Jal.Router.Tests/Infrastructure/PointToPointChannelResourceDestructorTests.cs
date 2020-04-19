@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     [TestClass]
     public class PointToPointChannelResourceDestructorTests
     {
-        private PointToPointChannelResourceDestructor Build(IComponentFactoryGateway factory)
+        private PointToPointChannelResourceDestructor Build(IComponentFactoryFacade factory)
         {
             return new PointToPointChannelResourceDestructor(factory, new NullLogger());
         }

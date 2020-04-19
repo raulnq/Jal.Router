@@ -130,7 +130,7 @@ namespace Jal.Router.Model
                 TrackingContext?.ToEntity(), TracingContext?.ToEntity(), Name);
         }
 
-        public Dictionary<string, string> CreateCopyOfHeaders()
+        public Dictionary<string, string> CloneHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
         }
