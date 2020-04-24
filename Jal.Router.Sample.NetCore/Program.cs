@@ -16,6 +16,7 @@ using Jal.Router.Newtonsoft.Extensions;
 using System.Collections.Generic;
 using System.Reflection;
 using Jal.Router.Newtonsoft;
+using Jal.Router.AzureStorage;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -26,9 +27,9 @@ namespace Jal.Router.Sample.NetCore
             var container = new ServiceContainer();
             container.AddRouter( c=>
             {
-                c.AddSource<FileRouterConfigurationSmokeTest>();
-                //c.AddAzureServiceBus();
-                //c.AddAzureStorage();
+                c.AddSource<RouterConfigurationSmokeTest>();
+                c.AddAzureServiceBus();
+                c.AddAzureStorage();
                 c.AddNewtonsoft();
             });
 
@@ -83,13 +84,13 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                //.UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60, MaxConcurrentCalls=4, MaxConcurrentPartitions=1, TimeoutInSeconds = 60 }, useazureservicemanagement: false)
+                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 }, useazureservicemanagement: false)
                 //.UseFileSystemAsTransport(parameter)
-                //.UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=testraul;AccountKey=zeI7y9ubW3IXtR4/9i1IBmKnFsWGjY0snh4fE2Hc2FXkC4q4iPJ2JPUjCWDwCps7C9T0sVZCU9YbV5j/MAgnqg==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=testraul;AccountKey=zeI7y9ubW3IXtR4/9i1IBmKnFsWGjY0snh4fE2Hc2FXkC4q4iPJ2JPUjCWDwCps7C9T0sVZCU9YbV5j/MAgnqg==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
-                .UseMemoryAsTransport()
+                //.UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
-                .UseMemoryAsStorage()
+                //.UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
