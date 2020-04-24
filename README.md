@@ -90,6 +90,7 @@ Jal.Router is licensed under the [Apache2 license](https://github.com/raulnq/Jal
 ## Authors
 * Raul Naupari (raulnq@gmail.com)
 ## RoadMap
+* Feature: Default transport and transport by router/endpoind
 * Feature: Compression/encryption (middleware).
 * Feature: Message consumption during scheduled periods of time.
 * Feature: Non native duplicate detection (middleware).
