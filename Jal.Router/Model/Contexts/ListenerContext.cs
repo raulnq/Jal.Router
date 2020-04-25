@@ -13,14 +13,17 @@ namespace Jal.Router.Model
 
         public IListenerChannel ListenerChannel { get; private set; }
 
+        public IMessageAdapter MessageAdapter { get; private set; }
+
         public List<Route> Routes { get; private set; }
 
-        public ListenerContext(Channel channel, IListenerChannel listener, Partition partition)
+        public ListenerContext(Channel channel, IListenerChannel listener, IMessageAdapter adapter, Partition partition)
         {
             Channel = channel;
             Routes = new List<Route>();
             Partition = partition;
             ListenerChannel = listener;
+            MessageAdapter = adapter;
         }
 
         public async Task<bool> Close()

@@ -3,6 +3,7 @@ using Jal.Router.Interface;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
+using System;
 
 namespace Jal.Router.Tests
 {
@@ -16,7 +17,7 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>())).Returns(listenermock.Object);
+            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns(listenermock.Object);
 
             var factory = factorymock.Object;
 
@@ -24,7 +25,7 @@ namespace Jal.Router.Tests
 
             var listenercontext = sut.Add(Builder.CreateChannel());
 
-            factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>()), Times.Once);
+            factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             listenercontext.Channel.ShouldNotBeNull();
 

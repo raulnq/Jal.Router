@@ -15,12 +15,15 @@ namespace Jal.Router.Model
 
         public ISenderChannel SenderChannel { get; private set; }
 
-        public SenderContext(Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel)
+        public IMessageAdapter MessageAdapter { get; private set; }
+
+        public SenderContext(Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter)
         {
             Channel = channel;
             Endpoints = new List<EndPoint>();
             SenderChannel = senderchannel;
             ReaderChannel = readerchannel;
+            MessageAdapter = adapter;
         }
 
         public async Task<bool> Close()
@@ -35,9 +38,9 @@ namespace Jal.Router.Model
             return false;
         }
 
-        public Task<MessageContext> Read(MessageContext context, IMessageAdapter adapter)
+        public Task<MessageContext> Read(MessageContext context)
         {
-            return ReaderChannel.Read(this, context, adapter);
+            return ReaderChannel.Read(this, context, MessageAdapter);
         }
 
         public Task<string> Send(object message)

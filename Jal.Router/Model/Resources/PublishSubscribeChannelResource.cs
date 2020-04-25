@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
-    public class PublishSubscribeChannelResource : ChannelResource
+    public class PublishSubscribeChannelResource : Resource
     {
         public PublishSubscribeChannelResource(string path, string connectionstring, Dictionary<string, string> properties)
             :base(path, connectionstring, properties)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jal.Router.Interface;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Func<object, Channel, Task> Consumer { get; private set; }
+        public Func<object, Channel, IMessageAdapter, Task> Consumer { get; private set; }
 
         public List<Channel> Channels { get; }
 
@@ -55,7 +56,7 @@ namespace Jal.Router.Model
             UseClaimCheck = useclaimcheck;
         }
 
-        public void SetConsumer(Func<object, Channel, Task> consumer)
+        public void SetConsumer(Func<object, Channel, IMessageAdapter, Task> consumer)
         {
             Consumer = consumer;
         }

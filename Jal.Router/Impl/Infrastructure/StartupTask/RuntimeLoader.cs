@@ -20,8 +20,6 @@ namespace Jal.Router.Impl
         {
             Logger.Log("Loading runtime configuration");
 
-            var adapter = Factory.CreateMessageAdapter();
-
             foreach (var source in _sources)
             {
                 Factory.Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
@@ -38,7 +36,7 @@ namespace Jal.Router.Impl
 
                 foreach (var route in source.GetRoutes())
                 {
-                    route.SetConsumer(async (message, channel) => {
+                    route.SetConsumer(async (message, channel, adapter) => {
 
                         var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
@@ -59,7 +57,7 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.InitialRoutes)
                     {
-                        route.SetConsumer(async (message, channel) => {
+                        route.SetConsumer(async (message, channel, adapter) => {
 
                             var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
@@ -80,7 +78,7 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.FinalRoutes)
                     {
-                        route.SetConsumer(async (message, channel) => {
+                        route.SetConsumer(async (message, channel, adapter) => {
 
                             var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 
@@ -101,7 +99,7 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.Routes)
                     {
-                        route.SetConsumer(async (message, channel) => {
+                        route.SetConsumer(async (message, channel, adapter) => {
 
                             var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
 

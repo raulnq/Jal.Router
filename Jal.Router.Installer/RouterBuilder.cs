@@ -17,7 +17,7 @@ namespace Jal.Router.Installer
 
         public IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
             where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource : ChannelResource
+            where TResource : Resource
         {
             _container.Register(Component.For<IChannelResourceManager<TResource, TStatistics>>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 

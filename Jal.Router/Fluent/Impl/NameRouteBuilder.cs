@@ -34,7 +34,7 @@ namespace Jal.Router.Fluent.Impl
             return builder;
         }
 
-        public void AddPointToPointChannel(string path, string connectionstring)
+        public void AddPointToPointChannel(string path, string connectionstring, Type adapter=null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -46,10 +46,20 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            _channels.Add(new Channel(ChannelType.PointToPoint, connectionstring, path));
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPointToPointChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+            _channels.Add(new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type));
         }
 
-        public void AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring)
+        public void AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter=null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -63,8 +73,16 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
+            if(adapter !=null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
 
-            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription));
+            _channels.Add(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type));
         }
 
         public INameRouteBuilder ToListen(Action<IListenerChannelBuilder> channelbuilder)

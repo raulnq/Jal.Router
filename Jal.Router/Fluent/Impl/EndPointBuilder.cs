@@ -21,7 +21,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public void AddPointToPointChannel(string connectionstring, string path)
+        public void AddPointToPointChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -33,7 +33,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPointToPointChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
         }
@@ -49,17 +59,16 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, null, null);
 
             _endpoint.Channels.Add(channel);
 
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public void AddPublishSubscribeChannel(string connectionstring, string path)
+        public void AddPublishSubscribeChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
-
-
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
                 throw new ArgumentNullException(nameof(connectionstring));
@@ -70,7 +79,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path);
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+            var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
         }

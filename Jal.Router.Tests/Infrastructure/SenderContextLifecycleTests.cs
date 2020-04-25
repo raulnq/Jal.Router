@@ -4,6 +4,7 @@ using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
+using System;
 
 namespace Jal.Router.Tests
 {
@@ -17,13 +18,13 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreatePointToPointChannel()).Returns(channelmock.Object);
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object,null));
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.PointToPoint));
 
-            factorymock.Verify(x => x.CreatePointToPointChannel(), Times.Once);
+            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             sendercontext.SenderChannel.ShouldNotBeNull();
 
@@ -35,7 +36,7 @@ namespace Jal.Router.Tests
 
             sendercontext.Channel.Path.ShouldBe("path");
 
-            sendercontext.Channel.Type.ShouldBe(ChannelType.PointToPoint);
+            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.PointToPoint);
         }
 
         [TestMethod]
@@ -45,13 +46,13 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreatePublishSubscribeChannel()).Returns(channelmock.Object);
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, null));
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.PublishSubscribe));
 
-            factorymock.Verify(x => x.CreatePublishSubscribeChannel(), Times.Once);
+            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             sendercontext.SenderChannel.ShouldNotBeNull();
 
@@ -65,7 +66,7 @@ namespace Jal.Router.Tests
 
             sendercontext.Channel.Subscription.ShouldBe("subscription");
 
-            sendercontext.Channel.Type.ShouldBe(ChannelType.PublishSubscribe);
+            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.PublishSubscribe);
         }
 
         [TestMethod]
@@ -75,13 +76,13 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateRequestReplyChannelFromPointToPointChannel()).Returns(channelmock.Object);
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
 
-            factorymock.Verify(x => x.CreateRequestReplyChannelFromPointToPointChannel(), Times.Once);
+            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             sendercontext.SenderChannel.ShouldNotBeNull();
 
@@ -95,7 +96,7 @@ namespace Jal.Router.Tests
 
             sendercontext.Channel.Path.ShouldBe("path");
 
-            sendercontext.Channel.Type.ShouldBe(ChannelType.RequestReplyToPointToPoint);
+            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.RequestReplyToPointToPoint);
         }
 
         [TestMethod]
@@ -105,13 +106,13 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel()).Returns(channelmock.Object);
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
 
-            factorymock.Verify(x => x.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel(), Times.Once);
+            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             sendercontext.SenderChannel.ShouldNotBeNull();
 
@@ -125,7 +126,7 @@ namespace Jal.Router.Tests
 
             sendercontext.Channel.Path.ShouldBe("path");
 
-            sendercontext.Channel.Type.ShouldBe(ChannelType.RequestReplyToSubscriptionToPublishSubscribe);
+            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.RequestReplyToSubscriptionToPublishSubscribe);
         }
     }
 }

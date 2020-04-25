@@ -3,6 +3,7 @@ using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
@@ -26,17 +27,15 @@ namespace Jal.Router.Tests
 
             var senderchannelmock = new Mock<ISenderChannel>();
 
+            var factory = factorymock.Object;
+
             messagecontext.SetChannel(Builder.CreateChannel());
 
-            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(new SenderContext(Builder.CreateChannel(), senderchannelmock.Object, null));
-
-            var factory = factorymock.Object;
+            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(new SenderContext(Builder.CreateChannel(), senderchannelmock.Object, null, factory.CreateMessageAdapter(It.IsAny<Type>())));
 
             var sut = Build(factory, lifecyclemock.Object);
 
             await sut.Produce(messagecontext);
-
-            factorymock.CreateMessageAdapterWasExecuted();
 
             senderchannelmock.WasExecuted();
 

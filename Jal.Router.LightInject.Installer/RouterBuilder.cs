@@ -17,7 +17,7 @@ namespace Jal.Router.LightInject.Installer
 
         public IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
             where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource : ChannelResource
+            where TResource : Resource
         {
             _container.Register<IChannelResourceManager<TResource, TStatistics>, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
 
