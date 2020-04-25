@@ -8,13 +8,13 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+    public class AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager
     {
         public AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<Statistic> Get(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 
@@ -22,7 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var info = await client.GetSubscriptionRuntimeInfoAsync(channel.Path, channel.Subscription).ConfigureAwait(false);
 
-                var statistics = new SubscriptionToPublishSubscribeChannelStatistics(channel.Subscription, channel.Path);
+                var statistics = new Statistic(channel.Path, channel.Subscription);
 
                 statistics.Properties.Add("DeadLetterMessageCount", info.MessageCountDetails.DeadLetterMessageCount.ToString());
 
@@ -36,7 +36,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public override async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<bool> CreateIfNotExist(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 
@@ -88,7 +88,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<bool> DeleteIfExist(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 

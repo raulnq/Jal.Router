@@ -143,11 +143,11 @@ namespace Jal.Router.AzureServiceBus.Standard
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, AzureServiceBusSubscriptionToTopic subscription, AzureServiceBusConfiguration servicebusconfiguration, string filter = null)
         {
 
-            SubscriptionToPublishSubscribeChannelResourceRule r = null;
+            Rule r = null;
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new SubscriptionToPublishSubscribeChannelResourceRule(filter, "$Default", true);
+                r = new Rule(filter, "$Default", true);
             }
 
             var dictionary = new Dictionary<string, string>();
@@ -181,11 +181,11 @@ namespace Jal.Router.AzureServiceBus.Standard
         public static void RegisterSubscriptionToTopic(this AbstractRouterConfigurationSource configuration, AzureServiceBusSubscriptionToTopic subscription, string connectionstring, string filter = null)
         {
 
-            SubscriptionToPublishSubscribeChannelResourceRule r = null;
+            Rule r = null;
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new SubscriptionToPublishSubscribeChannelResourceRule(filter, "$Default", true);
+                r = new Rule(filter, "$Default", true);
             }
 
             var dictionary = new Dictionary<string, string>();

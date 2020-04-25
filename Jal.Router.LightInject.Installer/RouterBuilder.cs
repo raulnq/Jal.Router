@@ -15,11 +15,10 @@ namespace Jal.Router.LightInject.Installer
             _container = container;
         }
 
-        public IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
-            where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource : Resource
+        public IRouterBuilder AddResourceManager<TImplementation>() 
+            where TImplementation : class, IResourceManager
         {
-            _container.Register<IChannelResourceManager<TResource, TStatistics>, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
+            _container.Register<IResourceManager, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
 
             return this;
         }

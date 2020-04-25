@@ -33,9 +33,7 @@ namespace Jal.Router.Interface
 
         IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
 
-        IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
-            where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource: Resource;
+        IRouterBuilder AddResourceManager<TImplementation>() where TImplementation : class, IResourceManager;
 
         IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher;
 

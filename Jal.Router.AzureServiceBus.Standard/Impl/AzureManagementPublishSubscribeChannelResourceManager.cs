@@ -8,13 +8,13 @@ using Microsoft.Rest.Azure;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementPublishSubscribeChannelResourceManager : AbstractAzureManagementChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
+    public class AzureManagementPublishSubscribeChannelResourceManager : AbstractAzureManagementChannelResourceManager
     {
         public AzureManagementPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<bool> CreateIfNotExist(PublishSubscribeChannelResource channel)
+        public override async Task<bool> CreateIfNotExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -72,7 +72,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> DeleteIfExist(PublishSubscribeChannelResource channel)
+        public override async Task<bool> DeleteIfExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -97,7 +97,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannelResource channel)
+        public override async Task<Statistic> Get(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -111,7 +111,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
-                    var statistics = new PublishSubscribeChannelStatistics(channel.Path);
+                    var statistics = new Statistic(channel.Path);
 
                     statistics.Properties.Add("DeadLetterMessageCount", topic.DeadLetterMessageCount.ToString());
 

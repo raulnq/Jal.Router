@@ -5,19 +5,19 @@ using Microsoft.ApplicationInsights;
 
 namespace Jal.Router.ApplicationInsights
 {
-    public class PointToPointChannelStatisticsLogger : ILogger<PointToPointChannelStatistics>
+    public class StatisticsLogger : ILogger<Statistic>
     {
         private readonly TelemetryClient _client;
-        public PointToPointChannelStatisticsLogger(TelemetryClient client)
+        public StatisticsLogger(TelemetryClient client)
         {
             _client = client;
         }
 
-        public void Log(PointToPointChannelStatistics statistics, DateTime datetime)
+        public void Log(Statistic statistics, DateTime datetime)
         {
             foreach (var item in statistics.Properties)
             {
-                _client.TrackMetric($"{statistics.Path} - {item.Key}", Double.Parse(item.Value));
+                _client.TrackMetric($"{statistics.Path}/{statistics.Subscription} - {item.Key}", Double.Parse(item.Value));
             }
         }
     }

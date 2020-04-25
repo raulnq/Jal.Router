@@ -5,13 +5,13 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-    public class PointToPointChannelResourceDestructor : IShutdownTask
+    public class ResourceDestructor : IShutdownTask
     {
         private readonly IComponentFactoryFacade _factory;
 
         private readonly ILogger _logger;
 
-        public PointToPointChannelResourceDestructor(IComponentFactoryFacade factory, ILogger logger) 
+        public ResourceDestructor(IComponentFactoryFacade factory, ILogger logger) 
         {
             _logger = logger;
 
@@ -22,28 +22,28 @@ namespace Jal.Router.Impl
         {
             var errors = new StringBuilder();
 
-            _logger.Log("Deleting point to point channels");
+            _logger.Log("Deleting resources");
 
-            var manager = _factory.CreatePointToPointChannelResourceManager();
-
-            foreach (var channel in _factory.Configuration.Runtime.PointToPointChannelResources)
+            foreach (var resource in _factory.Configuration.Runtime.Resources)
             {
                 try
                 {
-                    var deleted = await manager.DeleteIfExist(channel).ConfigureAwait(false);
+                    var manager = _factory.CreateResourceManager(resource.ChannelType);
+
+                    var deleted = await manager.DeleteIfExist(resource).ConfigureAwait(false);
 
                     if (deleted)
                     {
-                        _logger.Log($"Deleted {channel.Path} point to point channel");
+                        _logger.Log($"Deleted {resource.FullPath} {resource.ToString()} resource");
                     }
                     else
                     {
-                        _logger.Log($"Point to point channel {channel.Path} does not exist");
+                        _logger.Log($"The {resource.ToString()} resource {resource.FullPath} does not exist");
                     }
                 }
                 catch (Exception ex)
                 {
-                    var error = $"Exception {channel.Path} point to point channel: {ex}";
+                    var error = $"Exception {resource.FullPath} {resource.ToString()} resource: {ex}";
 
                     errors.AppendLine(error);
 
@@ -56,7 +56,7 @@ namespace Jal.Router.Impl
                 throw new ApplicationException(errors.ToString());
             }
 
-            _logger.Log("Point to point channels deleted");
+            _logger.Log("Resources deleted");
         }
     }
 }

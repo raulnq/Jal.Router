@@ -48,11 +48,7 @@ namespace Jal.Router.Installer
 
             builder.AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>();
 
-            builder.AddShutdownTask<PointToPointChannelResourceDestructor>();
-
-            builder.AddShutdownTask<PublishSubscribeChannelResourceDestructor>();
-
-            builder.AddShutdownTask<SubscriptionToPublishSubscribeChannelResourceDestructor>();
+            builder.AddShutdownTask<ResourceDestructor>();
 
             builder.AddShutdownTask<ShutdownTask>();
 
@@ -60,21 +56,13 @@ namespace Jal.Router.Installer
 
             builder.AddShutdownTask<ListenerShutdownTask>();
 
-            builder.AddStartupTask<PointToPointChannelResourceValidator>();
-
-            builder.AddStartupTask<PublishSubscribeChannelResourceValidator>();
-
-            builder.AddStartupTask<SubscriptionToPublishSubscribeChannelResourceValidator>();
-
-            builder.AddStartupTask<SubscriptionToPublishSubscribeChannelResourceCreator>();
+            builder.AddStartupTask<ResourceValidator>();
 
             builder.AddStartupTask<StartupBeatLogger>();
 
             builder.AddStartupTask<EndpointValidator>();
 
-            builder.AddStartupTask<PointToPointChannelResourceCreator>();
-
-            builder.AddStartupTask<PublishSubscribeChannelResourceCreator>();
+            builder.AddStartupTask<ResourceCreator>();
 
             builder.AddStartupTask<RouteValidator>();
 
@@ -84,9 +72,7 @@ namespace Jal.Router.Installer
 
             builder.AddStartupTask<SenderLoader>();
 
-            builder.AddMonitoringTask<PointToPointChannelMonitor>();
-
-            builder.AddMonitoringTask<SubscriptionToPublishSubscribeChannelMonitor>();
+            builder.AddMonitoringTask<StatisticMonitor>();
 
             builder.AddMonitoringTask<HeartBeatLogger>();
 
@@ -104,29 +90,21 @@ namespace Jal.Router.Installer
 
             builder.AddEntityStorage<InMemoryEntityStorage>();
 
-            builder.AddChannelResourceManager<NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>, PointToPointChannelResource, PointToPointChannelStatistics>();
+            builder.AddResourceManager<NullResourceManager>();
 
-            builder.AddChannelResourceManager<NullChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>, PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<FileSystemPointToPointlResourceManager>();
 
-            builder.AddChannelResourceManager<NullChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>, SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<FileSystemPublishSubscribeResourceManager>();
 
-            builder.AddChannelResourceManager<FileSystemPointToPointChannelResourceManager, PointToPointChannelResource, PointToPointChannelStatistics>();
+            builder.AddResourceManager<FileSystemSubscriptionToPublishSubscribeResourceManager>();
 
-            builder.AddChannelResourceManager<FileSystemPublishSubscribeChannelResourceManager, PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<InMemoryPointToPointResourceManager>();
 
-            builder.AddChannelResourceManager<FileSystemSubscriptionToPublishSubscribeChannelResourceManager, SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<InMemoryPublishSubscribeResourceManager>();
 
-            builder.AddChannelResourceManager<InMemoryPointToPointChannelResourceManager, PointToPointChannelResource, PointToPointChannelStatistics>();
+            builder.AddResourceManager<InMemorySubscriptionToPublishSubscribeResourceManager>();
 
-            builder.AddChannelResourceManager<InMemoryPublishSubscribeChannelResourceManager, PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>();
-
-            builder.AddChannelResourceManager<InMemorySubscriptionToPublishSubscribeChannelResourceManager, SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>();
-
-            builder.AddLogger<PointToPointChannelStatisticsLogger, PointToPointChannelStatistics>();
-
-            builder.AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
-
-            builder.AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
+            builder.AddLogger<StatisticLogger, Statistic>();
 
             builder.AddLogger<BeatLogger, Beat>();
 

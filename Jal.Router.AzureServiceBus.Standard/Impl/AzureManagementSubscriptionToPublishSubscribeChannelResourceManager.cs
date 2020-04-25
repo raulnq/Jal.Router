@@ -10,13 +10,13 @@ using Microsoft.Rest.Azure;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureManagementChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+    public class AzureManagementSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureManagementChannelResourceManager
     {
         public AzureManagementSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<bool> CreateIfNotExist(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<bool> CreateIfNotExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -91,7 +91,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> DeleteIfExist(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<bool> DeleteIfExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -125,7 +125,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<SubscriptionToPublishSubscribeChannelStatistics> Get(SubscriptionToPublishSubscribeChannelResource channel)
+        public override async Task<Statistic> Get(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -141,7 +141,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                     var subs = await topic.Subscriptions.GetByNameAsync(channel.Subscription).ConfigureAwait(false);
 
-                    var statistics = new SubscriptionToPublishSubscribeChannelStatistics(channel.Subscription, channel.Path);
+                    var statistics = new Statistic(channel.Subscription, channel.Path);
 
                     statistics.Properties.Add("DeadLetterMessageCount", subs.DeadLetterMessageCount.ToString());
 

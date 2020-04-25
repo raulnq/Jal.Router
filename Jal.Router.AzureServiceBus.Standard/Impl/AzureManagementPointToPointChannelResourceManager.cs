@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementPointToPointChannelResourceManager : AbstractAzureManagementChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
+    public class AzureManagementPointToPointChannelResourceManager : AbstractAzureManagementChannelResourceManager
     {
         public AzureManagementPointToPointChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<PointToPointChannelStatistics> Get(PointToPointChannelResource channel)
+        public override async Task<Statistic> Get(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -28,7 +28,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     var queue = await serviceBusNamespace.Queues.GetByNameAsync(channel.Path).ConfigureAwait(false);
 
-                    var statistics = new PointToPointChannelStatistics(channel.Path);
+                    var statistics = new Statistic(channel.Path);
 
                     statistics.Properties.Add("DeadLetterMessageCount", queue.DeadLetterMessageCount.ToString());
 
@@ -49,7 +49,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public override async Task<bool> CreateIfNotExist(PointToPointChannelResource channel)
+        public override async Task<bool> CreateIfNotExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 
@@ -119,7 +119,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> DeleteIfExist(PointToPointChannelResource channel)
+        public override async Task<bool> DeleteIfExist(Resource channel)
         {
             var serializer = _factory.CreateMessageSerializer();
 

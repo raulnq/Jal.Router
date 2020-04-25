@@ -15,11 +15,10 @@ namespace Jal.Router.Installer
             _container = container;
         }
 
-        public IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
-            where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource : Resource
+        public IRouterBuilder AddResourceManager<TImplementation>() 
+            where TImplementation : class, IResourceManager
         {
-            _container.Register(Component.For<IChannelResourceManager<TResource, TStatistics>>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+            _container.Register(Component.For<IResourceManager>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
