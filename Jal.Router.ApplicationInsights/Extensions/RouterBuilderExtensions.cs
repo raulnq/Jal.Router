@@ -7,13 +7,9 @@ namespace Jal.Router.ApplicationInsights
     {
         public static IRouterBuilder AddApplicationInsights(this IRouterBuilder builder)
         {
-            builder.AddLogger<PointToPointChannelStatisticsLogger, PointToPointChannelStatistics>();
-
             builder.AddLogger<BeatLogger, Beat>();
 
-            builder.AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
-
-            builder.AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
+            builder.AddLogger<StatisticsLogger, Statistic>();
 
             builder.AddMiddleware<RouterLogger>();
 

@@ -32,9 +32,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointChannelResourceManager<FileSystemPointToPointChannelResourceManager>()
-                .UsePublishSubscribeChannelResourceManager<FileSystemPublishSubscribeChannelResourceManager>()
-                .UseSubscriptionToPublishSubscribeChannelResourceManager<FileSystemSubscriptionToPublishSubscribeChannelResourceManager>()
+                .UsePointToPointResourceManager<FileSystemPointToPointlResourceManager>()
+                .UsePublishSubscribeResourceManager<FileSystemPublishSubscribeResourceManager>()
+                .UseSubscriptionToPublishSubscribeResourceManager<FileSystemSubscriptionToPublishSubscribeResourceManager>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }
@@ -54,9 +54,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointChannelResourceManager<InMemoryPointToPointChannelResourceManager>()
-                .UsePublishSubscribeChannelResourceManager<InMemoryPublishSubscribeChannelResourceManager>()
-                .UseSubscriptionToPublishSubscribeChannelResourceManager<InMemorySubscriptionToPublishSubscribeChannelResourceManager>()
+                .UsePointToPointResourceManager<InMemoryPointToPointResourceManager>()
+                .UsePublishSubscribeResourceManager<InMemoryPublishSubscribeResourceManager>()
+                .UseSubscriptionToPublishSubscribeResourceManager<InMemorySubscriptionToPublishSubscribeResourceManager>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }

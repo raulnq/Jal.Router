@@ -16,17 +16,17 @@ namespace Jal.Router.AzureServiceBus.Standard
 
             builder.AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>();
 
-            builder.AddChannelResourceManager<AzureManagementPointToPointChannelResourceManager, PointToPointChannelResource, PointToPointChannelStatistics>();
+            builder.AddResourceManager<AzureManagementPointToPointChannelResourceManager>();
 
-            builder.AddChannelResourceManager<AzureManagementPublishSubscribeChannelResourceManager, PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<AzureManagementPublishSubscribeChannelResourceManager>();
 
-            builder.AddChannelResourceManager<AzureManagementSubscriptionToPublishSubscribeChannelResourceManager, SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<AzureManagementSubscriptionToPublishSubscribeChannelResourceManager>();
 
-            builder.AddChannelResourceManager<AzureServiceBusPointToPointChannelResourceManager, PointToPointChannelResource, PointToPointChannelStatistics>();
+            builder.AddResourceManager<AzureServiceBusPointToPointChannelResourceManager>();
 
-            builder.AddChannelResourceManager<AzureServiceBusPublishSubscribeChannelResourceManager, PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<AzureServiceBusPublishSubscribeChannelResourceManager>();
 
-            builder.AddChannelResourceManager<AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager, SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>();
+            builder.AddResourceManager<AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager>();
 
             builder.AddMessageAdapter<AzureServiceBusMessageAdapter>();
         }

@@ -24,11 +24,7 @@ namespace Jal.Router.Tests
 
             configurationmock.Setup(x => x.GetPartitions()).Returns(new Model.Partition[] { new Model.Partition("name") });
 
-            configurationmock.Setup(x => x.GetPointToPointChannelResources()).Returns(new Model.PointToPointChannelResource[] { new Model.PointToPointChannelResource("path", "connectionstring", new Dictionary<string, string>()) });
-
-            configurationmock.Setup(x => x.GetPublishSubscribeChannelResources()).Returns(new Model.PublishSubscribeChannelResource[] { new Model.PublishSubscribeChannelResource("path", "connectionstring", new Dictionary<string, string>()) });
-
-            configurationmock.Setup(x => x.GetSubscriptionsToPublishSubscribeChannelResource()).Returns(new Model.SubscriptionToPublishSubscribeChannelResource[] { new Model.SubscriptionToPublishSubscribeChannelResource("subscription", "path", "connectionstring", new Dictionary<string, string>()) });
+            configurationmock.Setup(x => x.GetResources()).Returns(new Model.Resource[] { new Model.Resource(Model.ChannelType.PointToPoint, "path", "connectionstring", new Dictionary<string, string>()) });
 
             var saga = new Model.Saga("name", typeof(object));
 
@@ -54,11 +50,7 @@ namespace Jal.Router.Tests
 
             configurationmock.Verify(x => x.GetPartitions(), Times.Once);
 
-            configurationmock.Verify(x => x.GetPointToPointChannelResources(), Times.Once);
-
-            configurationmock.Verify(x => x.GetPublishSubscribeChannelResources(), Times.Once);
-
-            configurationmock.Verify(x => x.GetSubscriptionsToPublishSubscribeChannelResource(), Times.Once);
+            configurationmock.Verify(x => x.GetResources(), Times.Once);
 
             configurationmock.Verify(x => x.GetSagas(), Times.Once);
 
@@ -68,11 +60,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.Runtime.Partitions.Count.ShouldBe(1);
 
-            factory.Configuration.Runtime.PointToPointChannelResources.Count.ShouldBe(1);
-
-            factory.Configuration.Runtime.PublishSubscribeChannelResources.Count.ShouldBe(1);
-
-            factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.Count.ShouldBe(1);
+            factory.Configuration.Runtime.Resources.Count.ShouldBe(1);
 
             factory.Configuration.Runtime.Sagas.Count.ShouldBe(1);
         }

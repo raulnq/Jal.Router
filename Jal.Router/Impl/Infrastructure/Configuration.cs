@@ -16,9 +16,9 @@ namespace Jal.Router.Impl
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
         public IList<MonitorTask> MonitoringTaskTypes { get; }
-        public Type PointToPointChannelResourceType { get; private set; }
-        public Type PublishSubscribeChannelResourceType { get; private set; }
-        public Type SubscriptionToPublishSubscribeChannelResourceType { get; private set; }
+        public Type PointToPointResourceType { get; private set; }
+        public Type PublishSubscribeResourceType { get; private set; }
+        public Type SubscriptionToPublishSubscribeResourceType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
         public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
@@ -88,21 +88,21 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
+        public IConfiguration UsePublishSubscribeResourceManager<TChannel>() where TChannel : IResourceManager
         {
-            PublishSubscribeChannelResourceType = typeof(TChannel);
+            PublishSubscribeResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>
+        public IConfiguration UsePointToPointResourceManager<TChannel>() where TChannel : IResourceManager
         {
-            PointToPointChannelResourceType = typeof(TChannel);
+            PointToPointResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>
+        public IConfiguration UseSubscriptionToPublishSubscribeResourceManager<TChannel>() where TChannel : IResourceManager
         {
-            SubscriptionToPublishSubscribeChannelResourceType = typeof(TChannel);
+            SubscriptionToPublishSubscribeResourceType = typeof(TChannel);
             return this;
         }
 
@@ -222,9 +222,9 @@ namespace Jal.Router.Impl
             UseBusInterceptor<NullBusInterceptor>();
             UseEntityStorage<NullEntityStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UsePointToPointChannelResourceManager<NullChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>>();
-            UsePublishSubscribeChannelResourceManager<NullChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>>();
-            UseSubscriptionToPublishSubscribeChannelResourceManager<NullChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>>();
+            UsePointToPointResourceManager<NullResourceManager>();
+            UsePublishSubscribeResourceManager<NullResourceManager>();
+            UseSubscriptionToPublishSubscribeResourceManager<NullResourceManager>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
@@ -241,19 +241,13 @@ namespace Jal.Router.Impl
             OutboundMiddlewareTypes = new List<Type>();
             ShutdownWatcherTypes = new List<Type>();
             AddLogger<BeatLogger, Beat>();
-            AddLogger<PointToPointChannelStatisticsLogger, PointToPointChannelStatistics>();
-            AddLogger<PublishSubscribeChannelStatisticsLogger, PublishSubscribeChannelStatistics>();
-            AddLogger<SubscriptionToPublishSubscribeChannelStatisticsLogger, SubscriptionToPublishSubscribeChannelStatistics>();
+            AddLogger<StatisticLogger, Statistic>();
             AddStartupTask<StartupBeatLogger>();
             AddStartupTask<RuntimeLoader>();
             AddStartupTask<EndpointValidator>();
             AddStartupTask<RouteValidator>();
-            AddStartupTask<PointToPointChannelResourceValidator>();
-            AddStartupTask<PublishSubscribeChannelResourceValidator>();
-            AddStartupTask<SubscriptionToPublishSubscribeChannelResourceValidator>();
-            AddStartupTask<PointToPointChannelResourceCreator>();
-            AddStartupTask<PublishSubscribeChannelResourceCreator>();
-            AddStartupTask<SubscriptionToPublishSubscribeChannelResourceCreator>();
+            AddStartupTask<ResourceValidator>();
+            AddStartupTask<ResourceCreator>();
             AddStartupTask<SenderLoader>();
             AddStartupTask<ListenerLoader>();
             AddShutdownTask<ListenerShutdownTask>();

@@ -9,12 +9,9 @@ namespace Jal.Router.Impl
     {
         private IComponentFactoryFacade _factory;
 
-        private ILogger _logger;
-
-        public SenderContextLifecycle(IComponentFactoryFacade factory, ILogger logger)
+        public SenderContextLifecycle(IComponentFactoryFacade factory)
         {
             _factory = factory;
-            _logger = logger;
         }
 
         public SenderContext AddOrGet(Channel channel)

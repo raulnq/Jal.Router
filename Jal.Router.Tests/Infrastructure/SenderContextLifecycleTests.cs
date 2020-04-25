@@ -20,7 +20,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object,null));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object);
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.PointToPoint));
 
@@ -48,7 +48,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, null));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object);
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.PublishSubscribe));
 
@@ -78,7 +78,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object);
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
 
@@ -108,7 +108,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object);
 
             var sendercontext = sut.Add(Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
 

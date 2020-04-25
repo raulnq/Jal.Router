@@ -17,11 +17,7 @@ namespace Jal.Router.Model
 
         public List<SenderContext> SenderContexts { get; }
 
-        public List<PointToPointChannelResource> PointToPointChannelResources { get; }
-
-        public List<PublishSubscribeChannelResource> PublishSubscribeChannelResources { get; }
-
-        public List<SubscriptionToPublishSubscribeChannelResource> SubscriptionToPublishSubscribeChannelResources { get; }
+        public List<Resource> Resources { get; }
 
         public RuntimeContext()
         {
@@ -35,11 +31,7 @@ namespace Jal.Router.Model
 
             Routes = new List<Route>();
 
-            PointToPointChannelResources = new List<PointToPointChannelResource>();
-
-            PublishSubscribeChannelResources = new List<PublishSubscribeChannelResource>();
-
-            SubscriptionToPublishSubscribeChannelResources = new List<SubscriptionToPublishSubscribeChannelResource>();
+            Resources = new List<Resource>();
 
             Partitions = new List<Partition>();
         }

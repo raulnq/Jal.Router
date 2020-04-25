@@ -2,11 +2,11 @@
 
 namespace Jal.Router.Impl
 {
-    public class AbstractInMemoryChannelResourceManager<T, S> : AbstractChannelResourceManager<T, S>
+    public abstract class AbstractInMemoryResourceManager : AbstractResourceManager
     {
         protected readonly IInMemoryTransport _transport;
 
-        public AbstractInMemoryChannelResourceManager(IInMemoryTransport transport)
+        protected AbstractInMemoryResourceManager(IInMemoryTransport transport)
         {
             _transport = transport;
         }

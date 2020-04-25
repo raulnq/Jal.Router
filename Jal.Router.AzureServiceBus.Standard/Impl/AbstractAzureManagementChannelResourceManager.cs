@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public abstract class AbstractAzureManagementChannelResourceManager<T,S> : AbstractChannelResourceManager<T, S>
+    public abstract class AbstractAzureManagementChannelResourceManager : AbstractResourceManager
     {
         public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
 

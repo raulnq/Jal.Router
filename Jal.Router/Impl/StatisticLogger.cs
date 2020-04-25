@@ -4,15 +4,15 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class PublishSubscribeChannelStatisticsLogger : ILogger<PublishSubscribeChannelStatistics>
+    public class StatisticLogger : ILogger<Statistic>
     {
         private readonly ILogger _logger;
-        public PublishSubscribeChannelStatisticsLogger(ILogger logger)
+        public StatisticLogger(ILogger logger)
         {
             _logger = logger;
         }
 
-        public void Log(PublishSubscribeChannelStatistics statistics, DateTime datetime)
+        public void Log(Statistic statistics, DateTime datetime)
         {
             foreach (var item in statistics.Properties)
             {

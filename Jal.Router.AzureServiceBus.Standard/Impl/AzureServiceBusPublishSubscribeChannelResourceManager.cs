@@ -6,13 +6,13 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>
+    public class AzureServiceBusPublishSubscribeChannelResourceManager : AbstractAzureServiceBusChannelResourceManager
     {
         public AzureServiceBusPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<PublishSubscribeChannelStatistics> Get(PublishSubscribeChannelResource channel)
+        public override async Task<Statistic> Get(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 
@@ -20,7 +20,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var info = await client.GetTopicRuntimeInfoAsync(channel.Path).ConfigureAwait(false);
 
-                var statistics = new PublishSubscribeChannelStatistics(channel.Path);
+                var statistics = new Statistic(channel.Path);
 
                 statistics.Properties.Add("DeadLetterMessageCount", info.MessageCountDetails.DeadLetterMessageCount.ToString());
 
@@ -36,7 +36,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return null;
         }
 
-        public override async Task<bool> DeleteIfExist(PublishSubscribeChannelResource channel)
+        public override async Task<bool> DeleteIfExist(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 
@@ -50,7 +50,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> CreateIfNotExist(PublishSubscribeChannelResource channel)
+        public override async Task<bool> CreateIfNotExist(Resource channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 

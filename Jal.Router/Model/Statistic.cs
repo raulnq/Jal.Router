@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
-    public class SubscriptionToPublishSubscribeChannelStatistics
+    public class Statistic
     {
-        public SubscriptionToPublishSubscribeChannelStatistics(string subscription, string path)
+        public Statistic(string path, string subscription = null)
         {
             Subscription = subscription;
             Path = path;

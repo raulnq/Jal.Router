@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Jal.ChainOfResponsability;
-using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Interface
@@ -17,9 +16,9 @@ namespace Jal.Router.Interface
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
         IList<MonitorTask> MonitoringTaskTypes { get; }
-        Type PublishSubscribeChannelResourceType { get; }
-        Type PointToPointChannelResourceType { get; }
-        Type SubscriptionToPublishSubscribeChannelResourceType { get; }
+        Type PublishSubscribeResourceType { get; }
+        Type PointToPointResourceType { get; }
+        Type SubscriptionToPublishSubscribeResourceType { get; }
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
@@ -46,11 +45,11 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UsePointToPointChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PointToPointChannelResource, PointToPointChannelStatistics>;
+        IConfiguration UsePointToPointResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
 
-        IConfiguration UsePublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<PublishSubscribeChannelResource, PublishSubscribeChannelStatistics>;
+        IConfiguration UsePublishSubscribeResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
 
-        IConfiguration UseSubscriptionToPublishSubscribeChannelResourceManager<TChannel>() where TChannel : IChannelResourceManager<SubscriptionToPublishSubscribeChannelResource, SubscriptionToPublishSubscribeChannelStatistics>;
+        IConfiguration UseSubscriptionToPublishSubscribeResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
 
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;

@@ -1,8 +1,8 @@
 ﻿namespace Jal.Router.Model
 {
-    public class SubscriptionToPublishSubscribeChannelResourceRule
+    public class Rule
     {
-        public SubscriptionToPublishSubscribeChannelResourceRule(string filter, string name, bool isdefault)
+        public Rule(string filter, string name, bool isdefault)
         {
             Filter = filter;
             Name = name;
