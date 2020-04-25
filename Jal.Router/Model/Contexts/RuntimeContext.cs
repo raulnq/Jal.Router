@@ -19,6 +19,8 @@ namespace Jal.Router.Model
 
         public List<Resource> Resources { get; }
 
+        public List<ResourceContext> ResourceContexts { get; }
+
         public RuntimeContext()
         {
             ListenerContexts = new List<ListenerContext>();
@@ -34,6 +36,8 @@ namespace Jal.Router.Model
             Resources = new List<Resource>();
 
             Partitions = new List<Partition>();
+
+            ResourceContexts = new List<ResourceContext>();
         }
     }
 }

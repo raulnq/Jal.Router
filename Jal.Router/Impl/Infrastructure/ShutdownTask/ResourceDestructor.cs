@@ -24,26 +24,24 @@ namespace Jal.Router.Impl
 
             _logger.Log("Deleting resources");
 
-            foreach (var resource in _factory.Configuration.Runtime.Resources)
+            foreach (var context in _factory.Configuration.Runtime.ResourceContexts)
             {
                 try
                 {
-                    var manager = _factory.CreateResourceManager(resource.ChannelType);
-
-                    var deleted = await manager.DeleteIfExist(resource).ConfigureAwait(false);
+                    var deleted = await context.DeleteIfExist().ConfigureAwait(false);
 
                     if (deleted)
                     {
-                        _logger.Log($"Deleted {resource.FullPath} {resource.ToString()} resource");
+                        _logger.Log($"Deleted {context.Resource.FullPath} {context.Resource.ToString()} resource");
                     }
                     else
                     {
-                        _logger.Log($"The {resource.ToString()} resource {resource.FullPath} does not exist");
+                        _logger.Log($"The {context.Resource.ToString()} resource {context.Resource.FullPath} does not exist");
                     }
                 }
                 catch (Exception ex)
                 {
-                    var error = $"Exception {resource.FullPath} {resource.ToString()} resource: {ex}";
+                    var error = $"Exception {context.Resource.FullPath} {context.Resource.ToString()} resource: {ex}";
 
                     errors.AppendLine(error);
 

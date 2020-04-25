@@ -49,6 +49,14 @@ namespace Jal.Router.Model
             return string.Empty;
         }
 
+        public string Id
+        {
+            get
+            {
+                return Path + Subscription + ConnectionString;
+            }
+        }
+
         public string FullPath
         {
             get

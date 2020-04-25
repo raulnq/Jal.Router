@@ -1,7 +1,6 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
