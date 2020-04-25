@@ -143,36 +143,36 @@ namespace Jal.Router.Tests
 
             endpoint.SetOrigin(new Origin());
 
-            endpoint.Channels.Add(new Channel(channel, null, null, null));
+            endpoint.Channels.Add(new Channel(channel, null, null, null, null));
 
             endpointprovidermock.Setup(x => x.Provide(It.IsAny<Options>(), It.IsAny<Type>())).Returns(endpoint);
 
             return endpointprovidermock;
         }
 
-        public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription")
+        public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription", Type adapter = null, Type type = null)
         {
-            return new Channel(channeltype, connectionstring, path, subscription);
+            return new Channel(channeltype, connectionstring, path, subscription, adapter, type);
         }
 
-        public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null )
+        public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null, IMessageAdapter adapter = null)
         {
             if(channel==null)
             {
                 channel = CreateChannel();
             }
 
-            return new SenderContext(channel, senderchannel, readerchannel);
+            return new SenderContext(channel, senderchannel, readerchannel, adapter);
         }
 
-        public static ListenerContext CreateListenerContext(Channel channel = null, IListenerChannel listenerchannel = null, Partition partition= null)
+        public static ListenerContext CreateListenerContext(Channel channel = null, IListenerChannel listenerchannel = null, Partition partition= null, IMessageAdapter adapter=null)
         {
             if (channel == null)
             {
                 channel = CreateChannel();
             }
 
-            return new ListenerContext(channel, listenerchannel, partition);
+            return new ListenerContext(channel, listenerchannel, adapter, partition);
         }
 
         public static Mock<IComponentFactoryFacade> CreateFactoryMock()
@@ -185,7 +185,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
 
-            factorymock.Setup(x => x.CreateMessageAdapter()).Returns(new NullMessageAdapter());
+            factorymock.Setup(x => x.CreateMessageAdapter(It.IsAny<Type>())).Returns(new NullMessageAdapter());
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

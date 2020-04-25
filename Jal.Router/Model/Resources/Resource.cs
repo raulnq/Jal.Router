@@ -1,10 +1,8 @@
-﻿using Jal.Router.Interface;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
-    public abstract class ChannelResource
+    public abstract class Resource
     {
         public string Path { get; }
 
@@ -12,7 +10,7 @@ namespace Jal.Router.Model
 
         public Dictionary<string, string> Properties { get; }
 
-        protected ChannelResource(string path, string connectionstring, Dictionary<string, string> properties)
+        protected Resource(string path, string connectionstring, Dictionary<string, string> properties)
         {
             Path = path;
 

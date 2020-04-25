@@ -5,7 +5,7 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IPartitionForChannelBuilder
     {
-        IPartitionUntilBuilder ForPointToPointChannel(string path, string connectionstringprovider);
-        IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring);
+        IPartitionUntilBuilder ForPointToPointChannel(string path, string connectionstringprovider, Type adapter=null, Type type = null);
+        IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter = null, Type type = null);
     }
 }

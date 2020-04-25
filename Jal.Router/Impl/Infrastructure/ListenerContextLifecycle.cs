@@ -27,11 +27,13 @@ namespace Jal.Router.Impl
 
         public ListenerContext Add(Channel channel)
         {
-            var listenerchannel = _factory.CreateListenerChannel(channel.Type);
+            var listenerchannel = _factory.CreateListenerChannel(channel.ChannelType, channel.Type);
+
+            var adapter = _factory.CreateMessageAdapter(channel.AdapterType);
 
             var partition = _factory.Configuration.Runtime.Partitions.FirstOrDefault(x => x.Channel.Id == channel.Id);
 
-            var listenercontext = new ListenerContext(channel, listenerchannel, partition);
+            var listenercontext = new ListenerContext(channel, listenerchannel, adapter,  partition);
 
             _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
 

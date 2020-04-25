@@ -40,7 +40,7 @@ namespace Jal.Router.Tests
 
         public static void CreateMessageAdapterWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
-            factorymock.Verify(x => x.CreateMessageAdapter(), Times.Once());
+            factorymock.Verify(x => x.CreateMessageAdapter(It.IsAny<Type>()), Times.Once());
         }
 
         public static void WasExecuted(this Mock<ISenderChannel> sendermock)

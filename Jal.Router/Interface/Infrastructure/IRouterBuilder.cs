@@ -35,7 +35,7 @@ namespace Jal.Router.Interface
 
         IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
             where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource: ChannelResource;
+            where TResource: Resource;
 
         IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher;
 

@@ -1,4 +1,6 @@
-﻿namespace Jal.Router.Fluent.Interface
+﻿using System;
+
+namespace Jal.Router.Fluent.Interface
 {
     public interface IToReplyChannelBuilder
     {

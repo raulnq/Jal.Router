@@ -51,8 +51,6 @@ namespace Jal.Router.Impl
 
         public void Listen(ListenerContext listenercontext)
         {
-            var adapter = Factory.CreateMessageAdapter();
-
             _watcher.Created += async (object sender, FileSystemEventArgs e) =>
             {
                 if(e.FullPath.Contains(".jal"))
@@ -61,7 +59,7 @@ namespace Jal.Router.Impl
 
                     var message = _transport.ReadFile(e.FullPath);
 
-                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -71,7 +69,7 @@ namespace Jal.Router.Impl
 
                         foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
                         {
-                            handlers.Add(runtimehandler(message, listenercontext.Channel));
+                            handlers.Add(runtimehandler(message, listenercontext.Channel, listenercontext.MessageAdapter));
                         }
 
                         await Task.WhenAll(handlers.ToArray());

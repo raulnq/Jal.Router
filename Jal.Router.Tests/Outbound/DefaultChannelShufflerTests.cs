@@ -21,9 +21,9 @@ namespace Jal.Router.Tests
 
             channels.Length.ShouldBe(2);
 
-            channels[0].Type.ShouldBe(ChannelType.PointToPoint);
+            channels[0].ChannelType.ShouldBe(ChannelType.PointToPoint);
 
-            channels[1].Type.ShouldBe(ChannelType.PublishSubscribe);
+            channels[1].ChannelType.ShouldBe(ChannelType.PublishSubscribe);
         }
     }
 }

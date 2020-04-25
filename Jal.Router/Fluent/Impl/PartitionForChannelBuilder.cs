@@ -14,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
             _partition = partition;
         }
 
-        public IPartitionUntilBuilder ForPointToPointChannel(string path, string connectionstring)
+        public IPartitionUntilBuilder ForPointToPointChannel(string path, string connectionstring, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -26,12 +26,23 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            _partition.UpdateChannel(new Channel(ChannelType.PointToPoint, connectionstring, path));
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPointToPointChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+
+            _partition.UpdateChannel(new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type));
 
             return this;
         }
 
-        public IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring)
+        public IPartitionUntilBuilder ForSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -45,8 +56,16 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
 
-            _partition.UpdateChannel(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription));
+            _partition.UpdateChannel(new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type));
 
             return this;
         }

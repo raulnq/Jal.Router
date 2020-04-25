@@ -27,10 +27,6 @@ namespace Jal.Router.Impl
 
             try
             {
-                var adapter = _factory.CreateMessageAdapter();
-
-                var message = await adapter.WritePhysicalMessage(context).ConfigureAwait(false);
-
                 var sendercontext = _lifecycle.Get(context.Channel);
 
                 if (sendercontext == null)
@@ -43,6 +39,8 @@ namespace Jal.Router.Impl
                     }
                 }
 
+                var message = await sendercontext.MessageAdapter.WritePhysicalMessage(context).ConfigureAwait(false);
+
                 id = await sendercontext.Send(message).ConfigureAwait(false);
 
                 if (sendercontext.ReaderChannel != null)
@@ -51,7 +49,7 @@ namespace Jal.Router.Impl
 
                     try
                     {
-                        outputcontext = await sendercontext.Read(context, adapter).ConfigureAwait(false);
+                        outputcontext = await sendercontext.Read(context).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

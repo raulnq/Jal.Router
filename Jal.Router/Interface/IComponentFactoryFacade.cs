@@ -25,13 +25,9 @@ namespace Jal.Router.Interface
 
         IMessageSerializer CreateMessageSerializer();
 
-        IMessageAdapter CreateMessageAdapter();
+        IMessageAdapter CreateMessageAdapter(Type type);
 
-        IPublishSubscribeChannel CreatePublishSubscribeChannel();
-
-        IPointToPointChannel CreatePointToPointChannel();
-
-        ISenderChannel CreateSenderChannel(ChannelType channel);
+        (ISenderChannel, IReaderChannel) CreateSenderChannel(ChannelType channel, Type type);
 
         IMessageStorage CreateMessageStorage();
 
@@ -53,11 +49,7 @@ namespace Jal.Router.Interface
 
         IStartupTask CreateStartupTask(Type type);
 
-        IRequestReplyChannelFromPointToPointChannel CreateRequestReplyChannelFromPointToPointChannel();
-
-        IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
-
-        IListenerChannel CreateListenerChannel(ChannelType channel);
+        IListenerChannel CreateListenerChannel(ChannelType channel, Type type);
 
         IShutdownTask CreateShutdownTask(Type type);
 

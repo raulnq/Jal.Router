@@ -64,13 +64,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var sessionoptions = CreateSessionOptions(listenercontext);
 
-            var adapter = Factory.CreateMessageAdapter();
-
             if (listenercontext.Partition != null)
             {
                 _client.RegisterSessionHandler(async (ms, message, token) => {
 
-                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -82,7 +80,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel, listenercontext.MessageAdapter));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
@@ -109,7 +107,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _client.RegisterMessageHandler(async (message, token) =>
                 {
-                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
@@ -121,7 +119,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                         {
                             var clone = message.Clone();
 
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
+                            handlers.Add(runtimehandler(clone, listenercontext.Channel, listenercontext.MessageAdapter));
                         }
 
                         await Task.WhenAll(handlers.ToArray());
