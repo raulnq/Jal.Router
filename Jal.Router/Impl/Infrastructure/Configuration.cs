@@ -247,6 +247,7 @@ namespace Jal.Router.Impl
             AddStartupTask<EndpointValidator>();
             AddStartupTask<RouteValidator>();
             AddStartupTask<ResourceValidator>();
+            AddStartupTask<ResourceLoader>();
             AddStartupTask<ResourceCreator>();
             AddStartupTask<SenderLoader>();
             AddStartupTask<ListenerLoader>();

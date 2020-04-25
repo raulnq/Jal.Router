@@ -41,6 +41,8 @@ namespace Jal.Router.Installer
 
             container.Register(Component.For<ISenderContextLifecycle>().ImplementedBy<SenderContextLifecycle>().LifestyleSingleton());
 
+            container.Register(Component.For<IResourceContextLifecycle>().ImplementedBy<ResourceContextLifecycle>().LifestyleSingleton());
+
             container.Register(Component.For<ISenderContextLoader>().ImplementedBy<SenderContextLoader>().LifestyleSingleton());
 
             container.Register(Component.For<ILogger>().ImplementedBy<Impl.ConsoleLogger>().LifestyleSingleton());

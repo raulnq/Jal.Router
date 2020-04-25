@@ -8,20 +8,12 @@ namespace Jal.Router.Impl
     {
         private readonly IComponentFactory _factory;
 
-        private readonly IConfiguration _configuration;
-
-        public IConfiguration Configuration
-        {
-            get
-            {
-                return _configuration;
-            }
-        }
+        public IConfiguration Configuration { get; }
 
         public ComponentFactoryFacade(IComponentFactory factory, IConfiguration configuration)
         {
             _factory = factory;
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public IResourceManager CreateResourceManager(ChannelType channel)
@@ -46,37 +38,37 @@ namespace Jal.Router.Impl
 
         private IResourceManager CreatePointToPointChannelResourceManager()
         {
-            return _factory.Create<IResourceManager>(_configuration.PointToPointResourceType);
+            return _factory.Create<IResourceManager>(Configuration.PointToPointResourceType);
         }
 
         private IResourceManager CreatePublishSubscribeChannelResourceManager()
         {
-            return _factory.Create<IResourceManager>(_configuration.PublishSubscribeResourceType);
+            return _factory.Create<IResourceManager>(Configuration.PublishSubscribeResourceType);
         }
 
         private IResourceManager CreateSubscriptionToPublishSubscribeChannelResourceManager()
         {
-            return _factory.Create<IResourceManager>(_configuration.SubscriptionToPublishSubscribeResourceType);
+            return _factory.Create<IResourceManager>(Configuration.SubscriptionToPublishSubscribeResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()
         {
-            return _factory.Create<IBusInterceptor>(_configuration.BusInterceptorType);
+            return _factory.Create<IBusInterceptor>(Configuration.BusInterceptorType);
         }
 
         public IRouterInterceptor CreateRouterInterceptor()
         {
-            return _factory.Create<IRouterInterceptor>(_configuration.RouterInterceptorType);
+            return _factory.Create<IRouterInterceptor>(Configuration.RouterInterceptorType);
         }
 
         public IMessageSerializer CreateMessageSerializer()
         {
-            return _factory.Create<IMessageSerializer>(_configuration.MessageSerializerType);
+            return _factory.Create<IMessageSerializer>(Configuration.MessageSerializerType);
         }
 
         public IChannelShuffler CreateChannelShuffler()
         {
-            return _factory.Create<IChannelShuffler>(_configuration.ChannelShufflerType);
+            return _factory.Create<IChannelShuffler>(Configuration.ChannelShufflerType);
         }
 
         public IMessageAdapter CreateMessageAdapter(Type type)
@@ -87,7 +79,7 @@ namespace Jal.Router.Impl
             }
             else
             {
-                return _factory.Create<IMessageAdapter>(_configuration.MessageAdapterType);
+                return _factory.Create<IMessageAdapter>(Configuration.MessageAdapterType);
             }
         }
 
@@ -95,7 +87,7 @@ namespace Jal.Router.Impl
         {
             if(type==null)
             {
-                return _factory.Create<IPointToPointChannel>(_configuration.PointToPointChannelType);
+                return _factory.Create<IPointToPointChannel>(Configuration.PointToPointChannelType);
             }
             else
             {
@@ -107,7 +99,7 @@ namespace Jal.Router.Impl
         {
             if (type == null)
             {
-                return _factory.Create<IPublishSubscribeChannel>(_configuration.PublishSubscribeChannelType);
+                return _factory.Create<IPublishSubscribeChannel>(Configuration.PublishSubscribeChannelType);
             }
             else
             {
@@ -119,7 +111,7 @@ namespace Jal.Router.Impl
         {
             if (type == null)
             {
-                return _factory.Create<IRequestReplyChannelFromPointToPointChannel>(_configuration.RequestReplyChannelFromPointToPointChannelType);
+                return _factory.Create<IRequestReplyChannelFromPointToPointChannel>(Configuration.RequestReplyChannelFromPointToPointChannelType);
             }
             else
             {
@@ -131,7 +123,7 @@ namespace Jal.Router.Impl
         {
             if (type == null)
             {
-                return _factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(_configuration.RequestReplyFromSubscriptionToPublishSubscribeChannelType);
+                return _factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(Configuration.RequestReplyFromSubscriptionToPublishSubscribeChannelType);
             }
             else
             {
@@ -141,12 +133,12 @@ namespace Jal.Router.Impl
 
         public IMessageStorage CreateMessageStorage()
         {
-            return _factory.Create<IMessageStorage>(_configuration.MessageStorageType);
+            return _factory.Create<IMessageStorage>(Configuration.MessageStorageType);
         }
 
         public IEntityStorage CreateEntityStorage()
         {
-            return _factory.Create<IEntityStorage>(_configuration.StorageType);
+            return _factory.Create<IEntityStorage>(Configuration.StorageType);
         }
 
         public IStartupTask CreateStartupTask(Type type)

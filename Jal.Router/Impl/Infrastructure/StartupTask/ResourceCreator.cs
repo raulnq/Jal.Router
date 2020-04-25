@@ -19,26 +19,24 @@ namespace Jal.Router.Impl
 
             Logger.Log("Creating resources");
 
-            foreach (var resource in Factory.Configuration.Runtime.Resources)
+            foreach (var context in Factory.Configuration.Runtime.ResourceContexts)
             {
                 try
                 {
-                    var manager = Factory.CreateResourceManager(resource.ChannelType);
-
-                    var created = await manager.CreateIfNotExist(resource).ConfigureAwait(false);
+                    var created = await context.CreateIfNotExist().ConfigureAwait(false);
 
                     if (created)
                     {
-                        Logger.Log($"Created {resource.FullPath} {resource.ToString()} resource");
+                        Logger.Log($"Created {context.Resource.FullPath} {context.Resource.ToString()} resource");
                     }
                     else
                     {
-                        Logger.Log($"The {resource.ToString()} resource {resource.FullPath} already exists");
+                        Logger.Log($"The {context.Resource.ToString()} resource {context.Resource.FullPath} already exists");
                     }
                 }
                 catch (Exception ex)
                 {
-                    var error = $"Exception {resource.FullPath} {resource.ToString()} resource: {ex}";
+                    var error = $"Exception {context.Resource.FullPath} {context.Resource.ToString()} resource: {ex}";
 
                     errors.AppendLine(error);
 

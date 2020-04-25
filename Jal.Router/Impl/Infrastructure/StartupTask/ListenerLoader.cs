@@ -1,9 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
+
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
         private readonly IListenerContextLifecycle _lifecycle;

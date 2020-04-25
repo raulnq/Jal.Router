@@ -40,6 +40,8 @@ namespace Jal.Router.Impl
 
             AddShutdownTask<ListenerShutdownTask>();
 
+            AddStartupTask<ResourceLoader>();
+
             AddStartupTask<ResourceValidator>();
 
             AddStartupTask<StartupBeatLogger>();
