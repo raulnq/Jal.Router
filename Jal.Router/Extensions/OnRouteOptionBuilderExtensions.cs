@@ -10,14 +10,14 @@ namespace Jal.Router.Extensions
 {
     public static class OnRouteOptionBuilderExtensions
     {
-        public static void ForwardMessageTo(this IOnRouteEntryBuilder builder, string endpoint)
+        public static void ForwardMessageTo<TContent>(this IOnRouteEntryBuilder builder, string endpoint)
         {
             if (string.IsNullOrWhiteSpace(endpoint))
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            builder.Use<ForwardRouteEntryMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint } });
+            builder.Use<ForwardRouteEntryMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint }, { "type", typeof(TContent) } });
         }
 
         public static void Execute(this IOnRouteEntryBuilder builder, Func<MessageContext, Handler, Task> init)
@@ -30,17 +30,17 @@ namespace Jal.Router.Extensions
             builder.Use<RouteEntryMessageHandler>(new Dictionary<string, object>() { { "init", init } });
         }
 
-        public static IForExceptionBuilder ForwardMessageTo(this IOnRouteErrorBuilder builder, string endpoint)
+        public static IForExceptionBuilder ForwardMessageTo<TContent>(this IOnRouteErrorBuilder builder, string endpoint)
         {
             if (string.IsNullOrWhiteSpace(endpoint))
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            return builder.Use<ForwardRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint } });
+            return builder.Use<ForwardRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint }, { "type", typeof(TContent) } });
         }
 
-        public static IForExceptionBuilder RetryMessageTo(this IOnRouteErrorBuilder builder, string endpoint, IRetryPolicy policy, Func<MessageContext, Exception, ErrorHandler, Task> fallback=null)
+        public static IForExceptionBuilder RetryMessageTo<TContent>(this IOnRouteErrorBuilder builder, string endpoint, IRetryPolicy policy, Func<MessageContext, Exception, ErrorHandler, Task> fallback=null)
         {
             if (string.IsNullOrWhiteSpace(endpoint))
             {
@@ -52,7 +52,7 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(nameof(policy));
             }
 
-            return builder.Use<RetryRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint }, { "policy", policy }, { "fallback", fallback } });
+            return builder.Use<RetryRouteErrorMessageHandler>(new Dictionary<string, object>() { { "endpoint", endpoint }, { "policy", policy }, { "fallback", fallback }, { "type", typeof(TContent) } });
         }
     }
 }

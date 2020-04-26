@@ -24,7 +24,7 @@ namespace Jal.Router.Tests
 
             var messagecontext = Builder.CreateMessageContext();
 
-            messagecontext.Route.MiddlewareTypes.Add(typeof(string));
+            messagecontext.Route.Middlewares.Add(typeof(string));
 
             var sut = new ProducerMiddleware(producermock.Object, factorymock.Object);
 

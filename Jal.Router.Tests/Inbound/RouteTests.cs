@@ -29,7 +29,7 @@ namespace Jal.Router.Tests
 
             var messagecontext = Builder.CreateMessageContext();
 
-            messagecontext.Route.MiddlewareTypes.Add(typeof(string));
+            messagecontext.Route.Middlewares.Add(typeof(string));
 
             var factory = factorymock.Object;
 
@@ -37,7 +37,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory, pipelinemock.Object);
 
-            await sut.Route<NullMiddleware>(messagecontext);
+            await sut.Route(messagecontext);
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
@@ -51,11 +51,11 @@ namespace Jal.Router.Tests
 
             var messagecontext = Builder.CreateMessageContext();
 
-            messagecontext.Route.UpdateWhen(x => false);
+            messagecontext.Route.When(x => false);
 
             var sut = Build(factorymock.Object, pipelinemock.Object);
 
-            await sut.Route<NullMiddleware>(messagecontext);
+            await sut.Route(messagecontext);
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Never());
         }
@@ -71,7 +71,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object, pipelinemock.Object);
 
-            await Should.ThrowAsync<Exception>(sut.Route<NullMiddleware>(messagecontext));
+            await Should.ThrowAsync<Exception>(sut.Route(messagecontext));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }

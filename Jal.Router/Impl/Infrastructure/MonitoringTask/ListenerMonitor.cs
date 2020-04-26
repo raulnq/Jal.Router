@@ -21,12 +21,12 @@ namespace Jal.Router.Impl
                 {
                     if(await listenercontext.Close().ConfigureAwait(false))
                     {
-                        Logger.Log($"Shutdown {listenercontext.Id}");
+                        Logger.Log($"Shutdown {listenercontext.ToString()}");
                     }
 
                     if(listenercontext.Open())
                     {
-                        Logger.Log($"Listening {listenercontext.Id}");
+                        Logger.Log($"Listening {listenercontext.ToString()}");
                     }
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -22,15 +23,17 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock();
 
+            var lifecyclemock = new Mock<ISenderContextLifecycle>();
+
             var messagecontext = Builder.CreateMessageContext();
 
-            messagecontext.Route.MiddlewareTypes.Add(typeof(string));
+            messagecontext.Route.Middlewares.Add(typeof(string));
 
             var factory = factorymock.Object;
 
             factory.Configuration.OutboundMiddlewareTypes.Add(typeof(string));
 
-            var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object));
+            var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
 
             await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
 
@@ -48,7 +51,9 @@ namespace Jal.Router.Tests
 
             var endpointprovidermock = Builder.CreateEnpointProvider();
 
-            var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object));
+            var lifecyclemock = new Mock<ISenderContextLifecycle>();
+
+            var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
 
             await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
 

@@ -11,9 +11,9 @@ namespace Jal.Router.Tests
     [TestClass]
     public class ProducerTests
     {
-        private Producer Build(IComponentFactoryFacade factory, ISenderContextLifecycle lifecycle)
+        private Producer Build(ISenderContextLifecycle lifecycle)
         {
-            return new Producer(factory, new NullLogger(), lifecycle);
+            return new Producer(new NullLogger(), lifecycle);
         }
 
         [TestMethod]
@@ -29,11 +29,9 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            messagecontext.SetChannel(Builder.CreateChannel());
+            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(new SenderContext(new EndPoint("name"), Builder.CreateChannel(), senderchannelmock.Object, null, factory.CreateMessageAdapter(It.IsAny<Type>()), factory.CreateMessageSerializer(), factory.CreateMessageStorage()));
 
-            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(new SenderContext(Builder.CreateChannel(), senderchannelmock.Object, null, factory.CreateMessageAdapter(It.IsAny<Type>())));
-
-            var sut = Build(factory, lifecyclemock.Object);
+            var sut = Build(lifecyclemock.Object);
 
             await sut.Produce(messagecontext);
 

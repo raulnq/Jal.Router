@@ -21,7 +21,7 @@ namespace Jal.Router.Impl
             {
                 if (await listenercontext.Close().ConfigureAwait(false))
                 {
-                    _logger.Log($"Shutdown {listenercontext.Id}");
+                    _logger.Log($"Shutdown {listenercontext.ToString()}");
                 }
             }
         }

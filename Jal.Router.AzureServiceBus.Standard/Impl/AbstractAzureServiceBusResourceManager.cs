@@ -3,7 +3,7 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public abstract class AbstractAzureServiceBusChannelResourceManager : AbstractResourceManager
+    public abstract class AbstractAzureServiceBusResourceManager : AbstractResourceManager
     {
         public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
 
@@ -19,7 +19,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         protected readonly IComponentFactoryFacade _factory;
 
-        public AbstractAzureServiceBusChannelResourceManager(IComponentFactoryFacade factory)
+        public AbstractAzureServiceBusResourceManager(IComponentFactoryFacade factory)
         {
             _factory = factory;
         }

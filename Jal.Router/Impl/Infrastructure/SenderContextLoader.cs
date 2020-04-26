@@ -25,15 +25,13 @@ namespace Jal.Router.Impl
 
                 if (sendercontext == null)
                 {
-                    sendercontext = _lifecycle.Add(channel);
+                    sendercontext = _lifecycle.Add(endpoint, channel);
 
                     if (sendercontext.Open())
                     {
-                        _logger.Log($"Opening {sendercontext.Id}");
+                        _logger.Log($"Opening {sendercontext.ToString()}");
                     }
                 }
-
-                sendercontext.Endpoints.Add(endpoint);
             }
         }
 
@@ -47,7 +45,7 @@ namespace Jal.Router.Impl
                 {
                     if (await sendercontext.Close().ConfigureAwait(false))
                     {
-                        _logger.Log($"Shutdown {sendercontext.Id}");
+                        _logger.Log($"Shutdown {sendercontext.ToString()}");
                     }
                 }
             }

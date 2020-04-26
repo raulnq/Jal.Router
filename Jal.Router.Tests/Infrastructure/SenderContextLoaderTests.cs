@@ -15,7 +15,7 @@ namespace Jal.Router.Tests
         {
             var creatormock = new Mock<ISenderContextLifecycle>();
 
-            creatormock.Setup(x => x.Add(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+            creatormock.Setup(x => x.Add(It.IsAny<EndPoint>(), It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
 
             var sut = new SenderContextLoader(creatormock.Object, new NullLogger());
 
@@ -27,7 +27,7 @@ namespace Jal.Router.Tests
 
             sut.Add(endpoint);
 
-            creatormock.Verify(x => x.Add(It.IsAny<Channel>()), Times.Once);
+            creatormock.Verify(x => x.Add(It.IsAny<EndPoint>(), It.IsAny<Channel>()), Times.Once);
 
             creatormock.Verify(x => x.Get(It.IsAny<Channel>()), Times.Once);
         }

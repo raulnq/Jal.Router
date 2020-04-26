@@ -16,7 +16,7 @@ namespace Jal.Router.Tests
     {
         private RetryRouteErrorMessageHandler Build(IComponentFactoryFacade factory)
         {
-            return new RetryRouteErrorMessageHandler(factory, new NullLogger());
+            return new RetryRouteErrorMessageHandler(new NullLogger());
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object } }, true));
+            var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object }, { "type", typeof(object) } }, true));
 
             factorymock.CreateMessageSerializerWasExecuted();
 
@@ -142,7 +142,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object }, { "fallback", fallback } }, true));
+            var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object }, { "fallback", fallback }, { "type", typeof(object) } }, true));
 
             factorymock.CreateMessageSerializerWasNotExecuted();
 

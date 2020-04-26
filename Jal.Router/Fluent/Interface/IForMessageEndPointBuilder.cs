@@ -1,6 +1,6 @@
 namespace Jal.Router.Fluent.Interface
 {
-    public interface INameEndPointBuilder
+    public interface IForMessageEndPointBuilder
     {
         IToEndPointBuilder ForMessage<TMessage>();
     }

@@ -28,9 +28,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (message != null)
             {
-                outputcontext = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, context.EndPoint.ReplyContentType, context.EndPoint.UseClaimCheck).ConfigureAwait(false);
-
-                outputcontext.SetEndPoint(context.EndPoint);
+                outputcontext = await adapter.ReadFromPhysicalMessage(message, sendercontext).ConfigureAwait(false);
 
                 await messagesession.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
             }

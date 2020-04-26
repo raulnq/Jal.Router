@@ -3,7 +3,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IOutboundMiddlewareBuilder
+    public interface IEndpointMiddlewareBuilder
     {
         void Add<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
     }

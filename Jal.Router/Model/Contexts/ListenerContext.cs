@@ -1,6 +1,4 @@
 using Jal.Router.Interface;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Model
@@ -9,23 +7,52 @@ namespace Jal.Router.Model
     {
         public Channel Channel { get; private set; }
 
-        public Partition Partition { get; private set; }
-
         public IListenerChannel ListenerChannel { get; private set; }
 
         public IMessageAdapter MessageAdapter { get; private set; }
 
-        public List<Route> Routes { get; private set; }
+        public IMessageSerializer MessageSerializer { get; private set; }
 
-        public ListenerContext(Channel channel, IListenerChannel listener, IMessageAdapter adapter, Partition partition)
+        public IMessageStorage MessageStorage { get; private set; }
+
+        public IRouter Router { get; private set; }
+
+        public Route Route { get; private set; }
+
+        public ListenerContext(Route route, Channel channel, IListenerChannel listener, IMessageAdapter adapter, IRouter router, IMessageSerializer serializer, IMessageStorage storage)
         {
             Channel = channel;
-            Routes = new List<Route>();
-            Partition = partition;
+            Route = route;
             ListenerChannel = listener;
             MessageAdapter = adapter;
+            Router = router;
+            MessageSerializer = serializer;
+            MessageStorage = storage;
         }
 
+        public Task Consume(MessageContext context)
+        {
+            var when = true;
+
+            if(Channel.Condition!=null)
+            {
+                when = Channel.Condition(context);
+            }
+
+            if(when)
+            {
+                return Router.Route(context);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public Task<MessageContext> Read(object message)
+        {
+            return MessageAdapter.ReadFromPhysicalMessage(message, this);
+        }
         public async Task<bool> Close()
         {
             if (ListenerChannel != null)
@@ -62,12 +89,9 @@ namespace Jal.Router.Model
             return false;
         }
 
-        public string Id
+        public override string ToString()
         {
-            get
-            {
-                return $"{Partition?.ToString()} {Channel.FullPath} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
-            }
+            return $"{Channel.FullPath} {Channel.ToString()} channel: {Route.ToString()} partition: {Channel.Partition}";
         }
     }
 }

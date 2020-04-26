@@ -33,7 +33,7 @@ namespace Jal.Router.Impl
             {
                 if (listenercontext.Open())
                 {
-                    Logger.Log($"Listening {listenercontext.Id}");
+                    Logger.Log($"Listening {listenercontext.ToString()}");
                 }
             }
         }
@@ -44,9 +44,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in route.Channels)
                 {
-                    var listenercontext = _lifecycle.AddOrGet(channel);
-
-                    listenercontext.Routes.Add(route);
+                    _lifecycle.Add(route, channel);
                 }
             }
         }

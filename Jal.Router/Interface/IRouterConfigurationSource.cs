@@ -10,8 +10,6 @@ namespace Jal.Router.Interface
 
         EndPoint[] GetEndPoints();
 
-        Partition[] GetPartitions();
-
         Resource[] GetResources();
     }
 }

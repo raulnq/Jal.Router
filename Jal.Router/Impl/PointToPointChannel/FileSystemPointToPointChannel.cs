@@ -57,22 +57,15 @@ namespace Jal.Router.Impl
                 {
                     Thread.Sleep(500);
 
-                    var message = _transport.ReadFile(e.FullPath);
+                    var message = _transport.ReadFile(e.FullPath, listenercontext.MessageSerializer);
 
-                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = await listenercontext.Read(message).ConfigureAwait(false);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                     try
                     {
-                        var handlers = new List<Task>();
-
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                        {
-                            handlers.Add(runtimehandler(message, listenercontext.Channel, listenercontext.MessageAdapter));
-                        }
-
-                        await Task.WhenAll(handlers.ToArray());
+                        await listenercontext.Consume(context).ConfigureAwait(false);
 
                         _transport.DeleteFile(e.FullPath);
                     }
@@ -102,7 +95,7 @@ namespace Jal.Router.Impl
             _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
         }
 
-        public Task<string> Send(SenderContext sendercontext, object message)
+        public async Task<string> Send(SenderContext sendercontext, object message)
         {
             var m = message as Message;
 
@@ -112,27 +105,22 @@ namespace Jal.Router.Impl
 
                 var handledbymock = false;
 
-                foreach (var endpoint in sendercontext.Endpoints)
+                if (_parameter.Handlers.ContainsKey(sendercontext.EndPoint.Name))
                 {
-                    if (_parameter.Handlers.ContainsKey(endpoint.Name))
-                    {
-                        var serializer = Factory.CreateMessageSerializer();
+                    await _parameter.Handlers[sendercontext.EndPoint.Name](sendercontext.MessageSerializer, m);
 
-                        _parameter.Handlers[endpoint.Name](serializer, m);
-
-                        handledbymock = true;
-                    }
+                    handledbymock = true;
                 }
 
-                if(!handledbymock)
+                if (!handledbymock)
                 {
-                    _transport.CreateFile(_path, filename, m);
+                    _transport.CreateFile(_path, filename, m, sendercontext.MessageSerializer);
                 }
 
-                return Task.FromResult(m.Id);
+                return m.Id;
             }
 
-            return Task.FromResult(string.Empty);
+            return string.Empty;
         }
     }
 }

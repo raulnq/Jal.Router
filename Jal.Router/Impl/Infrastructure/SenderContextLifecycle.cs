@@ -12,26 +12,18 @@ namespace Jal.Router.Impl
         {
             _factory = factory;
         }
-
-        public SenderContext AddOrGet(Channel channel)
-        {
-            var sendercontext = Get(channel);
-
-            if (sendercontext == null)
-            {
-                sendercontext = Add(channel);
-            }
-
-            return sendercontext;
-        }
-
-        public SenderContext Add(Channel channel)
+        
+        public SenderContext Add(EndPoint endpoint, Channel channel)
         {
             var (senderchannel, readerchannel) = _factory.CreateSenderChannel(channel.ChannelType, channel.Type);
 
             var adapter = _factory.CreateMessageAdapter(channel.AdapterType);
 
-            var sendercontext = new SenderContext(channel, senderchannel, readerchannel, adapter);
+            var serializer = _factory.CreateMessageSerializer();
+
+            var storage = _factory.CreateMessageStorage();
+
+            var sendercontext = new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, storage);
 
             _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 

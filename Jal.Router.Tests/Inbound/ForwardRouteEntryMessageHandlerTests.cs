@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     {
         private ForwardRouteEntryMessageHandler Build(IComponentFactoryFacade factory)
         {
-            return new ForwardRouteEntryMessageHandler(factory, new NullLogger());
+            return new ForwardRouteEntryMessageHandler(new NullLogger());
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" } }));
+            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "type", typeof(object) } }));
 
             factorymock.CreateMessageSerializerWasExecuted();
 

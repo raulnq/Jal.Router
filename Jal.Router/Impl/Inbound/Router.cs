@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Jal.ChainOfResponsability;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
@@ -23,7 +22,7 @@ namespace Jal.Router.Impl
 
             _logger = logger;
         }
-        public async Task Route<TMiddleware>(MessageContext context) where TMiddleware : IAsyncMiddleware<MessageContext>
+        public async Task Route(MessageContext context)
         {
             var interceptor = _factory.CreateRouterInterceptor();
 
@@ -31,9 +30,9 @@ namespace Jal.Router.Impl
 
             var when = true;
 
-            if (context.Route.When != null)
+            if (context.Route.Condition != null)
             {
-                when = context.Route.When(context);
+                when = context.Route.Condition(context);
             }
 
             if (when)
@@ -48,12 +47,12 @@ namespace Jal.Router.Impl
                         chain.UseAsync(type);
                     }
 
-                    foreach (var type in context.Route.MiddlewareTypes)
+                    foreach (var type in context.Route.Middlewares)
                     {
                         chain.UseAsync(type);
                     }
 
-                    await chain.UseAsync<TMiddleware>().RunAsync(context).ConfigureAwait(false);
+                    await chain.UseAsync(context.Route.Middleware).RunAsync(context).ConfigureAwait(false);
 
                     interceptor.OnSuccess(context);
                 }
