@@ -35,61 +35,49 @@ namespace Jal.Router.Impl
             Bus = bus;
         }
 
-        private async Task<MessageContext> ReadContent(object message, MessageContext context, Type contenttype, bool useclaimcheck)
+        protected async Task<object> ReadContent(object message, string claimcheckid, bool useclaimcheck, IMessageStorage storage)
         {
             string data;
 
-            if (useclaimcheck && !string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
+            if (useclaimcheck && !string.IsNullOrWhiteSpace(claimcheckid))
             {
-                var storage = Factory.CreateMessageStorage();
-
-                data = await storage.Read(context.ContentContext.ClaimCheckId).ConfigureAwait(false);
+                data = await storage.Read(claimcheckid).ConfigureAwait(false);
             }
             else
             {
                 data = ReadContent(message);
             }
 
-            var contentcontext = new ContentContext(context,  context.ContentContext.ClaimCheckId, useclaimcheck, contenttype, data);
-
-            context.SetContent(contentcontext);
-
-            return context;
+            return data;
         }
 
-        public Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck)
+        public Task<MessageContext> ReadFromPhysicalMessage(object message, ListenerContext listener)
         {
-            var context = ReadMetadataFromPhysicalMessage(message);
+            return Read(message, listener.Route, null, listener.Channel, listener.MessageSerializer, listener.MessageStorage);
 
-            return ReadContent(message, context, contenttype, useclaimcheck);
         }
 
-        public async Task<object> WritePhysicalMessage(MessageContext context)
+        public Task<MessageContext> ReadFromPhysicalMessage(object message, SenderContext sender)
         {
-            if(context.ContentContext.IsClaimCheck)
+            //TODO Bug: Should be the a claim from the reply configuration
+            return Read(message, null, sender.EndPoint, sender.Channel, sender.MessageSerializer, sender.MessageStorage);
+        }
+
+        public async Task<object> WritePhysicalMessage(MessageContext context, SenderContext sender)
+        {
+            if(context.ContentContext.UseClaimCheck)
             {
-                var storage = Factory.CreateMessageStorage();
-
-                await storage.Write(context.ContentContext.ClaimCheckId, context.ContentContext.Data).ConfigureAwait(false);
+                await sender.MessageStorage.Write(context.ContentContext.ClaimCheckId, context.ContentContext.Data).ConfigureAwait(false);
             }
 
-            var serializer = Factory.CreateMessageSerializer();
-
-            var message = Write(context, serializer);
+            var message = Write(context, sender.MessageSerializer);
 
             return message;
         }
 
         protected abstract object Write(MessageContext context, IMessageSerializer serializer);
 
-        public MessageContext ReadMetadataFromPhysicalMessage(object message)
-        {
-            var serializer = Factory.CreateMessageSerializer();
-
-            return ReadMetadata(message, serializer);
-        }
-
-        protected abstract MessageContext ReadMetadata(object message, IMessageSerializer serializer);
+        protected abstract Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage storage);
 
         protected abstract string ReadContent(object message);
     }

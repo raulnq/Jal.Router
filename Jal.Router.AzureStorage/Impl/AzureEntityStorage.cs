@@ -479,11 +479,11 @@ namespace Jal.Router.AzureStorage
             }
             catch(StorageException s)
             {
-                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentContextEntity.Type} and route/endpoint {messageentity.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
+                throw new ApplicationException($"Error during the message record creation with route/endpoint {messageentity.Name}, status code: {s.RequestInformation?.HttpStatusCode} error code: {s.RequestInformation?.ExtendedErrorInformation?.ErrorCode} error message: {s.RequestInformation?.ExtendedErrorInformation?.ErrorMessage}", s);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Error during the message record creation with content {messageentity.ContentContextEntity.Type} and route {messageentity.Name}", ex);
+                throw new ApplicationException($"Error during the message record creation with route/endpoint {messageentity.Name}", ex);
             }
         }
 

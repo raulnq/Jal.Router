@@ -21,16 +21,6 @@ namespace Jal.Router.Impl
 
             var errors = new StringBuilder();
 
-            foreach (var partition in Factory.Configuration.Runtime.Partitions)
-            {
-                var result = _validator.Validate(partition.Channel, "Partition", partition.Name);
-
-                if (!string.IsNullOrWhiteSpace(result))
-                {
-                    errors.AppendLine(result);
-                }
-            }
-
             foreach (var route in Factory.Configuration.Runtime.Routes)
             {
                 if (route.Channels.Any())

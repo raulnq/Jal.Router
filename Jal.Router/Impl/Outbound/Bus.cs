@@ -15,11 +15,17 @@ namespace Jal.Router.Impl
 
         private readonly IPipelineBuilder _pipeline;
 
-        public Bus(IEndPointProvider provider, IComponentFactoryFacade factory, IPipelineBuilder pipeline)
+        private readonly ISenderContextLifecycle _lifecycle;
+
+        private readonly ILogger _logger;
+
+        public Bus(IEndPointProvider provider, IComponentFactoryFacade factory, IPipelineBuilder pipeline, ISenderContextLifecycle lifecycle, ILogger logger)
         {
             _provider = provider;
             _factory = factory;
             _pipeline = pipeline;
+            _lifecycle = lifecycle;
+            _logger = logger;
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
@@ -31,13 +37,9 @@ namespace Jal.Router.Impl
 
         public async Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult: class
         {
-            var serializer = _factory.CreateMessageSerializer();
+            var result = await Dispatch(content, endpoint, origin, options).ConfigureAwait(false);
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
-
-            await Send(message).ConfigureAwait(false);
-
-            return message.ContentContext.Result as TResult;
+            return result as TResult;
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
@@ -71,11 +73,7 @@ namespace Jal.Router.Impl
 
         public Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
-
-            return Send(message);
+            return Dispatch(content, endpoint, origin, options);
         }
 
         public Task Send<TContent>(TContent content, Options options)
@@ -128,11 +126,90 @@ namespace Jal.Router.Impl
 
         public Task Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            var serializer = _factory.CreateMessageSerializer();
+            return Dispatch(content, endpoint, origin, options);
+        }
 
-            var message = new MessageContext(endpoint, options, DateTime.UtcNow, origin, content.GetType(), serializer.Serialize(content));
+        private async Task<object> Dispatch(object content, EndPoint endpoint, Origin origin, Options options)
+        {
+            var interceptor = _factory.CreateBusInterceptor();
 
-            return Send(message);
+            var shuffler = _factory.CreateChannelShuffler();
+
+            if (!endpoint.Channels.Any())
+            {
+                throw new ApplicationException($"Endpoint {endpoint.Name}, missing channels");
+            }
+
+            var channels = shuffler.Shuffle(endpoint.Channels.ToArray());
+
+            var numberofchannels = channels.Length;
+
+            var count = 0;
+
+            foreach (var channel in channels)
+            {
+                count++;
+
+                var sendercontext = _lifecycle.Get(channel);
+
+                if (sendercontext == null)
+                {
+                    sendercontext = _lifecycle.Add(endpoint, channel);
+
+                    if (sendercontext.Open())
+                    {
+                        _logger.Log($"Opening {sendercontext.ToString()}");
+                    }
+                }
+
+                var message = new MessageContext(endpoint, channel, sendercontext.MessageSerializer, options, DateTime.UtcNow, origin, content);
+
+                interceptor.OnEntry(message);
+
+                try
+                {
+                    await Update(message).ConfigureAwait(false);
+
+                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
+
+                    foreach (var type in _factory.Configuration.OutboundMiddlewareTypes)
+                    {
+                        chain.UseAsync(type);
+                    }
+
+                    foreach (var type in message.EndPoint.MiddlewareTypes)
+                    {
+                        chain.UseAsync(type);
+                    }
+
+                    await chain.UseAsync<ProducerMiddleware>().RunAsync(message).ConfigureAwait(false);
+
+                    interceptor.OnSuccess(message);
+
+                    return message.ContentContext.Result;
+                }
+                catch (Exception ex)
+                {
+                    interceptor.OnError(message, ex);
+
+                    if (count < numberofchannels)
+                    {
+                        _logger.Log($"Message {message.Id} failed to distribute ({count}), moving to the next channel");
+                    }
+                    else
+                    {
+                        _logger.Log($"Message {message.Id} failed to distribute ({count}), no more channels");
+
+                        throw;
+                    }
+                }
+                finally
+                {
+                    interceptor.OnExit(message);
+                }
+            }
+
+            return null;
         }
 
         private async Task Send(MessageContext message)

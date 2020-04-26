@@ -16,17 +16,17 @@ namespace Jal.Router.AzureServiceBus.Standard
 
             builder.AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>();
 
-            builder.AddResourceManager<AzureManagementPointToPointChannelResourceManager>();
+            builder.AddResourceManager<AzureManagementPointToPointResourceManager>();
 
-            builder.AddResourceManager<AzureManagementPublishSubscribeChannelResourceManager>();
+            builder.AddResourceManager<AzureManagementPublishSubscribeResourceManager>();
 
-            builder.AddResourceManager<AzureManagementSubscriptionToPublishSubscribeChannelResourceManager>();
+            builder.AddResourceManager<AzureManagementSubscriptionToPublishSubscribeResourceManager>();
 
-            builder.AddResourceManager<AzureServiceBusPointToPointChannelResourceManager>();
+            builder.AddResourceManager<AzureServiceBusPointToPointResourceManager>();
 
-            builder.AddResourceManager<AzureServiceBusPublishSubscribeChannelResourceManager>();
+            builder.AddResourceManager<AzureServiceBusPublishSubscribeResourceManager>();
 
-            builder.AddResourceManager<AzureServiceBusSubscriptionToPublishSubscribeChannelResourceManager>();
+            builder.AddResourceManager<AzureServiceBusSubscriptionToPublishSubscribeResourceManager>();
 
             builder.AddMessageAdapter<AzureServiceBusMessageAdapter>();
         }

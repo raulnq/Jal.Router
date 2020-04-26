@@ -17,7 +17,7 @@ namespace Jal.Router.Model
 
         public string SagaId { get; set; }
 
-        public string ContentId { get; set; }
+        public string ClaimCheckId { get; set; }
 
         public List<Tracking> Trackings { get; set; }
 

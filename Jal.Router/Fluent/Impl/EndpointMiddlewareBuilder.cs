@@ -4,10 +4,10 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class OutboundMiddlewareBuilder : IOutboundMiddlewareBuilder
+    public class EndpointMiddlewareBuilder : IEndpointMiddlewareBuilder
     {
         private readonly EndPoint _endpoint;
-        public OutboundMiddlewareBuilder(EndPoint endpoint)
+        public EndpointMiddlewareBuilder(EndPoint endpoint)
         {
             _endpoint = endpoint;
         }

@@ -104,7 +104,7 @@ namespace Jal.Router.Tests
 
             var route = Builder.CreateRouteWithConsumer("status");
 
-            var messagecontext = Builder.CreateMessageContextWithSaga(route);
+            var messagecontext = Builder.CreateMessageContextWithSaga(status: "status");
 
             var typedconsumer = CreateTypedConsumerMock(evaluator);
 

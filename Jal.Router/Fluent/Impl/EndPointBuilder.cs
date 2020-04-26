@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
+    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IForMessageEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
         private readonly EndPoint _endpoint;
 
@@ -106,14 +106,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action)
+        public IOnEndPointOptionBuilder UseMiddleware(Action<IEndpointMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new OutboundMiddlewareBuilder(_endpoint);
+            var builder = new EndpointMiddlewareBuilder(_endpoint);
 
             action(builder);
 

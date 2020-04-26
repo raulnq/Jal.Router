@@ -16,7 +16,7 @@ namespace Jal.Router.Tests
         {
             var creatormock = new Mock<ISenderContextLifecycle>();
 
-            creatormock.Setup(x => x.AddOrGet(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+            creatormock.Setup(x => x.Add(It.IsAny<EndPoint>(), It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -32,7 +32,7 @@ namespace Jal.Router.Tests
 
             await sut.Run();
 
-            creatormock.Verify(x => x.AddOrGet(It.IsAny<Channel>()), Times.Once);
+            creatormock.Verify(x => x.Add(It.IsAny<EndPoint>(), It.IsAny<Channel>()), Times.Once);
         }
     }
 }

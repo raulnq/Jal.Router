@@ -12,107 +12,110 @@ namespace Jal.Router.Tests
 {
     public static class Builder
     {
-        public static MessageContext CreateMessageContext(Route route=null, EndPoint endpoint=null,  Mock<IBus> busmock = null)
+        public static MessageContext CreateMessageContext(Route route=null, EndPoint endpoint=null,  Mock<IBus> busmock = null, IMessageSerializer serializer = null)
         {
             if(busmock==null)
             {
                 busmock = new Mock<IBus>();
             }
 
-            var messagecontext = new MessageContext(busmock.Object);
+            if (route == null)
+            {
+                route = new Route("route", typeof(ConsumerMiddleware));
+            }
 
-            if(route==null)
-            {
-                messagecontext.SetRoute(new Route("route", typeof(object), new List<Channel>()));
-            }
-            else
-            {
-                messagecontext.SetRoute(route);
-            }
 
             if (endpoint == null)
             {
-                messagecontext.SetEndPoint(new EndPoint("endpoint"));
+                endpoint = new EndPoint("endpoint");
             }
-            else
+
+            if(serializer==null)
             {
-                messagecontext.SetEndPoint(endpoint);
+                serializer = new NullMessageSerializer();
             }
+
+            var messagecontext = new MessageContext(busmock.Object, serializer, Guid.NewGuid().ToString(), route, CreateChannel(), endpoint);
 
             return messagecontext;
         }
 
         public static MessageContext CreateMessageContextWithSaga(Route route = null, string status=null)
         {
+            if(route == null)
+            {
+                route = new Route(new Saga("name", typeof(object)), "name", typeof(object));
+            }
+
             var messagecontext = CreateMessageContext(route);
 
-            messagecontext.SetSaga(new Saga("name", typeof(object)));
+            messagecontext.SagaContext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
 
-            var sagacontext = new SagaContext(messagecontext, "id");
+            //var sagacontext = new SagaContext(messagecontext, "id");
 
-            sagacontext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
+            //sagacontext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
 
-            messagecontext.UpdateSagaContext(sagacontext);
+            //messagecontext.UpdateSagaContext(sagacontext);
 
             return messagecontext;
         }
 
         public static Route CreateRoute()
         {
-            var route = new Route("route", typeof(object), new List<Channel>() { });
+            var route = new Route("route", typeof(ConsumerMiddleware));
 
             return route;
         }
 
-        public static Route CreateRouteWithConsumer(string status)
+        public static Route CreateRouteWithConsumer(string status, Func<MessageContext, bool> condition = null)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethodWithData<object, Handler, object>((o,h,m,d)=>Task.CompletedTask, typeof(Handler), status);
+            var method = new RouteMethodWithData<object, Handler, object>((o,h,m,d)=>Task.CompletedTask, typeof(Handler), typeof(object), condition, status);
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route CreateRouteWithConsumer()
+        public static Route CreateRouteWithConsumer(Func<MessageContext, bool> condition = null)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>((o, h, m) => Task.CompletedTask, typeof(Handler));
+            var method = new RouteMethod<object, Handler>((o, h, m) => Task.CompletedTask, typeof(Handler), typeof(object), condition);
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, Task> consumer,Func<MessageContext, bool> condition= null)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler));
+            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler), typeof(object), condition);
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route CreateRouteWithConsumer(Func<object, Handler, object, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, object, Task> consumer, Func<MessageContext, bool> condition = null)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler));
+            var method = new RouteMethod<object, Handler>(consumer, typeof(Handler), typeof(object), condition);
 
             route.RouteMethods.Add(method);
 
             return route;
         }
 
-        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, object, Task> consumer)
+        public static Route CreateRouteWithConsumer(Func<object, Handler, MessageContext, object, Task> consumer, Func<MessageContext, bool> condition=null)
         {
             var route = CreateRoute();
 
-            var method = new RouteMethodWithData<object, Handler, object>(consumer, typeof(Handler));
+            var method = new RouteMethodWithData<object, Handler, object>(consumer, typeof(Handler), typeof(object), condition);
 
             route.RouteMethods.Add(method);
 
@@ -155,24 +158,34 @@ namespace Jal.Router.Tests
             return new Channel(channeltype, connectionstring, path, subscription, adapter, type);
         }
 
-        public static SenderContext CreateSenderContext(Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null, IMessageAdapter adapter = null)
+        public static SenderContext CreateSenderContext(EndPoint endpoint = null, Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null, IMessageAdapter adapter = null, IMessageSerializer serializer = null, IMessageStorage storage = null)
         {
             if(channel==null)
             {
                 channel = CreateChannel();
             }
 
-            return new SenderContext(channel, senderchannel, readerchannel, adapter);
+            if (endpoint == null)
+            {
+                endpoint = new EndPoint("name");
+            }
+
+            return new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, storage);
         }
 
-        public static ListenerContext CreateListenerContext(Channel channel = null, IListenerChannel listenerchannel = null, Partition partition= null, IMessageAdapter adapter=null)
+        public static ListenerContext CreateListenerContext(Route route = null, Channel channel = null, IListenerChannel listenerchannel = null,  IMessageAdapter adapter=null, IRouter router=null, IMessageSerializer serializer = null, IMessageStorage storage=null)
         {
             if (channel == null)
             {
                 channel = CreateChannel();
             }
 
-            return new ListenerContext(channel, listenerchannel, adapter, partition);
+            if (route == null)
+            {
+                route = CreateRoute();
+            }
+
+            return new ListenerContext(route, channel, listenerchannel, adapter, router, serializer, storage);
         }
 
         public static Mock<IComponentFactoryFacade> CreateFactoryMock()

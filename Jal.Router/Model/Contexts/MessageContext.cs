@@ -8,6 +8,8 @@ namespace Jal.Router.Model
 {
     public class MessageContext
     {
+        public IMessageSerializer MessageSerializer { get; private set; }
+
         private readonly IBus _bus;
         public Channel Channel { get; private set; }
         public IDictionary<string, string> Headers { get; private set; }
@@ -51,20 +53,27 @@ namespace Jal.Router.Model
             }
         }
 
-        public MessageContext(IBus bus): this(bus, Guid.NewGuid().ToString())
+        public MessageContext(IBus bus, IMessageSerializer serializer) : this(bus, serializer, Guid.NewGuid().ToString())
         {
 
         }
 
-        public MessageContext(IBus bus, string id) 
-            :this(bus, new TracingContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty)
+        public MessageContext(IBus bus, IMessageSerializer serializer, string id) 
+            :this(bus, serializer, null, null, null, new TracingContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, null)
         {
 
         }
 
-        public MessageContext(IBus bus, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid)
+        public MessageContext(IBus bus, IMessageSerializer serializer, string id, Route route, Channel channel, EndPoint endPoint)
+        : this(bus, serializer, route, endPoint, channel, new TracingContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, null)
+        {
+
+        }
+
+        public MessageContext(IBus bus, IMessageSerializer serializer, Route route, EndPoint endpoint, Channel channel, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid, object content)
         {
             _bus = bus;
+            MessageSerializer = serializer;
             Headers = new Dictionary<string, string>();
             Version = version;
             Origin = origin;
@@ -72,13 +81,19 @@ namespace Jal.Router.Model
             TrackingContext = new TrackingContext(this, tracks);
             TracingContext = tracingcontext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, claimcheckid, !string.IsNullOrEmpty(claimcheckid));
+            ContentContext = new ContentContext(this, claimcheckid, channel.UseClaimCheck, MessageSerializer.Serialize(content));
             Host = Environment.MachineName;
+            Route = route;
+            Channel = channel;
+            EndPoint = endpoint;
+            Saga = route?.Saga;
         }
 
-        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, Type contenttype, string content)
+        public MessageContext(EndPoint endpoint, Channel channel, IMessageSerializer serializer, Options options, DateTime datetimeutc, Origin origin, object content)
         {
             Origin = origin;
+            Channel = channel;
+            MessageSerializer = serializer;
             EndPoint = endpoint;
             TracingContext = options.TracingContext;
             Headers = options.Headers;
@@ -89,38 +104,8 @@ namespace Jal.Router.Model
             Saga = options.Saga;
             TrackingContext = options.TrackingContext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, endpoint.UseClaimCheck, contenttype, content);
+            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, channel.UseClaimCheck, MessageSerializer.Serialize(content));
             Host = Environment.MachineName;
-        }
-
-        public void SetContent(ContentContext contentcontext)
-        {
-            ContentContext = contentcontext;
-        }
-
-        public void SetRoute(Route route)
-        {
-            Route = route;
-        }
-
-        public void SetEndPoint(EndPoint endpoint)
-        {
-            EndPoint = endpoint;
-        }
-
-        public void SetChannel(Channel channel)
-        {
-            Channel = channel;
-        }
-
-        public void SetSaga(Saga saga)
-        {
-            Saga = saga;
-        }
-
-        public void UpdateSagaContext(SagaContext sagacontext)
-        {
-            SagaContext = sagacontext;
         }
 
         public MessageEntity ToEntity()

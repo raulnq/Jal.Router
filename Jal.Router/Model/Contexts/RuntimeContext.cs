@@ -9,8 +9,6 @@ namespace Jal.Router.Model
 
         public List<EndPoint> EndPoints { get; }
 
-        public List<Partition> Partitions { get; }
-
         public List<Saga> Sagas { get; }
 
         public List<Route> Routes { get; }
@@ -34,8 +32,6 @@ namespace Jal.Router.Model
             Routes = new List<Route>();
 
             Resources = new List<Resource>();
-
-            Partitions = new List<Partition>();
 
             ResourceContexts = new List<ResourceContext>();
         }

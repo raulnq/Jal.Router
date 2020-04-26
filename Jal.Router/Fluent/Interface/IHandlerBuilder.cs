@@ -2,13 +2,13 @@ using System;
 
 namespace Jal.Router.Fluent.Interface
 {
-    public interface IHandlerBuilder<out TContent> 
+    public interface IHandlerBuilder
     {
-        IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent>> action);
+        IWhenRouteBuilder With(Action<IForMessageRouteBuilder> action);
     }
 
-    public interface IHandlerBuilder<out TContent, out TData>
+    public interface IHandlerBuilder<out TData>
     {
-        IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent, TData>> action);
+        IWhenRouteBuilder With(Action<IForMessageRouteBuilder<TData>> action);
     }
 }

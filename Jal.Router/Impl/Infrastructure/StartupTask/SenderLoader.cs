@@ -33,7 +33,7 @@ namespace Jal.Router.Impl
             {
                 if(sendercontext.Open())
                 {
-                    Logger.Log($"Opening {sendercontext.Id}");
+                    Logger.Log($"Opening {sendercontext.ToString()}");
                 }
             }
         }
@@ -44,9 +44,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in endpoint.Channels)
                 {
-                    var sendercontext = _lifecycle.AddOrGet(channel);
-
-                    sendercontext.Endpoints.Add(endpoint);
+                    _lifecycle.Add(endpoint, channel);
                 }
             }
         }

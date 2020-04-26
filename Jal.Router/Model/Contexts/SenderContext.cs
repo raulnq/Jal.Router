@@ -9,7 +9,7 @@ namespace Jal.Router.Model
     {
         public Channel Channel { get; private set; }
 
-        public List<EndPoint> Endpoints { get; private set; }
+        public EndPoint EndPoint { get; private set; }
 
         public IReaderChannel ReaderChannel { get; private set; }
 
@@ -17,13 +17,19 @@ namespace Jal.Router.Model
 
         public IMessageAdapter MessageAdapter { get; private set; }
 
-        public SenderContext(Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter)
+        public IMessageSerializer MessageSerializer { get; private set; }
+
+        public IMessageStorage MessageStorage { get; private set; }
+
+        public SenderContext(EndPoint endpoint, Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, IMessageSerializer serializer, IMessageStorage storage)
         {
             Channel = channel;
-            Endpoints = new List<EndPoint>();
+            EndPoint = endpoint;
             SenderChannel = senderchannel;
             ReaderChannel = readerchannel;
             MessageAdapter = adapter;
+            MessageSerializer = serializer;
+            MessageStorage = storage;
         }
 
         public async Task<bool> Close()
@@ -41,6 +47,11 @@ namespace Jal.Router.Model
         public Task<MessageContext> Read(MessageContext context)
         {
             return ReaderChannel.Read(this, context, MessageAdapter);
+        }
+
+        public Task<object> Write(MessageContext context)
+        {
+            return MessageAdapter.WritePhysicalMessage(context, this);
         }
 
         public Task<string> Send(object message)
@@ -75,12 +86,10 @@ namespace Jal.Router.Model
             return false;
         }
 
-        public string Id
+        public override string ToString()
         {
-            get
-            {
-                return $"{Channel.FullPath} {Channel.ToString()} channel ({Endpoints.Count}): {string.Join(",", Endpoints.Select(x => x.Name))}";
-            }
+            return $"{Channel.FullPath} {Channel.ToString()} channel: {EndPoint.Name}";
         }
+
     }
 }

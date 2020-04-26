@@ -6,10 +6,10 @@ namespace Jal.Router.Interface
 {
     public interface IMessageAdapter
     {
-        Task<MessageContext> ReadMetadataAndContentFromPhysicalMessage(object message, Type contenttype, bool useclaimcheck);
+        Task<MessageContext> ReadFromPhysicalMessage(object message, ListenerContext listener);
 
-        MessageContext ReadMetadataFromPhysicalMessage(object message);
+        Task<MessageContext> ReadFromPhysicalMessage(object message, SenderContext sender);
 
-        Task<object> WritePhysicalMessage(MessageContext context);
+        Task<object> WritePhysicalMessage(MessageContext context, SenderContext sender);
     }
 }

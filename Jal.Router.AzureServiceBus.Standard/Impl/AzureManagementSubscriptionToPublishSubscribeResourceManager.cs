@@ -10,9 +10,9 @@ using Microsoft.Rest.Azure;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementSubscriptionToPublishSubscribeChannelResourceManager : AbstractAzureManagementChannelResourceManager
+    public class AzureManagementSubscriptionToPublishSubscribeResourceManager : AbstractAzureManagementResourceManager
     {
-        public AzureManagementSubscriptionToPublishSubscribeChannelResourceManager(IComponentFactoryFacade factory) : base(factory)
+        public AzureManagementSubscriptionToPublishSubscribeResourceManager(IComponentFactoryFacade factory) : base(factory)
         {
         }
 

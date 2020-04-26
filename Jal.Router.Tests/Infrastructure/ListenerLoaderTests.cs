@@ -16,7 +16,7 @@ namespace Jal.Router.Tests
         {
             var lifecyclemock = new Mock<IListenerContextLifecycle>();
 
-            lifecyclemock.Setup(x => x.AddOrGet(It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
+            lifecyclemock.Setup(x => x.Add(It.IsAny<Route>(), It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -32,7 +32,7 @@ namespace Jal.Router.Tests
 
             await sut.Run();
 
-            lifecyclemock.Verify(x => x.AddOrGet(It.IsAny<Channel>()), Times.Once);
+            lifecyclemock.Verify(x => x.Add(It.IsAny<Route>(), It.IsAny<Channel>()), Times.Once);
         }
     }
 }

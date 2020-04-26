@@ -8,14 +8,11 @@ namespace Jal.Router.Impl
 {
     public class Producer : IProducer
     {
-        public Producer(IComponentFactoryFacade factory, ILogger logger, ISenderContextLifecycle lifecycle)
+        public Producer(ILogger logger, ISenderContextLifecycle lifecycle)
         {
-            _factory = factory;
             _logger = logger;
             _lifecycle = lifecycle;
         }
-
-        private readonly IComponentFactoryFacade _factory;
 
         private readonly ISenderContextLifecycle _lifecycle;
 
@@ -29,17 +26,7 @@ namespace Jal.Router.Impl
             {
                 var sendercontext = _lifecycle.Get(context.Channel);
 
-                if (sendercontext == null)
-                {
-                    sendercontext = _lifecycle.Add(context.Channel);
-
-                    if (sendercontext.Open())
-                    {
-                        _logger.Log($"Opening {sendercontext.Id}");
-                    }
-                }
-
-                var message = await sendercontext.MessageAdapter.WritePhysicalMessage(context).ConfigureAwait(false);
+                var message = await sendercontext.Write(context).ConfigureAwait(false);
 
                 id = await sendercontext.Send(message).ConfigureAwait(false);
 
@@ -64,9 +51,7 @@ namespace Jal.Router.Impl
 
                     if (outputcontext != null)
                     {
-                        var serializer = _factory.CreateMessageSerializer();
-
-                        context.ContentContext.SetResult(serializer.Deserialize(outputcontext.ContentContext.Data, outputcontext.ContentContext.Type));
+                        context.ContentContext.SetResult(sendercontext.MessageSerializer.Deserialize(outputcontext.ContentContext.Data, context.EndPoint.ReplyContentType));
                     }
                 }
             }

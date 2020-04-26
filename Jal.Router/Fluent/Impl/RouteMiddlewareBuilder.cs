@@ -4,17 +4,17 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class InboundMiddlewareBuilder : IInboundMiddlewareBuilder
+    public class RouteMiddlewareBuilder : IRouteMiddlewareBuilder
     {
         private readonly Route _route;
-        public InboundMiddlewareBuilder(Route route)
+        public RouteMiddlewareBuilder(Route route)
         {
             _route = route;
         }
 
         public void Add<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
-            _route.MiddlewareTypes.Add(typeof(TMiddleware));
+            _route.Middlewares.Add(typeof(TMiddleware));
         }
     }
 }

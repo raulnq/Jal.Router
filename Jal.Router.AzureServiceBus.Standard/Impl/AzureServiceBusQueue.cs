@@ -64,30 +64,21 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var sessionoptions = CreateSessionOptions(listenercontext);
 
-            if (listenercontext.Partition != null)
+            if (listenercontext.Channel.Partition)
             {
                 _client.RegisterSessionHandler(async (ms, message, token) => {
 
-                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = await listenercontext.Read(message).ConfigureAwait(false);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                     try
                     {
-                        var handlers = new List<Task>();
-
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                        {
-                            var clone = message.Clone();
-
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel, listenercontext.MessageAdapter));
-                        }
-
-                        await Task.WhenAll(handlers.ToArray());
+                        await listenercontext.Consume(context).ConfigureAwait(false);
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (listenercontext.Partition.Until(context))
+                        if (listenercontext.Channel.ClosePartitionCondition!=null && listenercontext.Channel.ClosePartitionCondition(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
@@ -107,23 +98,14 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _client.RegisterMessageHandler(async (message, token) =>
                 {
-                    var context = listenercontext.MessageAdapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = await listenercontext.Read(message).ConfigureAwait(false);
 
                     Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                     try
                     {
-                        var handlers = new List<Task>();
+                        await listenercontext.Consume(context).ConfigureAwait(false);
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                        {
-                            var clone = message.Clone();
-
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel, listenercontext.MessageAdapter));
-                        }
-
-                        await Task.WhenAll(handlers.ToArray());
-                        
                         await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)

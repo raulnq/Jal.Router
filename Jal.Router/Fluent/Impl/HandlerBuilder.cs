@@ -5,54 +5,32 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-
-    public class HandlerBuilder<TContent> : IHandlerBuilder<TContent>, IWhenHandlerBuilder, IOnRouteOptionBuilder
+    public class HandlerBuilder : IHandlerBuilder, IWhenRouteBuilder, IOnRouteOptionBuilder, IForMessageRouteBuilder
     {
         private Route _route;
 
-        private List<Route> _routes;
-
-        private readonly string _name;
-
-        private readonly List<Channel> _channels;
-
-        public HandlerBuilder(List<Route> routes, string name, List<Channel> channels)
+        public HandlerBuilder(Route route)
         {
-            _routes = routes;
-            _name = name;
-            _channels = channels;
+            _route = route;
         }
 
-        public IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent>> action)
+        public IUseMethodBuilder<TContent> ForMessage<TContent>(Func<MessageContext, bool> condition = null)
+        {
+            var whitRouteBuilder = new UseRouteMethodBuilder<TContent>(_route, condition);
+
+            return whitRouteBuilder;
+        }
+
+        public IWhenRouteBuilder With(Action<IForMessageRouteBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var route = new Route(_name, typeof(TContent), _channels);
-
-            _routes.Add(route);
-
-            _route = route;
-
-            var whitRouteBuilder = new WhitRouteBuilder<TContent>(route);
-
-            action(whitRouteBuilder);
+            action(this);
 
             return this;
-        }
-
-        public void With(Action<IOnRouteWithBuilder> action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            var builder = new OnRouteWithBuilder(_route);
-
-            action(builder);
         }
 
         public IOnRouteOptionBuilder When(Func<MessageContext, bool> condition)
@@ -62,7 +40,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.UpdateWhen(condition);
+            _route.When(condition);
 
             return this;
         }
@@ -96,14 +74,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UseMiddleware(Action<IInboundMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UseMiddleware(Action<IRouteMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new InboundMiddlewareBuilder(_route);
+            var builder = new RouteMiddlewareBuilder(_route);
 
             action(builder);
 
@@ -123,23 +101,16 @@ namespace Jal.Router.Fluent.Impl
 
             return this;
         }
+
     }
 
-    public class HandlerBuilder<TContent, TData> : IHandlerBuilder<TContent, TData>, IWhenHandlerBuilder, IOnRouteOptionBuilder
+    public class HandlerBuilder<TData> : IHandlerBuilder<TData>, IWhenRouteBuilder, IOnRouteOptionBuilder, IForMessageRouteBuilder<TData>
     {
         private Route _route;
 
-        private List<Route> _routes;
-
-        private readonly string _name;
-
-        private readonly List<Channel> _channels;
-
-        public HandlerBuilder(List<Route> routes, string name, List<Channel> channels)
+        public HandlerBuilder(Route route)
         {
-            _routes = routes;
-            _name = name;
-            _channels = channels;
+            _route = route;
         }
 
         public IOnRouteOptionBuilder When(Func<MessageContext, bool> condition)
@@ -149,7 +120,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(condition));
             }
 
-            _route.UpdateWhen(condition);
+            _route.When(condition);
 
             return this;
         }
@@ -168,14 +139,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnRouteOptionBuilder UseMiddleware(Action<IInboundMiddlewareBuilder> action)
+        public IOnRouteOptionBuilder UseMiddleware(Action<IRouteMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new InboundMiddlewareBuilder(_route);
+            var builder = new RouteMiddlewareBuilder(_route);
 
             action(builder);
 
@@ -196,17 +167,6 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public void With(Action<IOnRouteWithBuilder> action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            var builder = new OnRouteWithBuilder(_route);
-
-            action(builder);
-        }
 
         public IOnRouteOptionBuilder OnExit(Action<IOnRouteExitBuilder> action)
         {
@@ -222,24 +182,23 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IWhenHandlerBuilder Use(Action<IWithMethodBuilder<TContent, TData>> action)
+        public IWhenRouteBuilder With(Action<IForMessageRouteBuilder<TData>> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var route = new Route(_name, typeof(TContent), _channels);
-
-            _routes.Add(route);
-
-            _route = route;
-
-            var whitRouteBuilder = new WhitRouteBuilder<TContent, TData>(route);
-
-            action(whitRouteBuilder);
+            action(this);
 
             return this;
+        }
+
+        public IUseMethodBuilder<TContent, TData> ForMessage<TContent>(Func<MessageContext, bool> condition = null)
+        {
+            var whitRouteBuilder = new UseRouteMethodBuilder<TContent, TData>(_route, condition);
+
+            return whitRouteBuilder;
         }
     }
 }

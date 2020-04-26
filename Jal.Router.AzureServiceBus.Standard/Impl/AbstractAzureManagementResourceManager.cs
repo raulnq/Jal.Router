@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public abstract class AbstractAzureManagementChannelResourceManager : AbstractResourceManager
+    public abstract class AbstractAzureManagementResourceManager : AbstractResourceManager
     {
         public const string DefaultMessageTtlInDays = "defaultmessagettlindays";
 
@@ -25,7 +25,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
         protected readonly IComponentFactoryFacade _factory;
 
-        public AbstractAzureManagementChannelResourceManager(IComponentFactoryFacade factory)
+        public AbstractAzureManagementResourceManager(IComponentFactoryFacade factory)
         {
             _factory = factory;
 

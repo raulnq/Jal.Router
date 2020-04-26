@@ -10,11 +10,6 @@ namespace Jal.Router.Fluent.Impl
 
         public WhenRouteBuilderWithData(RouteMethodWithData<TContent, THandler, TData> routemethod)
         {
-            if (routemethod == null)
-            {
-                throw new ArgumentNullException(nameof(routemethod));
-            }
-
             _routemethod = routemethod;
         }
 
@@ -25,7 +20,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(method));
             }
 
-            _routemethod.UpdateEvaluator(method);
+            _routemethod.When(method);
         }
     }
 
@@ -35,11 +30,6 @@ namespace Jal.Router.Fluent.Impl
 
         public WhenRouteBuilderWithData(RouteMethodWithData<TContent, TData> routemethod)
         {
-            if (routemethod == null)
-            {
-                throw new ArgumentNullException(nameof(routemethod));
-            }
-
             _routemethod = routemethod;
         }
 
@@ -50,7 +40,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(method));
             }
 
-            _routemethod.UpdateEvaluator(method);
+            _routemethod.When(method);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Jal.Router.Interface;
-using System;
+﻿using System;
 
 namespace Jal.Router.Model
 {
@@ -18,6 +17,8 @@ namespace Jal.Router.Model
             AdapterType = adaptertype;
 
             Type = type;
+
+            Id = Guid.NewGuid().ToString();
         }
 
         public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
@@ -25,6 +26,14 @@ namespace Jal.Router.Model
         {
             Subscription = subscription;
         }
+
+        public Func<MessageContext, bool> Condition { get; private set; }
+
+        public bool UseClaimCheck { get; private set; }
+
+        public bool Partition { get; private set; }
+
+        public Func<MessageContext, bool> ClosePartitionCondition { get; private set; }
 
         public bool RouterConfigurationSource { get; private set; }
 
@@ -34,13 +43,7 @@ namespace Jal.Router.Model
 
         public ChannelType ChannelType { get; private set; }
 
-        public string Id
-        {
-            get
-            {
-                return Path + Subscription + ConnectionString;
-            }
-        }
+        public string Id { get; }
 
         public override string ToString()
         {
@@ -117,6 +120,23 @@ namespace Jal.Router.Model
         {
             return new ChannelEntity(Path, Subscription, ChannelType);
         }
+
+        public void AsClaimCheck()
+        {
+            UseClaimCheck = true;
+        }
+
+        public void UsePartitions(Func<MessageContext, bool> condition=null)
+        {
+            Partition = true;
+            ClosePartitionCondition = condition;
+        }
+
+        public void When(Func<MessageContext, bool> when)
+        {
+            Condition = when;
+        }
+
 
         public void UpdateReplyFromPointToPointChannel(string replypath, int replytimeout, 
             string replyconnectionstring, Type adapter, Type type)

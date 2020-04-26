@@ -6,34 +6,27 @@ namespace Jal.Router.Impl
 {
     public class ListenerContextLifecycle : IListenerContextLifecycle
     {
-        private IComponentFactoryFacade _factory;
+        private readonly IComponentFactoryFacade _factory;
 
-        public ListenerContextLifecycle(IComponentFactoryFacade factory)
+        private readonly IRouter _router;
+
+        public ListenerContextLifecycle(IComponentFactoryFacade factory, IRouter router)
         {
             _factory = factory;
+            _router = router;
         }
 
-        public ListenerContext AddOrGet(Channel channel)
-        {
-            var listenercontext = Get(channel);
-
-            if (listenercontext == null)
-            {
-                listenercontext = Add(channel);
-            }
-
-            return listenercontext;
-        }
-
-        public ListenerContext Add(Channel channel)
+        public ListenerContext Add(Route route, Channel channel)
         {
             var listenerchannel = _factory.CreateListenerChannel(channel.ChannelType, channel.Type);
 
             var adapter = _factory.CreateMessageAdapter(channel.AdapterType);
 
-            var partition = _factory.Configuration.Runtime.Partitions.FirstOrDefault(x => x.Channel.Id == channel.Id);
+            var serializer = _factory.CreateMessageSerializer();
 
-            var listenercontext = new ListenerContext(channel, listenerchannel, adapter,  partition);
+            var storage = _factory.CreateMessageStorage();
+
+            var listenercontext = new ListenerContext(route, channel, listenerchannel, adapter, _router, serializer, storage);
 
             _factory.Configuration.Runtime.ListenerContexts.Add(listenercontext);
 

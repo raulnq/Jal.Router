@@ -36,21 +36,16 @@ namespace Jal.Router.Impl
 
                 var handledbymock = false;
 
-                foreach (var endpoint in sendercontext.Endpoints)
+                if (_parameter.Handlers.ContainsKey(sendercontext.EndPoint.Name))
                 {
-                    if (_parameter.Handlers.ContainsKey(endpoint.Name))
-                    {
-                        var serializer = Factory.CreateMessageSerializer();
+                    await _parameter.Handlers[sendercontext.EndPoint.Name](sendercontext.MessageSerializer, m);
 
-                        await _parameter.Handlers[endpoint.Name](serializer, m);
-
-                        handledbymock = true;
-                    }
+                    handledbymock = true;
                 }
 
                 if (!handledbymock)
                 {
-                    _transport.CreateFile(_path, filename, m);
+                    _transport.CreateFile(_path, filename, m, sendercontext.MessageSerializer);
                 }
 
                 return m.Id;

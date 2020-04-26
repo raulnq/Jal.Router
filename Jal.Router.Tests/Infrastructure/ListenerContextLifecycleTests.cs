@@ -13,6 +13,8 @@ namespace Jal.Router.Tests
         [TestMethod]
         public void Add_With_ShouldBeCreated()
         {
+            var routermock = new Mock<IRouter>();
+
             var listenermock = new Mock<IListenerChannel>();
 
             var factorymock = Builder.CreateFactoryMock();
@@ -21,9 +23,9 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextLifecycle(factory);
+            var sut = new ListenerContextLifecycle(factory, routermock.Object);
 
-            var listenercontext = sut.Add(Builder.CreateChannel());
+            var listenercontext = sut.Add(Builder.CreateRoute(), Builder.CreateChannel());
 
             factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>()), Times.Once);
 
@@ -34,8 +36,6 @@ namespace Jal.Router.Tests
             listenercontext.ListenerChannel.ShouldBeAssignableTo<IListenerChannel>();
 
             listenercontext.Channel.Path.ShouldBe("path");
-
-            listenercontext.Partition.ShouldBeNull();
         }
     }
 }
