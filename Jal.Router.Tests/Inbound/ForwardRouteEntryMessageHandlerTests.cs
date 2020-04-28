@@ -21,15 +21,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { }));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -37,15 +39,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
-
             var factory = factorymock.Object;
+
+            var busmock = new Mock<IBus>();
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "" } }));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -55,15 +59,13 @@ namespace Jal.Router.Tests
 
             var busmock = new Mock<IBus>();
 
-            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
-
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "type", typeof(object) } }));
-
-            factorymock.CreateMessageSerializerWasExecuted();
 
             busmock.SendWasExecuted<object>(op => op.EndPointName == "queue");
         }

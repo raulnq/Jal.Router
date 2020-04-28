@@ -6,8 +6,8 @@ using Moq;
 using Shouldly;
 using System;
 using System.Threading.Tasks;
-using Jal.Router.Tests;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability;
 
 namespace Jal.Router.Tests
 {
@@ -36,7 +36,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factorymock.Object);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -62,7 +62,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 

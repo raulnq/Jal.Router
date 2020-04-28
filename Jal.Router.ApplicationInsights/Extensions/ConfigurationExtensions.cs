@@ -8,8 +8,8 @@ namespace Jal.Router.ApplicationInsights
         public static IConfiguration UseApplicationInsights(this IConfiguration configuration)
         {
             return configuration
-                .AddOutboundMiddleware<BusLogger>()
-                .AddInboundMiddleware<RouterLogger>()
+                .AddEndpointMiddleware<BusLogger>()
+                .AddRouteMiddleware<RouterLogger>()
                 .AddLogger<BeatLogger, Beat>()
                 .AddLogger<StatisticsLogger, Statistic>();
         }

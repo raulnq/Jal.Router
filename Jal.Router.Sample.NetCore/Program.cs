@@ -87,7 +87,7 @@ namespace Jal.Router.Sample.NetCore
             host.Configuration
                 .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 }, useazureservicemanagement: false)
                 //.UseFileSystemAsTransport(parameter)
-                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 //.UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
@@ -297,13 +297,7 @@ namespace Jal.Router.Sample.NetCore
         {
             var config = new AzureServiceBusConfiguration()
             {
-                ClientId = "",
-                ClientSecret = "",
-                ConnectionString = "",
-                ResourceGroupName = "",
-                ResourceName = "",
-                SubscriptionId = "",
-                TenantId = ""
+
             };
 
             RegisterHandler(_sendersessionqueue + "_handler")
@@ -681,9 +675,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = "continue";
 
-            var tracing = new TracingContext(id: context.TracingContext.Id + "_end", operationid: context.TracingContext.OperationId);
-
-            return context.Send(new Message() { Name = message.Name }, "endendpoint", tracing);
+            return context.Send(new Message() { Name = message.Name }, "endendpoint", id: $"{Guid.NewGuid()}_toend");
         }
     }
 
@@ -699,9 +691,7 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            //var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
-
-            return context.Send( new Message() { Name=message.Name }, "continueendpoint"/*, tracing*/);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint", id: $"{Guid.NewGuid()}_tocontinue");
         }
     }
 

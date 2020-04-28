@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -7,16 +8,23 @@ namespace Jal.Router.Fluent.Impl
 {
     public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IForMessageEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
-        private readonly EndPoint _endpoint;
+        private EndPoint _endpoint;
 
-        public EndPointBuilder(EndPoint endpoint)
+        private readonly List<EndPoint> _endpoints;
+
+        private readonly string _name;
+
+        public EndPointBuilder(List<EndPoint> endpoints, string name)
         {
-            _endpoint = endpoint;
+            _endpoints = endpoints;
+            _name = name;
         }
 
         public IToEndPointBuilder ForMessage<TMessage>()
         {
-            _endpoint.SetContentType(typeof (TMessage));
+            _endpoint = new EndPoint(_name, typeof(TMessage));
+
+            _endpoints.Add(_endpoint);
 
             return this;
         }

@@ -22,7 +22,7 @@ namespace Jal.Router.Tests
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Add(new EndPoint("name"), Builder.CreateChannel(ChannelType.PointToPoint));
+            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.PointToPoint));
 
             factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
@@ -50,7 +50,7 @@ namespace Jal.Router.Tests
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Add(new EndPoint("name"), Builder.CreateChannel(ChannelType.PublishSubscribe));
+            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.PublishSubscribe));
 
             factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
@@ -80,7 +80,7 @@ namespace Jal.Router.Tests
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Add(new EndPoint("name"), Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
+            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
 
             factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 
@@ -110,7 +110,7 @@ namespace Jal.Router.Tests
 
             var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
 
-            var sendercontext = sut.Add(new EndPoint("name"), Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
+            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
 
             factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
 

@@ -31,8 +31,8 @@ namespace Jal.Router.Impl
         public IList<Type> RouterLoggerTypes { get; }
         public Type RouterInterceptorType { get; private set; }
         public Type BusInterceptorType { get; private set; }
-        public IList<Type> InboundMiddlewareTypes { get; }
-        public IList<Type> OutboundMiddlewareTypes { get; }
+        public IList<Type> RouteMiddlewareTypes { get; }
+        public IList<Type> EndpointMiddlewareTypes { get; }
         public Type MessageSerializerType { get; private set; }
         public IDictionary<string, object> Parameters { get; private set; }
         public IConfiguration EnableStorage(bool ignoreexceptions = true)
@@ -134,15 +134,15 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
+        public IConfiguration AddRouteMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
-            InboundMiddlewareTypes.Add(typeof(TMiddleware));
+            RouteMiddlewareTypes.Add(typeof(TMiddleware));
             return this;
         }
 
-        public IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
+        public IConfiguration AddEndpointMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>
         {
-            OutboundMiddlewareTypes.Add(typeof(TMiddleware));
+            EndpointMiddlewareTypes.Add(typeof(TMiddleware));
             return this;
         }
 
@@ -231,14 +231,14 @@ namespace Jal.Router.Impl
             UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
             UseMessageSerializer<NullMessageSerializer>();
             UseMessageAdapter<NullMessageAdapter>();
-            InboundMiddlewareTypes = new List<Type>();
+            RouteMiddlewareTypes = new List<Type>();
             RouterLoggerTypes = new List<Type>();
             MonitoringTaskTypes = new List<MonitorTask>();
             StartupTaskTypes = new List<Type>();
             ShutdownTaskTypes = new List<Type>();
             LoggerTypes = new Dictionary<Type, IList<Type>>();
             Parameters = new Dictionary<string, object>();
-            OutboundMiddlewareTypes = new List<Type>();
+            EndpointMiddlewareTypes = new List<Type>();
             ShutdownWatcherTypes = new List<Type>();
             AddLogger<BeatLogger, Beat>();
             AddLogger<StatisticLogger, Statistic>();

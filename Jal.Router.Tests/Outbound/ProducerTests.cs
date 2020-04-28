@@ -23,13 +23,15 @@ namespace Jal.Router.Tests
 
             var lifecyclemock = new Mock<ISenderContextLifecycle>();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
-
             var senderchannelmock = new Mock<ISenderChannel>();
+
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((senderchannelmock.Object, null));
 
             var factory = factorymock.Object;
 
-            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+            var messagecontext = Builder.CreateMessageContextToSend(factory: factory);
+
+            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext(factory));
 
             var sut = Build(lifecyclemock.Object);
 
