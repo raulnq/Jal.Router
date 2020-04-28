@@ -14,19 +14,13 @@ namespace Jal.Router.Impl
             Factory = factory;
         }
 
-        protected async Task CreateMessageEntityAndSave(MessageContext messagecontext)
+        protected async Task CreateAndInsertMessageIntoStorage(MessageContext context)
         {
             if (Factory.Configuration.Storage.Enabled)
             {
                 try
                 {
-                    var storage = Factory.CreateEntityStorage();
-
-                    var entity = messagecontext.ToEntity();
-
-                    var id = await storage.Create(entity).ConfigureAwait(false);
-
-                    entity.SetId(id);
+                    await context.CreateAndInsertMessageIntoStorage(context.ToEntity()).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {

@@ -16,9 +16,9 @@ namespace Jal.Router.Installer
             _container = container;
         }
 
-        public override IRouterBuilder AddResourceManager<TImplementation>()
+        public override IRouterBuilder AddResource<TImplementation>()
         {
-            _container.Register(Component.For<IResourceManager>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+            _container.Register(Component.For<IResource>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }

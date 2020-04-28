@@ -8,17 +8,17 @@ using Microsoft.Rest.Azure;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureManagementPublishSubscribeResourceManager : AbstractAzureManagementResourceManager
+    public class AzureManagementPublishSubscribeResource : AbstractAzureManagementResource
     {
-        public AzureManagementPublishSubscribeResourceManager(IComponentFactoryFacade factory) : base(factory)
+        public AzureManagementPublishSubscribeResource(IComponentFactoryFacade factory) : base(factory)
         {
         }
 
-        public override async Task<bool> CreateIfNotExist(Resource channel)
+        public override async Task<bool> CreateIfNotExist(ResourceContext context)
         {
-            var serializer = _factory.CreateMessageSerializer();
+            var resource = context.Resource;
 
-            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = context.MessageSerializer.Deserialize<AzureServiceBusConfiguration>(resource.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -26,7 +26,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
+                    await serviceBusNamespace.Topics.GetByNameAsync(resource.Path).ConfigureAwait(false);
 
                     return false;
                 }
@@ -36,27 +36,27 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         var messagettl = 14;
 
-                        if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                        if (resource.Properties.ContainsKey(DefaultMessageTtlInDays))
                         {
-                            messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
+                            messagettl = Convert.ToInt32(resource.Properties[DefaultMessageTtlInDays]);
                         }
 
-                        var descriptor = serviceBusNamespace.Topics.Define(channel.Path)
+                        var descriptor = serviceBusNamespace.Topics.Define(resource.Path)
                             .WithDefaultMessageTTL(TimeSpan.FromDays(messagettl));
 
-                        if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
+                        if (resource.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
                         {
-                            var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
+                            var duplicatemessagedetectioninminutes = Convert.ToInt32(resource.Properties[DuplicateMessageDetectionInMinutes]);
 
                             descriptor = descriptor.WithDuplicateMessageDetection(TimeSpan.FromMinutes(duplicatemessagedetectioninminutes));
                         }
 
-                        if (channel.Properties.ContainsKey(PartitioningEnabled))
+                        if (resource.Properties.ContainsKey(PartitioningEnabled))
                         {
                             descriptor = descriptor.WithPartitioning();
                         }
 
-                        if (channel.Properties.ContainsKey(ExpressMessageEnabled))
+                        if (resource.Properties.ContainsKey(ExpressMessageEnabled))
                         {
                             descriptor = descriptor.WithExpressMessage();
                         }
@@ -72,11 +72,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<bool> DeleteIfExist(Resource channel)
+        public override async Task<bool> DeleteIfExist(ResourceContext context)
         {
-            var serializer = _factory.CreateMessageSerializer();
+            var resource = context.Resource;
 
-            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = context.MessageSerializer.Deserialize<AzureServiceBusConfiguration>(resource.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -84,7 +84,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    await serviceBusNamespace.Topics.DeleteByNameAsync(channel.Path).ConfigureAwait(false);
+                    await serviceBusNamespace.Topics.DeleteByNameAsync(resource.Path).ConfigureAwait(false);
 
                     return true;
                 }
@@ -97,11 +97,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public override async Task<Statistic> Get(Resource channel)
+        public override async Task<Statistic> Get(ResourceContext context)
         {
-            var serializer = _factory.CreateMessageSerializer();
+            var resource = context.Resource;
 
-            var configuration = serializer.Deserialize<AzureServiceBusConfiguration>(channel.ConnectionString);
+            var configuration = context.MessageSerializer.Deserialize<AzureServiceBusConfiguration>(resource.ConnectionString);
 
             var serviceBusNamespace = await GetServiceBusNamespace(configuration).ConfigureAwait(false);
 
@@ -109,9 +109,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 try
                 {
-                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(channel.Path).ConfigureAwait(false);
+                    var topic = await serviceBusNamespace.Topics.GetByNameAsync(resource.Path).ConfigureAwait(false);
 
-                    var statistics = new Statistic(channel.Path);
+                    var statistics = new Statistic(resource.Path);
 
                     statistics.Properties.Add("DeadLetterMessageCount", topic.DeadLetterMessageCount.ToString());
 

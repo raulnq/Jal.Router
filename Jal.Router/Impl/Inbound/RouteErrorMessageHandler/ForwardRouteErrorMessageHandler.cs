@@ -35,7 +35,7 @@ namespace Jal.Router.Impl
                     headers.Add("innerexceptionstacktrace", ex.InnerException.StackTrace);
                 }
 
-                var content = context.MessageSerializer.Deserialize(context.ContentContext.Data, type);
+                var content = context.Deserialize(context.ContentContext.Data, type);
 
                 _logger.Log($"Message {context.Id}, sending the message to the error endpoint {endpointname} by route {context.Name}");
 

@@ -60,7 +60,7 @@ namespace Jal.Router.AzureStorage
             return table;
         }
 
-        public override async Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IDictionary<string, string> options = null)
+        public override async Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IMessageSerializer serializer, IDictionary<string, string> options = null)
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
 
@@ -79,7 +79,7 @@ namespace Jal.Router.AzureStorage
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{saganame}";
 
-                var sagas = await Get(table, partitionkey, start, end, options).ConfigureAwait(false);
+                var sagas = await Get(table, partitionkey, start, end, serializer, options).ConfigureAwait(false);
 
                 list.AddRange(sagas);
 
@@ -89,7 +89,7 @@ namespace Jal.Router.AzureStorage
             return list.ToArray();
         }
 
-        private async Task<SagaData[]> Get(CloudTable table, string partitionkey, DateTime start, DateTime end, IDictionary<string, string> options = null)
+        private async Task<SagaData[]> Get(CloudTable table, string partitionkey, DateTime start, DateTime end, IMessageSerializer serializer, IDictionary<string, string> options = null)
         {
 
             var where = TableQuery.CombineFilters(
@@ -104,13 +104,11 @@ namespace Jal.Router.AzureStorage
 
             var records = await ExecuteQuery<SagaRecord>(table, query).ConfigureAwait(false);
 
-            var serializer = _factory.CreateMessageSerializer();
-
             return records.Select(record =>
             {
                 var sagatype = serializer.Deserialize<Type>(record.DataType);
 
-                var data = ReadSaga(record, sagatype);
+                var data = ReadSaga(record, sagatype, serializer);
 
                 var entity = new SagaData(record.Id, data, sagatype, record.Name, record.Created, record.Timeout, record.Status, record.Updated, record.Ended, record.Duration);
 
@@ -119,10 +117,8 @@ namespace Jal.Router.AzureStorage
             ).ToArray();
         }
 
-        private object ReadSaga(SagaRecord record, Type sagatype)
+        private object ReadSaga(SagaRecord record, Type sagatype, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             if (record.NumberOfDataArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfDataArrays, i => SagaDataReader[i].Invoke(record));
@@ -151,10 +147,8 @@ namespace Jal.Router.AzureStorage
             return retVal;
         }
 
-        public override async Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null)
+        public override async Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IMessageSerializer serializer, IDictionary<string, string> options = null)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
             if (options != null && options.ContainsKey("messagestoragename") && !string.IsNullOrWhiteSpace(options["messagestoragename"]))
@@ -176,10 +170,8 @@ namespace Jal.Router.AzureStorage
             }).ToArray();
         }
 
-        private ContentContextEntity ReadContentContextEntity(MessageRecord record)
+        private ContentContextEntity ReadContentContextEntity(MessageRecord record, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             if (record.NumberOfContentArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfContentArrays, i => MessageContentReader[i].Invoke(record));
@@ -194,10 +186,8 @@ namespace Jal.Router.AzureStorage
             }
         }
 
-        private SagaContextEntity ReadSagaContextEntity(MessageRecord record)
+        private SagaContextEntity ReadSagaContextEntity(MessageRecord record, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             if (record.NumberOfSagaArrays > 0)
             {
                 var bytearray = Combine(record.NumberOfSagaArrays, i => MessageSagaReader[i].Invoke(record));
@@ -212,7 +202,7 @@ namespace Jal.Router.AzureStorage
             }
         }
 
-        public override async Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null)
+        public override async Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IMessageSerializer serializer, IDictionary<string, string> options = null)
         {
             var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.MessageTableName}{_parameter.TableSufix}");
 
@@ -231,7 +221,7 @@ namespace Jal.Router.AzureStorage
             {
                 var partitionkey = $"{currentdate.ToString("yyyyMMdd")}_{routename}";
 
-                var messages = await GetMessages(table, partitionkey, start, end).ConfigureAwait(false);
+                var messages = await GetMessages(table, partitionkey, start, end, serializer).ConfigureAwait(false);
 
                 list.AddRange(messages);
 
@@ -241,10 +231,8 @@ namespace Jal.Router.AzureStorage
             return list.ToArray();
         }
 
-        private async Task<MessageEntity[]> GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end)
+        private async Task<MessageEntity[]> GetMessages(CloudTable table, string partitionkey, DateTime start, DateTime end, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             var where = TableQuery.CombineFilters(
                 TableQuery.CombineFilters(
                     TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionkey),
@@ -273,19 +261,21 @@ namespace Jal.Router.AzureStorage
             var origin = !string.IsNullOrWhiteSpace(record.OriginEntity) ? serializer.Deserialize<OriginEntity>(record.OriginEntity) : null;
             var saga = !string.IsNullOrWhiteSpace(record.SagaEntity) ? serializer.Deserialize<SagaEntity>(record.SagaEntity) : null;
             var tracking = !string.IsNullOrWhiteSpace(record.TrackingContextEntity) ? serializer.Deserialize<TrackingContextEntity>(record.TrackingContextEntity) : null;
-            var contentcontext = ReadContentContextEntity(record);
-            var sagacontext = ReadSagaContextEntity(record);
+            var contentcontext = ReadContentContextEntity(record, serializer);
+            var sagacontext = ReadSagaContextEntity(record, serializer);
             var entity = new MessageEntity(record.Id, record.Host, channel, headers, record.Version, record.DateTimeUtc, record.ScheduledEnqueueDateTimeUtc, router, endpoint,
                 origin, saga, contentcontext, sagacontext, tracking, tracing, record.Name);
             return entity;
         }
 
-        private void WriteMessage(MessageEntity messageentity, MessageRecord record)
+        private void WriteMessage(MessageEntity messageentity, MessageRecord record, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
             var content = serializer.Serialize(messageentity.ContentContextEntity);
+
             var bytescount = _parameter.TableStorageStringEncoding.GetByteCount(content);
+
             record.SizeOfContent = bytescount;
+
             if (bytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
                 record.ContentContextEntity = content;
@@ -293,6 +283,7 @@ namespace Jal.Router.AzureStorage
             else
             {
                 record.SizeOfContentArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
+
                 record.NumberOfContentArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(content), bytescount, (i, buffer) => MessageContentWriter[i].Invoke(record, buffer));
             }
 
@@ -301,7 +292,9 @@ namespace Jal.Router.AzureStorage
                 var saga = serializer.Serialize(messageentity.SagaContextEntity);
 
                 var sagabytescount = _parameter.TableStorageStringEncoding.GetByteCount(saga);
+
                 record.SizeOfSaga = sagabytescount;
+
                 if (sagabytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
                 {
                     record.SagaContextEntity = saga;
@@ -309,12 +302,13 @@ namespace Jal.Router.AzureStorage
                 else
                 {
                     record.SizeOfSagaArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
+
                     record.NumberOfSagaArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(saga), sagabytescount, (i, buffer) => MessageSagaWriter[i].Invoke(record, buffer));
                 }
             }
         }
 
-        public override async Task<SagaData> Get(string id)
+        public override async Task<SagaData> Get(string id, IMessageSerializer serializer)
         {
             try
             {
@@ -334,13 +328,11 @@ namespace Jal.Router.AzureStorage
 
                     var record = result.Result as SagaRecord;
 
-                    var serializer = _factory.CreateMessageSerializer();
-
                     if (record != null)
                     {
                         var sagatype = serializer.Deserialize<Type>(record.DataType);
 
-                        var data = ReadSaga(record, sagatype);
+                        var data = ReadSaga(record, sagatype, serializer);
 
                         var entity = new SagaData(record.Id, data,  sagatype, record.Name, record.Created, record.Timeout, record.Status, record.Updated, record.Ended, record.Duration);
 
@@ -366,7 +358,7 @@ namespace Jal.Router.AzureStorage
             }
         }
 
-        public override async Task<string> Create(SagaData sagadata)
+        public override async Task<string> Insert(SagaData sagadata, IMessageSerializer serializer)
         {
             try
             {
@@ -377,8 +369,6 @@ namespace Jal.Router.AzureStorage
                 var id = $"{partition}@{rowkey}@{_parameter.TableSufix}";
 
                 var table = GetCloudTable(_parameter.TableStorageConnectionString, $"{_parameter.SagaTableName}{_parameter.TableSufix}");
-
-                var serializer = _factory.CreateMessageSerializer();
 
                 var record = new SagaRecord(partition, rowkey)
                 {
@@ -397,7 +387,7 @@ namespace Jal.Router.AzureStorage
                     Id = id
                 };
 
-                WriteSaga(sagadata, record);
+                WriteSaga(sagadata, record, serializer);
 
                 await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
 
@@ -413,14 +403,14 @@ namespace Jal.Router.AzureStorage
             }
         }
 
-        private void WriteSaga(SagaData sagadata, SagaRecord record)
+        private void WriteSaga(SagaData sagadata, SagaRecord record, IMessageSerializer serializer)
         {
-            var serializer = _factory.CreateMessageSerializer();
-
             var data = serializer.Serialize(sagadata.Data);
 
             var databytescount = _parameter.TableStorageStringEncoding.GetByteCount(data);
+
             record.SizeOfData = databytescount;
+
             if (databytescount < _parameter.TableStorageMaxColumnSizeOnKilobytes * _kilobyte)
             {
                 record.Data = data;
@@ -428,16 +418,15 @@ namespace Jal.Router.AzureStorage
             else
             {
                 record.SizeOfDataArraysOnKilobytes = _parameter.TableStorageMaxColumnSizeOnKilobytes;
+
                 record.NumberOfDataArrays = Split(_parameter.TableStorageStringEncoding.GetBytes(data), databytescount, (i, buffer) => SagaDataWriter[i].Invoke(record, buffer));
             }
         }
 
-        public override async Task<string> Create(MessageEntity messageentity)
+        public override async Task<string> Insert(MessageEntity messageentity, IMessageSerializer serializer)
         {
             try
             {
-                var serializer = _factory.CreateMessageSerializer();
-
                 var partition = $"{messageentity.DateTimeUtc.ToString("yyyyMMdd")}_{messageentity.Name}";
 
                 var rowkey = $"{Guid.NewGuid()}";
@@ -471,7 +460,7 @@ namespace Jal.Router.AzureStorage
                     SagaEntity = messageentity.SagaEntity!=null?serializer.Serialize(messageentity.SagaEntity):null
                 };
 
-                WriteMessage(messageentity, record);
+                WriteMessage(messageentity, record, serializer);
 
                 await table.ExecuteAsync(TableOperation.Insert(record)).ConfigureAwait(false);
 
@@ -541,7 +530,7 @@ namespace Jal.Router.AzureStorage
             return rv;
         }
 
-        public override async Task Update(SagaData sagadata)
+        public override async Task Update(SagaData sagadata, IMessageSerializer serializer)
         {
             try
             {
@@ -595,7 +584,7 @@ namespace Jal.Router.AzureStorage
 
                             record.SizeOfDataArraysOnKilobytes = 0;
 
-                            WriteSaga(sagadata, record);
+                            WriteSaga(sagadata, record, serializer);
 
                             await table.ExecuteAsync(TableOperation.Replace(record)).ConfigureAwait(false);
                         }

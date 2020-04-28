@@ -25,7 +25,7 @@ namespace Jal.Router.Tests
 
             var consumermock = new Mock<IConsumer>();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -51,7 +51,7 @@ namespace Jal.Router.Tests
 
             consumermock.Setup(x => x.Consume(It.IsAny<MessageContext>())).Throws(new Exception());
 
-            var messagecontext = Builder.CreateMessageContext();
+            
 
             var factory = factorymock.Object;
 
@@ -60,6 +60,8 @@ namespace Jal.Router.Tests
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 
             factory.Configuration.EnableStorage();
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             var sut = Build(consumermock.Object, factory);
 
@@ -79,13 +81,13 @@ namespace Jal.Router.Tests
 
             var consumermock = new Mock<IConsumer>();
 
-            var messagecontext = Builder.CreateMessageContext();
-
             var entitystoragemock = Builder.CreateEntityStorage();
 
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage();
 
@@ -109,15 +111,15 @@ namespace Jal.Router.Tests
 
             var consumermock = new Mock<IConsumer>();
 
-            var messagecontext = Builder.CreateMessageContext();
-
             var entitystoragemock = Builder.CreateEntityStorage();
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).Throws(new Exception());
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>())).Throws(new Exception());
 
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage(true);
 
@@ -141,15 +143,15 @@ namespace Jal.Router.Tests
 
             var consumermock = new Mock<IConsumer>();
 
-            var messagecontext = Builder.CreateMessageContext();
-
             var entitystoragemock = Builder.CreateEntityStorage();
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).Throws(new Exception());
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>())).Throws(new Exception());
 
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage(false);
 

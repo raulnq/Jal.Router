@@ -4,14 +4,16 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class InMemorySubscriptionToPublishSubscribeResourceManager : AbstractInMemoryResourceManager
+    public class InMemoryPointToPointResource : AbstractInMemoryResource
     {
-        public InMemorySubscriptionToPublishSubscribeResourceManager(IInMemoryTransport transport) : base(transport)
+        public InMemoryPointToPointResource(IInMemoryTransport transport) : base(transport)
         {
         }
 
-        public override Task<bool> CreateIfNotExist(Resource resource)
+        public override Task<bool> CreateIfNotExist(ResourceContext context)
         {
+            var resource = context.Resource;
+
             var name = _transport.CreateName(resource.ConnectionString, resource.Path);
 
             if (!_transport.Exists(name))

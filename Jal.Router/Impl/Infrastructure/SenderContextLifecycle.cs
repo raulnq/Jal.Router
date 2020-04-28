@@ -8,22 +8,17 @@ namespace Jal.Router.Impl
     {
         private IComponentFactoryFacade _factory;
 
-        public SenderContextLifecycle(IComponentFactoryFacade factory)
+        private ILogger _logger;
+
+        public SenderContextLifecycle(IComponentFactoryFacade factory, ILogger logger)
         {
             _factory = factory;
+            _logger = logger;
         }
         
         public SenderContext Add(EndPoint endpoint, Channel channel)
         {
-            var (senderchannel, readerchannel) = _factory.CreateSenderChannel(channel.ChannelType, channel.Type);
-
-            var adapter = _factory.CreateMessageAdapter(channel.AdapterType);
-
-            var serializer = _factory.CreateMessageSerializer();
-
-            var storage = _factory.CreateMessageStorage();
-
-            var sendercontext = new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, storage);
+            var sendercontext = SenderContext.Create(_factory, _logger, channel, endpoint);
 
             _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 

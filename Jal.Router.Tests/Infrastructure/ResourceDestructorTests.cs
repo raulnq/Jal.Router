@@ -22,7 +22,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Run_With_ShouldBeCreated()
         {
-            var resourcemanager = new Mock<IResourceManager>();
+            var resourcemock = new Mock<IResource>();
 
             var factorymock = Builder.CreateFactoryMock();
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Tests
 
             var resource = new Resource(ChannelType.PointToPoint, "path", "connectionstring", new Dictionary<string, string>());
 
-            var resourcecontext = new ResourceContext(resource, resourcemanager.Object);
+            var resourcecontext = new ResourceContext(resource, resourcemock.Object, new NullMessageSerializer());
 
             factory.Configuration.Runtime.ResourceContexts.Add(resourcecontext);
 
@@ -38,7 +38,7 @@ namespace Jal.Router.Tests
 
             await sut.Run();
 
-            resourcemanager.Verify(x => x.DeleteIfExist(It.IsAny<Resource>()), Times.Once);
+            resourcemock.Verify(x => x.DeleteIfExist(It.IsAny<ResourceContext>()), Times.Once);
         }
     }
 }

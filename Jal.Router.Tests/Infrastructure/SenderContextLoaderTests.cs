@@ -17,7 +17,7 @@ namespace Jal.Router.Tests
 
             creatormock.Setup(x => x.Add(It.IsAny<EndPoint>(), It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
 
-            var sut = new SenderContextLoader(creatormock.Object, new NullLogger());
+            var sut = new SenderContextLoader(creatormock.Object);
 
             var endpoint = new EndPoint("name");
 

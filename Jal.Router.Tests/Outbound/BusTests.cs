@@ -21,11 +21,19 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            var pipelinemock = Builder.CreatePipelineMock();
+            var shuffermock = new Mock<IChannelShuffler>();
+
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var lifecyclemock = new Mock<ISenderContextLifecycle>();
 
-            var messagecontext = Builder.CreateMessageContext();
+            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+
+            factorymock.Setup(m => m.CreateChannelShuffler()).Returns(shuffermock.Object);
+
+            var pipelinemock = Builder.CreatePipelineMock();
+
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             messagecontext.Route.Middlewares.Add(typeof(string));
 
@@ -35,7 +43,9 @@ namespace Jal.Router.Tests
 
             var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
 
-            await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
+            var options = Options.CreateEmpty("endpointname");
+
+            await sut.Send(new object(), options);
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
@@ -45,17 +55,27 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var pipelinemock = Builder.CreatePipelineMock(true);
+            var shuffermock = new Mock<IChannelShuffler>();
 
-            var messagecontext = Builder.CreateMessageContext();
-
-            var endpointprovidermock = Builder.CreateEnpointProvider();
+            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
 
             var lifecyclemock = new Mock<ISenderContextLifecycle>();
 
+            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
+
+            factorymock.Setup(m => m.CreateChannelShuffler()).Returns(shuffermock.Object);
+
+            var pipelinemock = Builder.CreatePipelineMock(true);
+
+            var messagecontext = Builder.CreateMessageContextFromListen();
+
+            var endpointprovidermock = Builder.CreateEnpointProvider();
+
             var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
 
-            await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
+            var options = Options.CreateEmpty("endpointname");
+
+            await Should.ThrowAsync<Exception>(sut.Send(new object(), options));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }

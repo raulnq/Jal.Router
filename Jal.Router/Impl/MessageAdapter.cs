@@ -22,7 +22,7 @@ namespace Jal.Router.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage storage)
+        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage)
         {
             var fmessage = message as Message;
 
@@ -46,9 +46,9 @@ namespace Jal.Router.Impl
 
                 var claimcheckid = fmessage.ClaimCheckId;
 
-                var content = await ReadContent(fmessage, claimcheckid, channel.UseClaimCheck, storage).ConfigureAwait(false);
+                var content = await ReadContent(fmessage, claimcheckid, channel.UseClaimCheck, messagestorage).ConfigureAwait(false);
 
-                var context = new MessageContext(Bus, serializer, route, endpoint, channel, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid, content);
+                var context = MessageContext.CreateFromListen(Bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, trackings, new Origin(from, key), content, sagaid, claimcheckid, DateTime.UtcNow, version);
 
                 if (fmessage.Headers != null)
                 {

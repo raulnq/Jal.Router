@@ -14,9 +14,9 @@ namespace Jal.Router.Extensions
                 throw new ArgumentNullException(endpointname);
             }
 
-            var options = context.CreateOptions(endpointname, id, sagaid, headers);
+            var replyid = Guid.NewGuid().ToString();
 
-            options.TracingContext.SetReplyToRequestId(Guid.NewGuid().ToString());
+            var options = context.CreateOptions(endpointname, id, sagaid, headers, version, replytorequestid: replyid);
 
             return context.Reply<TContent, TResult>(content, options);
         }
@@ -29,8 +29,6 @@ namespace Jal.Router.Extensions
             }
 
             var options = context.CreateOptions(endpointname, tracingcontext, sagaid, headers, version);
-
-            options.TracingContext.SetReplyToRequestId(Guid.NewGuid().ToString());
 
             return context.Reply<TContent, TResult>(content, options);
         }
@@ -100,41 +98,16 @@ namespace Jal.Router.Extensions
             return new Origin() { Key = key};
         }
 
-        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext,string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        private static Options CreateOptions(this MessageContext context, string endpointname, string id = null, string sagaid = null, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null, string replytorequestid=null)
         {
-            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
-        }
-
-        public static Options CreateOptions(this MessageContext context, string endpointname, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            return new Options(endpointname, context.CloneHeaders(), context.SagaContext, context.TrackingContext, context.TracingContext.Clone(), context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
-        }
-
-        private static Options CreateOptions(this MessageContext context, string endpointname, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null)
-        {
-            var tracingcontext = context.TracingContext.Clone();
-
-            if (string.IsNullOrWhiteSpace(tracingcontext.Id))
-            {
-                throw new ArgumentNullException(tracingcontext.Id);
-            }
-
-            if(!string.IsNullOrWhiteSpace(tracingcontext.ParentId))
-            {
-                tracingcontext.SetParentId(tracingcontext.Id);
-            }
-
-            if (!string.IsNullOrWhiteSpace(tracingcontext.OperationId))
-            {
-                tracingcontext.SetOperationId(tracingcontext.Id);
-            }
+            var tracingcontext = context.TracingContext.CreateDependency(id, replytorequestid);
 
             if (string.IsNullOrEmpty(version))
             {
                 version = context.Version;
             }
 
-            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
+            var options = Options.CreateFromMessageContext(context, endpointname, tracingcontext, sagaid, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
@@ -154,25 +127,14 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        private static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
-
-            if (string.IsNullOrWhiteSpace(tracingcontext.Id))
-            {
-                throw new ArgumentNullException(tracingcontext.Id);
-            }
-
-            if (!string.IsNullOrWhiteSpace(context.TracingContext.ReplyToRequestId))
-            {
-                tracingcontext.SetRequestId(context.TracingContext.ReplyToRequestId);
-            }
-
             if (string.IsNullOrEmpty(version))
             {
                 version = context.Version;
             }
 
-            var options = context.CreateOptions(endpointname, tracingcontext, version, scheduledenqueuedatetimeutc);
+            var options = Options.CreateFromMessageContext(context, endpointname, tracingcontext, sagaid, version, scheduledenqueuedatetimeutc);
 
             if (headers != null)
             {
@@ -187,35 +149,6 @@ namespace Jal.Router.Extensions
                         options.Headers.Add(header);
                     }
                 }
-            }
-
-            return options;
-        }
-
-        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext indentitycontext, string sagaid=null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            var options = CreateOptions(context, endpointname, indentitycontext, headers, version, scheduledenqueuedatetimeutc);
-
-            if (!string.IsNullOrEmpty(sagaid))
-            {
-                options.SagaContext.SetId(sagaid);
-            }
-
-            return options;
-        }
-
-        public static Options CreateOptions(this MessageContext context, string endpointname, string id=null, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
-        {
-            var options = CreateOptions(context, endpointname, headers, version, scheduledenqueuedatetimeutc);
-
-            if(!string.IsNullOrEmpty(sagaid))
-            {
-                options.SagaContext.SetId(sagaid);
-            }
-
-            if (!string.IsNullOrEmpty(id))
-            {
-                options.TracingContext.SetId(id);
             }
 
             return options;

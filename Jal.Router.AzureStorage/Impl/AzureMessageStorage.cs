@@ -11,7 +11,7 @@ namespace Jal.Router.AzureStorage
     {
         private readonly AzureStorageParameter _parameter;
 
-        public AzureMessageStorage(string connectionstring, string path, IParameterProvider provider)
+        public AzureMessageStorage(IParameterProvider provider)
         {
             _parameter = provider.Get<AzureStorageParameter>();
         }

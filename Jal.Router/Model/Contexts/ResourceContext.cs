@@ -7,28 +7,30 @@ namespace Jal.Router.Model
     {
         public Resource Resource { get; private set; }
 
-        public IResourceManager ResourceManager { get; private set; }
+        public IResource IResource { get; private set; }
 
-        public ResourceContext(Resource resource, IResourceManager manager)
+        public IMessageSerializer MessageSerializer { get; private set; }
+
+        public ResourceContext(Resource resource, IResource manager, IMessageSerializer serializer)
         {
             Resource = resource;
-
-            ResourceManager = manager;
+            MessageSerializer = serializer;
+            IResource = manager;
         }
 
         public Task<bool> CreateIfNotExist()
         {
-            return ResourceManager.CreateIfNotExist(Resource);
+            return IResource.CreateIfNotExist(this);
         }
 
         public Task<bool> DeleteIfExist()
         {
-            return ResourceManager.DeleteIfExist(Resource);
+            return IResource.DeleteIfExist(this);
         }
 
         public Task<Statistic> Get()
         {
-            return ResourceManager.Get(Resource);
+            return IResource.Get(this);
         }
     }
 }

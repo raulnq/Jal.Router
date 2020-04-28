@@ -57,7 +57,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                     try
                     {
-                        await listenercontext.Consume(context).ConfigureAwait(false);
+                        await listenercontext.Dispatch(context).ConfigureAwait(false);
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
@@ -87,7 +87,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                     try
                     {
-                        await listenercontext.Consume(context).ConfigureAwait(false);
+                        await listenercontext.Dispatch(context).ConfigureAwait(false);
 
                         await _subscriptionclient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }

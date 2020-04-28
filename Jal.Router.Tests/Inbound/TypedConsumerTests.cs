@@ -16,7 +16,7 @@ namespace Jal.Router.Tests
 
         public void Select_With_ShouldBeTrue()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public void Select_WithContentAndHandler_ShouldBeTrue()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -50,7 +50,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public void Select_WithContentAndHandlerAndMessageContext_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -70,7 +70,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Consume_WithContentAndHandler_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -84,7 +84,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Consume_WithContentAndHandlerAndMessageContext_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -98,7 +98,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ConsumeForData_WithContentAndHandler_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -112,7 +112,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ConsumeForData_WithContentAndHandlerAndMessageContext_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -126,7 +126,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ConsumeForSaga_WithContentAndHandlerAndData_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -140,7 +140,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ConsumeForSaga_WithContentAndHandlerAndMessageContextAndData_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 

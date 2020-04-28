@@ -21,7 +21,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -37,7 +37,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -55,7 +55,7 @@ namespace Jal.Router.Tests
 
             var busmock = new Mock<IBus>();
 
-            var messagecontext = Builder.CreateMessageContext(busmock: busmock);
+            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
 
             var factory = factorymock.Object;
 

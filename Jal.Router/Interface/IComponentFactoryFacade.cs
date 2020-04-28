@@ -37,7 +37,7 @@ namespace Jal.Router.Interface
 
         TComponent CreateComponent<TComponent>(Type type) where TComponent : class;
 
-        IResourceManager CreateResourceManager(ChannelType channel);
+        IResource CreateResource(ChannelType channel);
 
         ILogger<T> CreateLogger<T>(Type type);
 

@@ -148,11 +148,6 @@ namespace Jal.Router.Impl
             return timeoutbuilder;
         }
 
-        public ITimeoutBuilder RegisterSaga<TData>(Action<IRouteBuilder<TData>> start, Action<IRouteBuilder<TData>> @continue = null, Action<IRouteBuilder<TData>> end = null) where TData : class, new()
-        {
-            return RegisterSaga<TData>(typeof(TData).Name.ToLower(), start, @continue, end);
-        }
-
         public void RegisterOrigin(string name, string key="")
         {
             _origin.From = name;

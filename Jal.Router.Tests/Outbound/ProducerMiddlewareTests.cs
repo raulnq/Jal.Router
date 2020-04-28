@@ -22,7 +22,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.DisableStorage();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             messagecontext.Route.Middlewares.Add(typeof(string));
 
@@ -40,7 +40,7 @@ namespace Jal.Router.Tests
 
             var producermock = new Mock<IProducer>();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var entitystoragemock = Builder.CreateEntityStorage();
 

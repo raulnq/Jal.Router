@@ -6,14 +6,15 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-    public class StartupBeatLogger : AbstractStartupTask, IStartupTask
+    public class MonitoringTask : AbstractMonitoringTask, IMonitoringTask
     {
-        public StartupBeatLogger(IComponentFactoryFacade factory, ILogger logger)
-            :base(factory, logger)
+
+        public MonitoringTask(IComponentFactoryFacade factory, ILogger logger)
+            : base(factory, logger)
         {
         }
 
-        public Task Run()
+        public Task Run(DateTime datetime)
         {
             if (Factory.Configuration.LoggerTypes.ContainsKey(typeof(Beat)))
             {
@@ -21,11 +22,9 @@ namespace Jal.Router.Impl
 
                 var loggers = loggertypes.Select(x => Factory.CreateLogger<Beat>(x)).ToArray();
 
-                var message = new Beat(Factory.Configuration.ApplicationName, "Started");
+                var message = new Beat(Factory.Configuration.ApplicationName, "Running");
 
-                var startuptime = DateTime.UtcNow;
-
-                Array.ForEach(loggers, x => x.Log(message, startuptime));
+                Array.ForEach(loggers, x => x.Log(message, datetime));
             }
 
             return Task.CompletedTask;

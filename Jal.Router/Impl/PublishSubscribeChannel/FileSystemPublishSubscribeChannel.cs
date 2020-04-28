@@ -65,7 +65,7 @@ namespace Jal.Router.Impl
 
                     try
                     {
-                        await listenercontext.Consume(context).ConfigureAwait(false);
+                        await listenercontext.Dispatch(context).ConfigureAwait(false);
 
                         _transport.DeleteFile(e.FullPath);
                     }

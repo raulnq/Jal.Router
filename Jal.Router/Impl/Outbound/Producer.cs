@@ -51,7 +51,7 @@ namespace Jal.Router.Impl
 
                     if (outputcontext != null)
                     {
-                        context.ContentContext.SetResult(sendercontext.MessageSerializer.Deserialize(outputcontext.ContentContext.Data, context.EndPoint.ReplyContentType));
+                        context.ContentContext.ReplyData = sendercontext.MessageSerializer.Deserialize(outputcontext.ContentContext.Data, context.EndPoint.ReplyContentType);
                     }
                 }
             }

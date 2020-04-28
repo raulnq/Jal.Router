@@ -3,7 +3,6 @@ using Jal.Router.Interface;
 
 namespace Jal.Router.Impl
 {
-
     public class ListenerLoader : AbstractStartupTask, IStartupTask
     {
         private readonly IListenerContextLifecycle _lifecycle;
@@ -31,10 +30,7 @@ namespace Jal.Router.Impl
         {
             foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                if (listenercontext.Open())
-                {
-                    Logger.Log($"Listening {listenercontext.ToString()}");
-                }
+                listenercontext.Open();
             }
         }
 

@@ -16,39 +16,39 @@ namespace Jal.Router.Impl
             Configuration = configuration;
         }
 
-        public IResourceManager CreateResourceManager(ChannelType channel)
+        public IResource CreateResource(ChannelType channel)
         {
             if (channel == ChannelType.PointToPoint)
             {
-                return CreatePointToPointChannelResourceManager();
+                return CreatePointToPointChannelResource();
             }
 
             if (channel == ChannelType.SubscriptionToPublishSubscribe)
             {
-                return CreateSubscriptionToPublishSubscribeChannelResourceManager();
+                return CreateSubscriptionToPublishSubscribeChannelResource();
             }
 
             if (channel == ChannelType.PublishSubscribe)
             {
-                return CreatePublishSubscribeChannelResourceManager();
+                return CreatePublishSubscribeChannelResource();
             }
 
             return null;
         }
 
-        private IResourceManager CreatePointToPointChannelResourceManager()
+        private IResource CreatePointToPointChannelResource()
         {
-            return _factory.Create<IResourceManager>(Configuration.PointToPointResourceType);
+            return _factory.Create<IResource>(Configuration.PointToPointResourceType);
         }
 
-        private IResourceManager CreatePublishSubscribeChannelResourceManager()
+        private IResource CreatePublishSubscribeChannelResource()
         {
-            return _factory.Create<IResourceManager>(Configuration.PublishSubscribeResourceType);
+            return _factory.Create<IResource>(Configuration.PublishSubscribeResourceType);
         }
 
-        private IResourceManager CreateSubscriptionToPublishSubscribeChannelResourceManager()
+        private IResource CreateSubscriptionToPublishSubscribeChannelResource()
         {
-            return _factory.Create<IResourceManager>(Configuration.SubscriptionToPublishSubscribeResourceType);
+            return _factory.Create<IResource>(Configuration.SubscriptionToPublishSubscribeResourceType);
         }
 
         public IBusInterceptor CreateBusInterceptor()
@@ -232,7 +232,6 @@ namespace Jal.Router.Impl
 
             return (senderchannel,readerchannel);
         }
-
 
         public IListenerChannel CreateListenerChannel(ChannelType channel, Type type)
         {

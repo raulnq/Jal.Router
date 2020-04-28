@@ -22,7 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         public AzureServiceBusMessageAdapter(IComponentFactoryFacade factory, IBus bus) : base(factory, bus)
         {
         }
-        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage storage)
+        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage)
         {
             var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
@@ -86,9 +86,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     claimcheckid = sbmessage.UserProperties[ClaimCheckId].ToString();
                 }
 
-                var content = await ReadContent(sbmessage, claimcheckid, channel.UseClaimCheck, storage).ConfigureAwait(false);
+                var content = await ReadContent(sbmessage, claimcheckid, channel.UseClaimCheck, messagestorage).ConfigureAwait(false);
 
-                var context = new MessageContext(Bus, serializer, route, endpoint, channel, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid, content);
+                var context = MessageContext.CreateFromListen(Bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, trackings, new Origin(from, key), content, sagaid, claimcheckid, DateTime.UtcNow, version);
 
                 if (sbmessage.UserProperties != null)
                 {

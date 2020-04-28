@@ -70,7 +70,7 @@ namespace Jal.Router.Tests
 
             var entitystoragemock = Builder.CreateEntityStorage(id);
 
-            entitystoragemock.Setup(x => x.Get(It.IsAny<string>())).ReturnsAsync(default(SagaData));
+            entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(default(SagaData));
 
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 
@@ -112,7 +112,7 @@ namespace Jal.Router.Tests
 
             var entitystoragemock = Builder.CreateEntityStorage(id);
 
-            entitystoragemock.Setup(x => x.Get(It.IsAny<string>())).ReturnsAsync(new SagaData(null, typeof(object), "name", DateTime.UtcNow, 0, string.Empty));
+            entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(new SagaData(null, typeof(object), "name", DateTime.UtcNow, 0, string.Empty));
 
             factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
 

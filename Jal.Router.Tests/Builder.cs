@@ -12,11 +12,33 @@ namespace Jal.Router.Tests
 {
     public static class Builder
     {
-        public static MessageContext CreateMessageContext(Route route=null, EndPoint endpoint=null,  Mock<IBus> busmock = null, IMessageSerializer serializer = null)
+        public static MessageContext CreateMessageContextToSend(IComponentFactoryFacade factory=null, EndPoint endpoint = null, Channel channel= null)
         {
-            if(busmock==null)
+            if(factory==null)
             {
-                busmock = new Mock<IBus>();
+                factory = CreateFactoryMock().Object;
+            }
+
+            if (endpoint == null)
+            {
+                endpoint = new EndPoint("endpoint");
+            }
+
+            if (channel == null)
+            {
+                channel = CreateChannel();
+            }
+
+            var options = Options.CreateEmpty(endpoint.Name);
+
+            return MessageContext.CreateToSend(factory.CreateMessageSerializer(), factory.CreateEntityStorage(), endpoint, channel, options, new Origin(), null, DateTime.UtcNow);
+        }
+
+        public static MessageContext CreateMessageContextFromListen(IComponentFactoryFacade factory = null, Route route=null, Channel channel = null, IBus bus = null)
+        {
+            if(bus == null)
+            {
+                bus = new Mock<IBus>().Object;
             }
 
             if (route == null)
@@ -24,18 +46,19 @@ namespace Jal.Router.Tests
                 route = new Route("route", typeof(ConsumerMiddleware));
             }
 
-
-            if (endpoint == null)
+            if (channel == null)
             {
-                endpoint = new EndPoint("endpoint");
+                channel = CreateChannel();
             }
 
-            if(serializer==null)
+            if (factory == null)
             {
-                serializer = new NullMessageSerializer();
+                factory = CreateFactoryMock().Object;
             }
 
-            var messagecontext = new MessageContext(busmock.Object, serializer, Guid.NewGuid().ToString(), route, CreateChannel(), endpoint);
+            var messagecontext = MessageContext.CreateFromListen(bus, factory.CreateMessageSerializer(), factory.CreateEntityStorage(), route, null,
+                channel, new TracingContext(Guid.NewGuid().ToString()), new List<Tracking>(), new Origin(), 
+                string.Empty, string.Empty, string.Empty, DateTime.UtcNow, string.Empty);
 
             return messagecontext;
         }
@@ -47,9 +70,9 @@ namespace Jal.Router.Tests
                 route = new Route(new Saga("name", typeof(object)), "name", typeof(object));
             }
 
-            var messagecontext = CreateMessageContext(route);
+            var messagecontext = CreateMessageContextFromListen(route: route);
 
-            messagecontext.SagaContext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
+            //messagecontext.SagaContext.Load(new SagaData(new object(), typeof(object), "name", DateTime.Now, 0, status));
 
             //var sagacontext = new SagaContext(messagecontext, "id");
 
@@ -158,7 +181,7 @@ namespace Jal.Router.Tests
             return new Channel(channeltype, connectionstring, path, subscription, adapter, type);
         }
 
-        public static SenderContext CreateSenderContext(EndPoint endpoint = null, Channel channel = null, ISenderChannel senderchannel=null, IReaderChannel readerchannel=null, IMessageAdapter adapter = null, IMessageSerializer serializer = null, IMessageStorage storage = null)
+        public static SenderContext CreateSenderContext(IComponentFactoryFacade factory = null, EndPoint endpoint = null, Channel channel = null)
         {
             if(channel==null)
             {
@@ -170,10 +193,15 @@ namespace Jal.Router.Tests
                 endpoint = new EndPoint("name");
             }
 
-            return new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, storage);
+            if (factory == null)
+            {
+                factory = CreateFactoryMock().Object;
+            }
+
+            return SenderContext.Create(factory, new NullLogger(), channel, endpoint);
         }
 
-        public static ListenerContext CreateListenerContext(Route route = null, Channel channel = null, IListenerChannel listenerchannel = null,  IMessageAdapter adapter=null, IRouter router=null, IMessageSerializer serializer = null, IMessageStorage storage=null)
+        public static ListenerContext CreateListenerContext(IComponentFactoryFacade factory = null, IRouter router = null, Route route = null, Channel channel = null)
         {
             if (channel == null)
             {
@@ -185,7 +213,12 @@ namespace Jal.Router.Tests
                 route = CreateRoute();
             }
 
-            return new ListenerContext(route, channel, listenerchannel, adapter, router, serializer, storage);
+            if(factory==null)
+            {
+                factory = CreateFactoryMock().Object;
+            }
+
+            return ListenerContext.Create(factory, router, new NullLogger(), channel, route);
         }
 
         public static Mock<IComponentFactoryFacade> CreateFactoryMock()
@@ -198,7 +231,15 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateMessageSerializer()).Returns(new NullMessageSerializer());
 
+            factorymock.Setup(x => x.CreateEntityStorage()).Returns(new NullEntityStorage());
+
+            factorymock.Setup(x => x.CreateMessageStorage()).Returns(new NullMessageStorage());
+
             factorymock.Setup(x => x.CreateMessageAdapter(It.IsAny<Type>())).Returns(new NullMessageAdapter());
+
+            factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns(new NullPointToPointChannel());
+
+            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null));
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 
@@ -209,13 +250,13 @@ namespace Jal.Router.Tests
         {
             var entitystoragemock = new Mock<IEntityStorage>();
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<SagaData>())).ReturnsAsync(id);
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(id);
 
-            entitystoragemock.Setup(x => x.Update(It.IsAny<SagaData>()));
+            entitystoragemock.Setup(x => x.Update(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()));
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).ReturnsAsync(id);
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(id);
 
-            entitystoragemock.Setup(x => x.Get(It.IsAny<string>())).ReturnsAsync(new SagaData(id, new object(), typeof(object), "name", DateTime.Now, 0, string.Empty, null, null, 0));
+            entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(new SagaData(id, new object(), typeof(object), "name", DateTime.Now, 0, string.Empty, null, null, 0));
 
             return entitystoragemock;
         }

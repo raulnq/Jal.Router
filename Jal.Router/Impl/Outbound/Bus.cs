@@ -59,18 +59,6 @@ namespace Jal.Router.Impl
             return Reply<TContent, TResult>(content, endpoint, origin, options);
         }
 
-        private async Task Update(MessageContext context)
-        {
-            if(context.SagaContext.Data!=null && context.SagaContext.Data.Data != null && !string.IsNullOrWhiteSpace(context.SagaContext.Data.Id))
-            {
-                context.SagaContext.Data.Update(context.DateTimeUtc);
-
-                var storage = _factory.CreateEntityStorage();
-
-                await storage.Update(context.SagaContext.Data).ConfigureAwait(false);
-            }
-        }
-
         public Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
             return Dispatch(content, endpoint, origin, options);
@@ -156,19 +144,21 @@ namespace Jal.Router.Impl
                 {
                     sendercontext = _lifecycle.Add(endpoint, channel);
 
-                    if (sendercontext.Open())
-                    {
-                        _logger.Log($"Opening {sendercontext.ToString()}");
-                    }
+                    sendercontext.Open();
                 }
 
-                var message = new MessageContext(endpoint, channel, sendercontext.MessageSerializer, options, DateTime.UtcNow, origin, content);
+                var message = MessageContext.CreateToSend(sendercontext.MessageSerializer, sendercontext.EntityStorage, endpoint, channel, options, origin, content, DateTime.UtcNow);
 
                 interceptor.OnEntry(message);
 
                 try
                 {
-                    await Update(message).ConfigureAwait(false);
+                    if (message.SagaContext.IsLoaded() && message.SagaContext.Data.IsValid())
+                    {
+                        message.SagaContext.Data.Update(message.DateTimeUtc);
+
+                        await message.SagaContext.UpdateIntoStorage().ConfigureAwait(false);
+                    }
 
                     var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
 
@@ -186,7 +176,7 @@ namespace Jal.Router.Impl
 
                     interceptor.OnSuccess(message);
 
-                    return message.ContentContext.Result;
+                    return message.ContentContext.ReplyData;
                 }
                 catch (Exception ex)
                 {
@@ -210,52 +200,6 @@ namespace Jal.Router.Impl
             }
 
             return null;
-        }
-
-        private async Task Send(MessageContext message)
-        {
-            var interceptor = _factory.CreateBusInterceptor();
-
-            interceptor.OnEntry(message);
-
-            try
-            {
-                await Update(message).ConfigureAwait(false);
-
-                if (message.EndPoint.Channels.Any())
-                {
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
-
-                    foreach (var type in _factory.Configuration.OutboundMiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    foreach (var type in message.EndPoint.MiddlewareTypes)
-                    {
-                        chain.UseAsync(type);
-                    }
-
-                    await chain.UseAsync<ProducerMiddleware>().RunAsync(message).ConfigureAwait(false);
-                }
-                else
-                {
-                    throw new ApplicationException($"Endpoint {message.EndPoint.Name}, missing channels");
-                }
-
-                interceptor.OnSuccess(message);
-
-            }
-            catch (Exception ex)
-            {
-                interceptor.OnError(message, ex);
-
-                throw;
-            }
-            finally
-            {
-                interceptor.OnExit(message);
-            }
         }
     }
 }

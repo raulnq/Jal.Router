@@ -17,12 +17,11 @@ namespace Jal.Router.Impl
 
         public async Task Run()
         {
-            foreach (var sendercontext in _configuration.Runtime.SenderContexts)
+            foreach (var context in _configuration.Runtime.SenderContexts)
             {
-                if (await sendercontext.Close().ConfigureAwait(false))
-                {
-                    _logger.Log($"Shutdown {sendercontext.ToString()}");
-                }
+                await context.Close().ConfigureAwait(false);
+
+                _logger.Log($"Shutdown {context.ToString()}");
             }
         }
     }

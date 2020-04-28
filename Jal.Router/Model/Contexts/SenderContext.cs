@@ -1,12 +1,13 @@
 ﻿using Jal.Router.Interface;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
     public class SenderContext
     {
+        private readonly ILogger _logger;
+
         public Channel Channel { get; private set; }
 
         public EndPoint EndPoint { get; private set; }
@@ -21,27 +22,54 @@ namespace Jal.Router.Model
 
         public IMessageStorage MessageStorage { get; private set; }
 
-        public SenderContext(EndPoint endpoint, Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, IMessageSerializer serializer, IMessageStorage storage)
+        public IEntityStorage EntityStorage { get; private set; }
+
+        public static SenderContext Create(IComponentFactoryFacade factory, ILogger logger, Channel channel, EndPoint endpoint)
         {
+            var (senderchannel, readerchannel) = factory.CreateSenderChannel(channel.ChannelType, channel.Type);
+
+            var adapter = factory.CreateMessageAdapter(channel.AdapterType);
+
+            var serializer = factory.CreateMessageSerializer();
+
+            var messagestorage = factory.CreateMessageStorage();
+
+            var entitystorage = factory.CreateEntityStorage();
+
+            return new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, messagestorage, entitystorage, logger);
+        }
+
+        private SenderContext(EndPoint endpoint, Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage, ILogger logger)
+        {
+            if(senderchannel == null)
+            {
+                throw new ArgumentNullException(nameof(senderchannel));
+            }
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+            if (channel == null)
+            {
+                throw new ArgumentNullException(nameof(channel));
+            }
+
             Channel = channel;
             EndPoint = endpoint;
             SenderChannel = senderchannel;
             ReaderChannel = readerchannel;
             MessageAdapter = adapter;
             MessageSerializer = serializer;
-            MessageStorage = storage;
+            MessageStorage = messagestorage;
+            EntityStorage = entitystorage;
+            _logger = logger;
         }
 
-        public async Task<bool> Close()
+        public Task Close()
         {
-            if (SenderChannel != null)
-            {
-                await SenderChannel.Close(this).ConfigureAwait(false);
+            _logger.Log($"Shutdown {ToString()}");
 
-                return true;
-            }
-
-            return false;
+            return SenderChannel.Close(this);
         }
 
         public Task<MessageContext> Read(MessageContext context)
@@ -56,39 +84,24 @@ namespace Jal.Router.Model
 
         public Task<string> Send(object message)
         {
-            if (SenderChannel != null)
-            {
-                return SenderChannel.Send(this, message);
-            }
-
-            return Task.FromResult(string.Empty);
+            return SenderChannel.Send(this, message);
         }
 
         public bool IsActive()
         {
-            if (SenderChannel != null)
-            {
-                return SenderChannel.IsActive(this);
-            }
-
-            return false;
+            return SenderChannel.IsActive(this);
         }
 
-        public bool Open()
+        public void Open()
         {
-            if (SenderChannel != null)
-            {
-                SenderChannel.Open(this);
+            SenderChannel.Open(this);
 
-                return true;
-            }
-
-            return false;
+            _logger.Log($"Opening {ToString()}");
         }
 
         public override string ToString()
         {
-            return $"{Channel.FullPath} {Channel.ToString()} channel: {EndPoint.Name}";
+            return $"endpoint name: {EndPoint.ToString()} path: {Channel.FullPath} {Channel.ToString()} claimchek: {Channel.UseClaimCheck}";
         }
 
     }

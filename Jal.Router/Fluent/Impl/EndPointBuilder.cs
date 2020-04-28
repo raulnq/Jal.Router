@@ -190,7 +190,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition)
         {
-            _endpoint.SetCondition(condition);
+            _endpoint.When(condition);
 
             return this;
         }

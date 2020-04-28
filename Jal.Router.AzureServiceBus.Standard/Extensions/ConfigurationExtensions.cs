@@ -23,9 +23,9 @@ namespace Jal.Router.AzureServiceBus.Standard
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
                     .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                    .UsePointToPointResourceManager<AzureManagementPointToPointResourceManager>()
-                    .UsePublishSubscribeResourceManager<AzureManagementPublishSubscribeResourceManager>()
-                    .UseSubscriptionToPublishSubscribeResourceManager<AzureManagementSubscriptionToPublishSubscribeResourceManager>()
+                    .UsePointToPointResource<AzureManagementPointToPointResource>()
+                    .UsePublishSubscribeResource<AzureManagementPublishSubscribeResource>()
+                    .UseSubscriptionToPublishSubscribeResource<AzureManagementSubscriptionToPublishSubscribeResource>()
                     .UseMessageAdapter<AzureServiceBusMessageAdapter>()
                     .AddParameter(p);
             }
@@ -37,9 +37,9 @@ namespace Jal.Router.AzureServiceBus.Standard
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
                     .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<AzureServiceBusRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                    .UsePointToPointResourceManager<AzureServiceBusPointToPointResourceManager>()
-                    .UsePublishSubscribeResourceManager<AzureServiceBusPublishSubscribeResourceManager>()
-                    .UseSubscriptionToPublishSubscribeResourceManager<AzureServiceBusSubscriptionToPublishSubscribeResourceManager>()
+                    .UsePointToPointResource<AzureServiceBusPointToPointResource>()
+                    .UsePublishSubscribeResource<AzureServiceBusPublishSubscribeResource>()
+                    .UseSubscriptionToPublishSubscribeResource<AzureServiceBusSubscriptionToPublishSubscribeResource>()
                     .UseMessageAdapter<AzureServiceBusMessageAdapter>()
                     .AddParameter(p);
             }

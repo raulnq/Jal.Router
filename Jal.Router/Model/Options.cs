@@ -5,13 +5,38 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public Options(string endpointname, Dictionary<string, string> headers, 
-            SagaContext sagacontext, TrackingContext trackingcontext, TracingContext tracingcontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
+        public static Options CreateEmpty(string endpointname)
+        {
+            return new Options(endpointname,
+            new Dictionary<string, string>(), null, string.Empty,
+            new List<Tracking>(),
+            new TracingContext(string.Empty),
+            null,
+            null,
+            string.Empty,
+            null);
+        }
+
+        public static Options CreateFromMessageContext(MessageContext context, string endpointname, TracingContext tracingcontext, string sagaid, string version, DateTime? scheduledenqueuedatetimeutc)
+        {
+            if(string.IsNullOrWhiteSpace(sagaid))
+            {
+                return new Options(endpointname, context.CloneHeaders(), context.SagaContext?.Data, context.SagaContext?.Id, context.TrackingContext?.Trackings, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            }
+            else
+            {
+                return new Options(endpointname, context.CloneHeaders(), null, sagaid, context.TrackingContext?.Trackings, tracingcontext, context.Route, context.Saga, version, scheduledenqueuedatetimeutc);
+            }
+        }
+
+        private Options(string endpointname, Dictionary<string, string> headers, 
+            SagaData sagadata, string sagaid, List<Tracking> trackings, TracingContext tracingcontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
         {
             EndPointName = endpointname;
             Headers= headers;
-            SagaContext = sagacontext;
-            TrackingContext = trackingcontext;
+            SagaData = sagadata;
+            SagaId = sagaid;
+            Trackings = trackings;
             TracingContext = tracingcontext;
             Route = route;
             Saga = saga;
@@ -21,7 +46,9 @@ namespace Jal.Router.Model
 
         public TracingContext TracingContext { get; private set; }
 
-        public SagaContext SagaContext { get; private set; }
+        public SagaData SagaData { get; private set; }
+
+        public string SagaId { get; private set; }
 
         public Route Route { get; private set; }
 
@@ -35,6 +62,6 @@ namespace Jal.Router.Model
 
         public IDictionary<string,string> Headers { get; private set; }
 
-        public TrackingContext TrackingContext { get; private set; }
+        public List<Tracking> Trackings { get; private set; }
     }
 }

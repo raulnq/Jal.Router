@@ -27,9 +27,9 @@ namespace Jal.Router.Sample.NetCore
             var container = new ServiceContainer();
             container.AddRouter( c=>
             {
-                c.AddSource<FileRouterConfigurationSmokeTest>();
-                //c.AddAzureServiceBus();
-                //c.AddAzureStorage();
+                c.AddSource<RouterConfigurationSmokeTest>();
+                c.AddAzureServiceBus();
+                c.AddAzureStorage();
                 c.AddNewtonsoft();
             });
 
@@ -66,7 +66,7 @@ namespace Jal.Router.Sample.NetCore
             var bus = container.GetInstance<IBus>();
             var factory = container.GetInstance<IComponentFactoryFacade>();
             var parameter = new FileSystemParameter() { Path = appRoot };
-            var messagecontext = new MessageContext(bus, factory.CreateMessageSerializer());
+            var messagecontext = MessageContext.CreateEmptyFromListen(bus, factory);
             parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
              {
                  //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
@@ -85,13 +85,13 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                //.UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 }, useazureservicemanagement: false)
+                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 }, useazureservicemanagement: false)
                 //.UseFileSystemAsTransport(parameter)
-                //.UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=testraul;AccountKey=zeI7y9ubW3IXtR4/9i1IBmKnFsWGjY0snh4fE2Hc2FXkC4q4iPJ2JPUjCWDwCps7C9T0sVZCU9YbV5j/MAgnqg==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
-                .UseMemoryAsTransport()
+                //.UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
-                .UseMemoryAsStorage()
+                //.UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
@@ -297,13 +297,13 @@ namespace Jal.Router.Sample.NetCore
         {
             var config = new AzureServiceBusConfiguration()
             {
-                ClientId = "e40d9bbb-c50f-436e-8a5f-8494e0f84242",
-                ClientSecret = "OkDfucL/DT9h1FISlh79OfAnmwu9/h/TRx4ryFG+hIc=",
-                ConnectionString = "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=",
-                ResourceGroupName = "TestQueueApps",
-                ResourceName = "raulqueuetests",
-                SubscriptionId = "e759b3f9-6ac3-4f9d-b479-1ba4471235cd",
-                TenantId = "77f43f1b-5708-46dd-92a2-5f99f19e9b1f"
+                ClientId = "",
+                ClientSecret = "",
+                ConnectionString = "",
+                ResourceGroupName = "",
+                ResourceName = "",
+                SubscriptionId = "",
+                TenantId = ""
             };
 
             RegisterHandler(_sendersessionqueue + "_handler")
@@ -699,9 +699,9 @@ namespace Jal.Router.Sample.NetCore
 
             data.Name = message.Name;
 
-            var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
+            //var tracing = new TracingContext(id: context.TracingContext.Id + "_continue", operationid: context.TracingContext.OperationId);
 
-            return context.Send( new Message() { Name=message.Name }, "continueendpoint", tracing);
+            return context.Send( new Message() { Name=message.Name }, "continueendpoint"/*, tracing*/);
         }
     }
 
@@ -752,7 +752,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint", context.TracingContext);
+            var result = await context.Reply<Message, Message>(new Message() { }, "toreplyendpoint");
         }
     }
 
@@ -762,7 +762,7 @@ namespace Jal.Router.Sample.NetCore
         {
             Console.WriteLine("message handled by " + GetType().Name);
 
-            return context.Send(new Message() { Name = "Hi" }, "replyendpoint", context.TracingContext);
+            return context.Send(new Message() { Name = "Hi" }, "replyendpoint");
         }
     }
 

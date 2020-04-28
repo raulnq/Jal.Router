@@ -37,6 +37,10 @@ namespace Jal.Router.Model
 
         public IList<Handler> ExitHandlers { get; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
         public EndpointEntity ToEntity()
         {
             return new EndpointEntity(Name, ContentType);
@@ -52,7 +56,7 @@ namespace Jal.Router.Model
             ContentType = contenttype;
         }
 
-        public void SetCondition(Func<EndPoint, Options, Type, bool> condition)
+        public void When(Func<EndPoint, Options, Type, bool> condition)
         {
             Condition = condition;
         }
@@ -62,9 +66,9 @@ namespace Jal.Router.Model
             ReplyContentType = contenttype;
         }
 
-        public void SetUseClaimCheck(bool useclaimcheck)
+        public void AsClaimCheck()
         {
-            UseClaimCheck = useclaimcheck;
+            UseClaimCheck = true;
         }
     }
 }
