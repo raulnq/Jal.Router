@@ -162,7 +162,7 @@ namespace Jal.Router.Impl
 
                     var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
 
-                    foreach (var type in _factory.Configuration.OutboundMiddlewareTypes)
+                    foreach (var type in _factory.Configuration.EndpointMiddlewareTypes)
                     {
                         chain.UseAsync(type);
                     }

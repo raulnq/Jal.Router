@@ -40,13 +40,13 @@ namespace Jal.Router.Impl
                     }
                     catch (Exception ex)
                     {
-                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath} {ex}");
+                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name} {ex}");
 
                         throw;
                     }
                     finally
                     {
-                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name}");
                     }
 
                     if (outputcontext != null)
@@ -57,13 +57,13 @@ namespace Jal.Router.Impl
             }
             catch (Exception ex)
             {
-                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}  {ex}");
+                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name} {ex}");
 
                 throw;
             }
             finally
             {
-                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name}");
             }
         }
     }

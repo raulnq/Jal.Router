@@ -8,6 +8,7 @@ using Shouldly;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 
 namespace Jal.Router.Tests
 {
@@ -17,37 +18,36 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Bus_With_ShouldBeExecuted()
         {
-            var endpointprovidermock = Builder.CreateEnpointProvider();
+            var endpointprovidermock = Builder.CreateEnpointProviderMock();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            var shuffermock = new Mock<IChannelShuffler>();
+            var channel = Builder.CreateChannel();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
-            var lifecyclemock = new Mock<ISenderContextLifecycle>();
-
-            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
-
-            factorymock.Setup(m => m.CreateChannelShuffler()).Returns(shuffermock.Object);
+            factorymock.AddChannelShuffler(channel);
 
             var pipelinemock = Builder.CreatePipelineMock();
 
             var messagecontext = Builder.CreateMessageContextFromListen();
 
-            messagecontext.Route.Middlewares.Add(typeof(string));
-
             var factory = factorymock.Object;
 
-            factory.Configuration.OutboundMiddlewareTypes.Add(typeof(string));
+            var lifecyclemock = Builder.CreateSenderContextLifecycleMock(factory: factory, channel: channel);
 
-            var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
+            factory.Configuration.EndpointMiddlewareTypes.Add(typeof(string));
 
-            var options = Options.CreateEmpty("endpointname");
+            var sut = Build(endpointprovidermock, pipelinemock, factory, lifecyclemock);
+
+            var options = messagecontext.CreateOptions("endpoint");
 
             await sut.Send(new object(), options);
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+            pipelinemock.WasExecuted();
+        }
+
+        private static Bus Build(Mock<IEndPointProvider> endpointprovidermock, Mock<IPipeline> pipelinemock, IComponentFactoryFacade factory, Mock<ISenderContextLifecycle> lifecyclemock)
+        {
+            return new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
         }
 
         [TestMethod]
@@ -55,29 +55,27 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var shuffermock = new Mock<IChannelShuffler>();
+            var channel = Builder.CreateChannel();
 
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
+            factorymock.AddChannelShuffler(channel);
 
-            var lifecyclemock = new Mock<ISenderContextLifecycle>();
+            var factory = factorymock.Object;
 
-            lifecyclemock.Setup(x => x.Get(It.IsAny<Channel>())).Returns(Builder.CreateSenderContext());
-
-            factorymock.Setup(m => m.CreateChannelShuffler()).Returns(shuffermock.Object);
+            var lifecyclemock = Builder.CreateSenderContextLifecycleMock(factory: factory, channel: channel);
 
             var pipelinemock = Builder.CreatePipelineMock(true);
 
             var messagecontext = Builder.CreateMessageContextFromListen();
 
-            var endpointprovidermock = Builder.CreateEnpointProvider();
+            var endpointprovidermock = Builder.CreateEnpointProviderMock();
 
-            var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
+            var sut = Build(endpointprovidermock, pipelinemock, factory, lifecyclemock);
 
-            var options = Options.CreateEmpty("endpointname");
+            var options = messagecontext.CreateOptions("endpoint");
 
             await Should.ThrowAsync<Exception>(sut.Send(new object(), options));
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+            pipelinemock.WasExecuted();
         }
     }
 }

@@ -18,17 +18,11 @@ namespace Jal.Router.Tests
 
             var mock = new Mock<IRouterConfigurationSource>();
 
-            var ep = new EndPoint(endpointname);
+            mock.Setup(x => x.GetEndPoints()).Returns(new EndPoint[] { Builder.CreateEndpoint(endpointname) });
 
-            ep.SetContentType(typeof(object));
+            var sut = new EndPointProvider(new IRouterConfigurationSource[] { mock.Object });
 
-            ep.When((e, o, t) => true);
-
-            mock.Setup(x => x.GetEndPoints()).Returns(new EndPoint[] { ep });
-
-            var sut = new EndPointProvider(new Interface.IRouterConfigurationSource[] { mock.Object });
-
-            var endpoint = sut.Provide(Options.CreateEmpty(endpointname), typeof(object));
+            var endpoint = sut.Provide(Options.CreateEmpty(), typeof(object));
 
             endpoint.ShouldNotBeNull();
 
@@ -38,11 +32,9 @@ namespace Jal.Router.Tests
         [TestMethod]
         public void Provide_WithNonExistingEndpointName_ShouldThrowException()
         {
-            var endpointname = "name";
+            var sut = new EndPointProvider(new IRouterConfigurationSource[] { });
 
-            var sut = new EndPointProvider(new Interface.IRouterConfigurationSource[] { });
-
-            Should.Throw<ApplicationException>(() => sut.Provide(Options.CreateEmpty(endpointname), typeof(object)));
+            Should.Throw<ApplicationException>(() => sut.Provide(Options.CreateEmpty(), typeof(object)));
         }
     }
 }

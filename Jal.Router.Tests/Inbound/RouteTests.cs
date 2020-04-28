@@ -33,7 +33,7 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            factory.Configuration.InboundMiddlewareTypes.Add(typeof(string));
+            factory.Configuration.RouteMiddlewareTypes.Add(typeof(string));
 
             var sut = Build(factory, pipelinemock.Object);
 

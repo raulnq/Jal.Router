@@ -5,9 +5,10 @@ namespace Jal.Router.Model
 {
     public class EndPoint
     {
-        public EndPoint(string name)
+        public EndPoint(string name, Type contenttype)
         {
             Name = name;
+            ContentType = contenttype;
             Channels = new List<Channel>();
             MiddlewareTypes = new List<Type>();
             ErrorHandlers = new List<ErrorHandler>();
@@ -49,11 +50,6 @@ namespace Jal.Router.Model
         public void SetOrigin(Origin origin)
         {
             Origin = origin;
-        }
-
-        public void SetContentType(Type contenttype)
-        {
-            ContentType = contenttype;
         }
 
         public void When(Func<EndPoint, Options, Type, bool> condition)

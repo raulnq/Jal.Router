@@ -4,6 +4,7 @@ using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
+using System;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Tests
@@ -29,37 +30,47 @@ namespace Jal.Router.Tests
         }
 
         [TestMethod]
-        public async Task Consume_WithNoRoutes_ShouldDoNothing()
+        public async Task Consume_WithoutRoutes_ShouldDoNothing()
         {
-            var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
+            var factorymock = Builder.CreateFactoryMock();
+
+            factorymock.AddCreateComponent<Handler>();
 
             var messagecontext = Builder.CreateMessageContextFromListen();
 
-            var typedconsumer = CreateTypedConsumerMock();
+            var typedconsumermock = CreateTypedConsumerMock();
 
-            var sut = Build(factorymock.Object, typedconsumer.Object);
+            var sut = Build(factorymock.Object, typedconsumermock.Object);
 
             await sut.Consume(messagecontext);
 
-            factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Never());
+            factorymock.CreateComponentWasNotExecuted<Handler>();
 
-            typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>()), Times.Never());
+            typedconsumermock.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>()), Times.Never());
         }
 
         [TestMethod]
         public async Task Consume_WithoutRoutesForSaga_ShouldDoNothing()
         {
-            var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
+            var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextWithSaga();
+            factorymock.AddCreateComponent<Handler>();
+
+            var route = Builder.CreateRouteWithSaga();
+
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory, route: route);
+
+            messagecontext.SagaContext.Load(Builder.CreateSagaData());
 
             var typedconsumer = CreateTypedConsumerMock();
 
-            var sut = Build(factorymock.Object, typedconsumer.Object);
+            var sut = Build(factory, typedconsumer.Object);
 
             await sut.Consume(messagecontext);
 
-            factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Never());
+            factorymock.CreateComponentWasNotExecuted<Handler>();
 
             typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
         }
@@ -69,7 +80,9 @@ namespace Jal.Router.Tests
         [DataRow(false)]
         public async Task Consume_WithRoute_ShouldBe(bool evaluator)
         {
-            var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
+            var factorymock = Builder.CreateFactoryMock();
+
+            factorymock.AddCreateComponent<Handler>();
 
             var route = Builder.CreateRouteWithConsumer();
 
@@ -81,16 +94,14 @@ namespace Jal.Router.Tests
 
             await sut.Consume(messagecontext);
 
-            if(evaluator)
-            {
-                factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
+            factorymock.CreateComponentWasExecuted<Handler>();
 
+            if (evaluator)
+            {
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>()), Times.Once());
             }
             else
             {
-                factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
-
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethod<object, Handler>>(), It.IsAny<Handler>()), Times.Never());
             }
         }
@@ -100,30 +111,34 @@ namespace Jal.Router.Tests
         [DataRow(false)]
         public async Task Consume_WithRouteForSaga_ShouldBe(bool evaluator)
         {
-            var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
+            var factorymock = Builder.CreateFactoryMock();
 
-            var route = Builder.CreateRouteWithConsumer("status");
+            factorymock.AddCreateComponent<Handler>();
 
-            var messagecontext = Builder.CreateMessageContextWithSaga(status: "status");
+            var route = Builder.CreateRouteWithSagaAndConsumer("status");
+
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory, route: route);
+
+            messagecontext.SagaContext.Load(Builder.CreateSagaData());
 
             var typedconsumer = CreateTypedConsumerMock(evaluator);
 
-            var sut = Build(factorymock.Object, typedconsumer.Object);
+            var sut = Build(factory, typedconsumer.Object);
 
             await sut.Consume(messagecontext);
 
+            factorymock.CreateComponentWasExecuted<Handler>();
+
             if (evaluator)
             {
-                factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
-
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Once());
 
                 messagecontext.SagaContext.Data.Status.ShouldBe("status");
             }
             else
             {
-                factorymock.Verify(x => x.CreateComponent<Handler>(typeof(Handler)), Times.Once());
-
                 typedconsumer.Verify(x => x.Consume(It.IsAny<MessageContext>(), It.IsAny<object>(), It.IsAny<RouteMethodWithData<object, Handler, object>>(), It.IsAny<Handler>(), It.IsAny<object>()), Times.Never());
 
                 messagecontext.SagaContext.Data.Status.ShouldNotBe("status");

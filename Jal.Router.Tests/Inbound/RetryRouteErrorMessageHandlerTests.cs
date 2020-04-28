@@ -24,15 +24,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { }, false));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -40,15 +42,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "" } }, false));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -56,15 +60,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" } }, false));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -72,23 +78,21 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var busmock = new Mock<IBus>();
-
             var policymock = new Mock<IRetryPolicy>();
 
             policymock.Setup(x => x.CanRetry(It.IsAny<int>())).Returns(true);
 
             policymock.Setup(x => x.NextRetryInterval(It.IsAny<int>())).Returns(TimeSpan.FromSeconds(5));
 
-            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object }, { "type", typeof(object) } }, true));
-
-            factorymock.CreateMessageSerializerWasExecuted();
 
             busmock.SendWasExecuted<object>(op => op.Headers.Any(x=>x.Key.Contains("_retrycount")) && op.ScheduledEnqueueDateTimeUtc!=null && op.EndPointName== "queue");
 
@@ -100,21 +104,19 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var busmock = new Mock<IBus>();
-
             var policymock = new Mock<IRetryPolicy>();
 
             policymock.Setup(x => x.CanRetry(It.IsAny<int>())).Returns(false);
 
-            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object } }, true));
-
-            factorymock.CreateMessageSerializerWasNotExecuted();
 
             busmock.SendWasNotExecuted<object>();
 
@@ -126,8 +128,6 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var busmock = new Mock<IBus>();
-
             var policymock = new Mock<IRetryPolicy>();
 
             policymock.Setup(x => x.CanRetry(It.IsAny<int>())).Returns(false);
@@ -136,15 +136,15 @@ namespace Jal.Router.Tests
 
             Func<MessageContext, Exception, ErrorHandler, Task> fallback = (mc, e, eh) => { executed = true; return Task.CompletedTask; };
 
-            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             var handled = await sut.Handle(messagecontext, new System.Exception(), new Model.ErrorHandler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "policy", policymock.Object }, { "fallback", fallback }, { "type", typeof(object) } }, true));
-
-            factorymock.CreateMessageSerializerWasNotExecuted();
 
             busmock.SendWasNotExecuted<object>();
 

@@ -70,7 +70,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                     var context = await listenercontext.Read(message).ConfigureAwait(false);
 
-                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
 
                     try
                     {
@@ -85,11 +85,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
                     }
 
                 }, sessionoptions);
@@ -100,7 +100,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 {
                     var context = await listenercontext.Read(message).ConfigureAwait(false);
 
-                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
 
                     try
                     {
@@ -110,11 +110,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
                     }
                 }, options);
             }

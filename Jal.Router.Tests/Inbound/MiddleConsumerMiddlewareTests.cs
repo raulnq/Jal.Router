@@ -1,4 +1,5 @@
-﻿using Jal.Router.Impl;
+﻿using Jal.ChainOfResponsability;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,19 +27,21 @@ namespace Jal.Router.Tests
 
             var id = Guid.NewGuid().ToString();
 
-            var entitystoragemock = Builder.CreateEntityStorage(id);
+            var entitystoragemock = Builder.CreateEntityStorageMock(id);
 
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
-            var messagecontext = Builder.CreateMessageContextWithSaga();
+            var route = Builder.CreateRouteWithSagaAndConsumer("status");
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory, route: route);
 
             factory.Configuration.DisableStorage();
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -68,21 +71,23 @@ namespace Jal.Router.Tests
 
             var id = Guid.NewGuid().ToString();
 
-            var entitystoragemock = Builder.CreateEntityStorage(id);
+            var entitystoragemock = Builder.CreateEntityStorageMock(id);
 
             entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(default(SagaData));
 
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
-            var messagecontext = Builder.CreateMessageContextWithSaga();
+            var route = Builder.CreateRouteWithSagaAndConsumer("status");
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory, route: route);
 
             factory.Configuration.DisableStorage();
 
             var sut = Build(consumermock.Object, factory);
 
-            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             exception.Message.ShouldContain("No saga record type");
 
@@ -110,21 +115,23 @@ namespace Jal.Router.Tests
 
             var id = Guid.NewGuid().ToString();
 
-            var entitystoragemock = Builder.CreateEntityStorage(id);
+            var entitystoragemock = Builder.CreateEntityStorageMock(id);
 
-            entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(new SagaData(null, typeof(object), "name", DateTime.UtcNow, 0, string.Empty ));
+            entitystoragemock.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>())).ReturnsAsync(Builder.CreateSagaData(empty: true));
 
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
-            var messagecontext = Builder.CreateMessageContextWithSaga();
+            var route = Builder.CreateRouteWithSagaAndConsumer("status");
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory, route: route);
 
             factory.Configuration.DisableStorage();
 
             var sut = Build(consumermock.Object, factory);
 
-            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            var exception = await Should.ThrowAsync<ApplicationException>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             exception.Message.ShouldContain("Empty/Invalid saga record data");
 

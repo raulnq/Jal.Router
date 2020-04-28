@@ -1,13 +1,25 @@
-﻿using Jal.Router.Interface;
+﻿using Jal.ChainOfResponsability;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace Jal.Router.Tests
 {
     public static class MockExtensions
     {
+        public static void WasExecuted(this Mock<IPipeline> pipelinemock)
+        {
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        public static void WasNotExecuted(this Mock<IPipeline> pipelinemock)
+        {
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Never());
+        }
+
         public static void WasExecuted(this Mock<IProducer> producermock)
         {
             producermock.Verify(x => x.Produce(It.IsAny<MessageContext>()), Times.Once());
@@ -31,6 +43,16 @@ namespace Jal.Router.Tests
         public static void CreateEntityStorageWasNotExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Never());
+        }
+
+        public static void CreateComponentWasNotExecuted<T>(this Mock<IComponentFactoryFacade> factorymock) where T : class
+        {
+            factorymock.Verify(x => x.CreateComponent<T>(typeof(T)), Times.Never());
+        }
+
+        public static void CreateComponentWasExecuted<T>(this Mock<IComponentFactoryFacade> factorymock) where T : class
+        {
+            factorymock.Verify(x => x.CreateComponent<T>(typeof(T)), Times.Once());
         }
 
         public static void CreateEntityStorageWasExecuted(this Mock<IComponentFactoryFacade> factorymock)

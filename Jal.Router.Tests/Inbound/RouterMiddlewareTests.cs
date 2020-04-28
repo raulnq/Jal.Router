@@ -136,7 +136,7 @@ namespace Jal.Router.Tests
 
             var messagecontext = Builder.CreateMessageContextFromListen();
 
-            messagecontext.Route.ErrorHandlers.Add(new Model.ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
+            messagecontext.Route.ErrorHandlers.Add(new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
 
             var sut = Build(factorymock.Object);
 

@@ -5,7 +5,7 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public static Options CreateEmpty(string endpointname)
+        public static Options CreateEmpty(string endpointname="endpoint")
         {
             return new Options(endpointname,
             new Dictionary<string, string>(), null, string.Empty,

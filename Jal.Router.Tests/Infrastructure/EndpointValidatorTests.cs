@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            var endpoint = new EndPoint("name");
+            var endpoint = Builder.CreateEndpoint();
 
             endpoint.Channels.Add(Builder.CreateChannel());
 
@@ -54,7 +54,7 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            var endpoint = new EndPoint("name");
+            var endpoint = Builder.CreateEndpoint();
 
             endpoint.Channels.Add(Builder.CreateChannel());
 

@@ -162,11 +162,7 @@ namespace Jal.Router.Impl
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var endpoint = new EndPoint(name);
-
-            _enpoints.Add(endpoint);
-
-            var builder = new EndPointBuilder(endpoint);
+            var builder = new EndPointBuilder(_enpoints, name);
 
             return builder;
         }

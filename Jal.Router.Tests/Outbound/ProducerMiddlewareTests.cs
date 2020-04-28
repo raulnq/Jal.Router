@@ -40,13 +40,13 @@ namespace Jal.Router.Tests
 
             var producermock = new Mock<IProducer>();
 
-            var messagecontext = Builder.CreateMessageContextFromListen();
+            var entitystoragemock = Builder.CreateEntityStorageMock();
 
-            var entitystoragemock = Builder.CreateEntityStorage();
-
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
             factory.Configuration.EnableStorage();
 
@@ -55,8 +55,6 @@ namespace Jal.Router.Tests
             await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, x => Task.CompletedTask);
 
             producermock.WasExecuted();
-
-            factorymock.CreateEntityStorageWasExecuted();
 
             entitystoragemock.CreateMessageEntityWasExecuted();
         }

@@ -98,7 +98,7 @@ namespace Jal.Router.Extensions
             return new Origin() { Key = key};
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, string id = null, string sagaid = null, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null, string replytorequestid=null)
+        public static Options CreateOptions(this MessageContext context, string endpointname, string id = null, string sagaid = null, IDictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc=null, string replytorequestid=null)
         {
             var tracingcontext = context.TracingContext.CreateDependency(id, replytorequestid);
 
@@ -127,7 +127,7 @@ namespace Jal.Router.Extensions
             return options;
         }
 
-        private static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
+        public static Options CreateOptions(this MessageContext context, string endpointname, TracingContext tracingcontext, string sagaid = null, Dictionary<string, string> headers = null, string version = null, DateTime? scheduledenqueuedatetimeutc = null)
         {
             if (string.IsNullOrEmpty(version))
             {

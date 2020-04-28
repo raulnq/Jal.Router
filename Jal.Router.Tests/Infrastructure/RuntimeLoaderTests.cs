@@ -18,7 +18,7 @@ namespace Jal.Router.Tests
 
             configurationmock.Setup(x => x.GetRoutes()).Returns(new Model.Route[] { Builder.CreateRoute() });
 
-            configurationmock.Setup(x => x.GetEndPoints()).Returns(new Model.EndPoint[] { new Model.EndPoint("name") }  );
+            configurationmock.Setup(x => x.GetEndPoints()).Returns(new Model.EndPoint[] { Builder.CreateEndpoint() }  );
 
             configurationmock.Setup(x => x.GetResources()).Returns(new Model.Resource[] { new Model.Resource(Model.ChannelType.PointToPoint, "path", "connectionstring", new Dictionary<string, string>()) });
 

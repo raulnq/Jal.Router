@@ -19,7 +19,7 @@ namespace Jal.Router.Tests
 
             var sut = new SenderContextLoader(creatormock.Object);
 
-            var endpoint = new EndPoint("name");
+            var endpoint = Builder.CreateEndpoint();
 
             var channel = Builder.CreateChannel();
 

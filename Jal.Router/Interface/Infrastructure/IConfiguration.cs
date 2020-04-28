@@ -33,8 +33,8 @@ namespace Jal.Router.Interface
         Type BusInterceptorType { get; }
         Type MessageSerializerType { get; }
         Type MessageStorageType { get; }
-        IList<Type> InboundMiddlewareTypes { get; }
-        IList<Type> OutboundMiddlewareTypes { get; }
+        IList<Type> RouteMiddlewareTypes { get; }
+        IList<Type> EndpointMiddlewareTypes { get; }
         IConfiguration EnableStorage(bool ignoreexceptions = true);
         IConfiguration DisableStorage();
         IConfiguration SetTransportName(string name);
@@ -55,8 +55,8 @@ namespace Jal.Router.Interface
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseEntityStorage<TStorage>() where TStorage : IEntityStorage;
         IConfiguration AddShutdownWatcher<TShutdownWatcher>() where TShutdownWatcher : IShutdownWatcher;
-        IConfiguration AddInboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
-        IConfiguration AddOutboundMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
+        IConfiguration AddRouteMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
+        IConfiguration AddEndpointMiddleware<TMiddleware>() where TMiddleware : IAsyncMiddleware<MessageContext>;
         IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IConfiguration UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         IConfiguration UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
