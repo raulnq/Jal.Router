@@ -79,32 +79,32 @@ namespace Jal.Router.Tests
 
         public static void CreateMessageEntityWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<MessageEntity>()), Times.Once());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void CreateMessageEntityWasNotExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<MessageEntity>()), Times.Never());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>()), Times.Never());
         }
 
         public static void CreateSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<SagaData>()), Times.Once());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void UpdateSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>()), Times.Once());
+            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void UpdateSagaDataWasNotExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>()), Times.Never());
+            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Never());
         }
 
         public static void GetSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Get(It.IsAny<string>()), Times.Once());
+            entitystoragemock.Verify(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
     }
 }

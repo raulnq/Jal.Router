@@ -35,7 +35,7 @@ namespace Jal.Router.Impl
             Bus = bus;
         }
 
-        protected async Task<object> ReadContent(object message, string claimcheckid, bool useclaimcheck, IMessageStorage storage)
+        protected async Task<string> ReadContent(object message, string claimcheckid, bool useclaimcheck, IMessageStorage storage)
         {
             string data;
 
@@ -53,14 +53,14 @@ namespace Jal.Router.Impl
 
         public Task<MessageContext> ReadFromPhysicalMessage(object message, ListenerContext listener)
         {
-            return Read(message, listener.Route, null, listener.Channel, listener.MessageSerializer, listener.MessageStorage);
+            return Read(message, listener.Route, null, listener.Channel, listener.MessageSerializer, listener.MessageStorage, listener.EntityStorage);
 
         }
 
         public Task<MessageContext> ReadFromPhysicalMessage(object message, SenderContext sender)
         {
             //TODO Bug: Should be the a claim from the reply configuration
-            return Read(message, null, sender.EndPoint, sender.Channel, sender.MessageSerializer, sender.MessageStorage);
+            return Read(message, null, sender.EndPoint, sender.Channel, sender.MessageSerializer, sender.MessageStorage, sender.EntityStorage);
         }
 
         public async Task<object> WritePhysicalMessage(MessageContext context, SenderContext sender)
@@ -77,7 +77,7 @@ namespace Jal.Router.Impl
 
         protected abstract object Write(MessageContext context, IMessageSerializer serializer);
 
-        protected abstract Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage storage);
+        protected abstract Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage);
 
         protected abstract string ReadContent(object message);
     }

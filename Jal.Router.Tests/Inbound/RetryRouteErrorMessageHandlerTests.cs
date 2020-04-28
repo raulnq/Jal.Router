@@ -24,7 +24,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -40,7 +40,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -56,7 +56,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -80,7 +80,7 @@ namespace Jal.Router.Tests
 
             policymock.Setup(x => x.NextRetryInterval(It.IsAny<int>())).Returns(TimeSpan.FromSeconds(5));
 
-            var messagecontext = Builder.CreateMessageContext(busmock: busmock);
+            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
 
             var factory = factorymock.Object;
 
@@ -106,7 +106,7 @@ namespace Jal.Router.Tests
 
             policymock.Setup(x => x.CanRetry(It.IsAny<int>())).Returns(false);
 
-            var messagecontext = Builder.CreateMessageContext(busmock: busmock);
+            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
 
             var factory = factorymock.Object;
 
@@ -136,7 +136,7 @@ namespace Jal.Router.Tests
 
             Func<MessageContext, Exception, ErrorHandler, Task> fallback = (mc, e, eh) => { executed = true; return Task.CompletedTask; };
 
-            var messagecontext = Builder.CreateMessageContext(busmock: busmock);
+            var messagecontext = Builder.CreateMessageContextFromListen(bus: busmock.Object);
 
             var factory = factorymock.Object;
 

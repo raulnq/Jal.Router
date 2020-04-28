@@ -33,7 +33,7 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMockWithHandler<Handler>();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var typedconsumer = CreateTypedConsumerMock();
 
@@ -73,7 +73,7 @@ namespace Jal.Router.Tests
 
             var route = Builder.CreateRouteWithConsumer();
 
-            var messagecontext = Builder.CreateMessageContext(route);
+            var messagecontext = Builder.CreateMessageContextFromListen(route: route);
 
             var typedconsumer = CreateTypedConsumerMock(evaluator);
 

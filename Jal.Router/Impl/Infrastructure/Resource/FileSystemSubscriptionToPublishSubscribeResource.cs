@@ -4,21 +4,25 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public class FileSystemSubscriptionToPublishSubscribeResourceManager : AbstractFileSystemResourceManager
+    public class FileSystemSubscriptionToPublishSubscribeResource : AbstractFileSystemResource
     {
-        public FileSystemSubscriptionToPublishSubscribeResourceManager(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
+        public FileSystemSubscriptionToPublishSubscribeResource(IParameterProvider provider, IFileSystemTransport transport) : base(provider, transport)
         {
         }
 
-        public override Task<bool> CreateIfNotExist(Resource resource)
+        public override Task<bool> CreateIfNotExist(ResourceContext context)
         {
+            var resource = context.Resource;
+
             var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, resource.ConnectionString, resource.Path, resource.Subscription);
 
             return Task.FromResult(_transport.CreateDirectory(path));
         }
 
-        public override Task<bool> DeleteIfExist(Resource resource)
+        public override Task<bool> DeleteIfExist(ResourceContext context)
         {
+            var resource = context.Resource;
+
             var path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, resource.ConnectionString, resource.Path, resource.Subscription);
 
             return Task.FromResult(_transport.DeleteDirectory(path));

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
@@ -29,6 +30,8 @@ namespace Jal.Router.Model
             Subscription = subscription;
 
             Rules = new List<Rule>();
+
+            Id = Guid.NewGuid().ToString();
         }
 
         public override string ToString()
@@ -49,13 +52,7 @@ namespace Jal.Router.Model
             return string.Empty;
         }
 
-        public string Id
-        {
-            get
-            {
-                return Path + Subscription + ConnectionString;
-            }
-        }
+        public string Id { get; }
 
         public string FullPath
         {

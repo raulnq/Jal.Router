@@ -17,7 +17,7 @@ namespace Jal.Router.Tests
 
             lifecyclemock.Setup(x => x.Add(It.IsAny<Route>(), It.IsAny<Channel>())).Returns(Builder.CreateListenerContext());
 
-            var sut = new ListenerContextLoader(lifecyclemock.Object, new NullLogger());
+            var sut = new ListenerContextLoader(lifecyclemock.Object);
 
             var route = Builder.CreateRoute();
 

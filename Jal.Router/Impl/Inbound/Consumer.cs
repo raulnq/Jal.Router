@@ -54,7 +54,7 @@ namespace Jal.Router.Impl
 
                     try
                     {
-                        var content = context.MessageSerializer.Deserialize(context.ContentContext.Data, method.ContentType);
+                        var content = context.Deserialize(context.ContentContext.Data, method.ContentType);
 
                         if (method.IsAnonymous)
                         {
@@ -131,7 +131,7 @@ namespace Jal.Router.Impl
                             continue;
                         }
 
-                        var content = context.MessageSerializer.Deserialize(context.ContentContext.Data, method.ContentType);
+                        var content = context.Deserialize(context.ContentContext.Data, method.ContentType);
 
                         if (method.IsAnonymous)
                         {

@@ -10,7 +10,7 @@ namespace Jal.Router.Impl
     {
         public RuntimeContext Runtime { get; }
         public string TransportName { get; private set; }
-        public Storage Storage { get; set; }
+        public Storage Storage { get; }
         public string ApplicationName { get; private set; }
         public IDictionary<Type, IList<Type>> LoggerTypes { get; }
         public IList<Type> StartupTaskTypes { get; }
@@ -88,19 +88,19 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration UsePublishSubscribeResourceManager<TChannel>() where TChannel : IResourceManager
+        public IConfiguration UsePublishSubscribeResource<TChannel>() where TChannel : IResource
         {
             PublishSubscribeResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UsePointToPointResourceManager<TChannel>() where TChannel : IResourceManager
+        public IConfiguration UsePointToPointResource<TChannel>() where TChannel : IResource
         {
             PointToPointResourceType = typeof(TChannel);
             return this;
         }
 
-        public IConfiguration UseSubscriptionToPublishSubscribeResourceManager<TChannel>() where TChannel : IResourceManager
+        public IConfiguration UseSubscriptionToPublishSubscribeResource<TChannel>() where TChannel : IResource
         {
             SubscriptionToPublishSubscribeResourceType = typeof(TChannel);
             return this;
@@ -222,9 +222,9 @@ namespace Jal.Router.Impl
             UseBusInterceptor<NullBusInterceptor>();
             UseEntityStorage<NullEntityStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UsePointToPointResourceManager<NullResourceManager>();
-            UsePublishSubscribeResourceManager<NullResourceManager>();
-            UseSubscriptionToPublishSubscribeResourceManager<NullResourceManager>();
+            UsePointToPointResource<NullResource>();
+            UsePublishSubscribeResource<NullResource>();
+            UseSubscriptionToPublishSubscribeResource<NullResource>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
             UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
@@ -242,7 +242,7 @@ namespace Jal.Router.Impl
             ShutdownWatcherTypes = new List<Type>();
             AddLogger<BeatLogger, Beat>();
             AddLogger<StatisticLogger, Statistic>();
-            AddStartupTask<StartupBeatLogger>();
+            AddStartupTask<StartupLogger>();
             AddStartupTask<RuntimeLoader>();
             AddStartupTask<EndpointValidator>();
             AddStartupTask<RouteValidator>();

@@ -18,7 +18,7 @@ namespace Jal.Router.Impl
 
             foreach (var resource in Factory.Configuration.Runtime.Resources)
             {
-                _lifecycle.AddOrGet(resource);
+                _lifecycle.Add(resource);
             }
 
             Logger.Log("Resources loaded");

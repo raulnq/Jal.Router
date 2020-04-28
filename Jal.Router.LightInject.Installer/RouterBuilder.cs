@@ -15,9 +15,9 @@ namespace Jal.Router.LightInject.Installer
             _container = container;
         }
 
-        public override IRouterBuilder AddResourceManager<TImplementation>() 
+        public override IRouterBuilder AddResource<TImplementation>() 
         {
-            _container.Register<IResourceManager, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
+            _container.Register<IResource, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
 
             return this;
         }

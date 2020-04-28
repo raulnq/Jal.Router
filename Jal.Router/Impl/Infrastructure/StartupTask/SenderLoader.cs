@@ -31,10 +31,7 @@ namespace Jal.Router.Impl
         {
             foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
             {
-                if(sendercontext.Open())
-                {
-                    Logger.Log($"Opening {sendercontext.ToString()}");
-                }
+                sendercontext.Open();
             }
         }
 

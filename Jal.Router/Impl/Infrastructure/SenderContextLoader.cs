@@ -8,29 +8,22 @@ namespace Jal.Router.Impl
     {
         private readonly ISenderContextLifecycle _lifecycle;
 
-        private readonly ILogger _logger;
-
-        public SenderContextLoader(ISenderContextLifecycle lifecycle, ILogger logger)
+        public SenderContextLoader(ISenderContextLifecycle lifecycle)
         {
             _lifecycle = lifecycle;
-
-            _logger = logger;
         }
 
         public void Add(EndPoint endpoint)
         {
             foreach (var channel in endpoint.Channels)
             {
-                var sendercontext = _lifecycle.Get(channel);
+                var context = _lifecycle.Get(channel);
 
-                if (sendercontext == null)
+                if (context == null)
                 {
-                    sendercontext = _lifecycle.Add(endpoint, channel);
+                    context = _lifecycle.Add(endpoint, channel);
 
-                    if (sendercontext.Open())
-                    {
-                        _logger.Log($"Opening {sendercontext.ToString()}");
-                    }
+                    context.Open();
                 }
             }
         }
@@ -39,14 +32,11 @@ namespace Jal.Router.Impl
         {
             foreach (var channel in endpoint.Channels)
             {
-                var sendercontext = _lifecycle.Remove(channel);
+                var context = _lifecycle.Remove(channel);
 
-                if (sendercontext == null)
+                if (context == null)
                 {
-                    if (await sendercontext.Close().ConfigureAwait(false))
-                    {
-                        _logger.Log($"Shutdown {sendercontext.ToString()}");
-                    }
+                    await context.Close().ConfigureAwait(false);
                 }
             }
         }

@@ -45,11 +45,11 @@ namespace Jal.Router.Interface
 
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UsePointToPointResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
+        IConfiguration UsePointToPointResource<TResource>() where TResource : IResource;
 
-        IConfiguration UsePublishSubscribeResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
+        IConfiguration UsePublishSubscribeResource<TResource>() where TResource : IResource;
 
-        IConfiguration UseSubscriptionToPublishSubscribeResourceManager<TResourceManager>() where TResourceManager : IResourceManager;
+        IConfiguration UseSubscriptionToPublishSubscribeResource<TResource>() where TResource : IResource;
 
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;

@@ -57,7 +57,7 @@ namespace Jal.Router.Model
 
         public bool IsValid()
         {
-            return Data != null;
+            return Data != null && !string.IsNullOrWhiteSpace(Id);
         }
 
         public void End(DateTime ended)

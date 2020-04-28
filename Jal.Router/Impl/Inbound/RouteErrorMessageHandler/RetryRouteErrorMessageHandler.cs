@@ -39,7 +39,7 @@ namespace Jal.Router.Impl
                 {
                     context.Headers[countername] = count.ToString();
 
-                    var content = context.MessageSerializer.Deserialize(context.ContentContext.Data, type);
+                    var content = context.Deserialize(context.ContentContext.Data, type);
 
                     _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 

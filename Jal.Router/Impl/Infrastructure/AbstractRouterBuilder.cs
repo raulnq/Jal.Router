@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
 
             AddStartupTask<ResourceValidator>();
 
-            AddStartupTask<StartupBeatLogger>();
+            AddStartupTask<StartupLogger>();
 
             AddStartupTask<EndpointValidator>();
 
@@ -60,7 +60,7 @@ namespace Jal.Router.Impl
 
             AddMonitoringTask<StatisticMonitor>();
 
-            AddMonitoringTask<HeartBeatLogger>();
+            AddMonitoringTask<MonitoringTask>();
 
             AddMonitoringTask<ListenerMonitor>();
 
@@ -76,19 +76,19 @@ namespace Jal.Router.Impl
 
             AddEntityStorage<InMemoryEntityStorage>();
 
-            AddResourceManager<NullResourceManager>();
+            AddResource<NullResource>();
 
-            AddResourceManager<FileSystemPointToPointlResourceManager>();
+            AddResource<FileSystemPointToPointlResource>();
 
-            AddResourceManager<FileSystemPublishSubscribeResourceManager>();
+            AddResource<FileSystemPublishSubscribeResource>();
 
-            AddResourceManager<FileSystemSubscriptionToPublishSubscribeResourceManager>();
+            AddResource<FileSystemSubscriptionToPublishSubscribeResource>();
 
-            AddResourceManager<InMemoryPointToPointResourceManager>();
+            AddResource<InMemoryPointToPointResource>();
 
-            AddResourceManager<InMemoryPublishSubscribeResourceManager>();
+            AddResource<InMemoryPublishSubscribeResource>();
 
-            AddResourceManager<InMemorySubscriptionToPublishSubscribeResourceManager>();
+            AddResource<InMemorySubscriptionToPublishSubscribeResource>();
 
             AddLogger<StatisticLogger, Statistic>();
 
@@ -137,7 +137,7 @@ namespace Jal.Router.Impl
             AddRouteEntryMessageHandler<RouteEntryMessageHandler>();
         }
 
-        public abstract IRouterBuilder AddResourceManager<TImplementation>() where TImplementation : class, IResourceManager;
+        public abstract IRouterBuilder AddResource<TImplementation>() where TImplementation : class, IResource;
 
         public abstract IRouterBuilder AddEntityStorage<TImplementation>() where TImplementation : class, IEntityStorage;
 

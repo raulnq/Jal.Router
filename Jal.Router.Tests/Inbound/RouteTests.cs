@@ -27,7 +27,7 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             messagecontext.Route.Middlewares.Add(typeof(string));
 
@@ -49,7 +49,7 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             messagecontext.Route.When(x => false);
 
@@ -67,7 +67,7 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock(true);
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build(factorymock.Object, pipelinemock.Object);
 

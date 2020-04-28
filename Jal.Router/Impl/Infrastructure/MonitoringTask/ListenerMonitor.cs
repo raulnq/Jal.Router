@@ -19,15 +19,9 @@ namespace Jal.Router.Impl
             {
                 if (!listenercontext.IsActive())
                 {
-                    if(await listenercontext.Close().ConfigureAwait(false))
-                    {
-                        Logger.Log($"Shutdown {listenercontext.ToString()}");
-                    }
+                    await listenercontext.Close().ConfigureAwait(false);
 
-                    if(listenercontext.Open())
-                    {
-                        Logger.Log($"Listening {listenercontext.ToString()}");
-                    }
+                    listenercontext.Open();
                 }
             }
 

@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
-    public abstract class AbstractResourceManager : IResourceManager
+    public abstract class AbstractResource : IResource
     {
-        public virtual Task<bool> CreateIfNotExist(Resource resource)
+        public virtual Task<bool> CreateIfNotExist(ResourceContext context)
         {
             return Task.FromResult(false);
         }
 
-        public virtual Task<bool> DeleteIfExist(Resource resource)
+        public virtual Task<bool> DeleteIfExist(ResourceContext context)
         {
             return Task.FromResult(false);
         }
 
-        public virtual Task<Statistic> Get(Resource resource)
+        public virtual Task<Statistic> Get(ResourceContext context)
         {
             return Task.FromResult(default(Statistic));
         }

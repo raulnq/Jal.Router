@@ -6,7 +6,6 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Impl
 {
-
     public class ForwardRouteEntryMessageHandler : IRouteEntryMessageHandler
     {
         private readonly ILogger _logger;
@@ -20,7 +19,7 @@ namespace Jal.Router.Impl
             if (metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname) 
                 && metadata.Parameters.ContainsKey("type") && metadata.Parameters["type"] is Type type && type!=null)
             {
-                var content = context.MessageSerializer.Deserialize(context.ContentContext.Data, type);
+                var content = context.Deserialize(context.ContentContext.Data, type);
 
                 _logger.Log($"Message {context.Id}, forwarding the message to the endpoint {endpointname} by route {context.Name}");
 

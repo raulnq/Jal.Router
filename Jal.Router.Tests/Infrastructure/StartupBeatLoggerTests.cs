@@ -25,7 +25,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.LoggerTypes.Clear();
 
-            var sut = new StartupBeatLogger(factory, new NullLogger());
+            var sut = new StartupLogger(factory, new NullLogger());
 
             await sut.Run();
 
@@ -49,7 +49,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.LoggerTypes.Add(typeof(Beat), new List<Type>() { typeof(object) });
 
-            var sut = new StartupBeatLogger(factory, new NullLogger());
+            var sut = new StartupLogger(factory, new NullLogger());
 
             await sut.Run();
 

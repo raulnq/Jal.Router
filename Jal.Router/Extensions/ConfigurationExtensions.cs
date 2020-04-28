@@ -32,9 +32,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<FileSystemPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointResourceManager<FileSystemPointToPointlResourceManager>()
-                .UsePublishSubscribeResourceManager<FileSystemPublishSubscribeResourceManager>()
-                .UseSubscriptionToPublishSubscribeResourceManager<FileSystemSubscriptionToPublishSubscribeResourceManager>()
+                .UsePointToPointResource<FileSystemPointToPointlResource>()
+                .UsePublishSubscribeResource<FileSystemPublishSubscribeResource>()
+                .UseSubscriptionToPublishSubscribeResource<FileSystemSubscriptionToPublishSubscribeResource>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }
@@ -54,9 +54,9 @@ namespace Jal.Router.Extensions
                 .UsePublishSubscribeChannel<InMemoryPublishSubscribeChannel>()
                 .UseRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>()
                 .UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>()
-                .UsePointToPointResourceManager<InMemoryPointToPointResourceManager>()
-                .UsePublishSubscribeResourceManager<InMemoryPublishSubscribeResourceManager>()
-                .UseSubscriptionToPublishSubscribeResourceManager<InMemorySubscriptionToPublishSubscribeResourceManager>()
+                .UsePointToPointResource<InMemoryPointToPointResource>()
+                .UsePublishSubscribeResource<InMemoryPublishSubscribeResource>()
+                .UseSubscriptionToPublishSubscribeResource<InMemorySubscriptionToPublishSubscribeResource>()
                 .UseMessageAdapter<MessageAdapter>()
                 .AddParameter(p);
         }

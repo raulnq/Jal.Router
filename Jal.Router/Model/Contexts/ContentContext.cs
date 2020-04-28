@@ -12,7 +12,7 @@ namespace Jal.Router.Model
 
         public bool UseClaimCheck { get; private set; }
 
-        public object Result { get; private set; }
+        public object ReplyData { get; set; }
 
         public ContentContext(MessageContext context, string claimcheckid, bool useclaimcheck, string data)
         {
@@ -20,11 +20,6 @@ namespace Jal.Router.Model
             ClaimCheckId = claimcheckid;
             Context = context;
             UseClaimCheck = useclaimcheck;
-        }
-
-        public void SetResult(object result)
-        {
-            Result = result;
         }
 
         public ContentContextEntity ToEntity()

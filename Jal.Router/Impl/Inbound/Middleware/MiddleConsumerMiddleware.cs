@@ -18,31 +18,25 @@ namespace Jal.Router.Impl
         {
             var messagecontext = context.Data;
 
-            var storage = Factory.CreateEntityStorage();
+            await messagecontext.SagaContext.LoadDataFromStorage().ConfigureAwait(false);
 
-            messagecontext.SagaContext.Load(await storage.Get(messagecontext.SagaContext.Id).ConfigureAwait(false));
-
-            if (messagecontext.SagaContext.IsLoaded())
-            {
-                if (messagecontext.SagaContext.Data.IsValid())
-                {
-                    messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
-
-                    await Consume(messagecontext).ConfigureAwait(false);
-
-                    messagecontext.SagaContext.Data.Update(messagecontext.DateTimeUtc);
-
-                    await storage.Update(messagecontext.SagaContext.Data).ConfigureAwait(false);
-                }
-                else
-                {
-                    throw new ApplicationException($"Empty/Invalid saga record data {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
-                }
-            }
-            else
+            if (!messagecontext.SagaContext.IsLoaded())
             {
                 throw new ApplicationException($"No saga record type {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
             }
+
+            if (!messagecontext.SagaContext.Data.IsValid())
+            {
+                throw new ApplicationException($"Empty/Invalid saga record data {messagecontext.Saga.DataType.FullName}, {messagecontext.Name}");
+            }
+
+            messagecontext.SagaContext.Data.SetStatus(DefaultStatus);
+
+            await Consume(messagecontext).ConfigureAwait(false);
+
+            messagecontext.SagaContext.Data.Update(messagecontext.DateTimeUtc);
+
+            await messagecontext.SagaContext.UpdateIntoStorage().ConfigureAwait(false);
         }
     }
 }

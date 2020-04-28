@@ -19,21 +19,27 @@ namespace Jal.Router.Impl
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.Get(start, end, saganame, options);
+            var serializer = _factory.CreateMessageSerializer();
+
+            return storage.Get(start, end, saganame, serializer, options);
         }
 
         public Task<MessageEntity[]> GetMessagesBySaga(SagaData sagadata, IDictionary<string, string> options = null)
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetMessageEntitiesBySagaData(sagadata, options);
+            var serializer = _factory.CreateMessageSerializer();
+
+            return storage.GetMessageEntitiesBySagaData(sagadata, serializer, options);
         }
 
         public Task<MessageEntity[]> GetMessages(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null)
         {
             var storage = _factory.CreateEntityStorage();
 
-            return storage.GetMessageEntities(start, end, routename, options);
+            var serializer = _factory.CreateMessageSerializer();
+
+            return storage.GetMessageEntities(start, end, routename, serializer, options);
         }
     }
 }

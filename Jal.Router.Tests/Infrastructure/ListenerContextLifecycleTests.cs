@@ -23,7 +23,7 @@ namespace Jal.Router.Tests
 
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextLifecycle(factory, routermock.Object);
+            var sut = new ListenerContextLifecycle(factory, routermock.Object, new NullLogger());
 
             var listenercontext = sut.Add(Builder.CreateRoute(), Builder.CreateChannel());
 

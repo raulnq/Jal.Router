@@ -1,10 +1,13 @@
 using Jal.Router.Interface;
+using System;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
     public class ListenerContext
     {
+        private readonly ILogger _logger;
+
         public Channel Channel { get; private set; }
 
         public IListenerChannel ListenerChannel { get; private set; }
@@ -15,22 +18,58 @@ namespace Jal.Router.Model
 
         public IMessageStorage MessageStorage { get; private set; }
 
+        public IEntityStorage EntityStorage { get; private set; }
+
         public IRouter Router { get; private set; }
 
         public Route Route { get; private set; }
 
-        public ListenerContext(Route route, Channel channel, IListenerChannel listener, IMessageAdapter adapter, IRouter router, IMessageSerializer serializer, IMessageStorage storage)
+        public static ListenerContext Create(IComponentFactoryFacade factory, IRouter router, ILogger logger, Channel channel, Route route)
         {
+            var listenerchannel = factory.CreateListenerChannel(channel.ChannelType, channel.Type);
+
+            var adapter = factory.CreateMessageAdapter(channel.AdapterType);
+
+            var serializer = factory.CreateMessageSerializer();
+
+            var messagestorage = factory.CreateMessageStorage();
+
+            var entitystorage = factory.CreateEntityStorage();
+
+            var context = new ListenerContext(route, channel, listenerchannel, adapter, router, serializer, messagestorage, entitystorage, logger);
+
+            return context;
+        }
+
+        private ListenerContext(Route route, Channel channel, IListenerChannel listenerchannel, IMessageAdapter adapter,
+            IRouter router, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage,
+            ILogger logger)
+        {
+            if (listenerchannel == null)
+            {
+                throw new ArgumentNullException(nameof(listenerchannel));
+            }
+            if (route == null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
+            if (channel == null)
+            {
+                throw new ArgumentNullException(nameof(channel));
+            }
+
             Channel = channel;
             Route = route;
-            ListenerChannel = listener;
+            ListenerChannel = listenerchannel;
             MessageAdapter = adapter;
             Router = router;
             MessageSerializer = serializer;
-            MessageStorage = storage;
+            MessageStorage = messagestorage;
+            EntityStorage = entitystorage;
+            _logger = logger;
         }
 
-        public Task Consume(MessageContext context)
+        public Task Dispatch(MessageContext context)
         {
             var when = true;
 
@@ -53,45 +92,31 @@ namespace Jal.Router.Model
         {
             return MessageAdapter.ReadFromPhysicalMessage(message, this);
         }
-        public async Task<bool> Close()
+
+        public Task Close()
         {
-            if (ListenerChannel != null)
-            {
-                await ListenerChannel.Close(this).ConfigureAwait(false);
+            _logger.Log($"Shutdown {this.ToString()}");
 
-                return true;
-            }
-
-            return false;
+            return ListenerChannel.Close(this);
         }
 
         public bool IsActive()
         {
-            if (ListenerChannel != null)
-            {
-                return ListenerChannel.IsActive(this);
-            }
-
-            return false;
+            return ListenerChannel.IsActive(this);
         }
 
-        public bool Open()
+        public void Open()
         {
-            if (ListenerChannel != null)
-            {
-                ListenerChannel.Open(this);
+            ListenerChannel.Open(this);
 
-                ListenerChannel.Listen(this);
+            ListenerChannel.Listen(this);
 
-                return true;
-            }
-
-            return false;
+            _logger.Log($"Listening {ToString()}");
         }
 
         public override string ToString()
         {
-            return $"{Channel.FullPath} {Channel.ToString()} channel: {Route.ToString()} partition: {Channel.Partition}";
+            return $"route name: {Route.ToString()} path: {Channel.FullPath} {Channel.ToString()} partition: {Channel.Partition} claimchek: {Channel.UseClaimCheck}";
         }
     }
 }

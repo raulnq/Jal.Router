@@ -6,8 +6,6 @@ namespace Jal.Router.Interface
     {
         ResourceContext Remove(Resource resource);
 
-        ResourceContext AddOrGet(Resource resource);
-
         ResourceContext Add(Resource resource);
 
         ResourceContext Get(Resource resource);
