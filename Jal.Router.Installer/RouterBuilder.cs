@@ -191,5 +191,19 @@ namespace Jal.Router.Installer
 
             return this;
         }
+
+        public override IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+        {
+            _container.Register(Component.For<TService>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+
+            return this;
+        }
+
+        public override IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+        {
+            _container.Register(Component.For<TService>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
+
+            return this;
+        }
     }
 }

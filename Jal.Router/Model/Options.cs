@@ -5,15 +5,15 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public static Options CreateEmpty(string endpointname="endpoint")
+        public static Options Create(string endpointname="endpoint", string id=null, string version=null)
         {
             return new Options(endpointname,
             new Dictionary<string, string>(), null, string.Empty,
             new List<Tracking>(),
-            new TracingContext(string.Empty),
+            new TracingContext(id??Guid.NewGuid().ToString()),
             null,
             null,
-            string.Empty,
+            version,
             null);
         }
 

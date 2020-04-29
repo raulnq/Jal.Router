@@ -6,27 +6,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IForMessageEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
+    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
         private EndPoint _endpoint;
 
-        private readonly List<EndPoint> _endpoints;
-
-        private readonly string _name;
-
-        public EndPointBuilder(List<EndPoint> endpoints, string name)
+        public EndPointBuilder(EndPoint endpoint)
         {
-            _endpoints = endpoints;
-            _name = name;
-        }
-
-        public IToEndPointBuilder ForMessage<TMessage>()
-        {
-            _endpoint = new EndPoint(_name, typeof(TMessage));
-
-            _endpoints.Add(_endpoint);
-
-            return this;
+            _endpoint = endpoint;
         }
 
         public void AddPointToPointChannel(string connectionstring, string path, Type adapter = null, Type type = null)
@@ -196,7 +182,7 @@ namespace Jal.Router.Fluent.Impl
             action(builder);
         }
 
-        public IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition)
+        public IOnEndPointOptionBuilder When(Func<Options, object, bool> condition)
         {
             _endpoint.When(condition);
 

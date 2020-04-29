@@ -54,12 +54,12 @@ namespace Jal.Router.Model
             }
         }
 
-        public static MessageContext CreateEmptyFromListen(IBus bus, IComponentFactoryFacade factory)
+        public static MessageContext CreateFromListen(IBus bus, IComponentFactoryFacade factory)
         {
             return new MessageContext(bus, factory.CreateMessageSerializer(), factory.CreateEntityStorage(), null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
-        public static MessageContext CreateEmptyFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage)
+        public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage)
         {
             return new MessageContext(bus, serializer, entitystorage, null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }

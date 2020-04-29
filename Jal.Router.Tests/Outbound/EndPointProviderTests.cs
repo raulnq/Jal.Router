@@ -22,7 +22,7 @@ namespace Jal.Router.Tests
 
             var sut = new EndPointProvider(new IRouterConfigurationSource[] { mock.Object });
 
-            var endpoint = sut.Provide(Options.CreateEmpty(), typeof(object));
+            var endpoint = sut.Provide(Options.Create(endpointname), typeof(object));
 
             endpoint.ShouldNotBeNull();
 
@@ -34,7 +34,7 @@ namespace Jal.Router.Tests
         {
             var sut = new EndPointProvider(new IRouterConfigurationSource[] { });
 
-            Should.Throw<ApplicationException>(() => sut.Provide(Options.CreateEmpty(), typeof(object)));
+            Should.Throw<ApplicationException>(() => sut.Provide(Options.Create(), typeof(object)));
         }
     }
 }

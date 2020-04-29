@@ -30,7 +30,7 @@ namespace Jal.Router.Impl
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             return Reply<TContent, TResult>(content, endpoint, endpoint.Origin, options);
         }
@@ -44,7 +44,7 @@ namespace Jal.Router.Impl
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -66,14 +66,14 @@ namespace Jal.Router.Impl
 
         public Task Send<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             return Send(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Send<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -90,14 +90,14 @@ namespace Jal.Router.Impl
 
         public Task Publish<TContent>(TContent content, Options options)
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             return Publish(content, endpoint, endpoint.Origin, options);
         }
 
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            var endpoint = _provider.Provide(options, content.GetType());
+            var endpoint = _provider.Provide(options, content);
 
             if (string.IsNullOrWhiteSpace(origin.From))
             {
@@ -130,9 +130,9 @@ namespace Jal.Router.Impl
 
             var channels = shuffler.Shuffle(endpoint.Channels.ToArray());
 
-            var numberofchannels = channels.Length;
-
             var count = 0;
+
+            var result = default(object);
 
             foreach (var channel in channels)
             {
@@ -176,22 +176,13 @@ namespace Jal.Router.Impl
 
                     interceptor.OnSuccess(message);
 
-                    return message.ContentContext.ReplyData;
+                    result = message.ContentContext.ReplyData;
                 }
                 catch (Exception ex)
                 {
                     interceptor.OnError(message, ex);
 
-                    if (count < numberofchannels)
-                    {
-                        _logger.Log($"Message {message.Id} failed to distribute ({count}), moving to the next channel");
-                    }
-                    else
-                    {
-                        _logger.Log($"Message {message.Id} failed to distribute ({count}), no more channels");
-
-                        throw;
-                    }
+                    throw;
                 }
                 finally
                 {
@@ -199,7 +190,7 @@ namespace Jal.Router.Impl
                 }
             }
 
-            return null;
+            return result;
         }
     }
 }

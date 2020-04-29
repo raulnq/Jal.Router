@@ -11,7 +11,7 @@ namespace Jal.Router.Impl
     {
         private readonly List<Route> _routes = new List<Route>();
 
-        private readonly List<EndPoint> _enpoints = new List<EndPoint>();
+        private readonly List<EndPoint> _endpoints = new List<EndPoint>();
 
         private readonly List<Resource> _resources = new List<Resource>();
 
@@ -31,11 +31,11 @@ namespace Jal.Router.Impl
 
         public EndPoint[] GetEndPoints()
         {
-            foreach (var endPoint in _enpoints)
+            foreach (var endPoint in _endpoints)
             {
                 endPoint.SetOrigin(_origin);
             }
-            return _enpoints.ToArray();
+            return _endpoints.ToArray();
         }
 
         public Resource[] GetResources()
@@ -155,14 +155,18 @@ namespace Jal.Router.Impl
             _origin.Key = key;
         }
 
-        public IForMessageEndPointBuilder RegisterEndPoint(string name)
+        public IToEndPointBuilder RegisterEndPoint(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var builder = new EndPointBuilder(_enpoints, name);
+            var endpoint = new EndPoint(name);
+
+            _endpoints.Add(endpoint);
+
+            var builder = new EndPointBuilder(endpoint);
 
             return builder;
         }

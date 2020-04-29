@@ -35,13 +35,12 @@ public class RouterConfigurationSource : AbstractRouterConfigurationSource
     {
         RegisterHandler("handler")
             .ToListen(x=>x.AddPointToPointChannel("path","connectionstring"))
-            .ForMessage<Message>().Use(x =>
+            .With(x =>
             {
-                x.With<MessageHandler, MessageHandler>((request, handler, context) => handler.Handle(request));
+                x.ForMessage<Message>().Use<MessageHandler, MessageHandler>((request, handler, context) => handler.Handle(request));
             });  
             
         RegisterEndPoint("endpoint")
-            .ForMessage<Message>()
             .To(x => x.AddPointToPointChannel("connectionstring", "path"));
     }
 }
@@ -54,9 +53,8 @@ var container = new ServiceContainer();
 container.AddRouter(c=>{
     c.AddSource<RouterConfigurationSource>();
     c.AddNewtonsoft();
+    c.AddMessageHandlerAsSingleton<IMessageHandler, MessageHandler>();
 });
-
-container.Register<IMessageHandler, MessageHandler>(typeof(MessageHandler).FullName, new PerContainerLifetime());
 
 var bus = container.GetInstance<IBus>();
 
@@ -69,9 +67,7 @@ host.Configuration
 
 await host.Startup();
 
-var messagecontext = new MessageContext(bus);
-
-await messagecontext.Send(new Message(), "endpoint");
+await bus.Send(new Message(), Options.Create("endpoint"));
 
 Console.ReadLine();
 
@@ -90,6 +86,7 @@ Jal.Router is licensed under the [Apache2 license](https://github.com/raulnq/Jal
 ## Authors
 * Raul Naupari (raulnq@gmail.com)
 ## RoadMap
+* Feature: SqlServer transport
 * Feature: Default transport and transport by router/endpoind
 * Feature: Compression/encryption (middleware).
 * Feature: Message consumption during scheduled periods of time.

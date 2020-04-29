@@ -14,9 +14,9 @@ namespace Jal.Router.Tests
     {
         public static EndPoint CreateEndpoint(string name = "endpoint", bool when = true)
         {
-            var endpoint = new EndPoint(name, typeof(object));
+            var endpoint = new EndPoint(name);
 
-            endpoint.When((e, o, t) => when);
+            endpoint.When((op, ob) => when);
 
             return endpoint;
         }
@@ -38,7 +38,7 @@ namespace Jal.Router.Tests
                 channel = CreateChannel();
             }
 
-            var options = Options.CreateEmpty(endpoint.Name);
+            var options = Options.Create(endpoint.Name);
 
             return MessageContext.CreateToSend(factory.CreateMessageSerializer(), factory.CreateEntityStorage(), endpoint, channel, options, new Origin(), null, DateTime.UtcNow);
         }
@@ -144,7 +144,7 @@ namespace Jal.Router.Tests
 
             endpoint.Channels.Add(new Channel(channel, null, null, null, null));
 
-            endpointprovidermock.Setup(x => x.Provide(It.IsAny<Options>(), It.IsAny<Type>())).Returns(endpoint);
+            endpointprovidermock.Setup(x => x.Provide(It.IsAny<Options>(), It.IsAny<object>())).Returns(endpoint);
 
             return endpointprovidermock;
         }

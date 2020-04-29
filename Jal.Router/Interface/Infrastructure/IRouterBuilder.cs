@@ -5,6 +5,14 @@ namespace Jal.Router.Interface
 {
     public interface IRouterBuilder
     {
+        IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+            where TService: class
+            where TImplementation : class, TService;
+
+        IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService;
+
         IRouterBuilder AddSource<TImplementation>() where TImplementation : class, IRouterConfigurationSource;
 
         IRouterBuilder AddMiddleware<TImplementation>() where TImplementation : class, IAsyncMiddleware<MessageContext>;

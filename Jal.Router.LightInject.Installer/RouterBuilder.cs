@@ -189,5 +189,19 @@ namespace Jal.Router.LightInject.Installer
 
             return this;
         }
+
+        public override IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+        {
+            _container.Register<TService, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
+
+            return this;
+        }
+
+        public override IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+        {
+            _container.Register<TService, TImplementation>(typeof(TImplementation).FullName);
+
+            return this;
+        }
     }
 }

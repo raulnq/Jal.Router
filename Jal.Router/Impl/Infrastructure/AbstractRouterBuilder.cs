@@ -186,5 +186,13 @@ namespace Jal.Router.Impl
         public abstract IRouterBuilder AddBusExitMessageHandler<TImplementation>() where TImplementation : class, IBusExitMessageHandler;
 
         public abstract IRouterBuilder AddBusInterceptor<TImplementation>() where TImplementation : class, IBusInterceptor;
+
+        public abstract IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService;
+
+        public abstract IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService;
     }
 }
