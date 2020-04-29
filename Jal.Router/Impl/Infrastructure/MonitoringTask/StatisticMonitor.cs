@@ -22,9 +22,9 @@ namespace Jal.Router.Impl
 
                 var loggers = loggertypes.Select(x => Factory.CreateLogger<Statistic>(x)).ToArray();
 
-                foreach (var context in Factory.Configuration.Runtime.ResourceContexts)
+                foreach (var context in Factory.Configuration.Runtime.Contexts)
                 {
-                    var message = await context.Get().ConfigureAwait(false);
+                    var message = await context.GetStatistic().ConfigureAwait(false);
 
                     if (message != null)
                     {

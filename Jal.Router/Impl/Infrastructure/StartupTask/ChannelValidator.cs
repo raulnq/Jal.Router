@@ -13,39 +13,39 @@ namespace Jal.Router.Impl
             _logger = logger;
         }
 
-        public string Validate(Channel channel, string resourcetype, string resourcename)
+        public string Validate(Channel channel, string channeltype, string channelname)
         {
             StringBuilder errors = new StringBuilder();
 
-            Validate(errors, channel.ConnectionString, "connection string", resourcetype, resourcename);
+            Validate(errors, channel.ConnectionString, "connection string", channeltype, channelname);
 
-            Validate(errors, channel.Path, "path", resourcetype, resourcename);
+            Validate(errors, channel.Path, "path", channeltype, channelname);
 
             if (channel.ChannelType == ChannelType.SubscriptionToPublishSubscribe)
             {
-                Validate(errors, channel.Subscription, "subscription", resourcetype, resourcename);
+                Validate(errors, channel.Subscription, "subscription", channeltype, channelname);
             }
 
-            if (channel.ChannelType == ChannelType.RequestReplyToPointToPoint || channel.ChannelType == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+            if (channel.ReplyType != ReplyType.None)
             {
-                Validate(errors, channel.ReplyConnectionString, "reply connection string", resourcetype, resourcename);
+                Validate(errors, channel.ReplyConnectionString, "reply connection string", channeltype, channelname);
 
-                Validate(errors, channel.ReplyPath, "reply path", resourcetype, resourcename);
+                Validate(errors, channel.ReplyPath, "reply path", channeltype, channelname);
 
-                if (channel.ChannelType == Model.ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+                if (channel.ReplyType == ReplyType.FromSubscriptionToPublishSubscribe)
                 {
-                    Validate(errors, channel.ReplySubscription, "reply subscription", resourcetype, resourcename);
+                    Validate(errors, channel.ReplySubscription, "reply subscription", channeltype, channelname);
                 }
             }
 
             return errors.ToString();
         }
 
-        private void Validate(StringBuilder errors, string value, string propertyname, string resourcetype, string resourcename)
+        private void Validate(StringBuilder errors, string value, string propertyname, string channeltype, string channelname)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                var error = $"Empty {propertyname}, {resourcetype} {resourcename}";
+                var error = $"Empty {propertyname}, {channeltype} {channelname}";
 
                 errors.AppendLine(error);
 

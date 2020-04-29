@@ -4,29 +4,18 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
-    public class SenderContext
+
+    public class SenderContext : AbstractContext
     {
-        private readonly ILogger _logger;
-
-        public Channel Channel { get; private set; }
-
         public EndPoint EndPoint { get; private set; }
 
         public IReaderChannel ReaderChannel { get; private set; }
 
         public ISenderChannel SenderChannel { get; private set; }
 
-        public IMessageAdapter MessageAdapter { get; private set; }
-
-        public IMessageSerializer MessageSerializer { get; private set; }
-
-        public IMessageStorage MessageStorage { get; private set; }
-
-        public IEntityStorage EntityStorage { get; private set; }
-
-        public static SenderContext Create(IComponentFactoryFacade factory, ILogger logger, Channel channel, EndPoint endpoint)
+        public static SenderContext Create(IComponentFactoryFacade factory, ILogger logger, IHasher hasher, Channel channel, EndPoint endpoint)
         {
-            var (senderchannel, readerchannel) = factory.CreateSenderChannel(channel.ChannelType, channel.Type);
+            var (senderchannel, readerchannel, channelmanager) = factory.CreateSenderChannel(channel.ChannelType, channel.Type);
 
             var adapter = factory.CreateMessageAdapter(channel.AdapterType);
 
@@ -36,12 +25,16 @@ namespace Jal.Router.Model
 
             var entitystorage = factory.CreateEntityStorage();
 
-            return new SenderContext(endpoint, channel, senderchannel, readerchannel, adapter, serializer, messagestorage, entitystorage, logger);
+            return new SenderContext(endpoint, channel, channelmanager, senderchannel, readerchannel, adapter, serializer, messagestorage, entitystorage, logger, hasher);
         }
 
-        private SenderContext(EndPoint endpoint, Channel channel, ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage, ILogger logger)
+        private SenderContext(EndPoint endpoint, Channel channel, IChannelManager channelmanager, 
+            ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, 
+            IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage, ILogger logger, IHasher hasher)
+            :base(channel, channelmanager, adapter, serializer, messagestorage, entitystorage, logger, hasher)
         {
-            if(senderchannel == null)
+
+            if (senderchannel == null)
             {
                 throw new ArgumentNullException(nameof(senderchannel));
             }
@@ -49,20 +42,10 @@ namespace Jal.Router.Model
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
-            if (channel == null)
-            {
-                throw new ArgumentNullException(nameof(channel));
-            }
 
-            Channel = channel;
             EndPoint = endpoint;
             SenderChannel = senderchannel;
             ReaderChannel = readerchannel;
-            MessageAdapter = adapter;
-            MessageSerializer = serializer;
-            MessageStorage = messagestorage;
-            EntityStorage = entitystorage;
-            _logger = logger;
         }
 
         public Task Close()
@@ -96,8 +79,12 @@ namespace Jal.Router.Model
         {
             SenderChannel.Open(this);
 
+            Hash();
+
             _logger.Log($"Opening {ToString()}");
         }
+
+
 
         public override string ToString()
         {

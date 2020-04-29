@@ -18,9 +18,9 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object,null));
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object,null, null));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger(), new Hasher());
 
             var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.PointToPoint));
 
@@ -46,9 +46,9 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, null));
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, null, null));
 
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
+            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger(), new Hasher());
 
             var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.PublishSubscribe));
 
@@ -67,66 +67,6 @@ namespace Jal.Router.Tests
             sendercontext.Channel.Subscription.ShouldBe("subscription");
 
             sendercontext.Channel.ChannelType.ShouldBe(ChannelType.PublishSubscribe);
-        }
-
-        [TestMethod]
-        public void Add_WithRequestReplyToPointToPointChannel_ShouldBeCreated()
-        {
-            var channelmock = new Mock<IRequestReplyChannelFromPointToPointChannel>();
-
-            var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
-
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
-
-            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.RequestReplyToPointToPoint));
-
-            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
-
-            sendercontext.SenderChannel.ShouldNotBeNull();
-
-            sendercontext.SenderChannel.ShouldBeAssignableTo<IRequestReplyChannelFromPointToPointChannel>();
-
-            sendercontext.ReaderChannel.ShouldNotBeNull();
-
-            sendercontext.ReaderChannel.ShouldBeAssignableTo<IRequestReplyChannelFromPointToPointChannel>();
-
-            sendercontext.Channel.ShouldNotBeNull();
-
-            sendercontext.Channel.Path.ShouldBe("path");
-
-            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.RequestReplyToPointToPoint);
-        }
-
-        [TestMethod]
-        public void Add_WithRequestReplyToSubscriptionToPublishSubscribeChannel_ShouldBeCreated()
-        {
-            var channelmock = new Mock<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
-
-            var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((channelmock.Object, channelmock.Object));
-
-            var sut = new SenderContextLifecycle(factorymock.Object, new NullLogger());
-
-            var sendercontext = sut.Add(Builder.CreateEndpoint(), Builder.CreateChannel(ChannelType.RequestReplyToSubscriptionToPublishSubscribe));
-
-            factorymock.Verify(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>()), Times.Once);
-
-            sendercontext.SenderChannel.ShouldNotBeNull();
-
-            sendercontext.SenderChannel.ShouldBeAssignableTo<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
-
-            sendercontext.ReaderChannel.ShouldNotBeNull();
-
-            sendercontext.ReaderChannel.ShouldBeAssignableTo<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
-
-            sendercontext.Channel.ShouldNotBeNull();
-
-            sendercontext.Channel.Path.ShouldBe("path");
-
-            sendercontext.Channel.ChannelType.ShouldBe(ChannelType.RequestReplyToSubscriptionToPublishSubscribe);
         }
     }
 }

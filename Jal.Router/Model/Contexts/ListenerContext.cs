@@ -4,29 +4,18 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
-    public class ListenerContext
+
+    public class ListenerContext : AbstractContext
     {
-        private readonly ILogger _logger;
-
-        public Channel Channel { get; private set; }
-
         public IListenerChannel ListenerChannel { get; private set; }
-
-        public IMessageAdapter MessageAdapter { get; private set; }
-
-        public IMessageSerializer MessageSerializer { get; private set; }
-
-        public IMessageStorage MessageStorage { get; private set; }
-
-        public IEntityStorage EntityStorage { get; private set; }
 
         public IRouter Router { get; private set; }
 
         public Route Route { get; private set; }
 
-        public static ListenerContext Create(IComponentFactoryFacade factory, IRouter router, ILogger logger, Channel channel, Route route)
+        public static ListenerContext Create(IComponentFactoryFacade factory, IRouter router, ILogger logger, IHasher hasher,  Channel channel, Route route)
         {
-            var listenerchannel = factory.CreateListenerChannel(channel.ChannelType, channel.Type);
+            var (listenerchannel, channelmanager) = factory.CreateListenerChannel(channel.ChannelType, channel.Type);
 
             var adapter = factory.CreateMessageAdapter(channel.AdapterType);
 
@@ -36,18 +25,22 @@ namespace Jal.Router.Model
 
             var entitystorage = factory.CreateEntityStorage();
 
-            var context = new ListenerContext(route, channel, listenerchannel, adapter, router, serializer, messagestorage, entitystorage, logger);
+            var context = new ListenerContext(route, channel, channelmanager, listenerchannel, adapter, router, serializer, messagestorage, entitystorage, logger, hasher);
 
             return context;
         }
 
-        private ListenerContext(Route route, Channel channel, IListenerChannel listenerchannel, IMessageAdapter adapter,
+        private ListenerContext(Route route, Channel channel, IChannelManager channelcreator, IListenerChannel listenerchannel, IMessageAdapter adapter,
             IRouter router, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage,
-            ILogger logger)
+            ILogger logger, IHasher hasher) : base(channel, channelcreator, adapter, serializer, messagestorage, entitystorage, logger, hasher)
         {
             if (listenerchannel == null)
             {
                 throw new ArgumentNullException(nameof(listenerchannel));
+            }
+            if (channelcreator == null)
+            {
+                throw new ArgumentNullException(nameof(channelcreator));
             }
             if (route == null)
             {
@@ -58,15 +51,9 @@ namespace Jal.Router.Model
                 throw new ArgumentNullException(nameof(channel));
             }
 
-            Channel = channel;
             Route = route;
             ListenerChannel = listenerchannel;
-            MessageAdapter = adapter;
             Router = router;
-            MessageSerializer = serializer;
-            MessageStorage = messagestorage;
-            EntityStorage = entitystorage;
-            _logger = logger;
         }
 
         public Task Dispatch(MessageContext context)
@@ -111,12 +98,14 @@ namespace Jal.Router.Model
 
             ListenerChannel.Listen(this);
 
+            Hash();
+
             _logger.Log($"Listening {ToString()}");
         }
 
         public override string ToString()
         {
-            return $"route name: {Route.ToString()} path: {Channel.FullPath} {Channel.ToString()} partition: {Channel.Partition} claimchek: {Channel.UseClaimCheck}";
+            return $"route name: {Route.ToString()} path: {Channel.FullPath} {Channel.ToString()} partition: {Channel.UsePartition} claimchek: {Channel.UseClaimCheck}";
         }
     }
 }

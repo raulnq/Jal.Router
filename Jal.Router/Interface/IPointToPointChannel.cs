@@ -1,6 +1,6 @@
 namespace Jal.Router.Interface
 {
-    public interface IPointToPointChannel : IListenerChannel, ISenderChannel
+    public interface IPointToPointChannel : IListenerChannel, ISenderChannel, IChannelManager, IReaderChannel
     {
 
     }

@@ -5,8 +5,15 @@
         None,
         PointToPoint,
         PublishSubscribe,
-        RequestReplyToPointToPoint,
-        RequestReplyToSubscriptionToPublishSubscribe,
+        //RequestReplyToPointToPoint,
+        //RequestReplyToSubscriptionToPublishSubscribe,
         SubscriptionToPublishSubscribe
+    }
+
+    public enum ReplyType
+    {
+        None,
+        FromPointToPoint,
+        FromSubscriptionToPublishSubscribe
     }
 }

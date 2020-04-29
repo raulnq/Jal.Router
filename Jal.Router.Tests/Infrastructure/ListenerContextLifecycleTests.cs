@@ -19,7 +19,7 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns(listenermock.Object);
+            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns((listenermock.Object, null));
 
             var factory = factorymock.Object;
 

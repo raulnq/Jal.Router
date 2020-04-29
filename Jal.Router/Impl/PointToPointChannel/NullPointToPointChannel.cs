@@ -11,6 +11,16 @@ namespace Jal.Router.Impl
 
         }
 
+        public Task<Statistic> GetStatistic(Channel channel)
+        {
+            return Task.FromResult(default(Statistic));
+        }
+
+        public Task<bool> DeleteIfExist(Channel channel)
+        {
+            return Task.FromResult(false);
+        }
+
         public bool IsActive(ListenerContext listenercontext)
         {
             return false;
@@ -44,6 +54,16 @@ namespace Jal.Router.Impl
         public Task Close(SenderContext sendercontext)
         {
             return Task.CompletedTask;
+        }
+
+        public Task<bool> CreateIfNotExist(Channel channel)
+        {
+            return Task.FromResult(false);
+        }
+
+        public Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
+        {
+            return Task.FromResult(default(MessageContext));
         }
     }
 }

@@ -16,41 +16,6 @@ namespace Jal.Router.Impl
             Configuration = configuration;
         }
 
-        public IResource CreateResource(ChannelType channel)
-        {
-            if (channel == ChannelType.PointToPoint)
-            {
-                return CreatePointToPointChannelResource();
-            }
-
-            if (channel == ChannelType.SubscriptionToPublishSubscribe)
-            {
-                return CreateSubscriptionToPublishSubscribeChannelResource();
-            }
-
-            if (channel == ChannelType.PublishSubscribe)
-            {
-                return CreatePublishSubscribeChannelResource();
-            }
-
-            return null;
-        }
-
-        private IResource CreatePointToPointChannelResource()
-        {
-            return _factory.Create<IResource>(Configuration.PointToPointResourceType);
-        }
-
-        private IResource CreatePublishSubscribeChannelResource()
-        {
-            return _factory.Create<IResource>(Configuration.PublishSubscribeResourceType);
-        }
-
-        private IResource CreateSubscriptionToPublishSubscribeChannelResource()
-        {
-            return _factory.Create<IResource>(Configuration.SubscriptionToPublishSubscribeResourceType);
-        }
-
         public IBusInterceptor CreateBusInterceptor()
         {
             return _factory.Create<IBusInterceptor>(Configuration.BusInterceptorType);
@@ -104,30 +69,6 @@ namespace Jal.Router.Impl
             else
             {
                 return _factory.Create<IPublishSubscribeChannel>(type);
-            }
-        }
-
-        private IRequestReplyChannelFromPointToPointChannel CreateRequestReplyChannelFromPointToPointChannel(Type type)
-        {
-            if (type == null)
-            {
-                return _factory.Create<IRequestReplyChannelFromPointToPointChannel>(Configuration.RequestReplyChannelFromPointToPointChannelType);
-            }
-            else
-            {
-                return _factory.Create<IRequestReplyChannelFromPointToPointChannel>(type);
-            }
-        }
-
-        private IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel CreateRequestReplyFromSubscriptionToPublishSubscribeChannel(Type type)
-        {
-            if (type == null)
-            {
-                return _factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(Configuration.RequestReplyFromSubscriptionToPublishSubscribeChannelType);
-            }
-            else
-            {
-                return _factory.Create<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>(type);
             }
         }
 
@@ -196,56 +137,64 @@ namespace Jal.Router.Impl
             return _factory.Create<TComponent>(type);
         }
 
-        public (ISenderChannel,IReaderChannel) CreateSenderChannel(ChannelType channel, Type type)
+        public (ISenderChannel,IReaderChannel,IChannelManager) CreateSenderChannel(ChannelType channel, Type type)
         {
             var senderchannel = default(ISenderChannel);
 
             var readerchannel = default(IReaderChannel);
 
+            var channelmanager = default(IChannelManager);
+
             if (channel == ChannelType.PointToPoint)
             {
-                senderchannel = CreatePointToPointChannel(type);
+                var pointtopointchannel = CreatePointToPointChannel(type);
+
+                senderchannel = pointtopointchannel;
+
+                channelmanager = pointtopointchannel;
+
+                readerchannel = pointtopointchannel;
             }
 
             if (channel == ChannelType.PublishSubscribe)
             {
-                senderchannel = CreatePublishSubscribeChannel(type);
+                var publishsubscribechannel = CreatePublishSubscribeChannel(type);
+
+                senderchannel = publishsubscribechannel;
+
+                channelmanager = publishsubscribechannel;
+
+                readerchannel = publishsubscribechannel;
             }
 
-            if (channel == ChannelType.RequestReplyToPointToPoint)
-            {
-                var requestresplychannel = CreateRequestReplyChannelFromPointToPointChannel(type);
-
-                readerchannel = requestresplychannel;
-
-                senderchannel = requestresplychannel;
-            }
-
-            if (channel == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
-            {
-                var requestresplychannel = CreateRequestReplyFromSubscriptionToPublishSubscribeChannel(type);
-
-                readerchannel = requestresplychannel;
-
-                senderchannel = requestresplychannel;
-            }
-
-            return (senderchannel,readerchannel);
+            return (senderchannel,readerchannel, channelmanager);
         }
 
-        public IListenerChannel CreateListenerChannel(ChannelType channel, Type type)
+        public (IListenerChannel, IChannelManager) CreateListenerChannel(ChannelType channel, Type type)
         {
+            var listenerchannel = default(IListenerChannel);
+
+            var channelmanager = default(IChannelManager);
+
             if (channel == ChannelType.PointToPoint)
             {
-                return CreatePointToPointChannel(type);
+                var pointtopointchannel = CreatePointToPointChannel(type);
+
+                listenerchannel = pointtopointchannel;
+
+                channelmanager = pointtopointchannel;
             }
 
             if (channel == ChannelType.SubscriptionToPublishSubscribe)
             {
-                return CreatePublishSubscribeChannel(type);
+                var publishsubscriberchannel = CreatePublishSubscribeChannel(type);
+
+                listenerchannel = publishsubscriberchannel;
+
+                channelmanager = publishsubscriberchannel;
             }
 
-            return null;
+            return (listenerchannel, channelmanager);
         }
     }
 }

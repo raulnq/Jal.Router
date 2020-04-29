@@ -24,6 +24,16 @@ namespace Jal.Router.Impl
             _transport = inmemorysystem;
         }
 
+        public Task<Statistic> GetStatistic(Channel channel)
+        {
+            return Task.FromResult(default(Statistic));
+        }
+
+        public Task<bool> DeleteIfExist(Channel channel)
+        {
+            return Task.FromResult(false);
+        }
+
         public Task Close(ListenerContext listenercontext)
         {
             return Task.CompletedTask;
@@ -32,6 +42,20 @@ namespace Jal.Router.Impl
         public Task Close(SenderContext sendercontext)
         {
             return Task.CompletedTask;
+        }
+
+        public Task<bool> CreateIfNotExist(Channel channel)
+        {
+            var name = _transport.CreateName(channel.ConnectionString, channel.Path);
+
+            if (!_transport.Exists(name))
+            {
+                _transport.Create(name);
+
+                return Task.FromResult(true);
+            }
+
+            return Task.FromResult(false);
         }
 
         public bool IsActive(ListenerContext listenercontext)
@@ -75,6 +99,11 @@ namespace Jal.Router.Impl
         public void Open(SenderContext sendercontext)
         {
             _sendername = _transport.CreateName(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
+        }
+
+        public Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

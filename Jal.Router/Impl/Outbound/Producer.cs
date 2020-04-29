@@ -30,7 +30,7 @@ namespace Jal.Router.Impl
 
                 id = await sendercontext.Send(message).ConfigureAwait(false);
 
-                if (sendercontext.ReaderChannel != null)
+                if (sendercontext.Channel.ReplyType != ReplyType.None)
                 {
                     MessageContext outputcontext = null;
 

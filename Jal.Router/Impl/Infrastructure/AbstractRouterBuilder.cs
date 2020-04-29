@@ -12,27 +12,15 @@ namespace Jal.Router.Impl
 
             AddPublishSubscribeChannel<NullPublishSubscribeChannel>();
 
-            AddRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
-
-            AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
-
             AddPointToPointChannel<FileSystemPointToPointChannel>();
 
             AddPublishSubscribeChannel<FileSystemPublishSubscribeChannel>();
-
-            AddRequestReplyChannelFromPointToPointChannel<FileSystemRequestReplyFromPointToPointChannel>();
-
-            AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<FileSystemRequestReplyFromSubscriptionToPublishSubscribeChannel>();
 
             AddPointToPointChannel<InMemoryPointToPointChannel>();
 
             AddPublishSubscribeChannel<InMemoryPublishSubscribeChannel>();
 
-            AddRequestReplyChannelFromPointToPointChannel<InMemoryRequestReplyFromPointToPointChannel>();
-
-            AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<InMemoryRequestReplyFromSubscriptionToPublishSubscribeChannel>();
-
-            AddShutdownTask<ResourceDestructor>();
+            AddShutdownTask<ChannelDestructor>();
 
             AddShutdownTask<ShutdownTask>();
 
@@ -40,15 +28,9 @@ namespace Jal.Router.Impl
 
             AddShutdownTask<ListenerShutdownTask>();
 
-            AddStartupTask<ResourceLoader>();
-
-            AddStartupTask<ResourceValidator>();
-
             AddStartupTask<StartupLogger>();
 
             AddStartupTask<EndpointValidator>();
-
-            AddStartupTask<ResourceCreator>();
 
             AddStartupTask<RouteValidator>();
 
@@ -75,20 +57,6 @@ namespace Jal.Router.Impl
             AddEntityStorage<NullEntityStorage>();
 
             AddEntityStorage<InMemoryEntityStorage>();
-
-            AddResource<NullResource>();
-
-            AddResource<FileSystemPointToPointlResource>();
-
-            AddResource<FileSystemPublishSubscribeResource>();
-
-            AddResource<FileSystemSubscriptionToPublishSubscribeResource>();
-
-            AddResource<InMemoryPointToPointResource>();
-
-            AddResource<InMemoryPublishSubscribeResource>();
-
-            AddResource<InMemorySubscriptionToPublishSubscribeResource>();
 
             AddLogger<StatisticLogger, Statistic>();
 
@@ -137,8 +105,6 @@ namespace Jal.Router.Impl
             AddRouteEntryMessageHandler<RouteEntryMessageHandler>();
         }
 
-        public abstract IRouterBuilder AddResource<TImplementation>() where TImplementation : class, IResource;
-
         public abstract IRouterBuilder AddEntityStorage<TImplementation>() where TImplementation : class, IEntityStorage;
 
         public abstract IRouterBuilder AddLogger<TImplementation, TInfo>() where TImplementation : class, ILogger<TInfo>;
@@ -154,10 +120,6 @@ namespace Jal.Router.Impl
         public abstract IRouterBuilder AddPointToPointChannel<TImplementation>() where TImplementation : class, IPointToPointChannel;
 
         public abstract IRouterBuilder AddPublishSubscribeChannel<TImplementation>() where TImplementation : class, IPublishSubscribeChannel;
-
-        public abstract IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromPointToPointChannel;
-
-        public abstract IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
 
         public abstract IRouterBuilder AddSource<TImplementation>() where TImplementation : class, IRouterConfigurationSource;
 

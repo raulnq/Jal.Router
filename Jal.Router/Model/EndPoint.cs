@@ -27,8 +27,6 @@ namespace Jal.Router.Model
 
         public IList<Type> MiddlewareTypes { get; }
 
-        public bool UseClaimCheck { get; private set; }
-
         public IList<ErrorHandler> ErrorHandlers { get; }
 
         public IList<Handler> EntryHandlers { get; }
@@ -57,11 +55,6 @@ namespace Jal.Router.Model
         public void SetReplyContentType(Type contenttype)
         {
             ReplyContentType = contenttype;
-        }
-
-        public void AsClaimCheck()
-        {
-            UseClaimCheck = true;
         }
     }
 }

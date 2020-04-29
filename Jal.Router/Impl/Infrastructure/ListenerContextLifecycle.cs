@@ -12,16 +12,19 @@ namespace Jal.Router.Impl
 
         private readonly ILogger _logger;
 
-        public ListenerContextLifecycle(IComponentFactoryFacade factory, IRouter router, ILogger logger)
+        private readonly IHasher _hasher;
+
+        public ListenerContextLifecycle(IComponentFactoryFacade factory, IRouter router, ILogger logger, IHasher hasher)
         {
             _factory = factory;
             _router = router;
             _logger = logger;
+            _hasher = hasher;
         }
 
         public ListenerContext Add(Route route, Channel channel)
         {
-            var context = ListenerContext.Create(_factory, _router, _logger, channel, route);
+            var context = ListenerContext.Create(_factory, _router, _logger, _hasher, channel, route);
 
             _factory.Configuration.Runtime.ListenerContexts.Add(context);
 
