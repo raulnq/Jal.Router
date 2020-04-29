@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Jal.Router.Model
 {
@@ -19,6 +20,10 @@ namespace Jal.Router.Model
             Type = type;
 
             Id = Guid.NewGuid().ToString();
+
+            Properties = new Dictionary<string, object>();
+
+            Rules = new List<Rule>();
         }
 
         public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
@@ -27,11 +32,17 @@ namespace Jal.Router.Model
             Subscription = subscription;
         }
 
+        public IDictionary<string, object> Properties { get; }
+
+        public IList<Rule> Rules { get; }
+
         public Func<MessageContext, bool> Condition { get; private set; }
 
         public bool UseClaimCheck { get; private set; }
 
-        public bool Partition { get; private set; }
+        public bool UseCreateIfNotExists { get; private set; }
+
+        public bool UsePartition { get; private set; }
 
         public Func<MessageContext, bool> ClosePartitionCondition { get; private set; }
 
@@ -43,32 +54,38 @@ namespace Jal.Router.Model
 
         public ChannelType ChannelType { get; private set; }
 
+        public ReplyType ReplyType { get; private set; }
+
         public string Id { get; }
 
         public override string ToString()
         {
+            var type = string.Empty;
+
             if (ChannelType == ChannelType.PointToPoint)
             {
-                return "point to point";
-            }
-            if (ChannelType == ChannelType.RequestReplyToPointToPoint)
-            {
-                return "request reply to point to point";
-            }
-            if (ChannelType == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
-            {
-                return "request reply to subscription to publish subscribe";
+                type = "point to point";
             }
             if (ChannelType == ChannelType.PublishSubscribe)
             {
-                return "publish subscribe";
+                type =  "publish subscribe";
             }
             if (ChannelType == ChannelType.SubscriptionToPublishSubscribe)
             {
-                return "subscription to publish subscribe";
+                type = "subscription to publish subscribe";
             }
 
-            return string.Empty;
+            if(ReplyType == ReplyType.FromPointToPoint)
+            {
+                type = type + " (reply from point to point channel)";
+            }
+
+            if(ReplyType == ReplyType.FromSubscriptionToPublishSubscribe)
+            {
+                type = type + " (reply from subscription to publish subscribe channel)";
+            }
+
+            return type;
         }
 
         public string FullPath
@@ -126,9 +143,14 @@ namespace Jal.Router.Model
             UseClaimCheck = true;
         }
 
-        public void UsePartitions(Func<MessageContext, bool> condition=null)
+        public void CreateIfNotExists()
         {
-            Partition = true;
+            UseCreateIfNotExists = true;
+        }
+
+        public void Partition(Func<MessageContext, bool> condition=null)
+        {
+            UsePartition = true;
             ClosePartitionCondition = condition;
         }
 
@@ -138,27 +160,14 @@ namespace Jal.Router.Model
         }
 
 
-        public void UpdateReplyFromPointToPointChannel(string replypath, int replytimeout, 
-            string replyconnectionstring, Type adapter, Type type)
+        public void ReplyTo(ReplyType replytype, string replypath, int replytimeout, 
+            string replyconnectionstring, string replysubscription=null)
         {
             ReplyPath = replypath;
             ReplyTimeOut = replytimeout;
-            ChannelType = ChannelType.RequestReplyToPointToPoint;
+            ReplyType = replytype;
             ReplyConnectionString = replyconnectionstring;
-            AdapterType = adapter;
-            Type = type;
-        }
-
-        public void UpdateReplyFromSubscriptionToPublishSubscribeChannel(string replypath, int replytimeout, string replysubscription,
-            string replyconnectionstring, Type adapter, Type type)
-        {
             ReplySubscription = replysubscription;
-            ReplyPath = replypath;
-            ReplyTimeOut = replytimeout;
-            ChannelType = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
-            ReplyConnectionString = replyconnectionstring;
-            AdapterType = adapter;
-            Type = type;
         }
     }
 }

@@ -171,7 +171,7 @@ namespace Jal.Router.Tests
                 factory = CreateFactoryMock().Object;
             }
 
-            return SenderContext.Create(factory, new NullLogger(), channel, endpoint);
+            return SenderContext.Create(factory, new NullLogger(), new Hasher(), channel, endpoint);
         }
 
         public static ListenerContext CreateListenerContext(IComponentFactoryFacade factory = null, IRouter router = null, Route route = null, Channel channel = null)
@@ -191,7 +191,7 @@ namespace Jal.Router.Tests
                 factory = CreateFactoryMock().Object;
             }
 
-            return ListenerContext.Create(factory, router, new NullLogger(), channel, route);
+            return ListenerContext.Create(factory, router, new NullLogger(), new Hasher(), channel, route);
         }
 
         public static Mock<IComponentFactoryFacade> CreateFactoryMock()
@@ -210,9 +210,9 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateMessageAdapter(It.IsAny<Type>())).Returns(new NullMessageAdapter());
 
-            factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns(new NullPointToPointChannel());
+            factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), new NullPointToPointChannel()));
 
-            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null));
+            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null, null));
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

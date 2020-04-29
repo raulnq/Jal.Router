@@ -14,28 +14,44 @@ namespace Jal.Router.Impl
             _lifecycle = lifecycle;
         }
 
-        public Task Run()
+        public async Task Run()
         {
             Logger.Log("Loading senders");
 
-            Create();
+            Add();
+
+            await Create();
 
             Open();
 
             Logger.Log("Senders loaded");
-
-            return Task.CompletedTask;
         }
 
         private void Open()
         {
-            foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
+            foreach (var context in Factory.Configuration.Runtime.SenderContexts)
             {
-                sendercontext.Open();
+                context.Open();
+
+                if (Factory.Configuration.Runtime.Contexts.All(x => x.Id != context.Id))
+                {
+                    Factory.Configuration.Runtime.Contexts.Add(context);
+                }
             }
         }
 
-        private void Create()
+        private async Task Create()
+        {
+            foreach (var context in Factory.Configuration.Runtime.SenderContexts)
+            {
+                if (context.Channel.UseCreateIfNotExists)
+                {
+                    await context.CreateIfNotExist();
+                }
+            }
+        }
+
+        private void Add()
         {
             foreach (var endpoint in Factory.Configuration.Runtime.EndPoints)
             {

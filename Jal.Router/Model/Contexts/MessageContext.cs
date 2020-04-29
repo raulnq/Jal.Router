@@ -107,7 +107,7 @@ namespace Jal.Router.Model
             TrackingContext = new TrackingContext(this, options.Trackings);
             TracingContext = options.TracingContext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, channel.UseClaimCheck, content);
+            ContentContext = new ContentContext(this, channel.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, channel.UseClaimCheck, content);
             Route = options.Route;
             Saga = options.Saga;
             EndPoint = endpoint;

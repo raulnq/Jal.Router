@@ -16,15 +16,9 @@ namespace Jal.Router.Interface
         IList<Type> StartupTaskTypes { get; }
         IList<Type> ShutdownTaskTypes { get; }
         IList<MonitorTask> MonitoringTaskTypes { get; }
-        Type PublishSubscribeResourceType { get; }
-        Type PointToPointResourceType { get; }
-        Type SubscriptionToPublishSubscribeResourceType { get; }
         IList<Type> ShutdownWatcherTypes { get; }
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
-        Type RequestReplyChannelFromPointToPointChannelType { get; }
-        Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; }
-
         Type PublishSubscribeChannelType { get; }
         Type StorageType { get;  }
         Type MessageAdapterType { get; }
@@ -40,17 +34,8 @@ namespace Jal.Router.Interface
         IConfiguration SetDefaultTransportName(string name);
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
-        IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel;
-        IConfiguration UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
-
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
-        IConfiguration UsePointToPointResource<TResource>() where TResource : IResource;
-
-        IConfiguration UsePublishSubscribeResource<TResource>() where TResource : IResource;
-
-        IConfiguration UseSubscriptionToPublishSubscribeResource<TResource>() where TResource : IResource;
-
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;
         IConfiguration UseEntityStorage<TStorage>() where TStorage : IEntityStorage;

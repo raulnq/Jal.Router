@@ -37,12 +37,6 @@ namespace Jal.Router.Interface
 
         IRouterBuilder AddPublishSubscribeChannel<TImplementation>() where TImplementation : class, IPublishSubscribeChannel;
 
-        IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromPointToPointChannel;
-
-        IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
-
-        IRouterBuilder AddResource<TImplementation>() where TImplementation : class, IResource;
-
         IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher;
 
         IRouterBuilder AddChannelShuffler<TImplementation>() where TImplementation : class, IChannelShuffler;

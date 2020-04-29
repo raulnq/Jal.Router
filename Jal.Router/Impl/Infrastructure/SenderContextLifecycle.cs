@@ -8,17 +8,20 @@ namespace Jal.Router.Impl
     {
         private IComponentFactoryFacade _factory;
 
+        private IHasher _hasher;
+
         private ILogger _logger;
 
-        public SenderContextLifecycle(IComponentFactoryFacade factory, ILogger logger)
+        public SenderContextLifecycle(IComponentFactoryFacade factory, ILogger logger, IHasher hasher)
         {
             _factory = factory;
             _logger = logger;
+            _hasher = hasher;
         }
         
         public SenderContext Add(EndPoint endpoint, Channel channel)
         {
-            var sendercontext = SenderContext.Create(_factory, _logger, channel, endpoint);
+            var sendercontext = SenderContext.Create(_factory, _logger, _hasher, channel, endpoint);
 
             _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 

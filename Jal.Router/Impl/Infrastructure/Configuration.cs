@@ -16,12 +16,7 @@ namespace Jal.Router.Impl
         public IList<Type> StartupTaskTypes { get; }
         public IList<Type> ShutdownTaskTypes { get; }
         public IList<MonitorTask> MonitoringTaskTypes { get; }
-        public Type PointToPointResourceType { get; private set; }
-        public Type PublishSubscribeResourceType { get; private set; }
-        public Type SubscriptionToPublishSubscribeResourceType { get; private set; }
         public IList<Type> ShutdownWatcherTypes { get; private set; }
-        public Type RequestReplyChannelFromPointToPointChannelType { get; private set; }
-        public Type RequestReplyFromSubscriptionToPublishSubscribeChannelType { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
         public Type StorageType { get; private set; }
@@ -73,36 +68,6 @@ namespace Jal.Router.Impl
         public IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel
         {
             PointToPointChannelType = typeof(TPointToPointChannel);
-            return this;
-        }
-
-        public IConfiguration UseRequestReplyChannelFromPointToPointChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromPointToPointChannel
-        {
-            RequestReplyChannelFromPointToPointChannelType = typeof(TRequestReplyChannel);
-            return this;
-        }
-
-        public IConfiguration UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TRequestReplyChannel>() where TRequestReplyChannel : IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
-        {
-            RequestReplyFromSubscriptionToPublishSubscribeChannelType = typeof(TRequestReplyChannel);
-            return this;
-        }
-
-        public IConfiguration UsePublishSubscribeResource<TChannel>() where TChannel : IResource
-        {
-            PublishSubscribeResourceType = typeof(TChannel);
-            return this;
-        }
-
-        public IConfiguration UsePointToPointResource<TChannel>() where TChannel : IResource
-        {
-            PointToPointResourceType = typeof(TChannel);
-            return this;
-        }
-
-        public IConfiguration UseSubscriptionToPublishSubscribeResource<TChannel>() where TChannel : IResource
-        {
-            SubscriptionToPublishSubscribeResourceType = typeof(TChannel);
             return this;
         }
 
@@ -222,13 +187,8 @@ namespace Jal.Router.Impl
             UseBusInterceptor<NullBusInterceptor>();
             UseEntityStorage<NullEntityStorage>();
             UseMessageStorage<NullMessageStorage>();
-            UsePointToPointResource<NullResource>();
-            UsePublishSubscribeResource<NullResource>();
-            UseSubscriptionToPublishSubscribeResource<NullResource>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
-            UseRequestReplyChannelFromPointToPointChannel<NullRequestReplyChannelFromPointToPointChannel>();
-            UseRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<NullRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>();
             UseMessageSerializer<NullMessageSerializer>();
             UseMessageAdapter<NullMessageAdapter>();
             RouteMiddlewareTypes = new List<Type>();
@@ -246,9 +206,6 @@ namespace Jal.Router.Impl
             AddStartupTask<RuntimeLoader>();
             AddStartupTask<EndpointValidator>();
             AddStartupTask<RouteValidator>();
-            AddStartupTask<ResourceValidator>();
-            AddStartupTask<ResourceLoader>();
-            AddStartupTask<ResourceCreator>();
             AddStartupTask<SenderLoader>();
             AddStartupTask<ListenerLoader>();
             AddShutdownTask<ListenerShutdownTask>();

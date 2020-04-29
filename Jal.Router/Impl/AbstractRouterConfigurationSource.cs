@@ -13,8 +13,6 @@ namespace Jal.Router.Impl
 
         private readonly List<EndPoint> _endpoints = new List<EndPoint>();
 
-        private readonly List<Resource> _resources = new List<Resource>();
-
         private readonly List<Saga> _sagas = new List<Saga>();
 
         private readonly Origin _origin = new Origin();
@@ -34,13 +32,16 @@ namespace Jal.Router.Impl
             foreach (var endPoint in _endpoints)
             {
                 endPoint.SetOrigin(_origin);
+
+                foreach (var channel in endPoint.Channels)
+                {
+                    if(channel.Rules.Count==0)
+                    {
+                        channel.Rules.Add(new Rule($"origin='{_origin.Key}'", "$Default", true));
+                    }
+                }
             }
             return _endpoints.ToArray();
-        }
-
-        public Resource[] GetResources()
-        {
-            return _resources.ToArray();
         }
 
         public IListenerRouteBuilder RegisterHandler(string name)
@@ -57,67 +58,6 @@ namespace Jal.Router.Impl
             var builder = new ListenerRouteBuilder(route);
 
             return builder;
-        }
-
-        public void RegisterSubscriptionToPublishSubscribeChannel(string subscription, string path, string connectionstring, Dictionary<string, string> properties, Rule rule = null)
-        {
-            if (string.IsNullOrWhiteSpace(subscription))
-            {
-                throw new ArgumentNullException(nameof(subscription));
-            }
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-
-            var resource = new Resource(ChannelType.SubscriptionToPublishSubscribe, path, connectionstring, properties, subscription);
-
-            if(rule!=null)
-            {
-                resource.Rules.Add(rule);
-            }
-            else
-            {
-                resource.Rules.Add(new Rule($"origin='{_origin.Key}'", "$Default", true));
-            }
-
-            _resources.Add(resource);
-        }
-
-        public void RegisterPointToPointChannel(string path, string connectionstring, Dictionary<string, string> properties)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-
-            var resource = new Resource(ChannelType.PointToPoint, path, connectionstring, properties);
-
-            _resources.Add(resource);
-        }
-
-        public void RegisterPublishSubscribeChannel(string path, string connectionstring, Dictionary<string, string> properties)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            if (string.IsNullOrWhiteSpace(connectionstring))
-            {
-                throw new ArgumentNullException(nameof(connectionstring));
-            }
-
-            var resource = new Resource(ChannelType.PublishSubscribe, path, connectionstring, properties);
-
-            _resources.Add(resource);
         }
 
         public ITimeoutBuilder RegisterSaga<TData>(string name, Action<IRouteBuilder<TData>> start, Action<IRouteBuilder<TData>> @continue=null, Action<IRouteBuilder<TData>> end = null) where TData : class, new()
@@ -155,7 +95,7 @@ namespace Jal.Router.Impl
             _origin.Key = key;
         }
 
-        public IToEndPointBuilder RegisterEndPoint(string name)
+        public IEndPointBuilder RegisterEndPoint(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

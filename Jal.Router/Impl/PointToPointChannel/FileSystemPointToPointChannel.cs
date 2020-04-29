@@ -27,6 +27,18 @@ namespace Jal.Router.Impl
             _transport = transport;
         }
 
+        public Task<Statistic> GetStatistic(Channel channel)
+        {
+            return Task.FromResult(default(Statistic));
+        }
+
+        public Task<bool> DeleteIfExist(Channel channel)
+        {
+            var path = _transport.CreatePointToPointChannelPath(_parameter, channel.ConnectionString, channel.Path);
+
+            return Task.FromResult(_transport.DeleteDirectory(path));
+        }
+
         public Task Close(ListenerContext listenercontext)
         {
             _watcher.Dispose();
@@ -37,6 +49,13 @@ namespace Jal.Router.Impl
         public Task Close(SenderContext sendercontext)
         {
             return Task.CompletedTask;
+        }
+
+        public Task<bool> CreateIfNotExist(Channel channel)
+        {
+            var path = _transport.CreatePointToPointChannelPath(_parameter, channel.ConnectionString, channel.Path);
+
+            return Task.FromResult(_transport.CreateDirectory(path));
         }
 
         public bool IsActive(ListenerContext listenercontext)
@@ -93,6 +112,26 @@ namespace Jal.Router.Impl
         public void Open(SenderContext sendercontext)
         {
             _path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
+        }
+
+        public Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
+        {
+            Thread.Sleep(500);
+
+            var path = string.Empty;
+
+            if(sendercontext.Channel.ReplyType== ReplyType.FromPointToPoint)
+            {
+                path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
+            }
+            else
+            {
+                path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath, sendercontext.Channel.Subscription);
+            }
+            
+            var message = _transport.ReadFile(path, sendercontext.MessageSerializer);
+
+            return adapter.ReadFromPhysicalMessage(message, sendercontext);
         }
 
         public async Task<string> Send(SenderContext sendercontext, object message)

@@ -84,12 +84,13 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 }, useazureservicemanagement: false)
+                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
-                
+                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=cartmansaeus001;AccountKey=PScqxunCwYDh8OFmOFVbU39sBKcDHIH2OK9ML3OSONxAHtvgwYh27k2yw85CXvHbJRYwdK5UpTFXynHKbruj3g==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 //.UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
+                .AddShutdownTask<ChannelDestructor>()
                 //.UseMemoryAsStorage()
                 //.AddMonitoringTask<ListenerMonitor>(30)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
@@ -143,16 +144,17 @@ namespace Jal.Router.Sample.NetCore
             .With(x =>
             {
                 x.ForMessage<Message>().Use<IMessageHandler<Message>, HandlerQueueA>((request, handler, context) => handler.HandleWithContext(request, context)).When((request, handler, context) => true);
-                x.ForMessage<Message>().Use((request, context) => {
+                x.ForMessage<Message>().Use((request, context) =>
+                {
                     Console.WriteLine("message handled by handler");
-                    return Task.CompletedTask; 
+                    return Task.CompletedTask;
                 });
             });
 
             RegisterHandler("handler2")
             .ToListen(x =>
             {
-                x.AddSubscriptionToPublishSubscribeChannel("topic1", "subscription1", connectionstring);
+                x.AddSubscriptionToPublishSubscribeChannel("topic1", "subscription1", connectionstring).With(c => c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -170,32 +172,23 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("sendtoqueuea")
-                .To(x => x.AddPointToPointChannel(connectionstring, "queuea"));
+                .To(x => x.AddPointToPointChannel(connectionstring, "queuea").With(c => c.CreateIfNotExist()));
 
             RegisterEndPoint("sendtoqueue1")
-                .To(x => x.AddPointToPointChannel(connectionstring, "queue1"));
+                .To(x => x.AddPointToPointChannel(connectionstring, "queue1").With(c => c.CreateIfNotExist()));
 
             RegisterEndPoint("sendtoqueue2")
                 .To(x => x.AddPointToPointChannel(connectionstring, "queue2"));
 
-            RegisterPointToPointChannel("queuea", connectionstring, new Dictionary<string, string>());
-
-            RegisterPointToPointChannel("queue3", connectionstring, new Dictionary<string, string>());
-
-            RegisterSubscriptionToPublishSubscribeChannel("subscription1", "topic1", connectionstring, new Dictionary<string, string>());
-
             ////////////////////////
 
             RegisterEndPoint("sendtotopic1")
-                .To(x => x.AddPublishSubscribeChannel(connectionstring, "topic1"));
+                .To(x => x.AddPublishSubscribeChannel(connectionstring, "topic1").With(c => c.CreateIfNotExist()));
 
             RegisterEndPoint("sendtoqueue3")
-                .To(x => x.AddPointToPointChannel(connectionstring, "queue3"));
-
-            RegisterPublishSubscribeChannel("topic1", connectionstring, new Dictionary<string, string>());
-
-            RegisterPointToPointChannel("queue1", connectionstring, new Dictionary<string, string>());
+                .To(x => x.AddPointToPointChannel(connectionstring, "queue3").With(c => c.CreateIfNotExist()));
         }
+
     }
 
     public class HandlerQueueA : AbstractMessageHandler<Message>
@@ -289,15 +282,12 @@ namespace Jal.Router.Sample.NetCore
 
         public RouterConfigurationSmokeTest()
         {
-            var config = new AzureServiceBusConfiguration()
-            {
-
-            };
+            var connectionstring = "";
 
             RegisterHandler(_sendersessionqueue + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_sendersessionqueue, config.ConnectionString);
+                x.AddQueue(_sendersessionqueue, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -307,7 +297,10 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_sessionqueue + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_sessionqueue, config.ConnectionString).With(c => c.Partition());
+                x.AddQueue(_sessionqueue, connectionstring).With(c => { 
+                    c.Partition();
+                    c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true });
+                });
             })
             .With(x =>
             {
@@ -317,7 +310,10 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_sessiontopic + "_handler")
             .ToListen(x =>
             {
-                x.AddSubscriptionToTopic(_sessiontopic, _subscription, config.ConnectionString).With(c => c.Partition());
+                x.AddSubscriptionToTopic(_sessiontopic, _subscription, connectionstring).With(c => { 
+                    c.Partition();
+                    c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true }, "1=1");
+                });
             })
             .With(x =>
             {
@@ -325,77 +321,23 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("sessionqueueendpoint")
-            .To(x => x.AddQueue(config.ConnectionString, _sessionqueue));
+            .To(x => x.AddQueue(connectionstring, _sessionqueue));
 
             RegisterEndPoint("sessiontopicendpoint")
-            .To(x => x.AddTopic(config.ConnectionString, _sessiontopic));
+            .To(x => x.AddTopic(connectionstring, _sessiontopic).With(c=>c.CreateIfNotExist()));
 
             RegisterEndPoint("queuelistenbyonehandler")
-            .To(x => x.AddQueue(config.ConnectionString, _queuelistenbyonehandler));
+            .To(x => x.AddQueue(connectionstring, _queuelistenbyonehandler));
+
+            RegisterEndPoint("xxxx")
+                .To(x => x.AddTopic(connectionstring, _topiclistenbyonehandler).With(c=>c.CreateIfNotExist()));
 
             RegisterOrigin("smoketestapp", "123");
-
-            this.RegisterQueue(new AzureServiceBusQueue(_sendersessionqueue) { }, config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_sessionqueue) { SessionEnabled = true }, config.ConnectionString);
-
-            this.RegisterTopic(new AzureServiceBusTopic(_sessiontopic) { }, config.ConnectionString);
-
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _sessiontopic) { SessionEnabled = true }, config.ConnectionString, "1=1");
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetosend), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queueperformancetoread), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_replyqueue) { SessionEnabled = true }, config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_fromreplyqueue), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_toreplyqueue), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandler), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuetopublishtopic), config.ConnectionString);
-
-            this.RegisterTopic(new AzureServiceBusTopic(_topicpublishedfromqueue), config.ConnectionString);
-
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topicpublishedfromqueue), config.ConnectionString, "1=1");
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuestart), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_alternativequeuestart), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuecontinue), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queueend), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_errorqueue), config.ConnectionString);
-            
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexceptionandretry), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithexception), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_forwardqueue), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithmiddleware), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbyonehandlerwithwhen), config.ConnectionString);
-            
-            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlera), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_handlingtwoqueuesinonehandlerb), config.ConnectionString);
-
-            this.RegisterQueue(new AzureServiceBusQueue(_queuelistenbytwohandlers), config.ConnectionString);
-
-            this.RegisterTopic(new AzureServiceBusTopic(_topiclistenbyonehandler),  config.ConnectionString);
-
-            this.RegisterSubscriptionToTopic(new AzureServiceBusSubscriptionToTopic(_subscription, _topiclistenbyonehandler), config.ConnectionString, "1=1");
-
 
             RegisterHandler(_queueperformancetoread + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queueperformancetoread, config.ConnectionString);
+                x.AddQueue(_queueperformancetoread, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -405,7 +347,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queueperformancetosend + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queueperformancetosend, config.ConnectionString);
+                x.AddQueue(_queueperformancetosend, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -413,12 +355,12 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("queueperformanceendpoint")
-            .To(x => x.AddPointToPointChannel(config.ConnectionString, _queueperformancetoread));
+            .To(x => x.AddPointToPointChannel(connectionstring, _queueperformancetoread));
 
             RegisterHandler(_toreplyqueue + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_toreplyqueue, config.ConnectionString);
+                x.AddQueue(_toreplyqueue, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -428,7 +370,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_fromreplyqueue + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_fromreplyqueue, config.ConnectionString);
+                x.AddQueue(_fromreplyqueue, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -436,15 +378,15 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("toreplyendpoint")
-            .To<Message>(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
+            .To<Message>(x => x.AddQueue(connectionstring, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, connectionstring));
 
             RegisterEndPoint("replyendpoint")
-            .To(x => x.AddQueue(config.ConnectionString, _replyqueue));
+            .To(x => x.AddQueue(connectionstring, _replyqueue).With(c=>c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true })));
 
             RegisterHandler(_queuetopublishtopic + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuetopublishtopic, config.ConnectionString);
+                x.AddQueue(_queuetopublishtopic, connectionstring).With(c => c.CreateIfNotExist()) ;
             })
             .With(x =>
             {
@@ -454,7 +396,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_topicpublishedfromqueue + "_handler")
             .ToListen(x =>
             {
-                x.AddSubscriptionToTopic(_topicpublishedfromqueue, _subscription, config.ConnectionString);
+                x.AddSubscriptionToTopic(_topicpublishedfromqueue, _subscription, connectionstring).With(c => c.CreateIfNotExist(filter:"1=1"));
             })
             .With(x =>
             {
@@ -462,14 +404,14 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("fromqueueendpoint")
-            .To(x => x.AddPublishSubscribeChannel(config.ConnectionString, _topicpublishedfromqueue));
+            .To(x => x.AddPublishSubscribeChannel(connectionstring, _topicpublishedfromqueue).With(c=>c.CreateIfNotExist()));
 
 
             RegisterHandler("handlingtwoqueuesinonehandler_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_handlingtwoqueuesinonehandlera, config.ConnectionString);
-                x.AddQueue(_handlingtwoqueuesinonehandlerb, config.ConnectionString);
+                x.AddQueue(_handlingtwoqueuesinonehandlera, connectionstring).With(c => c.CreateIfNotExist());
+                x.AddQueue(_handlingtwoqueuesinonehandlerb, connectionstring).With(c => c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -479,7 +421,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbyonehandler+"_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbyonehandler, config.ConnectionString);
+                x.AddQueue(_queuelistenbyonehandler, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -489,7 +431,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbytwohandlers + "_A_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbytwohandlers, config.ConnectionString);
+                x.AddQueue(_queuelistenbytwohandlers, connectionstring).With(c => c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -499,7 +441,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbytwohandlers + "_B_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbytwohandlers, config.ConnectionString);
+                x.AddQueue(_queuelistenbytwohandlers, connectionstring).With(c => c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -509,7 +451,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_topiclistenbyonehandler + "_handler")
             .ToListen(x =>
             {
-                x.AddSubscriptionToPublishSubscribeChannel(_topiclistenbyonehandler, _subscription, config.ConnectionString);
+                x.AddSubscriptionToPublishSubscribeChannel(_topiclistenbyonehandler, _subscription, connectionstring).With(c => c.CreateIfNotExist(filter: "1=1"));
             })
             .With(x =>
             {
@@ -519,7 +461,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbyonehandlerwithwhen + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbyonehandlerwithwhen, config.ConnectionString);
+                x.AddQueue(_queuelistenbyonehandlerwithwhen, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -529,7 +471,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbyonehandlerwithmiddleware + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbyonehandlerwithmiddleware, config.ConnectionString);
+                x.AddQueue(_queuelistenbyonehandlerwithmiddleware, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -542,12 +484,12 @@ namespace Jal.Router.Sample.NetCore
             };
 
             RegisterEndPoint(_forwardqueueendpoint)
-            .To(x => x.AddPointToPointChannel(config.ConnectionString, _forwardqueue));
+            .To(x => x.AddPointToPointChannel(connectionstring, _forwardqueue).With(c=>c.CreateIfNotExist()));
 
             RegisterHandler(_queuelistenbyonehandlerwithexception + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbyonehandlerwithexception, config.ConnectionString);
+                x.AddQueue(_queuelistenbyonehandlerwithexception, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -567,7 +509,7 @@ namespace Jal.Router.Sample.NetCore
             RegisterHandler(_queuelistenbyonehandlerwithexceptionandretry + "_handler")
             .ToListen(x =>
             {
-                x.AddQueue(_queuelistenbyonehandlerwithexceptionandretry, config.ConnectionString);
+                x.AddQueue(_queuelistenbyonehandlerwithexceptionandretry, connectionstring).With(c=>c.CreateIfNotExist());
             })
             .With(x =>
             {
@@ -584,24 +526,24 @@ namespace Jal.Router.Sample.NetCore
             ;
 
             RegisterEndPoint(_errorqueueendpoint)
-                .To(x => x.AddQueue(config.ConnectionString, _errorqueue));
+                .To(x => x.AddQueue(connectionstring, _errorqueue).With(c=>c.CreateIfNotExist()));
                 //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" }, { "parameter3", "value3" } }))
                 //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }))
                 //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }));
 
             RegisterEndPoint("retryendpoint")
-                .To(x => x.AddQueue(config.ConnectionString, _queuelistenbyonehandlerwithexceptionandretry));
+                .To(x => x.AddQueue(connectionstring, _queuelistenbyonehandlerwithexceptionandretry));
 
         RegisterSaga<Data>("saga", 
             x => {
                 x.RegisterHandler("start")
-                .ToListen(y => y.AddQueue(_queuestart, config.ConnectionString))
+                .ToListen(y => y.AddQueue(_queuestart, connectionstring).With(c=>c.CreateIfNotExist()))
                 .With(y => {
                     y.ForMessage<Message>().Use<IMessageHandlerWithData<Message, Data>, StartHandler>((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
 
                 x.RegisterHandler("alternative")
-                .ToListen(y => y.AddQueue(_alternativequeuestart, config.ConnectionString))
+                .ToListen(y => y.AddQueue(_alternativequeuestart, connectionstring).With(c=>c.CreateIfNotExist()))
                 .With(y => {
                     y.ForMessage<Message>().Use<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "START");
                 });
@@ -609,7 +551,7 @@ namespace Jal.Router.Sample.NetCore
             x =>
             {
                 x.RegisterHandler("continue")
-                .ToListen(y => y.AddQueue(_queuecontinue, config.ConnectionString))
+                .ToListen(y => y.AddQueue(_queuecontinue, connectionstring).With(c=>c.CreateIfNotExist()))
                 .With(y =>
                 {
                     y.ForMessage<Message>().Use<IMessageHandlerWithData<Message, Data>, ContinueHandler>((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data), "CONTINUE");
@@ -618,7 +560,7 @@ namespace Jal.Router.Sample.NetCore
             x =>
             {
                 x.RegisterHandler("end")
-                .ToListen(y => y.AddQueue(_queueend, config.ConnectionString))
+                .ToListen(y => y.AddQueue(_queueend, connectionstring).With(c=>c.CreateIfNotExist()))
                 .With(y =>
                 {
                     y.ForMessage<Message>().Use<IMessageHandlerWithData<Message, Data>, EndHandler>((request, handler, context, data) => handler.HandleWithContextAndData(request, context, data),"END");
@@ -627,10 +569,10 @@ namespace Jal.Router.Sample.NetCore
          );
 
             RegisterEndPoint("continueendpoint")
-            .To(x => x.AddQueue(config.ConnectionString, _queuecontinue));
+            .To(x => x.AddQueue(connectionstring, _queuecontinue));
 
             RegisterEndPoint("endendpoint")
-            .To(x => x.AddQueue(config.ConnectionString, _queueend));
+            .To(x => x.AddQueue(connectionstring, _queueend));
 
         }
     }

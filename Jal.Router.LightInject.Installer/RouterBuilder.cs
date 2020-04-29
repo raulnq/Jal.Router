@@ -15,13 +15,6 @@ namespace Jal.Router.LightInject.Installer
             _container = container;
         }
 
-        public override IRouterBuilder AddResource<TImplementation>() 
-        {
-            _container.Register<IResource, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
-
-            return this;
-        }
-
         public override IRouterBuilder AddEntityStorage<TImplementation>()
         {
             _container.Register<IEntityStorage, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());
@@ -74,20 +67,6 @@ namespace Jal.Router.LightInject.Installer
         public override IRouterBuilder AddPublishSubscribeChannel<TImplementation>()
         {
             _container.Register<IPublishSubscribeChannel, TImplementation>(typeof(TImplementation).FullName);
-
-            return this;
-        }
-
-        public override IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>()
-        {
-            _container.Register<IRequestReplyChannelFromPointToPointChannel, TImplementation>(typeof(TImplementation).FullName);
-
-            return this;
-        }
-
-        public override IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>()
-        {
-            _container.Register<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel, TImplementation>(typeof(TImplementation).FullName);
 
             return this;
         }

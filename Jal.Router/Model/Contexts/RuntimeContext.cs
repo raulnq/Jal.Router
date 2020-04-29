@@ -15,9 +15,7 @@ namespace Jal.Router.Model
 
         public List<SenderContext> SenderContexts { get; }
 
-        public List<Resource> Resources { get; }
-
-        public List<ResourceContext> ResourceContexts { get; }
+        public List<AbstractContext> Contexts { get; }
 
         public RuntimeContext()
         {
@@ -25,15 +23,13 @@ namespace Jal.Router.Model
 
             SenderContexts = new List<SenderContext>();
 
+            Contexts = new List<AbstractContext>();
+
             EndPoints = new List<EndPoint>();
 
             Sagas = new List<Saga>();
 
             Routes = new List<Route>();
-
-            Resources = new List<Resource>();
-
-            ResourceContexts = new List<ResourceContext>();
         }
     }
 }

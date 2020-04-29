@@ -1,14 +1,7 @@
 ﻿namespace Jal.Router.AzureServiceBus.Standard.Model
 {
-    public class AzureServiceBusQueue
+    public class AzureServiceBusProperties
     {
-        public AzureServiceBusQueue(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; set; }
-
         public int DefaultMessageTtlInDays { get; set; }
 
         public int MessageLockDurationInSeconds { get; set; }

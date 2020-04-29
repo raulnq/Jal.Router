@@ -7,6 +7,7 @@ using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
@@ -64,7 +65,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var sessionoptions = CreateSessionOptions(listenercontext);
 
-            if (listenercontext.Channel.Partition)
+            if (listenercontext.Channel.UsePartition)
             {
                 _client.RegisterSessionHandler(async (ms, message, token) => {
 
@@ -175,6 +176,132 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         public Task Close(ListenerContext context)
         {
             return _client.CloseAsync();
+        }
+
+        public async Task<bool> CreateIfNotExist(Channel channel)
+        {
+            var client = new ManagementClient(channel.ConnectionString);
+
+            if (!await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            {
+                var description = new QueueDescription(channel.Path);
+
+                var messagettl = 14;
+
+                var lockduration = 300;
+
+                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                {
+                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
+                }
+
+                if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
+                {
+                    lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
+                }
+
+                description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
+
+                description.LockDuration = TimeSpan.FromSeconds(lockduration);
+
+                if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
+                {
+                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
+                    description.RequiresDuplicateDetection = true;
+                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
+                }
+
+                if (channel.Properties.ContainsKey(SessionEnabled))
+                {
+                    description.RequiresSession = true;
+                }
+
+                if (channel.Properties.ContainsKey(PartitioningEnabled))
+                {
+                    description.EnablePartitioning = true;
+                }
+
+                await client.CreateQueueAsync(description).ConfigureAwait(false);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<Statistic> GetStatistic(Channel channel)
+        {
+            var client = new ManagementClient(channel.ConnectionString);
+
+            if (await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            {
+                var info = await client.GetQueueRuntimeInfoAsync(channel.Path).ConfigureAwait(false);
+
+                var statistics = new Statistic(channel.Path);
+
+                statistics.Properties.Add("DeadLetterMessageCount", info.MessageCountDetails.DeadLetterMessageCount.ToString());
+
+                statistics.Properties.Add("ActiveMessageCount", info.MessageCountDetails.ActiveMessageCount.ToString());
+
+                statistics.Properties.Add("ScheduledMessageCount", info.MessageCountDetails.ScheduledMessageCount.ToString());
+
+                statistics.Properties.Add("CurrentSizeInBytes", info.SizeInBytes.ToString());
+
+                return statistics;
+            }
+
+            return null;
+        }
+
+        public async Task<bool> DeleteIfExist(Channel channel)
+        {
+            var client = new ManagementClient(channel.ConnectionString);
+
+            if (await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            {
+                await client.DeleteQueueAsync(channel.Path).ConfigureAwait(false);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
+        {
+            var client = default(SessionClient);
+
+            if(sendercontext.Channel.ReplyType==ReplyType.FromPointToPoint)
+            {
+                client = new SessionClient(sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
+            }
+            else
+            {
+                var entity = EntityNameHelper.FormatSubscriptionPath(sendercontext.Channel.ReplyPath, sendercontext.Channel.ReplySubscription);
+
+                client = new SessionClient(sendercontext.Channel.ReplyConnectionString, entity);
+            }
+            
+            var messagesession = await client.AcceptMessageSessionAsync(context.TracingContext.ReplyToRequestId).ConfigureAwait(false);
+
+            var message = sendercontext.Channel.ReplyTimeOut != 0 ?
+                await messagesession.ReceiveAsync(TimeSpan.FromSeconds(sendercontext.Channel.ReplyTimeOut)).ConfigureAwait(false) :
+                await messagesession.ReceiveAsync().ConfigureAwait(false);
+
+            MessageContext outputcontext = null;
+
+            if (message != null)
+            {
+                outputcontext = await adapter.ReadFromPhysicalMessage(message, sendercontext).ConfigureAwait(false);
+
+                await messagesession.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+            }
+
+            await messagesession.CloseAsync().ConfigureAwait(false);
+
+            await client.CloseAsync().ConfigureAwait(false);
+
+            return outputcontext;
         }
 
         private readonly AzureServiceBusParameter _parameter;

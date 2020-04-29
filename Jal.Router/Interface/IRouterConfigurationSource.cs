@@ -9,7 +9,5 @@ namespace Jal.Router.Interface
         Saga[] GetSagas();
 
         EndPoint[] GetEndPoints();
-
-        Resource[] GetResources();
     }
 }

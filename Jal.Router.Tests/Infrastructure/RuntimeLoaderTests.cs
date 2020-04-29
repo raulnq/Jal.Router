@@ -20,8 +20,6 @@ namespace Jal.Router.Tests
 
             configurationmock.Setup(x => x.GetEndPoints()).Returns(new Model.EndPoint[] { Builder.CreateEndpoint() }  );
 
-            configurationmock.Setup(x => x.GetResources()).Returns(new Model.Resource[] { new Model.Resource(Model.ChannelType.PointToPoint, "path", "connectionstring", new Dictionary<string, string>()) });
-
             var saga = new Model.Saga("name", typeof(object));
 
             saga.InitialRoutes.Add(Builder.CreateRoute());
@@ -44,15 +42,11 @@ namespace Jal.Router.Tests
 
             configurationmock.Verify(x => x.GetEndPoints(), Times.Once);
 
-            configurationmock.Verify(x => x.GetResources(), Times.Once);
-
             configurationmock.Verify(x => x.GetSagas(), Times.Once);
 
             factory.Configuration.Runtime.Routes.Count.ShouldBe(4);
 
             factory.Configuration.Runtime.EndPoints.Count.ShouldBe(1);
-
-            factory.Configuration.Runtime.Resources.Count.ShouldBe(1);
 
             factory.Configuration.Runtime.Sagas.Count.ShouldBe(1);
         }

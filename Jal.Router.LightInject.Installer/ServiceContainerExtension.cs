@@ -35,8 +35,6 @@ namespace Jal.Router.LightInject.Installer
 
             container.Register<ISenderContextLifecycle, SenderContextLifecycle>(new PerContainerLifetime());
 
-            container.Register<IResourceContextLifecycle, ResourceContextLifecycle>(new PerContainerLifetime());
-
             container.Register<ISenderContextLoader, SenderContextLoader>(new PerContainerLifetime());
 
             container.Register<IParameterProvider, ParameterProvider>(new PerContainerLifetime());

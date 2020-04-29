@@ -25,7 +25,7 @@ namespace Jal.Router.Tests
 
             var senderchannelmock = new Mock<ISenderChannel>();
 
-            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((senderchannelmock.Object, null));
+            factorymock.Setup(x => x.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((senderchannelmock.Object, null, null));
 
             var factory = factorymock.Object;
 

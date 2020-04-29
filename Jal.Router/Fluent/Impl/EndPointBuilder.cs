@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IToChannelBuilder, IToReplyChannelBuilder
+    public class EndPointBuilder : IEndPointBuilder, IOnEndPointOptionBuilder, IEndpointChannelBuilder, IReplyIEndpointChannelBuilder
     {
         private EndPoint _endpoint;
 
@@ -15,7 +14,7 @@ namespace Jal.Router.Fluent.Impl
             _endpoint = endpoint;
         }
 
-        public void AddPointToPointChannel(string connectionstring, string path, Type adapter = null, Type type = null)
+        public IChannelIWhenBuilder AddPointToPointChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -40,9 +39,11 @@ namespace Jal.Router.Fluent.Impl
             var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
+
+            return new ChannelWhenBuilder(channel);
         }
 
-        IAndWaitReplyFromEndPointBuilder IToReplyChannelBuilder.AddPointToPointChannel(string connectionstring, string path) 
+        IAndWaitReplyFromBuilder IReplyIEndpointChannelBuilder.AddPointToPointChannel(string connectionstring, string path) 
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -61,7 +62,7 @@ namespace Jal.Router.Fluent.Impl
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public void AddPublishSubscribeChannel(string connectionstring, string path, Type adapter = null, Type type = null)
+        public IChannelIWhenBuilder AddPublishSubscribeChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -86,9 +87,11 @@ namespace Jal.Router.Fluent.Impl
             var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
+
+            return new ChannelWhenBuilder(channel);
         }
 
-        public IOnEndPointOptionBuilder To(Action<IToChannelBuilder> channelbuilder)
+        public IOnEndPointOptionBuilder To(Action<IEndpointChannelBuilder> channelbuilder)
         {
             if (channelbuilder==null)
             {
@@ -114,7 +117,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnEndPointOptionBuilder To<TReply>(Action<IToReplyChannelBuilder> channelbuilder)
+        public IOnEndPointOptionBuilder To<TReply>(Action<IReplyIEndpointChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {
@@ -168,18 +171,6 @@ namespace Jal.Router.Fluent.Impl
             action(builder);
 
             return this;
-        }
-
-        public void With(Action<IOnEndPointWithBuilder> action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            var builder = new OnEndPointWithBuilder(_endpoint);
-
-            action(builder);
         }
 
         public IOnEndPointOptionBuilder When(Func<Options, object, bool> condition)

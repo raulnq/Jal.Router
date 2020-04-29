@@ -14,9 +14,5 @@ namespace Jal.Router.Fluent.Interface
         IOnEndPointOptionBuilder OnExit(Action<IOnEndPointExitBuilder> action);
 
         IOnEndPointOptionBuilder When(Func<Options, object, bool> condition);
-
-        void With(Action<IOnEndPointWithBuilder> action);
-
-
     }
 }

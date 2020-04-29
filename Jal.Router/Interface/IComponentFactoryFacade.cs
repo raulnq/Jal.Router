@@ -27,7 +27,7 @@ namespace Jal.Router.Interface
 
         IMessageAdapter CreateMessageAdapter(Type type);
 
-        (ISenderChannel, IReaderChannel) CreateSenderChannel(ChannelType channel, Type type);
+        (ISenderChannel, IReaderChannel, IChannelManager) CreateSenderChannel(ChannelType channel, Type type);
 
         IMessageStorage CreateMessageStorage();
 
@@ -37,13 +37,11 @@ namespace Jal.Router.Interface
 
         TComponent CreateComponent<TComponent>(Type type) where TComponent : class;
 
-        IResource CreateResource(ChannelType channel);
-
         ILogger<T> CreateLogger<T>(Type type);
 
         IStartupTask CreateStartupTask(Type type);
 
-        IListenerChannel CreateListenerChannel(ChannelType channel, Type type);
+        (IListenerChannel, IChannelManager) CreateListenerChannel(ChannelType channel, Type type);
 
         IShutdownTask CreateShutdownTask(Type type);
 

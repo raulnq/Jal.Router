@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Model;
 
@@ -18,9 +19,29 @@ namespace Jal.Router.Fluent.Impl
             _channel.AsClaimCheck();
         }
 
+        public void CreateIfNotExist(IDictionary<string, object> properties = null, IList<Rule> rules = null)
+        {
+            if(properties!=null)
+            {
+                foreach (var property in properties)
+                {
+                    _channel.Properties.Add(property.Key, property.Value);
+                }
+            }
+
+            if (rules != null)
+            {
+                foreach (var rule in rules)
+                {
+                    _channel.Rules.Add(rule);
+                }
+            }
+            _channel.CreateIfNotExists();
+        }
+
         public void Partition(Func<MessageContext, bool> condition = null)
         {
-            _channel.UsePartitions(condition);
+            _channel.Partition(condition);
         }
 
         public IChannelOptionBuilder When(Func<MessageContext, bool> condition)

@@ -16,13 +16,6 @@ namespace Jal.Router.Installer
             _container = container;
         }
 
-        public override IRouterBuilder AddResource<TImplementation>()
-        {
-            _container.Register(Component.For<IResource>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
-
-            return this;
-        }
-
         public override IRouterBuilder AddEntityStorage<TImplementation>()
         {
             _container.Register(Component.For<IEntityStorage>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
@@ -76,20 +69,6 @@ namespace Jal.Router.Installer
         public override IRouterBuilder AddPublishSubscribeChannel<TImplementation>()
         {
             _container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
-
-            return this;
-        }
-
-        public override IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>()
-        {
-            _container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
-
-            return this;
-        }
-
-        public override IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>()
-        {
-            _container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }

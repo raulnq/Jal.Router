@@ -21,8 +21,6 @@ namespace Jal.Router.Impl
             {
                 Factory.Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
 
-                Factory.Configuration.Runtime.Resources.AddRange(source.GetResources());
-
                 Factory.Configuration.Runtime.Sagas.AddRange(source.GetSagas());
 
                 foreach (var route in source.GetRoutes())
