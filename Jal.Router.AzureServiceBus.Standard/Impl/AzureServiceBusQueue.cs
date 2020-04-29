@@ -64,43 +64,32 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             var sessionoptions = CreateSessionOptions(listenercontext);
 
-            var adapter = Factory.CreateMessageAdapter();
-
-            if (listenercontext.Partition != null)
+            if (listenercontext.Channel.Partition)
             {
                 _client.RegisterSessionHandler(async (ms, message, token) => {
 
-                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = await listenercontext.Read(message).ConfigureAwait(false);
 
-                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
 
                     try
                     {
-                        var handlers = new List<Task>();
-
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                        {
-                            var clone = message.Clone();
-
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
-                        }
-
-                        await Task.WhenAll(handlers.ToArray());
+                        await listenercontext.Dispatch(context).ConfigureAwait(false);
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (listenercontext.Partition.Until(context))
+                        if (listenercontext.Channel.ClosePartitionCondition!=null && listenercontext.Channel.ClosePartitionCondition(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
                     }
 
                 }, sessionoptions);
@@ -109,32 +98,23 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 _client.RegisterMessageHandler(async (message, token) =>
                 {
-                    var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                    var context = await listenercontext.Read(message).ConfigureAwait(false);
 
-                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                    Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
 
                     try
                     {
-                        var handlers = new List<Task>();
+                        await listenercontext.Dispatch(context).ConfigureAwait(false);
 
-                        foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                        {
-                            var clone = message.Clone();
-
-                            handlers.Add(runtimehandler(clone, listenercontext.Channel));
-                        }
-
-                        await Task.WhenAll(handlers.ToArray());
-                        
                         await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
+                        Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name} {ex}");
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
                     }
                 }, options);
             }

@@ -1,5 +1,6 @@
 ﻿using Jal.ChainOfResponsability;
 using Jal.Router.Impl;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -7,6 +8,7 @@ using Shouldly;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Jal.Router.Extensions;
 
 namespace Jal.Router.Tests
 {
@@ -16,25 +18,36 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Bus_With_ShouldBeExecuted()
         {
-            var endpointprovidermock = Builder.CreateEnpointProvider();
+            var endpointprovidermock = Builder.CreateEnpointProviderMock();
 
             var factorymock = Builder.CreateFactoryMock();
 
+            var channel = Builder.CreateChannel();
+
+            factorymock.AddChannelShuffler(channel);
+
             var pipelinemock = Builder.CreatePipelineMock();
 
-            var messagecontext = Builder.CreateMessageContext();
-
-            messagecontext.Route.MiddlewareTypes.Add(typeof(string));
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
-            factory.Configuration.OutboundMiddlewareTypes.Add(typeof(string));
+            var lifecyclemock = Builder.CreateSenderContextLifecycleMock(factory: factory, channel: channel);
 
-            var sut = new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object));
+            factory.Configuration.EndpointMiddlewareTypes.Add(typeof(string));
 
-            await sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null));
+            var sut = Build(endpointprovidermock, pipelinemock, factory, lifecyclemock);
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+            var options = messagecontext.CreateOptions("endpoint");
+
+            await sut.Send(new object(), options);
+
+            pipelinemock.WasExecuted();
+        }
+
+        private static Bus Build(Mock<IEndPointProvider> endpointprovidermock, Mock<IPipeline> pipelinemock, IComponentFactoryFacade factory, Mock<ISenderContextLifecycle> lifecyclemock)
+        {
+            return new Bus(endpointprovidermock.Object, factory, new PipelineBuilder(pipelinemock.Object), lifecyclemock.Object, new NullLogger());
         }
 
         [TestMethod]
@@ -42,17 +55,27 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
+            var channel = Builder.CreateChannel();
+
+            factorymock.AddChannelShuffler(channel);
+
+            var factory = factorymock.Object;
+
+            var lifecyclemock = Builder.CreateSenderContextLifecycleMock(factory: factory, channel: channel);
+
             var pipelinemock = Builder.CreatePipelineMock(true);
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
-            var endpointprovidermock = Builder.CreateEnpointProvider();
+            var endpointprovidermock = Builder.CreateEnpointProviderMock();
 
-            var sut = new Bus(endpointprovidermock.Object, factorymock.Object, new PipelineBuilder(pipelinemock.Object));
+            var sut = Build(endpointprovidermock, pipelinemock, factory, lifecyclemock);
 
-            await Should.ThrowAsync<Exception>(sut.Send(new object(), new Options("endpointname", new System.Collections.Generic.Dictionary<string, string>() { }, messagecontext.SagaContext, messagecontext.TrackingContext, messagecontext.TracingContext, messagecontext.Route, messagecontext.Saga, messagecontext.Version, null)));
+            var options = messagecontext.CreateOptions("endpoint");
 
-            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+            await Should.ThrowAsync<Exception>(sut.Send(new object(), options));
+
+            pipelinemock.WasExecuted();
         }
     }
 }

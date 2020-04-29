@@ -30,7 +30,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(default(IRouteExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build(factorymock.Object);
 
@@ -54,7 +54,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(default(IRouteExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build(factorymock.Object);
 
@@ -92,7 +92,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(exithandler);
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             messagecontext.Route.EntryHandlers.Add(new Model.Handler(entryhandler.GetType(), new Dictionary<string, object>()));
 
@@ -134,9 +134,9 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(default(IRouteExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
-            messagecontext.Route.ErrorHandlers.Add(new Model.ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
+            messagecontext.Route.ErrorHandlers.Add(new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
 
             var sut = Build(factorymock.Object);
 
@@ -168,7 +168,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(default(IRouteExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var handler = new Model.ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false);
 
@@ -206,7 +206,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateRouteExitMessageHandler(It.IsAny<Type>())).Returns(default(IRouteExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var handler = new Model.ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false);
 

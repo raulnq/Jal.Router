@@ -21,15 +21,15 @@ namespace Jal.Router.Impl
             _endpoints = routes.ToArray();
         }
 
-        public EndPoint Provide(Options options, Type contenttype)
+        public EndPoint Provide(Options options, object content)
         {
             try
             {
-                return _endpoints.Single(x => x.Condition(x, options, contenttype));
+                return _endpoints.Single(x => x.Name==options.EndPointName && (x.Condition==null || x.Condition(options, content)));
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Missing or duplicate endpoint {options.EndPointName} for type {contenttype.FullName}, {ex.Message}");
+                throw new ApplicationException($"Missing or duplicate endpoint {options.EndPointName} for type {content.GetType().FullName}, {ex.Message}");
             }
             
         }

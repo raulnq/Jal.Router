@@ -38,11 +38,9 @@ namespace Jal.Router.Impl
             return Path.Combine(parameter.Path, hash, "topics", path, subscription);
         }
 
-        public void CreateFile(string path, string file, Message message)
+        public void CreateFile(string path, string file, Message message, IMessageSerializer serializer)
         {
             var fullpath = Path.Combine(path, file);
-
-            var serializer = _factory.CreateMessageSerializer();
 
             var content = serializer.Serialize(message);
 
@@ -53,7 +51,7 @@ namespace Jal.Router.Impl
             }
         }
 
-        public Message ReadFile(string path)
+        public Message ReadFile(string path, IMessageSerializer serializer)
         {
             var file = string.Empty;
 
@@ -62,8 +60,6 @@ namespace Jal.Router.Impl
             {
                 file = sr.ReadToEnd();
             }
-
-            var serializer = _factory.CreateMessageSerializer();
 
             return serializer.Deserialize<Message>(file);
         }

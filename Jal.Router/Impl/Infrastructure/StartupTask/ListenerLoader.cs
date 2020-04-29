@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.Interface;
 
@@ -31,10 +30,7 @@ namespace Jal.Router.Impl
         {
             foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                if (listenercontext.Open())
-                {
-                    Logger.Log($"Listening {listenercontext.Id}");
-                }
+                listenercontext.Open();
             }
         }
 
@@ -44,9 +40,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in route.Channels)
                 {
-                    var listenercontext = _lifecycle.AddOrGet(channel);
-
-                    listenercontext.Routes.Add(route);
+                    _lifecycle.Add(route, channel);
                 }
             }
         }

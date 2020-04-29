@@ -8,14 +8,11 @@ namespace Jal.Router.Impl
 {
     public class Producer : IProducer
     {
-        public Producer(IComponentFactoryFacade factory, ILogger logger, ISenderContextLifecycle lifecycle)
+        public Producer(ILogger logger, ISenderContextLifecycle lifecycle)
         {
-            _factory = factory;
             _logger = logger;
             _lifecycle = lifecycle;
         }
-
-        private readonly IComponentFactoryFacade _factory;
 
         private readonly ISenderContextLifecycle _lifecycle;
 
@@ -27,21 +24,9 @@ namespace Jal.Router.Impl
 
             try
             {
-                var adapter = _factory.CreateMessageAdapter();
-
-                var message = await adapter.WritePhysicalMessage(context).ConfigureAwait(false);
-
                 var sendercontext = _lifecycle.Get(context.Channel);
 
-                if (sendercontext == null)
-                {
-                    sendercontext = _lifecycle.Add(context.Channel);
-
-                    if (sendercontext.Open())
-                    {
-                        _logger.Log($"Opening {sendercontext.Id}");
-                    }
-                }
+                var message = await sendercontext.Write(context).ConfigureAwait(false);
 
                 id = await sendercontext.Send(message).ConfigureAwait(false);
 
@@ -51,36 +36,34 @@ namespace Jal.Router.Impl
 
                     try
                     {
-                        outputcontext = await sendercontext.Read(context, adapter).ConfigureAwait(false);
+                        outputcontext = await sendercontext.Read(context).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath} {ex}");
+                        _logger.Log($"Message {outputcontext?.Id} failed to arrived to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name} {ex}");
 
                         throw;
                     }
                     finally
                     {
-                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+                        _logger.Log($"Message {outputcontext?.Id} arrived to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name}");
                     }
 
                     if (outputcontext != null)
                     {
-                        var serializer = _factory.CreateMessageSerializer();
-
-                        context.ContentContext.SetResult(serializer.Deserialize(outputcontext.ContentContext.Data, outputcontext.ContentContext.Type));
+                        context.ContentContext.ReplyData = sendercontext.MessageSerializer.Deserialize(outputcontext.ContentContext.Data, context.EndPoint.ReplyContentType);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}  {ex}");
+                _logger.Log($"Message {id} failed to sent to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name} {ex}");
 
                 throw;
             }
             finally
             {
-                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.EndPoint.Name}/{context.Channel.FullPath}");
+                _logger.Log($"Message {id} sent to {context.Channel.ToString()} channel {context.Channel.FullPath} endpoint {context.EndPoint?.Name}");
             }
         }
     }

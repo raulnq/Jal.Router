@@ -5,6 +5,14 @@ namespace Jal.Router.Interface
 {
     public interface IRouterBuilder
     {
+        IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+            where TService: class
+            where TImplementation : class, TService;
+
+        IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService;
+
         IRouterBuilder AddSource<TImplementation>() where TImplementation : class, IRouterConfigurationSource;
 
         IRouterBuilder AddMiddleware<TImplementation>() where TImplementation : class, IAsyncMiddleware<MessageContext>;
@@ -33,9 +41,7 @@ namespace Jal.Router.Interface
 
         IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel;
 
-        IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
-            where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource: ChannelResource;
+        IRouterBuilder AddResource<TImplementation>() where TImplementation : class, IResource;
 
         IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher;
 

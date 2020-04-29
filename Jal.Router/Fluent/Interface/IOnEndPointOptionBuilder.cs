@@ -5,7 +5,7 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IOnEndPointOptionBuilder
     {
-        IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action);
+        IOnEndPointOptionBuilder UseMiddleware(Action<IEndpointMiddlewareBuilder> action);
 
         IOnEndPointOptionBuilder OnError(Action<IOnEndPointErrorBuilder> action);
 
@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Interface
 
         IOnEndPointOptionBuilder OnExit(Action<IOnEndPointExitBuilder> action);
 
-        IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition);
+        IOnEndPointOptionBuilder When(Func<Options, object, bool> condition);
 
         void With(Action<IOnEndPointWithBuilder> action);
 

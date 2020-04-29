@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
     public class Route
     {
-        public Route(string name, Type contenttype, List<Channel> channels)
+        public Route(string name, Type middleware)
         {
-            ContentType = contenttype;
-            MiddlewareTypes = new List<Type>();
+            Middlewares = new List<Type>();
             Name = name;
-            Channels = channels;
+            Channels = new List<Channel>();
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
             RouteMethods = new List<RouteMethod>();
+            Middleware = middleware;
         }
 
-        public Route(Saga saga, string name, Type contenttype, List<Channel> channels) : this(name, contenttype, channels)
+        public override string ToString()
+        {
+            return Saga == null ? Name : $"{Saga.Name}/{Name}";
+        }
+
+        public Route(Saga saga, string name, Type middleware) : this(name, middleware)
         {
             Saga = saga;
         }
@@ -31,38 +35,24 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public Func<object, Channel, Task> Consumer { get; private set; }
-
         public List<Channel> Channels { get; }
 
         public string Name { get; private set; }
 
-        public Type ContentType { get; }
+        public List<Type> Middlewares { get; }
 
-        public List<Type> MiddlewareTypes { get; }
+        public Type Middleware { get; }
 
-        public Func<MessageContext, bool> When { get; private set; }
-
-        public bool UseClaimCheck { get; private set; }
+        public Func<MessageContext, bool> Condition { get; private set; }
 
         public RouteEntity ToEntity()
         {
-            return new RouteEntity(Name, ContentType);
+            return new RouteEntity(Name);
         }
 
-        public void UpdateUseClaimCheck(bool useclaimcheck)
+        public void When(Func<MessageContext, bool> condition)
         {
-            UseClaimCheck = useclaimcheck;
-        }
-
-        public void SetConsumer(Func<object, Channel, Task> consumer)
-        {
-            Consumer = consumer;
-        }
-
-        public void UpdateWhen(Func<MessageContext, bool> when)
-        {
-            When = when;
+            Condition = condition;
         }
 
         public List<RouteMethod> RouteMethods { get; }

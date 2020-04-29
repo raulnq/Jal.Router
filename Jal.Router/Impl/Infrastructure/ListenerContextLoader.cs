@@ -8,13 +8,9 @@ namespace Jal.Router.Impl
     {
         private readonly IListenerContextLifecycle _lifecycle;
 
-        private readonly ILogger _logger;
-
-        public ListenerContextLoader(IListenerContextLifecycle lifecycle, ILogger logger)
+        public ListenerContextLoader(IListenerContextLifecycle lifecycle)
         {
             _lifecycle = lifecycle;
-
-            _logger = logger;
         }
 
         public void Add(Route route)
@@ -25,15 +21,10 @@ namespace Jal.Router.Impl
 
                 if (listenercontext == null)
                 {
-                    listenercontext = _lifecycle.Add(channel);
+                    listenercontext = _lifecycle.Add(route, channel);
 
-                    if (listenercontext.Open())
-                    {
-                        _logger.Log($"Listening {listenercontext.Id}");
-                    }
+                    listenercontext.Open();
                 }
-
-                listenercontext.Routes.Add(route);
             }
         }
 
@@ -45,10 +36,7 @@ namespace Jal.Router.Impl
 
                 if (listenercontext != null)
                 {
-                    if (await listenercontext.Close().ConfigureAwait(false))
-                    {
-                        _logger.Log($"Shutdown {listenercontext.Id}");
-                    }
+                    await listenercontext.Close().ConfigureAwait(false);
                 }
             }
         }

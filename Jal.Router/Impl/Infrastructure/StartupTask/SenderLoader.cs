@@ -31,10 +31,7 @@ namespace Jal.Router.Impl
         {
             foreach (var sendercontext in Factory.Configuration.Runtime.SenderContexts)
             {
-                if(sendercontext.Open())
-                {
-                    Logger.Log($"Opening {sendercontext.Id}");
-                }
+                sendercontext.Open();
             }
         }
 
@@ -44,9 +41,7 @@ namespace Jal.Router.Impl
             {
                 foreach (var channel in endpoint.Channels)
                 {
-                    var sendercontext = _lifecycle.AddOrGet(channel);
-
-                    sendercontext.Endpoints.Add(endpoint);
+                    _lifecycle.Add(endpoint, channel);
                 }
             }
         }

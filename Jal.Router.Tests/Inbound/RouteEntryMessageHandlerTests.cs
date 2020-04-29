@@ -20,7 +20,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Handle_WithNoInit_ShouldNotBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -30,7 +30,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Handle_WithNullInit_ShouldNotBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 
@@ -40,7 +40,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task Handle_WithNullInit_ShouldBeExecuted()
         {
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build();
 

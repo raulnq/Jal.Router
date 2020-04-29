@@ -6,8 +6,8 @@ using Moq;
 using Shouldly;
 using System;
 using System.Threading.Tasks;
-using Jal.Router.Tests;
 using System.Collections.Generic;
+using Jal.ChainOfResponsability;
 
 namespace Jal.Router.Tests
 {
@@ -22,13 +22,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ExecuteAsync_WithNoHandlers_ShouldDoNothing()
         {
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(default(IBusEntryMessageHandler));
 
@@ -36,11 +30,13 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(default(IBusExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
             var sut = Build(factorymock.Object);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -52,13 +48,7 @@ namespace Jal.Router.Tests
         [TestMethod]
         public async Task ExecuteAsync_WithException_ShouldThrowException()
         {
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(default(IBusEntryMessageHandler));
 
@@ -66,11 +56,13 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(default(IBusExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
 
-            var sut = Build(factorymock.Object);
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
+            var sut = Build(factory);
+
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Never());
 
@@ -96,13 +88,7 @@ namespace Jal.Router.Tests
 
             var exithandler = mockexithandler.Object;
 
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(entryhandler);
 
@@ -110,21 +96,23 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(exithandler);
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
 
-            messagecontext.EndPoint.EntryHandlers.Add(new Jal.Router.Model.Handler(entryhandler.GetType(), new Dictionary<string, object>()));
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
-            messagecontext.EndPoint.ExitHandlers.Add(new Jal.Router.Model.Handler(exithandler.GetType(), new Dictionary<string, object>()));
+            messagecontext.EndPoint.EntryHandlers.Add(new Model.Handler(entryhandler.GetType(), new Dictionary<string, object>()));
+
+            messagecontext.EndPoint.ExitHandlers.Add(new Model.Handler(exithandler.GetType(), new Dictionary<string, object>()));
 
             messagecontext.EndPoint.ErrorHandlers.Add(new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
 
-            var sut = Build(factorymock.Object);
+            var sut = Build(factory);
 
             await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception());
 
             factorymock.Verify(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>()), Times.Once());
 
-            mockentryhandler.Verify(x => x.Handle(It.IsAny<MessageContext>(), It.IsAny<Jal.Router.Model.Handler>()), Times.Once());
+            mockentryhandler.Verify(x => x.Handle(It.IsAny<MessageContext>(), It.IsAny<Model.Handler>()), Times.Once());
 
             factorymock.Verify(x => x.CreateBusErrorMessageHandler(It.IsAny<Type>()), Times.Once());
 
@@ -132,7 +120,7 @@ namespace Jal.Router.Tests
 
             factorymock.Verify(x => x.CreateBusExitMessageHandler(It.IsAny<Type>()), Times.Once());
 
-            mockexithandler.Verify(x => x.Handle(It.IsAny<MessageContext>(), It.IsAny<Jal.Router.Model.Handler>()), Times.Once());
+            mockexithandler.Verify(x => x.Handle(It.IsAny<MessageContext>(), It.IsAny<Model.Handler>()), Times.Once());
         }
 
         [TestMethod]
@@ -144,13 +132,7 @@ namespace Jal.Router.Tests
 
             var errorhandler = mockerrorhandler.Object;
 
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(default(IBusEntryMessageHandler));
 
@@ -158,11 +140,13 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(default(IBusExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
             messagecontext.EndPoint.ErrorHandlers.Add(new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false));
 
-            var sut = Build(factorymock.Object);
+            var sut = Build(factory);
 
             await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
@@ -184,13 +168,7 @@ namespace Jal.Router.Tests
 
             var errorhandler = mockerrorhandler.Object;
 
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(default(IBusEntryMessageHandler));
 
@@ -198,7 +176,9 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(default(IBusExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
             var handler = new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false);
 
@@ -206,7 +186,7 @@ namespace Jal.Router.Tests
 
             messagecontext.EndPoint.ErrorHandlers.Add(handler);
 
-            var sut = Build(factorymock.Object);
+            var sut = Build(factory);
 
             await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new Exception()));
 
@@ -228,13 +208,7 @@ namespace Jal.Router.Tests
 
             var errorhandler = mockerrorhandler.Object;
 
-            var shuffermock = new Mock<IChannelShuffler>();
-
-            shuffermock.Setup(x => x.Shuffle(It.IsAny<Channel[]>())).Returns(new Channel[] { Builder.CreateChannel() });
-
             var factorymock = Builder.CreateFactoryMock();
-
-            factorymock.Setup(x => x.CreateChannelShuffler()).Returns(shuffermock.Object);
 
             factorymock.Setup(x => x.CreateBusEntryMessageHandler(It.IsAny<Type>())).Returns(default(IBusEntryMessageHandler));
 
@@ -242,7 +216,9 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateBusExitMessageHandler(It.IsAny<Type>())).Returns(default(IBusExitMessageHandler));
 
-            var messagecontext = Builder.CreateMessageContext();
+            var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextToSend(factory);
 
             var handler = new ErrorHandler(errorhandler.GetType(), new Dictionary<string, object>(), false);
 
@@ -250,7 +226,7 @@ namespace Jal.Router.Tests
 
             messagecontext.EndPoint.ErrorHandlers.Add(handler);
 
-            var sut = Build(factorymock.Object);
+            var sut = Build(factory);
 
             await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => throw new ApplicationException());
 

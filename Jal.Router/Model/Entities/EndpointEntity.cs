@@ -6,17 +6,14 @@ namespace Jal.Router.Model
     {
         public string Name { get; private set; }
 
-        public Type ContentType { get; private set; }
-
         private EndpointEntity()
         {
 
         }
 
-        public EndpointEntity(string name, Type contenttype)
+        public EndpointEntity(string name)
         {
             Name = name;
-            ContentType = contenttype;
         }
     }
 }

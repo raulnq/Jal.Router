@@ -29,12 +29,6 @@ namespace Jal.Router.Tests
 
             factory.Configuration.Runtime.Routes.Add(route);
 
-            var partition = new Partition("name");
-
-            partition.UpdateChannel(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Partitions.Add(partition);
-
             var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
 
             var exception = false;
@@ -65,12 +59,6 @@ namespace Jal.Router.Tests
             route.Channels.Add(Builder.CreateChannel());
 
             factory.Configuration.Runtime.Routes.Add(route);
-
-            var partition = new Partition("name");
-
-            partition.UpdateChannel(Builder.CreateChannel());
-
-            factory.Configuration.Runtime.Partitions.Add(partition);
 
             var sut = new RouteValidator(factory, new NullLogger(), validatormock.Object);
 

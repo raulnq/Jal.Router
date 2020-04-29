@@ -13,7 +13,7 @@ namespace Jal.Router.Tests
     {
         private ForwardRouteEntryMessageHandler Build(IComponentFactoryFacade factory)
         {
-            return new ForwardRouteEntryMessageHandler(factory, new NullLogger());
+            return new ForwardRouteEntryMessageHandler(new NullLogger());
         }
 
         [TestMethod]
@@ -21,15 +21,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var busmock = new Mock<IBus>();
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { }));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -37,15 +39,17 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var messagecontext = Builder.CreateMessageContext();
-
             var factory = factorymock.Object;
+
+            var busmock = new Mock<IBus>();
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
             await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "" } }));
 
-            factorymock.CreateMessageSerializerWasNotExecuted();
+            busmock.SendWasNotExecuted<object>();
         }
 
         [TestMethod]
@@ -55,15 +59,13 @@ namespace Jal.Router.Tests
 
             var busmock = new Mock<IBus>();
 
-            var messagecontext = Builder.CreateMessageContext(busmock: busmock);
-
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory: factory, bus: busmock.Object);
 
             var sut = Build(factory);
 
-            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" } }));
-
-            factorymock.CreateMessageSerializerWasExecuted();
+            await sut.Handle(messagecontext, new Model.Handler(typeof(object), new Dictionary<string, object>() { { "endpoint", "queue" }, { "type", typeof(object) } }));
 
             busmock.SendWasExecuted<object>(op => op.EndPointName == "queue");
         }

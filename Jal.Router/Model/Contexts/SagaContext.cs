@@ -18,14 +18,14 @@ namespace Jal.Router.Model
             Context = context;
         }
 
+        public SagaContext(MessageContext context, string id, SagaData sagadata):this(context, id)
+        {
+            Data = sagadata;
+        }
+
         private SagaContext()
         {
 
-        }
-
-        public void Load(SagaData sagadata)
-        {
-            Data = sagadata;
         }
 
         public bool IsLoaded()
@@ -33,18 +33,34 @@ namespace Jal.Router.Model
             return Data!=null;
         }
 
-        public void SetId(string id)
+        public void Load(SagaData sagadata)
         {
-            Id = id;
+            Data = sagadata;
         }
 
-        public SagaData Create(string status)
+        public Task UpdateIntoStorage()
+        {
+            return Context.UpdateSagaDataIntoStorage(Data);
+        }
+
+        public async Task LoadDataFromStorage()
+        {
+            Load(await Context.GetSagaDataFromStorage(Id).ConfigureAwait(false));
+        }
+
+        public async Task CreateAndInsertDataIntoStorage(string status)
         {
             var data = Activator.CreateInstance(Context.Saga.DataType);
 
-            var entity = new SagaData(data, Context.Saga.DataType, Context.Saga.Name, Context.DateTimeUtc, Context.Saga.Timeout, status);
+            var sagadata = new SagaData(data, Context.Saga.DataType, Context.Saga.Name, Context.DateTimeUtc, Context.Saga.Timeout, status);
 
-            return entity;
+            var id = await Context.InsertSagaDataIntoStorage(sagadata).ConfigureAwait(false);
+
+            sagadata.SetId(id);
+
+            Load(sagadata);
+
+            Id = id;
         }
 
         public SagaContextEntity ToEntity()

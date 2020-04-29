@@ -1,5 +1,4 @@
 ﻿using Jal.Router.Model;
-using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
@@ -7,9 +6,7 @@ namespace Jal.Router.Interface
     {
         SenderContext Remove(Channel channel);
 
-        SenderContext AddOrGet(Channel channel);
-
-        SenderContext Add(Channel channel);
+        SenderContext Add(EndPoint endpoint, Channel channel);
 
         SenderContext Get(Channel channel);
 

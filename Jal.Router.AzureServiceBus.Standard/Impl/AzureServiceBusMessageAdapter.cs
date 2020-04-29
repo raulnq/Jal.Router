@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
@@ -21,8 +22,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         public AzureServiceBusMessageAdapter(IComponentFactoryFacade factory, IBus bus) : base(factory, bus)
         {
         }
-
-        protected override MessageContext ReadMetadata(object message, IMessageSerializer serializer)
+        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage)
         {
             var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
 
@@ -86,7 +86,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     claimcheckid = sbmessage.UserProperties[ClaimCheckId].ToString();
                 }
 
-                var context = new MessageContext(Bus, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, claimcheckid);
+                var content = await ReadContent(sbmessage, claimcheckid, channel.UseClaimCheck, messagestorage).ConfigureAwait(false);
+
+                var context = MessageContext.CreateFromListen(Bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, trackings, new Origin(from, key), content, sagaid, claimcheckid, DateTime.UtcNow, version);
 
                 if (sbmessage.UserProperties != null)
                 {
@@ -151,7 +153,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             var data = context.ContentContext.Data;
 
-            if(context.ContentContext.IsClaimCheck)
+            if(context.ContentContext.UseClaimCheck)
             {
                 data = string.Empty;
             }

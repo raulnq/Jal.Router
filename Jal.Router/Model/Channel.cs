@@ -1,58 +1,69 @@
-﻿using Jal.Router.Interface;
-using System;
+﻿using System;
 
 namespace Jal.Router.Model
 {
     public class Channel
     {
-        public Channel(ChannelType channeltype, string connectionstring, string path, bool fromrouterconfigurationsource = true)
+        public Channel(ChannelType channeltype, string connectionstring, string path, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
         {
-            Type = channeltype;
+            ChannelType = channeltype;
 
             ConnectionString = connectionstring;
 
             Path = path;
 
             RouterConfigurationSource = fromrouterconfigurationsource;
+
+            AdapterType = adaptertype;
+
+            Type = type;
+
+            Id = Guid.NewGuid().ToString();
         }
 
-        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, bool fromrouterconfigurationsource = true)
-            :this(channeltype, connectionstring, path, fromrouterconfigurationsource)
+        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
+            :this(channeltype, connectionstring, path, adaptertype, type, fromrouterconfigurationsource)
         {
             Subscription = subscription;
         }
 
-        public bool RouterConfigurationSource { get; set; }
+        public Func<MessageContext, bool> Condition { get; private set; }
 
-        public ChannelType Type { get; private set; }
+        public bool UseClaimCheck { get; private set; }
 
-        public string Id
-        {
-            get
-            {
-                return Path + Subscription + ConnectionString;
-            }
-        }
+        public bool Partition { get; private set; }
+
+        public Func<MessageContext, bool> ClosePartitionCondition { get; private set; }
+
+        public bool RouterConfigurationSource { get; private set; }
+
+        public Type AdapterType { get; set; }
+
+        public Type Type { get; set; }
+
+        public ChannelType ChannelType { get; private set; }
+
+        public string Id { get; }
 
         public override string ToString()
         {
-            if (Type == ChannelType.PointToPoint)
+            if (ChannelType == ChannelType.PointToPoint)
             {
                 return "point to point";
             }
-            if (Type == ChannelType.RequestReplyToPointToPoint)
+            if (ChannelType == ChannelType.RequestReplyToPointToPoint)
             {
                 return "request reply to point to point";
             }
-            if (Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+            if (ChannelType == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
             {
                 return "request reply to subscription to publish subscribe";
             }
-            if (Type == ChannelType.PublishSubscribe)
+            if (ChannelType == ChannelType.PublishSubscribe)
             {
                 return "publish subscribe";
             }
-            if (Type == ChannelType.SubscriptionToPublishSubscribe)
+            if (ChannelType == ChannelType.SubscriptionToPublishSubscribe)
             {
                 return "subscription to publish subscribe";
             }
@@ -107,26 +118,47 @@ namespace Jal.Router.Model
 
         public ChannelEntity ToEntity()
         {
-            return new ChannelEntity(Path, Subscription, Type);
+            return new ChannelEntity(Path, Subscription, ChannelType);
         }
 
+        public void AsClaimCheck()
+        {
+            UseClaimCheck = true;
+        }
+
+        public void UsePartitions(Func<MessageContext, bool> condition=null)
+        {
+            Partition = true;
+            ClosePartitionCondition = condition;
+        }
+
+        public void When(Func<MessageContext, bool> when)
+        {
+            Condition = when;
+        }
+
+
         public void UpdateReplyFromPointToPointChannel(string replypath, int replytimeout, 
-            string replyconnectionstring)
+            string replyconnectionstring, Type adapter, Type type)
         {
             ReplyPath = replypath;
             ReplyTimeOut = replytimeout;
-            Type = ChannelType.RequestReplyToPointToPoint;
+            ChannelType = ChannelType.RequestReplyToPointToPoint;
             ReplyConnectionString = replyconnectionstring;
+            AdapterType = adapter;
+            Type = type;
         }
 
         public void UpdateReplyFromSubscriptionToPublishSubscribeChannel(string replypath, int replytimeout, string replysubscription,
-            string replyconnectionstring)
+            string replyconnectionstring, Type adapter, Type type)
         {
             ReplySubscription = replysubscription;
             ReplyPath = replypath;
             ReplyTimeOut = replytimeout;
-            Type = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
+            ChannelType = ChannelType.RequestReplyToSubscriptionToPublishSubscribe;
             ReplyConnectionString = replyconnectionstring;
+            AdapterType = adapter;
+            Type = type;
         }
     }
 }

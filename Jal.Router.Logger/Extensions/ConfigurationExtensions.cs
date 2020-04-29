@@ -8,8 +8,8 @@ namespace Jal.Router.Logger
         public static IConfiguration UseCommonLogging(this IConfiguration configuration)
         {
             return configuration
-                .AddOutboundMiddleware<BusLogger>()
-                .AddInboundMiddleware<RouterLogger>()
+                .AddEndpointMiddleware<BusLogger>()
+                .AddRouteMiddleware<RouterLogger>()
                 .AddLogger<BeatLogger, Beat>();
         }
     }

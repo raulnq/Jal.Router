@@ -1,4 +1,5 @@
-﻿using Jal.Router.Impl;
+﻿using Jal.ChainOfResponsability;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,9 +24,9 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var consumermock = new Mock<IConsumer>();
+            var consumermock = Builder.CreateConsumerMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var factory = factorymock.Object;
 
@@ -33,7 +34,7 @@ namespace Jal.Router.Tests
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -47,23 +48,23 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var consumermock = new Mock<IConsumer>();
+            var consumermock = Builder.CreateConsumerMock();
 
             consumermock.Setup(x => x.Consume(It.IsAny<MessageContext>())).Throws(new Exception());
 
-            var messagecontext = Builder.CreateMessageContext();
-
             var factory = factorymock.Object;
 
-            var entitystoragemock = Builder.CreateEntityStorage();
+            var entitystoragemock = Builder.CreateEntityStorageMock();
 
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
             factory.Configuration.EnableStorage();
 
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
+
             var sut = Build(consumermock.Object, factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             consumermock.WasExecuted();
 
@@ -77,21 +78,21 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var consumermock = new Mock<IConsumer>();
+            var consumermock = Builder.CreateConsumerMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var entitystoragemock = Builder.CreateEntityStorageMock();
 
-            var entitystoragemock = Builder.CreateEntityStorage();
-
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage();
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -107,23 +108,23 @@ namespace Jal.Router.Tests
         {
             var factorymock = Builder.CreateFactoryMock();
 
-            var consumermock = new Mock<IConsumer>();
+            var consumermock = Builder.CreateConsumerMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var entitystoragemock = Builder.CreateEntityStorageMock();
 
-            var entitystoragemock = Builder.CreateEntityStorage();
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>())).Throws(new Exception());
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).Throws(new Exception());
-
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage(true);
 
             var sut = Build(consumermock.Object, factory);
 
-            await sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
+            await sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask);
 
             consumermock.WasExecuted();
 
@@ -141,21 +142,21 @@ namespace Jal.Router.Tests
 
             var consumermock = new Mock<IConsumer>();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var entitystoragemock = Builder.CreateEntityStorageMock();
 
-            var entitystoragemock = Builder.CreateEntityStorage();
+            entitystoragemock.Setup(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>())).Throws(new Exception());
 
-            entitystoragemock.Setup(x => x.Create(It.IsAny<MessageEntity>())).Throws(new Exception());
-
-            factorymock.Setup(x => x.CreateEntityStorage()).Returns(entitystoragemock.Object);
+            factorymock.AddEntityStorage(entitystoragemock);
 
             var factory = factorymock.Object;
+
+            var messagecontext = Builder.CreateMessageContextFromListen(factory);
 
             factory.Configuration.EnableStorage(false);
 
             var sut = Build(consumermock.Object, factory);
 
-            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new ChainOfResponsability.AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
+            await Should.ThrowAsync<Exception>(sut.ExecuteAsync(new AsyncContext<MessageContext>() { Data = messagecontext }, c => Task.CompletedTask));
 
             consumermock.WasExecuted();
 

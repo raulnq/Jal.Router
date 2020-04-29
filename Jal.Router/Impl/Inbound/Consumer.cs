@@ -22,59 +22,45 @@ namespace Jal.Router.Impl
             _typedconsumer = typedconsumer;
         }
 
-        public async Task Consume(MessageContext context)
+        public Task Consume(MessageContext context)
         {
-            try
+            if(!context.FromSaga())
             {
-                if(!context.FromSaga())
-                {
-                    var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 2);
-
-                    var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType);
-
-                    var task = genericroutemethod?.Invoke(this, new object[] { context, context.Route }) as Task;
-
-                    await task.ConfigureAwait(false);
-                }
-                else
-                {
-                    var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.Consume) && x.GetParameters().Count() == 3);
-
-                    var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Saga.DataType);
-
-                    var task = genericroutemethod?.Invoke(this, new[] { context, context.Route, context.SagaContext.Data.Data }) as Task;
-
-                    await task.ConfigureAwait(false);
-                }
-
+                return Consume(context, context.Route);
             }
-            catch (TargetInvocationException ex)
+            else
             {
-                _logger.Log($"Exception during the route {context.Route.Name} execution");
-
-                if (ex.InnerException != null) throw ex.InnerException;
-
-                throw;
+                return Consume(context, context.Route, context.SagaContext.Data.Data);
             }
         }
 
-        private async Task Consume<TContent>(MessageContext context, Route route)
+        private async Task Consume(MessageContext context, Route route)
         {
             if (route.AnyRouteMethods())
             {
-                var serializer = _factory.CreateMessageSerializer();
-
-                var content = serializer.Deserialize<TContent>(context.ContentContext.Data);
-
                 foreach (var method in route.RouteMethods)
                 {
+                    var when = true;
+
+                    if(method.Condition!=null)
+                    {
+                        when = method.Condition(context);
+                    }
+
+                    if(!when)
+                    {
+                        continue;
+                    }
+
                     try
                     {
-                        if(method.IsAnonymous)
+                        var content = context.Deserialize(context.ContentContext.Data, method.ContentType);
+
+                        if (method.IsAnonymous)
                         {
                             var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.AnonymousInnerConsume) && x.GetParameters().Count() == 3);
 
-                            var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType);
+                            var genericroutemethod = routemethod?.MakeGenericMethod(method.ContentType);
 
                             var task = genericroutemethod?.Invoke(this, new object[] { context, content, method }) as Task;
 
@@ -84,7 +70,7 @@ namespace Jal.Router.Impl
                         {
                             var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.InnerConsume) && x.GetParameters().Count() == 3);
 
-                            var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, method.HandlerType);
+                            var genericroutemethod = routemethod?.MakeGenericMethod(method.ContentType, method.HandlerType);
 
                             var task = genericroutemethod?.Invoke(this, new object[] { context, content, method }) as Task;
 
@@ -124,25 +110,34 @@ namespace Jal.Router.Impl
             }
         }
 
-        private async Task Consume<TContent, TData>(MessageContext context, Route route, TData data)
-            where TData : class, new()
+        private async Task Consume(MessageContext context, Route route, object data)
         {
 
             if (route.AnyRouteMethods())
             {
-                var serializer = _factory.CreateMessageSerializer();
-
-                var content = serializer.Deserialize<TContent>(context.ContentContext.Data);
-
                 foreach (var method in route.RouteMethods)
                 {
                     try
                     {
+                        var when = true;
+
+                        if (method.Condition != null)
+                        {
+                            when = method.Condition(context);
+                        }
+
+                        if (!when)
+                        {
+                            continue;
+                        }
+
+                        var content = context.Deserialize(context.ContentContext.Data, method.ContentType);
+
                         if (method.IsAnonymous)
                         {
                             var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.AnonymousInnerConsume) && x.GetParameters().Count() == 4);
 
-                            var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Saga.DataType);
+                            var genericroutemethod = routemethod?.MakeGenericMethod(method.ContentType, context.Saga.DataType);
 
                             var task = genericroutemethod?.Invoke(this, new object[] { context, content, method, data }) as Task;
 
@@ -152,7 +147,7 @@ namespace Jal.Router.Impl
                         {
                             var routemethod = typeof(Consumer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name == nameof(Consumer.InnerConsume) && x.GetParameters().Count() == 4);
 
-                            var genericroutemethod = routemethod?.MakeGenericMethod(context.Route.ContentType, context.Saga.DataType, method.HandlerType);
+                            var genericroutemethod = routemethod?.MakeGenericMethod(method.ContentType, context.Saga.DataType, method.HandlerType);
 
                             var task = genericroutemethod?.Invoke(this, new object[] { context, content, method, data }) as Task;
 

@@ -11,13 +11,14 @@ namespace Jal.Router.Model
 
         public Func<TContent, MessageContext, TData, Task> Consumer { get; }
 
-        public RouteMethodWithData(Func<TContent, MessageContext, TData, Task> consumer, string status = null) : base()
+        public RouteMethodWithData(Func<TContent, MessageContext, TData, Task> consumer, Type contenttype, Func<MessageContext, bool> condition, string status = null) 
+            : base(contenttype, condition)
         {
             Consumer = consumer;
             Status = status;
         }
 
-        public void UpdateEvaluator(Func<TContent, MessageContext, TData, bool> evaluator)
+        public void When(Func<TContent, MessageContext, TData, bool> evaluator)
         {
             Evaluator = evaluator;
         }
@@ -27,7 +28,8 @@ namespace Jal.Router.Model
     {
         public string Status { get; private set; }
 
-        protected RouteMethodWithData(Type handlertype, Type concretehandlertype) : base(handlertype)
+        protected RouteMethodWithData(Type handlertype, Type concretehandlertype, Type contenttype, Func<MessageContext, bool> condition) 
+            : base(handlertype, contenttype, condition)
         {
             ConcreteHandlerType = concretehandlertype;
         }
@@ -38,13 +40,14 @@ namespace Jal.Router.Model
 
         public Func<TContent, THandler, MessageContext, TData, bool> Evaluator { get; private set; }
 
-        public RouteMethodWithData(Func<TContent, THandler, MessageContext, TData, Task> consumer, Type concreteconsumertype, string status = null) : this(typeof(THandler), concreteconsumertype)
+        public RouteMethodWithData(Func<TContent, THandler, MessageContext, TData, Task> consumer, Type concreteconsumertype, Type contenttype, Func<MessageContext, bool> condition,  string status = null) 
+            : this(typeof(THandler), concreteconsumertype, contenttype, condition)
         {
             Consumer = consumer;
             Status = status;
         }
 
-        public void UpdateEvaluator(Func<TContent, THandler, MessageContext, TData, bool> evaluator)
+        public void When(Func<TContent, THandler, MessageContext, TData, bool> evaluator)
         {
             Evaluator = evaluator;
         }

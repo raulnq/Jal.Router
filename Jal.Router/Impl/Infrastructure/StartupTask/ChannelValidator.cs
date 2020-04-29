@@ -21,18 +21,18 @@ namespace Jal.Router.Impl
 
             Validate(errors, channel.Path, "path", resourcetype, resourcename);
 
-            if (channel.Type == ChannelType.SubscriptionToPublishSubscribe)
+            if (channel.ChannelType == ChannelType.SubscriptionToPublishSubscribe)
             {
                 Validate(errors, channel.Subscription, "subscription", resourcetype, resourcename);
             }
 
-            if (channel.Type == ChannelType.RequestReplyToPointToPoint || channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+            if (channel.ChannelType == ChannelType.RequestReplyToPointToPoint || channel.ChannelType == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
             {
                 Validate(errors, channel.ReplyConnectionString, "reply connection string", resourcetype, resourcename);
 
                 Validate(errors, channel.ReplyPath, "reply path", resourcetype, resourcename);
 
-                if (channel.Type == Model.ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
+                if (channel.ChannelType == Model.ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
                 {
                     Validate(errors, channel.ReplySubscription, "reply subscription", resourcetype, resourcename);
                 }

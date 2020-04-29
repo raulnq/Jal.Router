@@ -3,6 +3,7 @@ using Jal.Router.Interface;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Shouldly;
+using System;
 
 namespace Jal.Router.Tests
 {
@@ -12,19 +13,21 @@ namespace Jal.Router.Tests
         [TestMethod]
         public void Add_With_ShouldBeCreated()
         {
+            var routermock = new Mock<IRouter>();
+
             var listenermock = new Mock<IListenerChannel>();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>())).Returns(listenermock.Object);
+            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns(listenermock.Object);
 
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextLifecycle(factory);
+            var sut = new ListenerContextLifecycle(factory, routermock.Object, new NullLogger());
 
-            var listenercontext = sut.Add(Builder.CreateChannel());
+            var listenercontext = sut.Add(Builder.CreateRoute(), Builder.CreateChannel());
 
-            factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>()), Times.Once);
+            factorymock.Verify(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>()), Times.Once);
 
             listenercontext.Channel.ShouldNotBeNull();
 
@@ -33,8 +36,6 @@ namespace Jal.Router.Tests
             listenercontext.ListenerChannel.ShouldBeAssignableTo<IListenerChannel>();
 
             listenercontext.Channel.Path.ShouldBe("path");
-
-            listenercontext.Partition.ShouldBeNull();
         }
     }
 }

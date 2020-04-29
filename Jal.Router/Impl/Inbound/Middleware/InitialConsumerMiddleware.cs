@@ -18,21 +18,11 @@ namespace Jal.Router.Impl
         {
             var messagecontext = context.Data;
 
-            var storage = Factory.CreateEntityStorage();
-
-            var sagadata = messagecontext.SagaContext.Create(DefaultStatus);
-
-            var id = await storage.Create(sagadata).ConfigureAwait(false);
-
-            sagadata.SetId(id);
-
-            messagecontext.SagaContext.Load(sagadata);
-
-            messagecontext.SagaContext.SetId(id);
+            await messagecontext.SagaContext.CreateAndInsertDataIntoStorage(DefaultStatus).ConfigureAwait(false);
 
             await Consume(messagecontext).ConfigureAwait(false);
 
-            await storage.Update(sagadata).ConfigureAwait(false);
+            await messagecontext.SagaContext.UpdateIntoStorage().ConfigureAwait(false);
         }
     }
 }

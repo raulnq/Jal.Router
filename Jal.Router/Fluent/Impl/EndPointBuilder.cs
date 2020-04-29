@@ -1,27 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using Jal.Router.Fluent.Interface;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, INameEndPointBuilder, IToChannelBuilder, IToReplyChannelBuilder
+    public class EndPointBuilder : IToEndPointBuilder, IOnEndPointOptionBuilder, IToChannelBuilder, IToReplyChannelBuilder
     {
-        private readonly EndPoint _endpoint;
+        private EndPoint _endpoint;
 
         public EndPointBuilder(EndPoint endpoint)
         {
             _endpoint = endpoint;
         }
 
-        public IToEndPointBuilder ForMessage<TMessage>()
-        {
-            _endpoint.SetContentType(typeof (TMessage));
-
-            return this;
-        }
-
-        public void AddPointToPointChannel(string connectionstring, string path)
+        public void AddPointToPointChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
@@ -33,7 +27,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPointToPointChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
         }
@@ -49,17 +53,16 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path);
+
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, null, null);
 
             _endpoint.Channels.Add(channel);
 
             return new AndWaitReplyFromEndPointBuilder(channel);
         }
 
-        public void AddPublishSubscribeChannel(string connectionstring, string path)
+        public void AddPublishSubscribeChannel(string connectionstring, string path, Type adapter = null, Type type = null)
         {
-
-
             if (string.IsNullOrWhiteSpace(connectionstring))
             {
                 throw new ArgumentNullException(nameof(connectionstring));
@@ -70,7 +73,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path);
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+
+            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+            var channel = new Channel(ChannelType.PublishSubscribe, connectionstring, path, adapter, type);
 
             _endpoint.Channels.Add(channel);
         }
@@ -87,14 +100,14 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnEndPointOptionBuilder UseMiddleware(Action<IOutboundMiddlewareBuilder> action)
+        public IOnEndPointOptionBuilder UseMiddleware(Action<IEndpointMiddlewareBuilder> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var builder = new OutboundMiddlewareBuilder(_endpoint);
+            var builder = new EndpointMiddlewareBuilder(_endpoint);
 
             action(builder);
 
@@ -169,9 +182,9 @@ namespace Jal.Router.Fluent.Impl
             action(builder);
         }
 
-        public IOnEndPointOptionBuilder When(Func<EndPoint, Options, Type, bool> condition)
+        public IOnEndPointOptionBuilder When(Func<Options, object, bool> condition)
         {
-            _endpoint.SetCondition(condition);
+            _endpoint.When(condition);
 
             return this;
         }

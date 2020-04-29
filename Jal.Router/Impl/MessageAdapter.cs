@@ -1,6 +1,7 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System;
+using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
@@ -21,7 +22,7 @@ namespace Jal.Router.Impl
             throw new ApplicationException($"Invalid message type {message.GetType().FullName}");
         }
 
-        protected override MessageContext ReadMetadata(object message, IMessageSerializer serializer)
+        protected override async Task<MessageContext> Read(object message, Route route, EndPoint endpoint, Channel channel, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage)
         {
             var fmessage = message as Message;
 
@@ -43,9 +44,11 @@ namespace Jal.Router.Impl
 
                 var sagaid = fmessage.SagaId;
 
-                var contentid = fmessage.ContentId;
+                var claimcheckid = fmessage.ClaimCheckId;
 
-                var context = new MessageContext(Bus, tracingcontext, DateTime.UtcNow, trackings, new Origin(from, key), sagaid, version, contentid);
+                var content = await ReadContent(fmessage, claimcheckid, channel.UseClaimCheck, messagestorage).ConfigureAwait(false);
+
+                var context = MessageContext.CreateFromListen(Bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, trackings, new Origin(from, key), content, sagaid, claimcheckid, DateTime.UtcNow, version);
 
                 if (fmessage.Headers != null)
                 {
@@ -64,7 +67,7 @@ namespace Jal.Router.Impl
         {
             var data = context.ContentContext.Data;
 
-            if (context.ContentContext.IsClaimCheck)
+            if (context.ContentContext.UseClaimCheck)
             {
                 data = string.Empty;
             }
@@ -93,7 +96,7 @@ namespace Jal.Router.Impl
 
             if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                filemessage.ContentId = context.ContentContext.ClaimCheckId;
+                filemessage.ClaimCheckId = context.ContentContext.ClaimCheckId;
             }
 
             if (context.TrackingContext != null)

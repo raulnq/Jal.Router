@@ -23,7 +23,7 @@ namespace Jal.Router.Impl
             }
             finally
             {
-                await CreateMessageEntityAndSave(messagecontext).ConfigureAwait(false);
+                await CreateAndInsertMessageIntoStorage(messagecontext).ConfigureAwait(false);
             }
         }
     }

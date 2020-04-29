@@ -1,70 +1,122 @@
 using Jal.Router.Interface;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Model
 {
     public class ListenerContext
     {
-        public Channel Channel { get; private set; }
+        private readonly ILogger _logger;
 
-        public Partition Partition { get; private set; }
+        public Channel Channel { get; private set; }
 
         public IListenerChannel ListenerChannel { get; private set; }
 
-        public List<Route> Routes { get; private set; }
+        public IMessageAdapter MessageAdapter { get; private set; }
 
-        public ListenerContext(Channel channel, IListenerChannel listener, Partition partition)
+        public IMessageSerializer MessageSerializer { get; private set; }
+
+        public IMessageStorage MessageStorage { get; private set; }
+
+        public IEntityStorage EntityStorage { get; private set; }
+
+        public IRouter Router { get; private set; }
+
+        public Route Route { get; private set; }
+
+        public static ListenerContext Create(IComponentFactoryFacade factory, IRouter router, ILogger logger, Channel channel, Route route)
         {
-            Channel = channel;
-            Routes = new List<Route>();
-            Partition = partition;
-            ListenerChannel = listener;
+            var listenerchannel = factory.CreateListenerChannel(channel.ChannelType, channel.Type);
+
+            var adapter = factory.CreateMessageAdapter(channel.AdapterType);
+
+            var serializer = factory.CreateMessageSerializer();
+
+            var messagestorage = factory.CreateMessageStorage();
+
+            var entitystorage = factory.CreateEntityStorage();
+
+            var context = new ListenerContext(route, channel, listenerchannel, adapter, router, serializer, messagestorage, entitystorage, logger);
+
+            return context;
         }
 
-        public async Task<bool> Close()
+        private ListenerContext(Route route, Channel channel, IListenerChannel listenerchannel, IMessageAdapter adapter,
+            IRouter router, IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage,
+            ILogger logger)
         {
-            if (ListenerChannel != null)
+            if (listenerchannel == null)
             {
-                await ListenerChannel.Close(this).ConfigureAwait(false);
-
-                return true;
+                throw new ArgumentNullException(nameof(listenerchannel));
+            }
+            if (route == null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
+            if (channel == null)
+            {
+                throw new ArgumentNullException(nameof(channel));
             }
 
-            return false;
+            Channel = channel;
+            Route = route;
+            ListenerChannel = listenerchannel;
+            MessageAdapter = adapter;
+            Router = router;
+            MessageSerializer = serializer;
+            MessageStorage = messagestorage;
+            EntityStorage = entitystorage;
+            _logger = logger;
+        }
+
+        public Task Dispatch(MessageContext context)
+        {
+            var when = true;
+
+            if(Channel.Condition!=null)
+            {
+                when = Channel.Condition(context);
+            }
+
+            if(when)
+            {
+                return Router.Route(context);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public Task<MessageContext> Read(object message)
+        {
+            return MessageAdapter.ReadFromPhysicalMessage(message, this);
+        }
+
+        public Task Close()
+        {
+            _logger.Log($"Shutdown {this.ToString()}");
+
+            return ListenerChannel.Close(this);
         }
 
         public bool IsActive()
         {
-            if (ListenerChannel != null)
-            {
-                return ListenerChannel.IsActive(this);
-            }
-
-            return false;
+            return ListenerChannel.IsActive(this);
         }
 
-        public bool Open()
+        public void Open()
         {
-            if (ListenerChannel != null)
-            {
-                ListenerChannel.Open(this);
+            ListenerChannel.Open(this);
 
-                ListenerChannel.Listen(this);
+            ListenerChannel.Listen(this);
 
-                return true;
-            }
-
-            return false;
+            _logger.Log($"Listening {ToString()}");
         }
 
-        public string Id
+        public override string ToString()
         {
-            get
-            {
-                return $"{Partition?.ToString()} {Channel.FullPath} {Channel.ToString()} channel ({Routes.Count}): {string.Join(",", Routes.Select(x => x.Saga == null ? x.Name : $"{x.Saga.Name}/{x.Name}"))}";
-            }
+            return $"route name: {Route.ToString()} path: {Channel.FullPath} {Channel.ToString()} partition: {Channel.Partition} claimchek: {Channel.UseClaimCheck}";
         }
     }
 }

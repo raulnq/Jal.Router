@@ -1,14 +1,16 @@
+using Jal.Router.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jal.Router.Interface;
 
 namespace Jal.Router.Model
 {
     public class MessageContext
     {
-        private readonly IBus _bus;
+        public IMessageSerializer MessageSerializer { get; private set; }
+        public IEntityStorage EntityStorage { get; private set; }
+        public IBus Bus { get; private set; }
         public Channel Channel { get; private set; }
         public IDictionary<string, string> Headers { get; private set; }
         public DateTime DateTimeUtc { get; private set; }
@@ -23,7 +25,8 @@ namespace Jal.Router.Model
         public ContentContext ContentContext { get; private set; }
         public TrackingContext TrackingContext { get; private set; }
         public TracingContext TracingContext { get; private set; }
-        public string Id {
+        public string Id
+        {
             get
             {
                 return TracingContext?.Id;
@@ -33,14 +36,14 @@ namespace Jal.Router.Model
 
         public bool FromSaga()
         {
-            return Saga != null && SagaContext!=null && SagaContext.Data != null && SagaContext.Data.Data != null;
+            return Saga != null && SagaContext != null && SagaContext.Data != null && SagaContext.Data.Data != null;
         }
 
         public string Name
         {
             get
             {
-                if(EndPoint!=null)
+                if (EndPoint != null)
                 {
                     return Saga == null ? EndPoint.Name : Saga.Name + "/" + EndPoint.Name;
                 }
@@ -51,20 +54,33 @@ namespace Jal.Router.Model
             }
         }
 
-        public MessageContext(IBus bus): this(bus, Guid.NewGuid().ToString())
+        public static MessageContext CreateFromListen(IBus bus, IComponentFactoryFacade factory)
         {
-
+            return new MessageContext(bus, factory.CreateMessageSerializer(), factory.CreateEntityStorage(), null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
-        public MessageContext(IBus bus, string id) 
-            :this(bus, new TracingContext(id: id), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty)
+        public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage)
         {
-
+            return new MessageContext(bus, serializer, entitystorage, null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
-        public MessageContext(IBus bus, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid)
+        public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage, Route route, 
+            EndPoint endpoint, Channel channel, TracingContext tracingcontext, List<Tracking> trackings, Origin origin, string content, string sagaid, string claimcheckid, DateTime datetimeutc, string version)
         {
-            _bus = bus;
+            return new MessageContext(bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, datetimeutc, trackings, origin, sagaid, version, claimcheckid, content);
+        }
+
+        public static MessageContext CreateToSend(IMessageSerializer serializer, IEntityStorage storage, EndPoint endpoint, Channel channel, Options options, Origin origin, object content, DateTime datetimeutc)
+        {
+            return new MessageContext(endpoint, channel, serializer, storage, options, datetimeutc, origin, serializer.Serialize(content));
+        }
+
+        private MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage, Route route, EndPoint endpoint, Channel channel, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid, string content)
+        {
+            Bus = bus;
+
+            MessageSerializer = serializer;
+            EntityStorage = storage;
             Headers = new Dictionary<string, string>();
             Version = version;
             Origin = origin;
@@ -72,55 +88,33 @@ namespace Jal.Router.Model
             TrackingContext = new TrackingContext(this, tracks);
             TracingContext = tracingcontext;
             DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, claimcheckid, !string.IsNullOrEmpty(claimcheckid));
+            ContentContext = new ContentContext(this, claimcheckid, channel?.UseClaimCheck ?? false, content);
+            Route = route;
+            Saga = route?.Saga;
+            EndPoint = endpoint;
+            Channel = channel;
             Host = Environment.MachineName;
         }
 
-        public MessageContext(EndPoint endpoint, Options options, DateTime datetimeutc, Origin origin, Type contenttype, string content)
+        private MessageContext(EndPoint endpoint, Channel channel, IMessageSerializer serializer, IEntityStorage storage, Options options, DateTime datetimeutc, Origin origin, string content)
         {
-            Origin = origin;
-            EndPoint = endpoint;
-            TracingContext = options.TracingContext;
+            MessageSerializer = serializer;
+            EntityStorage = storage;
             Headers = options.Headers;
             Version = options.Version;
-            ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
-            SagaContext = options.SagaContext;
+            Origin = origin;
+            SagaContext = new SagaContext(this, options.SagaId, options.SagaData);
+            TrackingContext = new TrackingContext(this, options.Trackings);
+            TracingContext = options.TracingContext;
+            DateTimeUtc = datetimeutc;
+            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, channel.UseClaimCheck, content);
             Route = options.Route;
             Saga = options.Saga;
-            TrackingContext = options.TrackingContext;
-            DateTimeUtc = datetimeutc;
-            ContentContext = new ContentContext(this, endpoint.UseClaimCheck ? Guid.NewGuid().ToString() : string.Empty, endpoint.UseClaimCheck, contenttype, content);
-            Host = Environment.MachineName;
-        }
-
-        public void SetContent(ContentContext contentcontext)
-        {
-            ContentContext = contentcontext;
-        }
-
-        public void SetRoute(Route route)
-        {
-            Route = route;
-        }
-
-        public void SetEndPoint(EndPoint endpoint)
-        {
             EndPoint = endpoint;
-        }
-
-        public void SetChannel(Channel channel)
-        {
             Channel = channel;
-        }
+            Host = Environment.MachineName;
 
-        public void SetSaga(Saga saga)
-        {
-            Saga = saga;
-        }
-
-        public void UpdateSagaContext(SagaContext sagacontext)
-        {
-            SagaContext = sagacontext;
+            ScheduledEnqueueDateTimeUtc = options.ScheduledEnqueueDateTimeUtc;
         }
 
         public MessageEntity ToEntity()
@@ -130,54 +124,88 @@ namespace Jal.Router.Model
                 TrackingContext?.ToEntity(), TracingContext?.ToEntity(), Name);
         }
 
+        public async Task<MessageEntity> CreateAndInsertMessageIntoStorage(MessageEntity entity)
+        {
+            var id = await EntityStorage.Insert(entity, MessageSerializer).ConfigureAwait(false);
+
+            entity.SetId(id);
+
+            return entity;
+        }
+
         public Dictionary<string, string> CloneHeaders()
         {
             return Headers.ToDictionary(header => header.Key, header => header.Value);
         }
 
+        public Task<SagaData> GetSagaDataFromStorage(string id)
+        {
+            return EntityStorage.Get(id, MessageSerializer);
+        }
+
+        public Task UpdateSagaDataIntoStorage(SagaData sagadata)
+        {
+            return EntityStorage.Update(sagadata, MessageSerializer);
+        }
+
+        public Task<string> InsertSagaDataIntoStorage(SagaData sagadata)
+        {
+            return EntityStorage.Insert(sagadata, MessageSerializer);
+        }
+
+        public object Deserialize(string content, Type type)
+        {
+            return MessageSerializer.Deserialize(content, type);
+        }
+
+        public string Deserialize(object content)
+        {
+            return MessageSerializer.Serialize(content);
+        }
+
         public Task Send<TContent>(TContent content, Options options)
         {
-            return _bus.Send(content, options);
+            return Bus.Send(content, options);
         }
 
         public Task Send<TContent>(TContent content, Origin origin, Options options)
         {
-            return _bus.Send(content, origin, options);
+            return Bus.Send(content, origin, options);
         }
 
         public Task Send<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            return _bus.Send(content, endpoint, origin, options);
+            return Bus.Send(content, endpoint, origin, options);
         }
 
         public Task Publish<TContent>(TContent content, Options options)
         {
-            return _bus.Publish(content, options);
+            return Bus.Publish(content, options);
         }
 
         public Task Publish<TContent>(TContent content, Origin origin, Options options)
         {
-            return _bus.Publish(content, origin, options);
+            return Bus.Publish(content, origin, options);
         }
 
         public Task Publish<TContent>(TContent content, EndPoint endpoint, Origin origin, Options options)
         {
-            return _bus.Publish(content, endpoint, origin, options);
+            return Bus.Publish(content, endpoint, origin, options);
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Options options) where TResult : class
         {
-            return _bus.Reply<TContent, TResult>(content, options);
+            return Bus.Reply<TContent, TResult>(content, options);
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, Origin origin, Options options) where TResult : class
         {
-            return _bus.Reply<TContent, TResult>(content, origin, options);
+            return Bus.Reply<TContent, TResult>(content, origin, options);
         }
 
         public Task<TResult> Reply<TContent, TResult>(TContent content, EndPoint endpoint, Origin origin, Options options) where TResult : class
         {
-            return _bus.Reply<TContent, TResult>(content, endpoint, origin, options);
+            return Bus.Reply<TContent, TResult>(content, endpoint, origin, options);
         }
     }
 }

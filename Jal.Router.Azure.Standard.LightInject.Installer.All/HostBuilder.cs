@@ -143,7 +143,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             host.Configuration.UseNewtonsoftAsSerializer();
 
-            host.Configuration.AddMonitoringTask<HeartBeatLogger>(_parameter.HeartBeatFrequency);
+            host.Configuration.AddMonitoringTask<MonitoringTask>(_parameter.HeartBeatFrequency);
 
             _parameter.Setup?.Invoke(host.Configuration);
 

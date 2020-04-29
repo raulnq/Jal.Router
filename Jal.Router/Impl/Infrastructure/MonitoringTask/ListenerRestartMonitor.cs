@@ -18,15 +18,9 @@ namespace Jal.Router.Impl
 
             foreach (var listenercontext in Factory.Configuration.Runtime.ListenerContexts)
             {
-                if (await listenercontext.Close().ConfigureAwait(false))
-                {
-                    Logger.Log($"Shutdown {listenercontext.Id}");
-                }
+                await listenercontext.Close().ConfigureAwait(false);
 
-                if (listenercontext.Open())
-                {
-                    Logger.Log($"Listening {listenercontext.Id}");
-                }
+                listenercontext.Open();
             }
 
             Logger.Log($"Listeners restarted");

@@ -27,17 +27,17 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
-            messagecontext.Route.MiddlewareTypes.Add(typeof(string));
+            messagecontext.Route.Middlewares.Add(typeof(string));
 
             var factory = factorymock.Object;
 
-            factory.Configuration.InboundMiddlewareTypes.Add(typeof(string));
+            factory.Configuration.RouteMiddlewareTypes.Add(typeof(string));
 
             var sut = Build(factory, pipelinemock.Object);
 
-            await sut.Route<NullMiddleware>(messagecontext);
+            await sut.Route(messagecontext);
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }
@@ -49,13 +49,13 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock();
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
-            messagecontext.Route.UpdateWhen(x => false);
+            messagecontext.Route.When(x => false);
 
             var sut = Build(factorymock.Object, pipelinemock.Object);
 
-            await sut.Route<NullMiddleware>(messagecontext);
+            await sut.Route(messagecontext);
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Never());
         }
@@ -67,11 +67,11 @@ namespace Jal.Router.Tests
 
             var pipelinemock = Builder.CreatePipelineMock(true);
 
-            var messagecontext = Builder.CreateMessageContext();
+            var messagecontext = Builder.CreateMessageContextFromListen();
 
             var sut = Build(factorymock.Object, pipelinemock.Object);
 
-            await Should.ThrowAsync<Exception>(sut.Route<NullMiddleware>(messagecontext));
+            await Should.ThrowAsync<Exception>(sut.Route(messagecontext));
 
             pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
         }

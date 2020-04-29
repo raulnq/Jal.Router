@@ -8,19 +8,17 @@ namespace Jal.Router.Impl
 {
     public class RetryRouteErrorMessageHandler : IRouteErrorMessageHandler
     {
-        private readonly IComponentFactoryFacade _factory;
-
         private readonly ILogger _logger;
 
-        public RetryRouteErrorMessageHandler(IComponentFactoryFacade factory, ILogger logger)
+        public RetryRouteErrorMessageHandler(ILogger logger)
         {
-            _factory = factory;
             _logger = logger;
         }
         public async Task<bool> Handle(MessageContext context, Exception ex, ErrorHandler metadata)
         {
             if(metadata.Parameters.ContainsKey("endpoint") && metadata.Parameters["endpoint"] is string endpointname && !string.IsNullOrEmpty(endpointname)
-                && metadata.Parameters.ContainsKey("policy") && metadata.Parameters["policy"] is IRetryPolicy policy)
+                && metadata.Parameters.ContainsKey("policy") && metadata.Parameters["policy"] is IRetryPolicy policy
+                && metadata.Parameters.ContainsKey("type") && metadata.Parameters["type"] is Type type && type != null)
             {
                 var countername = $"{context.Route.Name}_{policy.GetType().Name.ToLower()}_retrycount";
 
@@ -41,9 +39,7 @@ namespace Jal.Router.Impl
                 {
                     context.Headers[countername] = count.ToString();
 
-                    var serializer = _factory.CreateMessageSerializer();
-
-                    var content = serializer.Deserialize(context.ContentContext.Data, context.ContentContext.Type);
+                    var content = context.Deserialize(context.ContentContext.Data, type);
 
                     _logger.Log($"Message {context.Id}, sending the message to the retry endpoint {endpointname} (retry count {count}) by route {context.Name}");
 

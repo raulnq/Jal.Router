@@ -46,24 +46,15 @@ namespace Jal.Router.Impl
 
         public void Listen(ListenerContext listenercontext)
         {
-            var adapter = Factory.CreateMessageAdapter();
-
             _transport.Subscribe(_listenername, async message =>
             {
-                var context = adapter.ReadMetadataFromPhysicalMessage(message);
+                var context = await listenercontext.Read(message).ConfigureAwait(false);
 
                 Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
 
                 try
                 {
-                    var handlers = new List<Task>();
-
-                    foreach (var runtimehandler in listenercontext.Routes.Select(x => x.Consumer))
-                    {
-                        handlers.Add(runtimehandler(message, listenercontext.Channel));
-                    }
-
-                    await Task.WhenAll(handlers.ToArray());
+                    await listenercontext.Dispatch(context).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -94,16 +85,11 @@ namespace Jal.Router.Impl
             {
                 var handledbymock = false;
 
-                foreach (var endpoint in sendercontext.Endpoints)
+                if (_parameter.Handlers.ContainsKey(sendercontext.EndPoint.Name))
                 {
-                    if (_parameter.Handlers.ContainsKey(endpoint.Name))
-                    {
-                        var serializer = Factory.CreateMessageSerializer();
+                    await _parameter.Handlers[sendercontext.EndPoint.Name](sendercontext.MessageSerializer, m);
 
-                        await _parameter.Handlers[endpoint.Name](serializer, m);
-
-                        handledbymock = true;
-                    }
+                    handledbymock = true;
                 }
 
                 if (!handledbymock)

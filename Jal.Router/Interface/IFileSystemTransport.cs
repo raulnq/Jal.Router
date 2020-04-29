@@ -16,9 +16,9 @@ namespace Jal.Router.Interface
 
         string[] GetDirectories(string path);
 
-        void CreateFile(string path, string file, Message message);
+        void CreateFile(string path, string file, Message message, IMessageSerializer serializer);
 
-        Message ReadFile(string path);
+        Message ReadFile(string path, IMessageSerializer serializer);
 
         void DeleteFile(string path);
     }

@@ -10,12 +10,6 @@ namespace Jal.Router.Interface
 
         EndPoint[] GetEndPoints();
 
-        Partition[] GetPartitions();
-
-        SubscriptionToPublishSubscribeChannelResource[] GetSubscriptionsToPublishSubscribeChannelResource();
-
-        PublishSubscribeChannelResource[] GetPublishSubscribeChannelResources();
-
-        PointToPointChannelResource[] GetPointToPointChannelResources();
+        Resource[] GetResources();
     }
 }

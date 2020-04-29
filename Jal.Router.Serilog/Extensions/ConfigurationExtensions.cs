@@ -8,8 +8,8 @@ namespace Jal.Router.Serilog
         public static IConfiguration UseSerilog(this IConfiguration configuration)
         {
             return configuration
-                .AddOutboundMiddleware<BusLogger>()
-                .AddInboundMiddleware<RouterLogger>()
+                .AddEndpointMiddleware<BusLogger>()
+                .AddRouteMiddleware<RouterLogger>()
                 .AddLogger<BeatLogger, Beat>();
         }
     }

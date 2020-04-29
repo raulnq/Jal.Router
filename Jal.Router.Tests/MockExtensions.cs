@@ -1,13 +1,25 @@
-﻿using Jal.Router.Interface;
+﻿using Jal.ChainOfResponsability;
+using Jal.Router.Interface;
 using Jal.Router.Model;
 using Moq;
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace Jal.Router.Tests
 {
     public static class MockExtensions
     {
+        public static void WasExecuted(this Mock<IPipeline> pipelinemock)
+        {
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Once());
+        }
+
+        public static void WasNotExecuted(this Mock<IPipeline> pipelinemock)
+        {
+            pipelinemock.Verify(mock => mock.ExecuteAsync(It.IsAny<AsyncMiddlewareConfiguration<MessageContext>[]>(), It.IsAny<MessageContext>(), It.IsAny<CancellationToken>()), Times.Never());
+        }
+
         public static void WasExecuted(this Mock<IProducer> producermock)
         {
             producermock.Verify(x => x.Produce(It.IsAny<MessageContext>()), Times.Once());
@@ -33,6 +45,16 @@ namespace Jal.Router.Tests
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Never());
         }
 
+        public static void CreateComponentWasNotExecuted<T>(this Mock<IComponentFactoryFacade> factorymock) where T : class
+        {
+            factorymock.Verify(x => x.CreateComponent<T>(typeof(T)), Times.Never());
+        }
+
+        public static void CreateComponentWasExecuted<T>(this Mock<IComponentFactoryFacade> factorymock) where T : class
+        {
+            factorymock.Verify(x => x.CreateComponent<T>(typeof(T)), Times.Once());
+        }
+
         public static void CreateEntityStorageWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
             factorymock.Verify(x => x.CreateEntityStorage(), Times.Once());
@@ -40,7 +62,7 @@ namespace Jal.Router.Tests
 
         public static void CreateMessageAdapterWasExecuted(this Mock<IComponentFactoryFacade> factorymock)
         {
-            factorymock.Verify(x => x.CreateMessageAdapter(), Times.Once());
+            factorymock.Verify(x => x.CreateMessageAdapter(It.IsAny<Type>()), Times.Once());
         }
 
         public static void WasExecuted(this Mock<ISenderChannel> sendermock)
@@ -79,32 +101,32 @@ namespace Jal.Router.Tests
 
         public static void CreateMessageEntityWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<MessageEntity>()), Times.Once());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void CreateMessageEntityWasNotExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<MessageEntity>()), Times.Never());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<MessageEntity>(), It.IsAny<IMessageSerializer>()), Times.Never());
         }
 
         public static void CreateSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Create(It.IsAny<SagaData>()), Times.Once());
+            entitystoragemock.Verify(x => x.Insert(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void UpdateSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>()), Times.Once());
+            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
 
         public static void UpdateSagaDataWasNotExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>()), Times.Never());
+            entitystoragemock.Verify(x => x.Update(It.IsAny<SagaData>(), It.IsAny<IMessageSerializer>()), Times.Never());
         }
 
         public static void GetSagaDataWasExecuted(this Mock<IEntityStorage> entitystoragemock)
         {
-            entitystoragemock.Verify(x => x.Get(It.IsAny<string>()), Times.Once());
+            entitystoragemock.Verify(x => x.Get(It.IsAny<string>(), It.IsAny<IMessageSerializer>()), Times.Once());
         }
     }
 }

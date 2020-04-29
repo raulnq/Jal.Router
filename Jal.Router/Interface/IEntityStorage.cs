@@ -7,18 +7,18 @@ namespace Jal.Router.Interface
 {
     public interface IEntityStorage
     {
-        Task<string> Create(MessageEntity messageentity);
+        Task<string> Insert(MessageEntity messageentity, IMessageSerializer serializer);
 
-        Task<string> Create(SagaData sagadata);
+        Task<string> Insert(SagaData sagadata, IMessageSerializer serializer);
 
-        Task Update(SagaData sagadata);
+        Task Update(SagaData sagadata, IMessageSerializer serializer);
 
-        Task<SagaData> Get(string id);
+        Task<SagaData> Get(string id, IMessageSerializer serializer);
 
-        Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IDictionary<string,string> options=null);
+        Task<SagaData[]> Get(DateTime start, DateTime end, string saganame, IMessageSerializer serializer, IDictionary<string,string> options=null);
 
-        Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IDictionary<string, string> options = null);
+        Task<MessageEntity[]> GetMessageEntitiesBySagaData(SagaData sagadata, IMessageSerializer serializer, IDictionary<string, string> options = null);
 
-        Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IDictionary<string, string> options = null);
+        Task<MessageEntity[]> GetMessageEntities(DateTime start, DateTime end, string routename, IMessageSerializer serializer, IDictionary<string, string> options = null);
     }
 }

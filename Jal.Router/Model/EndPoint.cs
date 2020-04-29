@@ -13,15 +13,13 @@ namespace Jal.Router.Model
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
-            Condition = ((e, o, t) => e.Name == o.EndPointName && e.ContentType == t);
+            Condition = null;
         }
         public Origin Origin { get; private set; }
 
         public string Name { get; private set; }
 
-        public Func<EndPoint, Options, Type, bool> Condition { get; private set; }
-
-        public Type ContentType { get; private set; }
+        public Func<Options, object, bool> Condition { get; private set; }
 
         public Type ReplyContentType { get; private set; }
 
@@ -37,9 +35,13 @@ namespace Jal.Router.Model
 
         public IList<Handler> ExitHandlers { get; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
         public EndpointEntity ToEntity()
         {
-            return new EndpointEntity(Name, ContentType);
+            return new EndpointEntity(Name);
         }
 
         public void SetOrigin(Origin origin)
@@ -47,12 +49,7 @@ namespace Jal.Router.Model
             Origin = origin;
         }
 
-        public void SetContentType(Type contenttype)
-        {
-            ContentType = contenttype;
-        }
-
-        public void SetCondition(Func<EndPoint, Options, Type, bool> condition)
+        public void When(Func<Options, object, bool> condition)
         {
             Condition = condition;
         }
@@ -62,9 +59,9 @@ namespace Jal.Router.Model
             ReplyContentType = contenttype;
         }
 
-        public void SetUseClaimCheck(bool useclaimcheck)
+        public void AsClaimCheck()
         {
-            UseClaimCheck = useclaimcheck;
+            UseClaimCheck = true;
         }
     }
 }

@@ -7,48 +7,26 @@ namespace Jal.Router.Impl
     {
         private readonly IRouterConfigurationSource[] _sources;
 
-        private readonly IRouter _router;
-
-        public RuntimeLoader(IComponentFactoryFacade factory, IRouterConfigurationSource[] sources, IRouter router, ILogger logger)
+        public RuntimeLoader(IComponentFactoryFacade factory, IRouterConfigurationSource[] sources, ILogger logger)
             :base(factory, logger)
         {
             _sources = sources;
-            _router = router;
         }
 
         public Task Run()
         {
             Logger.Log("Loading runtime configuration");
 
-            var adapter = Factory.CreateMessageAdapter();
-
             foreach (var source in _sources)
             {
                 Factory.Configuration.Runtime.EndPoints.AddRange(source.GetEndPoints());
 
-                Factory.Configuration.Runtime.Partitions.AddRange(source.GetPartitions());
-
-                Factory.Configuration.Runtime.PointToPointChannelResources.AddRange(source.GetPointToPointChannelResources());
-
-                Factory.Configuration.Runtime.PublishSubscribeChannelResources.AddRange(source.GetPublishSubscribeChannelResources());
-
-                Factory.Configuration.Runtime.SubscriptionToPublishSubscribeChannelResources.AddRange(source.GetSubscriptionsToPublishSubscribeChannelResource());
+                Factory.Configuration.Runtime.Resources.AddRange(source.GetResources());
 
                 Factory.Configuration.Runtime.Sagas.AddRange(source.GetSagas());
 
                 foreach (var route in source.GetRoutes())
                 {
-                    route.SetConsumer(async (message, channel) => {
-
-                        var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
-
-                        context.SetRoute(route);
-
-                        context.SetChannel(channel);
-
-                        await _router.Route<ConsumerMiddleware>(context).ConfigureAwait(false);
-                    });
-
                     Factory.Configuration.Runtime.Routes.Add(route);
                 }
             }
@@ -59,19 +37,6 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.InitialRoutes)
                     {
-                        route.SetConsumer(async (message, channel) => {
-
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
-
-                            context.SetRoute(route);
-
-                            context.SetChannel(channel);
-
-                            context.SetSaga(saga);
-
-                            await _router.Route<InitialConsumerMiddleware>(context).ConfigureAwait(false); ;
-                        });
-
                         Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }
@@ -80,19 +45,6 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.FinalRoutes)
                     {
-                        route.SetConsumer(async (message, channel) => {
-
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
-
-                            context.SetRoute(route);
-
-                            context.SetChannel(channel);
-
-                            context.SetSaga(saga);
-
-                            await _router.Route<FinalConsumerMiddleware>(context).ConfigureAwait(false); ;
-                        });
-
                         Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }
@@ -101,19 +53,6 @@ namespace Jal.Router.Impl
                 {
                     foreach (var route in saga.Routes)
                     {
-                        route.SetConsumer(async (message, channel) => {
-
-                            var context = await adapter.ReadMetadataAndContentFromPhysicalMessage(message, route.ContentType, route.UseClaimCheck).ConfigureAwait(false);
-
-                            context.SetRoute(route);
-
-                            context.SetChannel(channel);
-
-                            context.SetSaga(saga);
-
-                            await _router.Route<MiddleConsumerMiddleware>(context).ConfigureAwait(false);
-                        });
-
                         Factory.Configuration.Runtime.Routes.Add(route);
                     }
                 }

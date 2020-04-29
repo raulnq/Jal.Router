@@ -13,7 +13,7 @@ namespace Jal.Router.Fluent.Impl
             _channel = channel;
         }
 
-        public void AndWaitReplyFromPointToPointChannel(string path, string connectionstring, int timeout = 60)
+        public void AndWaitReplyFromPointToPointChannel(string path, string connectionstring, int timeout = 60, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -23,11 +23,21 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(connectionstring));
             }
-            _channel.UpdateReplyFromPointToPointChannel(path, timeout, connectionstring);
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+            if (type != null && !typeof(IRequestReplyChannelFromPointToPointChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
+
+
+            _channel.UpdateReplyFromPointToPointChannel(path, timeout, connectionstring, adapter, type);
         }
 
         public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel(string path, string subscription,
-            string connectionstring, int timeout = 60)
+            string connectionstring, int timeout = 60, Type adapter = null, Type type = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -41,8 +51,17 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new ArgumentNullException(nameof(subscription));
             }
+            if (adapter != null && !typeof(IMessageAdapter).IsAssignableFrom(adapter))
+            {
+                throw new InvalidOperationException("The adapter type is not valid");
+            }
+            if (type != null && !typeof(IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel).IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException("The channel type is not valid");
+            }
 
-            _channel.UpdateReplyFromSubscriptionToPublishSubscribeChannel(path, timeout, subscription, connectionstring);
+
+            _channel.UpdateReplyFromSubscriptionToPublishSubscribeChannel(path, timeout, subscription, connectionstring, adapter, type);
         }
     }
 }

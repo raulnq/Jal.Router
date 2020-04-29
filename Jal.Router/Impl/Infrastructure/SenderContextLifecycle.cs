@@ -1,7 +1,6 @@
 ﻿using Jal.Router.Interface;
 using Jal.Router.Model;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
@@ -16,54 +15,10 @@ namespace Jal.Router.Impl
             _factory = factory;
             _logger = logger;
         }
-
-        public SenderContext AddOrGet(Channel channel)
+        
+        public SenderContext Add(EndPoint endpoint, Channel channel)
         {
-            var sendercontext = Get(channel);
-
-            if (sendercontext == null)
-            {
-                sendercontext = Add(channel);
-            }
-
-            return sendercontext;
-        }
-
-        public SenderContext Add(Channel channel)
-        {
-            var senderchannel = default(ISenderChannel);
-
-            var readerchannel = default(IReaderChannel);
-
-            if (channel.Type == ChannelType.PointToPoint)
-            {
-                senderchannel = _factory.CreatePointToPointChannel();
-            }
-
-            if (channel.Type == ChannelType.PublishSubscribe)
-            {
-                senderchannel = _factory.CreatePublishSubscribeChannel();
-            }
-
-            if (channel.Type == ChannelType.RequestReplyToPointToPoint)
-            {
-                var requestresplychannel = _factory.CreateRequestReplyChannelFromPointToPointChannel();
-
-                readerchannel = requestresplychannel;
-
-                senderchannel = requestresplychannel;
-            }
-
-            if (channel.Type == ChannelType.RequestReplyToSubscriptionToPublishSubscribe)
-            {
-                var requestresplychannel = _factory.CreateRequestReplyFromSubscriptionToPublishSubscribeChannel();
-
-                readerchannel = requestresplychannel;
-
-                senderchannel = requestresplychannel;
-            }
-
-            var sendercontext = new SenderContext(channel, senderchannel, readerchannel);
+            var sendercontext = SenderContext.Create(_factory, _logger, channel, endpoint);
 
             _factory.Configuration.Runtime.SenderContexts.Add(sendercontext);
 

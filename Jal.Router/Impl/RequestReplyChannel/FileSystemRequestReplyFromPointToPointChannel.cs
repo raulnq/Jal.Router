@@ -18,11 +18,9 @@ namespace Jal.Router.Impl
 
             var path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
 
-            var message = _transport.ReadFile(path);
+            var message = _transport.ReadFile(path, sendercontext.MessageSerializer);
 
-            var outputcontext = adapter.ReadMetadataFromPhysicalMessage(message);
-
-            return Task.FromResult(outputcontext);
+            return adapter.ReadFromPhysicalMessage(message, sendercontext);
         }
     }
 }

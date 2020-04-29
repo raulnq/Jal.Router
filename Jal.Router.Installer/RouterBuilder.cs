@@ -1,12 +1,13 @@
 ﻿using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Jal.ChainOfResponsability;
+using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 
 namespace Jal.Router.Installer
 {
-    public class RouterBuilder : IRouterBuilder
+    public class RouterBuilder : AbstractRouterBuilder
     {
         private readonly IWindsorContainer _container;
 
@@ -15,44 +16,42 @@ namespace Jal.Router.Installer
             _container = container;
         }
 
-        public IRouterBuilder AddChannelResourceManager<TImplementation, TResource, TStatistics>() 
-            where TImplementation : class, IChannelResourceManager<TResource, TStatistics>
-            where TResource : ChannelResource
+        public override IRouterBuilder AddResource<TImplementation>()
         {
-            _container.Register(Component.For<IChannelResourceManager<TResource, TStatistics>>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+            _container.Register(Component.For<IResource>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddEntityStorage<TImplementation>() where TImplementation : class, IEntityStorage
+        public override IRouterBuilder AddEntityStorage<TImplementation>()
         {
             _container.Register(Component.For<IEntityStorage>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddLogger<TImplementation, TInfo>() where TImplementation : class, ILogger<TInfo>
+        public override IRouterBuilder AddLogger<TImplementation, TInfo>()
         {
             _container.Register(Component.For<ILogger<TInfo>>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddMessageAdapter<TImplementation>() where TImplementation : class, IMessageAdapter
+        public override IRouterBuilder AddMessageAdapter<TImplementation>()
         {
             _container.Register(Component.For<IMessageAdapter>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddMessageSerializer<TImplementation>() where TImplementation : class, IMessageSerializer
+        public override IRouterBuilder AddMessageSerializer<TImplementation>()
         {
             _container.Register(Component.For<IMessageSerializer>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddMessageStorage<TImplementation>() where TImplementation : class, IMessageStorage
+        public override IRouterBuilder AddMessageStorage<TImplementation>()
         {
 
             _container.Register(Component.For<IMessageStorage>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
@@ -60,135 +59,149 @@ namespace Jal.Router.Installer
             return this;
         }
 
-        public IRouterBuilder AddMiddleware<TImplementation>() where TImplementation : class, IAsyncMiddleware<MessageContext>
+        public override IRouterBuilder AddMiddleware<TImplementation>()
         {
             _container.Register(Component.For<IAsyncMiddleware<MessageContext>>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddPointToPointChannel<TImplementation>() where TImplementation : class, IPointToPointChannel
+        public override IRouterBuilder AddPointToPointChannel<TImplementation>()
         {
             _container.Register(Component.For<IPointToPointChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }
 
-        public IRouterBuilder AddPublishSubscribeChannel<TImplementation>() where TImplementation : class, IPublishSubscribeChannel
+        public override IRouterBuilder AddPublishSubscribeChannel<TImplementation>()
         {
             _container.Register(Component.For<IPublishSubscribeChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }
 
-        public IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromPointToPointChannel
+        public override IRouterBuilder AddRequestReplyChannelFromPointToPointChannel<TImplementation>()
         {
             _container.Register(Component.For<IRequestReplyChannelFromPointToPointChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }
 
-        public IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel
+        public override IRouterBuilder AddRequestReplyChannelFromSubscriptionToPublishSubscribeChannel<TImplementation>()
         {
             _container.Register(Component.For<IRequestReplyChannelFromSubscriptionToPublishSubscribeChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }
 
-        public IRouterBuilder AddSource<TImplementation>() where TImplementation : class, IRouterConfigurationSource
+        public override IRouterBuilder AddSource<TImplementation>()
         {
             _container.Register(Component.For<IRouterConfigurationSource>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddStartupTask<TImplementation>() where TImplementation : class, IStartupTask
+        public override IRouterBuilder AddStartupTask<TImplementation>()
         {
             _container.Register(Component.For<IStartupTask>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddShutdownTask<TImplementation>() where TImplementation : class, IShutdownTask
+        public override IRouterBuilder AddShutdownTask<TImplementation>()
         {
             _container.Register(Component.For<IShutdownTask>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddMonitoringTask<TImplementation>() where TImplementation : class, IMonitoringTask
+        public override IRouterBuilder AddMonitoringTask<TImplementation>()
         {
             _container.Register(Component.For<IMonitoringTask>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher
+        public override IRouterBuilder AddShutdownWatcher<TImplementation>()
         {
             _container.Register(Component.For<IShutdownWatcher>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddChannelShuffler<TImplementation>() where TImplementation : class, IChannelShuffler
+        public override IRouterBuilder AddChannelShuffler<TImplementation>()
         {
             _container.Register(Component.For<IChannelShuffler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddRouteEntryMessageHandler<TImplementation>() where TImplementation : class, IRouteEntryMessageHandler
+        public override IRouterBuilder AddRouteEntryMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IRouteEntryMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddRouteErrorMessageHandler<TImplementation>() where TImplementation : class, IRouteErrorMessageHandler
+        public override IRouterBuilder AddRouteErrorMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IRouteErrorMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddRouteExitMessageHandler<TImplementation>() where TImplementation : class, IRouteExitMessageHandler
+        public override IRouterBuilder AddRouteExitMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IRouteExitMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddRouterInterceptor<TImplementation>() where TImplementation : class, IRouterInterceptor
+        public override IRouterBuilder AddRouterInterceptor<TImplementation>()
         {
             _container.Register(Component.For<IRouterInterceptor>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddBusEntryMessageHandler<TImplementation>() where TImplementation : class, IBusEntryMessageHandler
+        public override IRouterBuilder AddBusEntryMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IBusEntryMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddBusErrorMessageHandler<TImplementation>() where TImplementation : class, IBusErrorMessageHandler
+        public override IRouterBuilder AddBusErrorMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IBusErrorMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddBusExitMessageHandler<TImplementation>() where TImplementation : class, IBusExitMessageHandler
+        public override IRouterBuilder AddBusExitMessageHandler<TImplementation>()
         {
             _container.Register(Component.For<IBusExitMessageHandler>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
 
             return this;
         }
 
-        public IRouterBuilder AddBusInterceptor<TImplementation>() where TImplementation : class, IBusInterceptor
+        public override IRouterBuilder AddBusInterceptor<TImplementation>()
         {
             _container.Register(Component.For<IBusInterceptor>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+
+            return this;
+        }
+
+        public override IRouterBuilder AddMessageHandlerAsSingleton<TService, TImplementation>()
+        {
+            _container.Register(Component.For<TService>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());
+
+            return this;
+        }
+
+        public override IRouterBuilder AddMessageHandlerAsTransient<TService, TImplementation>()
+        {
+            _container.Register(Component.For<TService>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
 
             return this;
         }

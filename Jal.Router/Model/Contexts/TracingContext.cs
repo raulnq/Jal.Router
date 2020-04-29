@@ -23,34 +23,32 @@
             Id = id;
         }
 
-        public TracingContext Clone()
+        public TracingContext CreateDependency(string newid, string newreplytorequestid)
         {
-            return new TracingContext(Id, OperationId, ParentId, PartitionId, ReplyToRequestId, RequestId);
-        }
+            var id = Id;
 
-        public void SetParentId(string parentid)
-        {
-            ParentId = parentid;
-        }
+            if (!string.IsNullOrWhiteSpace(newid))
+            {
+                id = newid;
+            }
 
-        public void SetOperationId(string operationid)
-        {
-            OperationId = operationid;
-        }
+            var replytorequestid = ReplyToRequestId;
 
-        public void SetId(string id)
-        {
-            Id = id;
-        }
+            if (!string.IsNullOrWhiteSpace(newreplytorequestid))
+            {
+                replytorequestid = newreplytorequestid;
+            }
 
-        public void SetRequestId(string requestid)
-        {
-            RequestId = requestid;
-        }
+            var requesid = RequestId;
 
-        public void SetReplyToRequestId(string replytorequestid)
-        {
-            ReplyToRequestId = replytorequestid;
+            if (!string.IsNullOrWhiteSpace(replytorequestid))
+            {
+                requesid = replytorequestid;
+            }
+
+            var parentid = Id;
+
+            return new TracingContext(id, OperationId, parentid, PartitionId, replytorequestid, requesid);
         }
 
         public TracingContextEntity ToEntity()
