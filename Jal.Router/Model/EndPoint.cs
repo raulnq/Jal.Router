@@ -5,24 +5,21 @@ namespace Jal.Router.Model
 {
     public class EndPoint
     {
-        public EndPoint(string name, Type contenttype)
+        public EndPoint(string name)
         {
             Name = name;
-            ContentType = contenttype;
             Channels = new List<Channel>();
             MiddlewareTypes = new List<Type>();
             ErrorHandlers = new List<ErrorHandler>();
             EntryHandlers = new List<Handler>();
             ExitHandlers = new List<Handler>();
-            Condition = ((e, o, t) => e.Name == o.EndPointName && e.ContentType == t);
+            Condition = null;
         }
         public Origin Origin { get; private set; }
 
         public string Name { get; private set; }
 
-        public Func<EndPoint, Options, Type, bool> Condition { get; private set; }
-
-        public Type ContentType { get; private set; }
+        public Func<Options, object, bool> Condition { get; private set; }
 
         public Type ReplyContentType { get; private set; }
 
@@ -44,7 +41,7 @@ namespace Jal.Router.Model
         }
         public EndpointEntity ToEntity()
         {
-            return new EndpointEntity(Name, ContentType);
+            return new EndpointEntity(Name);
         }
 
         public void SetOrigin(Origin origin)
@@ -52,7 +49,7 @@ namespace Jal.Router.Model
             Origin = origin;
         }
 
-        public void When(Func<EndPoint, Options, Type, bool> condition)
+        public void When(Func<Options, object, bool> condition)
         {
             Condition = condition;
         }

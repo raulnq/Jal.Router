@@ -18,7 +18,7 @@ namespace Jal.Router.AzureServiceBus.Standard
             if (useazureservicemanagement)
             {
                 return configuration
-                    .SetTransportName("Azure Service Bus")
+                    .SetDefaultTransportName("Azure Service Bus")
                     .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()
@@ -32,7 +32,7 @@ namespace Jal.Router.AzureServiceBus.Standard
             else
             {
                 return configuration
-                    .SetTransportName("Azure Service Bus")
+                    .SetDefaultTransportName("Azure Service Bus")
                     .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
                     .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
                     .UseRequestReplyChannelFromPointToPointChannel<AzureServiceBusRequestReplyFromPointToPointChannel>()

@@ -31,11 +31,10 @@ namespace Jal.Router.Sample.NetCore
                 c.AddAzureServiceBus();
                 c.AddAzureStorage();
                 c.AddNewtonsoft();
+                c.AddMessageHandlerAsSingleton<IMessageHandler<Message>, QueueListenByOneHandler>();
             });
 
 
-
-            container.Register<IMessageHandler<Message>, QueueListenByOneHandler>(typeof(QueueListenByOneHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoBHandlers>(typeof(QueueListenByTwoBHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, TopicListenByOneHandler>(typeof(TopicListenByOneHandler).FullName, new PerContainerLifetime());
@@ -66,7 +65,7 @@ namespace Jal.Router.Sample.NetCore
             var bus = container.GetInstance<IBus>();
             var factory = container.GetInstance<IComponentFactoryFacade>();
             var parameter = new FileSystemParameter() { Path = appRoot };
-            var messagecontext = MessageContext.CreateEmptyFromListen(bus, factory);
+            var messagecontext = MessageContext.CreateFromListen(bus, factory);
             parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
              {
                  //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
@@ -110,13 +109,13 @@ namespace Jal.Router.Sample.NetCore
 
             //await host.Startup();
 
-            //await messagecontext.Send(new Message(), "sendtoqueuea");
+            //messagecontext.Send(new Message(), Options.Create("queuelistenbyonehandler"));
 
             //Console.ReadLine();
 
             //await host.Shutdown();
 
-            host.RunAndBlock(/*()=> messagecontext.Send(new Message(), "sendtoqueuea")*/);
+            host.RunAndBlock(()=> bus.Send(new Message(), Options.Create("queuelistenbyonehandler")));
 
             //var bus = container.GetInstance<IBus>();
 
@@ -171,15 +170,12 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("sendtoqueuea")
-                .ForMessage<Message>()
                 .To(x => x.AddPointToPointChannel(connectionstring, "queuea"));
 
             RegisterEndPoint("sendtoqueue1")
-                .ForMessage<Message>()
                 .To(x => x.AddPointToPointChannel(connectionstring, "queue1"));
 
             RegisterEndPoint("sendtoqueue2")
-                .ForMessage<Message>()
                 .To(x => x.AddPointToPointChannel(connectionstring, "queue2"));
 
             RegisterPointToPointChannel("queuea", connectionstring, new Dictionary<string, string>());
@@ -191,11 +187,9 @@ namespace Jal.Router.Sample.NetCore
             ////////////////////////
 
             RegisterEndPoint("sendtotopic1")
-                .ForMessage<Message>()
                 .To(x => x.AddPublishSubscribeChannel(connectionstring, "topic1"));
 
             RegisterEndPoint("sendtoqueue3")
-                .ForMessage<Message>()
                 .To(x => x.AddPointToPointChannel(connectionstring, "queue3"));
 
             RegisterPublishSubscribeChannel("topic1", connectionstring, new Dictionary<string, string>());
@@ -331,12 +325,13 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("sessionqueueendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddQueue(config.ConnectionString, _sessionqueue));
 
             RegisterEndPoint("sessiontopicendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddTopic(config.ConnectionString, _sessiontopic));
+
+            RegisterEndPoint("queuelistenbyonehandler")
+            .To(x => x.AddQueue(config.ConnectionString, _queuelistenbyonehandler));
 
             RegisterOrigin("smoketestapp", "123");
 
@@ -418,7 +413,6 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("queueperformanceendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddPointToPointChannel(config.ConnectionString, _queueperformancetoread));
 
             RegisterHandler(_toreplyqueue + "_handler")
@@ -442,11 +436,9 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("toreplyendpoint")
-            .ForMessage<Message>()
             .To<Message>(x => x.AddQueue(config.ConnectionString, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, config.ConnectionString));
 
             RegisterEndPoint("replyendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddQueue(config.ConnectionString, _replyqueue));
 
             RegisterHandler(_queuetopublishtopic + "_handler")
@@ -470,7 +462,6 @@ namespace Jal.Router.Sample.NetCore
             });
 
             RegisterEndPoint("fromqueueendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddPublishSubscribeChannel(config.ConnectionString, _topicpublishedfromqueue));
 
 
@@ -551,7 +542,6 @@ namespace Jal.Router.Sample.NetCore
             };
 
             RegisterEndPoint(_forwardqueueendpoint)
-            .ForMessage<Message>()
             .To(x => x.AddPointToPointChannel(config.ConnectionString, _forwardqueue));
 
             RegisterHandler(_queuelistenbyonehandlerwithexception + "_handler")
@@ -594,14 +584,12 @@ namespace Jal.Router.Sample.NetCore
             ;
 
             RegisterEndPoint(_errorqueueendpoint)
-                .ForMessage<Message>()
                 .To(x => x.AddQueue(config.ConnectionString, _errorqueue));
                 //.OnEntry(x => x.Use<CustomEntryMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" }, { "parameter3", "value3" } }))
                 //.OnError(x => x.Use<CustomErrorMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value1" }, { "parameter2", "value2" } }))
                 //.OnExit(x => x.Use<CustomExitMessageHandler>(new Dictionary<string, object>() { { "parameter1", "value2" } }));
 
             RegisterEndPoint("retryendpoint")
-                .ForMessage<Message>()
                 .To(x => x.AddQueue(config.ConnectionString, _queuelistenbyonehandlerwithexceptionandretry));
 
         RegisterSaga<Data>("saga", 
@@ -639,11 +627,9 @@ namespace Jal.Router.Sample.NetCore
          );
 
             RegisterEndPoint("continueendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddQueue(config.ConnectionString, _queuecontinue));
 
             RegisterEndPoint("endendpoint")
-            .ForMessage<Message>()
             .To(x => x.AddQueue(config.ConnectionString, _queueend));
 
         }

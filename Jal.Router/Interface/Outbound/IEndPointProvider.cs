@@ -5,6 +5,6 @@ namespace Jal.Router.Interface
 {
     public interface IEndPointProvider
     {
-        EndPoint Provide(Options options, Type contenttype);
+        EndPoint Provide(Options options, object content);
     }
 }
