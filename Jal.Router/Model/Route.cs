@@ -35,11 +35,11 @@ namespace Jal.Router.Model
 
         public Saga Saga { get; }
 
-        public List<Channel> Channels { get; }
+        public IList<Channel> Channels { get; }
 
         public string Name { get; private set; }
 
-        public List<Type> Middlewares { get; }
+        public IList<Type> Middlewares { get; }
 
         public Type Middleware { get; }
 

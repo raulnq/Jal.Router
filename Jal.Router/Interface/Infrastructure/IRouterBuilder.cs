@@ -37,6 +37,8 @@ namespace Jal.Router.Interface
 
         IRouterBuilder AddPublishSubscribeChannel<TImplementation>() where TImplementation : class, IPublishSubscribeChannel;
 
+        IRouterBuilder AddSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, ISubscriptionToPublishSubscribeChannel;
+
         IRouterBuilder AddShutdownWatcher<TImplementation>() where TImplementation : class, IShutdownWatcher;
 
         IRouterBuilder AddChannelShuffler<TImplementation>() where TImplementation : class, IChannelShuffler;

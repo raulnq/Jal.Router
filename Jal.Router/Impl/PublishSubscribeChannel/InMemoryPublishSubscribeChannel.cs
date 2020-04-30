@@ -13,8 +13,6 @@ namespace Jal.Router.Impl
 
         private readonly InMemoryParameter _parameter;
 
-        private string _listenername;
-
         private string _sendername;
 
         public InMemoryPublishSubscribeChannel(IParameterProvider provider, IComponentFactoryFacade factory, ILogger logger, IInMemoryTransport inmemorysystem) : base(factory, logger)
@@ -32,11 +30,6 @@ namespace Jal.Router.Impl
         public Task<bool> DeleteIfExist(Channel channel)
         {
             return Task.FromResult(false);
-        }
-
-        public Task Close(ListenerContext listenercontext)
-        {
-            return Task.CompletedTask;
         }
 
         public Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
@@ -63,42 +56,9 @@ namespace Jal.Router.Impl
             return Task.FromResult(false);
         }
 
-        public bool IsActive(ListenerContext listenercontext)
-        {
-            return true;
-        }
-
         public bool IsActive(SenderContext sendercontext)
         {
             return true;
-        }
-
-        public void Listen(ListenerContext listenercontext)
-        {
-            _transport.Subscribe(_listenername, async message =>
-            {
-                var context = await listenercontext.Read(message).ConfigureAwait(false);
-
-                Logger.Log($"Message {context.Id} arrived to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
-
-                try
-                {
-                    await listenercontext.Dispatch(context).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"Message {context.Id} failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} {ex}");
-                }
-                finally
-                {
-                    Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
-                }
-            });
-        }
-
-        public void Open(ListenerContext listenercontext)
-        {
-            _listenername = _transport.CreateName(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path);
         }
 
         public void Open(SenderContext sendercontext)

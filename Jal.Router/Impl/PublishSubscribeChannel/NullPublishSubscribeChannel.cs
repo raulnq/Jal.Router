@@ -6,11 +6,6 @@ namespace Jal.Router.Impl
 {
     public class NullPublishSubscribeChannel : IPublishSubscribeChannel
     {
-        public void Open(ListenerContext listenercontext)
-        {
-
-        }
-
         public Task<Statistic> GetStatistic(Channel channel)
         {
             return Task.FromResult(default(Statistic));
@@ -24,21 +19,6 @@ namespace Jal.Router.Impl
         public Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
         {
             return Task.FromResult(default(MessageContext));
-        }
-
-        public bool IsActive(ListenerContext listenercontext)
-        {
-            return false;
-        }
-
-        public Task Close(ListenerContext listenercontext)
-        {
-            return Task.CompletedTask;
-        }
-
-        public void Listen(ListenerContext listenercontext)
-        {
-
         }
 
         public void Open(SenderContext sendercontext)

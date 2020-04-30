@@ -5,13 +5,13 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class UseRouteMethodBuilder<TContent> : IUseMethodBuilder<TContent>
+    public class UseMethodBuilder<TContent> : IUseMethodBuilder<TContent>
     {
         private readonly Route _route;
 
         private readonly Func<MessageContext, bool> _condition;
 
-        public UseRouteMethodBuilder(Route route, Func<MessageContext, bool> condition)
+        public UseMethodBuilder(Route route, Func<MessageContext, bool> condition)
         {
             _route = route;
             _condition = condition;
@@ -46,13 +46,13 @@ namespace Jal.Router.Fluent.Impl
         }
     }
 
-    public class UseRouteMethodBuilder<TContent, TData> : IUseMethodBuilder<TContent, TData>
+    public class UseMethodBuilder<TContent, TData> : IUseMethodBuilder<TContent, TData>
     {
         private readonly Route _route;
 
         private readonly Func<MessageContext, bool> _condition;
 
-        public UseRouteMethodBuilder(Route route, Func<MessageContext, bool> condition)
+        public UseMethodBuilder(Route route, Func<MessageContext, bool> condition)
         {
             _route = route;
             _condition = condition;

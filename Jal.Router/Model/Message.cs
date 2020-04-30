@@ -9,7 +9,7 @@ namespace Jal.Router.Model
 
         public string Content { get; set; }
 
-        public Dictionary<string, string> Headers { get; set; }
+        public IDictionary<string, string> Headers { get; set; }
 
         public string From { get; set; }
 
@@ -19,7 +19,7 @@ namespace Jal.Router.Model
 
         public string ClaimCheckId { get; set; }
 
-        public List<Tracking> Trackings { get; set; }
+        public IList<Tracking> Trackings { get; set; }
 
         public DateTime ScheduledEnqueueTimeUtc { get; set; }
 

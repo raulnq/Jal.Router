@@ -11,6 +11,8 @@ namespace Jal.Router.AzureServiceBus.Standard
 
             builder.AddPublishSubscribeChannel<AzureServiceBusTopic>();
 
+            builder.AddSubscriptionToPublishSubscribeChannel<AzureServiceBusSubscription>();
+
             builder.AddMessageAdapter<AzureServiceBusMessageAdapter>();
         }
     }

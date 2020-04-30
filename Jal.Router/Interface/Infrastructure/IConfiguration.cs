@@ -20,6 +20,7 @@ namespace Jal.Router.Interface
         Type ChannelShufflerType { get; }
         Type PointToPointChannelType { get; }
         Type PublishSubscribeChannelType { get; }
+        Type SubscriptionToPublishSubscribeChannelType { get; }
         Type StorageType { get;  }
         Type MessageAdapterType { get; }
         IList<Type> RouterLoggerTypes { get; }
@@ -35,6 +36,7 @@ namespace Jal.Router.Interface
         IConfiguration SetApplicationName(string name);
         IConfiguration UseChannelShuffler<TChannelShuffler>() where TChannelShuffler : IChannelShuffler;
         IConfiguration UsePublishSubscribeChannel<TPublishSubscribeChannel>() where TPublishSubscribeChannel : IPublishSubscribeChannel;
+        IConfiguration UseSubscriptionToPublishSubscribeChannel<TSubscriptionToPublishSubscribeChannel>() where TSubscriptionToPublishSubscribeChannel : ISubscriptionToPublishSubscribeChannel;      
         IConfiguration UsePointToPointChannel<TPointToPointChannel>() where TPointToPointChannel : IPointToPointChannel;
         IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter;
         IConfiguration UseMessageStorage<TMessageStorage>() where TMessageStorage : IMessageStorage;

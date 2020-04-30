@@ -4,10 +4,10 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class AndWaitReplyFromEndPointBuilder : IAndWaitReplyFromBuilder
+    public class AndWaitReplyFromBuilder : IAndWaitReplyFromBuilder
     {
         private readonly Channel _channel;
-        public AndWaitReplyFromEndPointBuilder(Channel channel)
+        public AndWaitReplyFromBuilder(Channel channel)
         {
             _channel = channel;
         }
@@ -23,7 +23,9 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            _channel.ReplyTo(ReplyType.FromPointToPoint, path, timeout, connectionstring);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, null, null);
+
+            _channel.ReplyTo(channel, timeout);
         }
 
         public void AndWaitReplyFromSubscriptionToPublishSubscribeChannel(string path, string subscription,
@@ -42,7 +44,9 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            _channel.ReplyTo(ReplyType.FromSubscriptionToPublishSubscribe, path, timeout, connectionstring, subscription);
+            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, null, null);
+
+            _channel.ReplyTo(channel, timeout);
         }
     }
 }

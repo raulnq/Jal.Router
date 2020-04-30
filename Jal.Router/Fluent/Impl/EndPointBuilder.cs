@@ -5,7 +5,7 @@ using Jal.Router.Model;
 
 namespace Jal.Router.Fluent.Impl
 {
-    public class EndPointBuilder : IEndPointBuilder, IOnEndPointOptionBuilder, IEndpointChannelBuilder, IReplyIEndpointChannelBuilder
+    public class EndPointBuilder : IWhenEndpointBuilder, IEndPointBuilder, IOnEndPointOptionBuilder, IEndpointChannelBuilder, IReplyIEndpointChannelBuilder
     {
         private EndPoint _endpoint;
 
@@ -59,7 +59,7 @@ namespace Jal.Router.Fluent.Impl
 
             _endpoint.Channels.Add(channel);
 
-            return new AndWaitReplyFromEndPointBuilder(channel);
+            return new AndWaitReplyFromBuilder(channel);
         }
 
         public IChannelIWhenBuilder AddPublishSubscribeChannel(string connectionstring, string path, Type adapter = null, Type type = null)
@@ -91,7 +91,7 @@ namespace Jal.Router.Fluent.Impl
             return new ChannelWhenBuilder(channel);
         }
 
-        public IOnEndPointOptionBuilder To(Action<IEndpointChannelBuilder> channelbuilder)
+        public IWhenEndpointBuilder To(Action<IEndpointChannelBuilder> channelbuilder)
         {
             if (channelbuilder==null)
             {
@@ -117,7 +117,7 @@ namespace Jal.Router.Fluent.Impl
             return this;
         }
 
-        public IOnEndPointOptionBuilder To<TReply>(Action<IReplyIEndpointChannelBuilder> channelbuilder)
+        public IWhenEndpointBuilder To<TReply>(Action<IReplyIEndpointChannelBuilder> channelbuilder)
         {
             if (channelbuilder == null)
             {

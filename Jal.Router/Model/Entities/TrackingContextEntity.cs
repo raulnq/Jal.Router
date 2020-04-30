@@ -4,14 +4,14 @@ namespace Jal.Router.Model
 {
     public class TrackingContextEntity
     {
-        public List<Tracking> Trackings { get; private set; }
+        public IList<Tracking> Trackings { get; private set; }
 
         private TrackingContextEntity()
         {
 
         }
 
-        public TrackingContextEntity(List<Tracking> trackings)
+        public TrackingContextEntity(IList<Tracking> trackings)
         {
             Trackings = trackings;
         }

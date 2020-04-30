@@ -120,15 +120,15 @@ namespace Jal.Router.Impl
 
             var path = string.Empty;
 
-            if(sendercontext.Channel.ReplyType== ReplyType.FromPointToPoint)
+            if (sendercontext.Channel.ReplyChannel.ChannelType == ChannelType.PointToPoint)
             {
-                path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath);
+                path = _transport.CreatePointToPointChannelPath(_parameter, sendercontext.Channel.ReplyChannel.ConnectionString, sendercontext.Channel.ReplyChannel.Path);
             }
             else
             {
-                path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, sendercontext.Channel.ReplyConnectionString, sendercontext.Channel.ReplyPath, sendercontext.Channel.Subscription);
+                path = _transport.CreateSubscriptionToPublishSubscribeChannelPath(_parameter, sendercontext.Channel.ReplyChannel.ConnectionString, sendercontext.Channel.ReplyChannel.Path, sendercontext.Channel.ReplyChannel.Subscription);
             }
-            
+
             var message = _transport.ReadFile(path, sendercontext.MessageSerializer);
 
             return adapter.ReadFromPhysicalMessage(message, sendercontext);

@@ -71,6 +71,13 @@ namespace Jal.Router.LightInject.Installer
             return this;
         }
 
+        public override IRouterBuilder AddSubscriptionToPublishSubscribeChannel<TImplementation>()
+        {
+            _container.Register<ISubscriptionToPublishSubscribeChannel, TImplementation>(typeof(TImplementation).FullName);
+
+            return this;
+        }
+
         public override IRouterBuilder AddSource<TImplementation>()
         {
             _container.Register<IRouterConfigurationSource, TImplementation>(typeof(TImplementation).FullName, new PerContainerLifetime());

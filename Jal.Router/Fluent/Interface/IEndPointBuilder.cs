@@ -4,8 +4,8 @@ namespace Jal.Router.Fluent.Interface
 {
     public interface IEndPointBuilder
     {
-        IOnEndPointOptionBuilder To(Action<IEndpointChannelBuilder> channelbuilder);
+        IWhenEndpointBuilder To(Action<IEndpointChannelBuilder> channelbuilder);
 
-        IOnEndPointOptionBuilder To<TReply>(Action<IReplyIEndpointChannelBuilder> channelbuilder);
+        IWhenEndpointBuilder To<TReply>(Action<IReplyIEndpointChannelBuilder> channelbuilder);
     }
 }

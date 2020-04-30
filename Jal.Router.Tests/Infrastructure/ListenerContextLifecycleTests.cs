@@ -19,11 +19,11 @@ namespace Jal.Router.Tests
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns((listenermock.Object, null));
+            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns((listenermock.Object, new NullPointToPointChannel()));
 
             var factory = factorymock.Object;
 
-            var sut = new ListenerContextLifecycle(factory, routermock.Object, new NullLogger());
+            var sut = new ListenerContextLifecycle(factory, routermock.Object, new NullLogger(), new Hasher());
 
             var listenercontext = sut.Add(Builder.CreateRoute(), Builder.CreateChannel());
 

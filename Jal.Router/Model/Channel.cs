@@ -54,7 +54,7 @@ namespace Jal.Router.Model
 
         public ChannelType ChannelType { get; private set; }
 
-        public ReplyType ReplyType { get; private set; }
+        public Channel ReplyChannel { get; private set; }
 
         public string Id { get; }
 
@@ -75,14 +75,17 @@ namespace Jal.Router.Model
                 type = "subscription to publish subscribe";
             }
 
-            if(ReplyType == ReplyType.FromPointToPoint)
+            if(ReplyChannel!=null)
             {
-                type = type + " (reply from point to point channel)";
-            }
+                if (ReplyChannel.ChannelType == ChannelType.PointToPoint)
+                {
+                    type = type + " (reply from point to point channel)";
+                }
 
-            if(ReplyType == ReplyType.FromSubscriptionToPublishSubscribe)
-            {
-                type = type + " (reply from subscription to publish subscribe channel)";
+                if (ReplyChannel.ChannelType == ChannelType.SubscriptionToPublishSubscribe)
+                {
+                    type = type + " (reply from subscription to publish subscribe channel)";
+                }
             }
 
             return type;
@@ -104,19 +107,13 @@ namespace Jal.Router.Model
                     description = $"{description}/{Subscription}";
                 }
 
-                if (!string.IsNullOrWhiteSpace(ReplyPath))
+                if (ReplyChannel!=null)
                 {
-                    description = $"{description}/{ReplyPath}";
-                }
-
-                if (!string.IsNullOrWhiteSpace(ReplySubscription))
-                {
-                    description = $"{description}/{ReplySubscription}";
+                    description = $"{description} - {ReplyChannel.FullPath}"; 
                 }
 
                 return description;
             }
-
         }
 
         public string ConnectionString { get; private set; }
@@ -125,13 +122,7 @@ namespace Jal.Router.Model
 
         public string Subscription { get; private set; }
 
-        public string ReplyPath { get; private set; }
-
         public int ReplyTimeOut { get; private set; }
-
-        public string ReplySubscription { get; private set; }
-
-        public string ReplyConnectionString { get; private set; }
 
         public ChannelEntity ToEntity()
         {
@@ -160,14 +151,10 @@ namespace Jal.Router.Model
         }
 
 
-        public void ReplyTo(ReplyType replytype, string replypath, int replytimeout, 
-            string replyconnectionstring, string replysubscription=null)
+        public void ReplyTo(Channel channel, int replytimeout)
         {
-            ReplyPath = replypath;
+            ReplyChannel = channel;
             ReplyTimeOut = replytimeout;
-            ReplyType = replytype;
-            ReplyConnectionString = replyconnectionstring;
-            ReplySubscription = replysubscription;
         }
     }
 }

@@ -84,7 +84,7 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .UseAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
+                .AddAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
                 .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("DefaultEndpointsProtocol=https;AccountName=cartmansaeus001;AccountKey=PScqxunCwYDh8OFmOFVbU39sBKcDHIH2OK9ML3OSONxAHtvgwYh27k2yw85CXvHbJRYwdK5UpTFXynHKbruj3g==;EndpointSuffix=core.windows.net") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
@@ -299,7 +299,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddQueue(_sessionqueue, connectionstring).With(c => { 
                     c.Partition();
-                    c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true });
+                    c.CreateIfNotExist(new AzureServiceBusChannelProperties() { SessionEnabled = true });
                 });
             })
             .With(x =>
@@ -312,7 +312,7 @@ namespace Jal.Router.Sample.NetCore
             {
                 x.AddSubscriptionToTopic(_sessiontopic, _subscription, connectionstring).With(c => { 
                     c.Partition();
-                    c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true }, "1=1");
+                    c.CreateIfNotExist(new AzureServiceBusChannelProperties() { SessionEnabled = true }, "1=1");
                 });
             })
             .With(x =>
@@ -381,7 +381,7 @@ namespace Jal.Router.Sample.NetCore
             .To<Message>(x => x.AddQueue(connectionstring, _fromreplyqueue).AndWaitReplyFromQueue(_replyqueue, connectionstring));
 
             RegisterEndPoint("replyendpoint")
-            .To(x => x.AddQueue(connectionstring, _replyqueue).With(c=>c.CreateIfNotExist(new AzureServiceBusProperties() { SessionEnabled = true })));
+            .To(x => x.AddQueue(connectionstring, _replyqueue).With(c=>c.CreateIfNotExist(new AzureServiceBusChannelProperties() { SessionEnabled = true })));
 
             RegisterHandler(_queuetopublishtopic + "_handler")
             .ToListen(x =>

@@ -11,7 +11,7 @@ namespace Jal.Router.Model
             Properties = new Dictionary<string, string>();
         }
 
-        public Dictionary<string, string> Properties { get; }
+        public IDictionary<string, string> Properties { get; }
 
         public string Subscription { get; }
 

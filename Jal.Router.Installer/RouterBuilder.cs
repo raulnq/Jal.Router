@@ -73,6 +73,13 @@ namespace Jal.Router.Installer
             return this;
         }
 
+        public override IRouterBuilder AddSubscriptionToPublishSubscribeChannel<TImplementation>()
+        {
+            _container.Register(Component.For<ISubscriptionToPublishSubscribeChannel>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleTransient());
+
+            return this;
+        }
+
         public override IRouterBuilder AddSource<TImplementation>()
         {
             _container.Register(Component.For<IRouterConfigurationSource>().ImplementedBy<TImplementation>().Named(typeof(TImplementation).FullName).LifestyleSingleton());

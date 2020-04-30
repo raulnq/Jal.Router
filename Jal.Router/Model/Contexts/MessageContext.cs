@@ -65,7 +65,7 @@ namespace Jal.Router.Model
         }
 
         public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage, Route route, 
-            EndPoint endpoint, Channel channel, TracingContext tracingcontext, List<Tracking> trackings, Origin origin, string content, string sagaid, string claimcheckid, DateTime datetimeutc, string version)
+            EndPoint endpoint, Channel channel, TracingContext tracingcontext, IList<Tracking> trackings, Origin origin, string content, string sagaid, string claimcheckid, DateTime datetimeutc, string version)
         {
             return new MessageContext(bus, serializer, entitystorage, route, endpoint, channel, tracingcontext, datetimeutc, trackings, origin, sagaid, version, claimcheckid, content);
         }
@@ -75,7 +75,7 @@ namespace Jal.Router.Model
             return new MessageContext(endpoint, channel, serializer, storage, options, datetimeutc, origin, serializer.Serialize(content));
         }
 
-        private MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage, Route route, EndPoint endpoint, Channel channel, TracingContext tracingcontext, DateTime datetimeutc, List<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid, string content)
+        private MessageContext(IBus bus, IMessageSerializer serializer, IEntityStorage storage, Route route, EndPoint endpoint, Channel channel, TracingContext tracingcontext, DateTime datetimeutc, IList<Tracking> tracks, Origin origin, string sagaid, string version, string claimcheckid, string content)
         {
             Bus = bus;
 
