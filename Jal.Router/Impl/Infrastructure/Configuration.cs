@@ -209,6 +209,8 @@ namespace Jal.Router.Impl
             Parameters = new Dictionary<string, object>();
             EndpointMiddlewareTypes = new List<Type>();
             ShutdownWatcherTypes = new List<Type>();
+            AddRouteMiddleware<RouterMiddleware>();
+            AddEndpointMiddleware<BusMiddleware>();
             AddLogger<BeatLogger, Beat>();
             AddLogger<StatisticLogger, Statistic>();
             AddStartupTask<StartupLogger>();

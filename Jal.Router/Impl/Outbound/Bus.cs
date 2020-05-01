@@ -160,7 +160,7 @@ namespace Jal.Router.Impl
                         await message.SagaContext.UpdateIntoStorage().ConfigureAwait(false);
                     }
 
-                    var chain = _pipeline.ForAsync<MessageContext>().UseAsync<BusMiddleware>();
+                    var chain = _pipeline.ForAsync<MessageContext>();
 
                     foreach (var type in _factory.Configuration.EndpointMiddlewareTypes)
                     {

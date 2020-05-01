@@ -61,7 +61,7 @@ var bus = container.GetInstance<IBus>();
 var host = container.GetInstance<IHost>();
 
 host.Configuration
-    .UseMemoryAsTransport()
+    .AddMemoryAsTransport()
     .UseNewtonsoftAsSerializer()
     .UseMemoryAsStorage();
 
@@ -87,7 +87,6 @@ Jal.Router is licensed under the [Apache2 license](https://github.com/raulnq/Jal
 * Raul Naupari (raulnq@gmail.com)
 ## RoadMap
 * Feature: SqlServer transport
-* Feature: Default transport and transport by router/endpoind
 * Feature: Compression/encryption (middleware).
 * Feature: Message consumption during scheduled periods of time.
 * Feature: Non native duplicate detection (middleware).
