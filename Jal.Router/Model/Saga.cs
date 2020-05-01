@@ -23,11 +23,11 @@ namespace Jal.Router.Model
 
         public int Timeout { get; private set; }
 
-        public List<Route> Routes { get; private set; }
+        public IList<Route> Routes { get; private set; }
 
-        public List<Route> InitialRoutes { get; private set; }
+        public IList<Route> InitialRoutes { get; private set; }
 
-        public List<Route> FinalRoutes { get; private set; }
+        public IList<Route> FinalRoutes { get; private set; }
 
         public SagaEntity ToEntity()
         {

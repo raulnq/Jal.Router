@@ -6,7 +6,7 @@ namespace Jal.Router.AzureServiceBus.Standard
 {
     public static class ConfigurationExtensions
     {
-        public static IConfiguration UseAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusParameter parameter=null)
+        public static IConfiguration AddAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusParameter parameter=null)
         {
             var p = new AzureServiceBusParameter();
 
@@ -17,8 +17,9 @@ namespace Jal.Router.AzureServiceBus.Standard
 
             return configuration
                 .SetDefaultTransportName("Azure Service Bus")
-                .UsePointToPointChannel<Impl.AzureServiceBusQueue>()
-                .UsePublishSubscribeChannel<Impl.AzureServiceBusTopic>()
+                .UsePointToPointChannel<AzureServiceBusQueue>()
+                .UsePublishSubscribeChannel<AzureServiceBusTopic>()
+                .UseSubscriptionToPublishSubscribeChannel<AzureServiceBusSubscription>()
                 .UseMessageAdapter<AzureServiceBusMessageAdapter>()
                 .AddParameter(p);
         }

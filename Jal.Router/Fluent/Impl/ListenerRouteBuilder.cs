@@ -63,7 +63,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new InvalidOperationException("The adapter type is not valid");
             }
-            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            if (type != null && !typeof(ISubscriptionToPublishSubscribeChannel).IsAssignableFrom(type))
             {
                 throw new InvalidOperationException("The channel type is not valid");
             }
@@ -146,7 +146,7 @@ namespace Jal.Router.Fluent.Impl
             {
                 throw new InvalidOperationException("The adapter type is not valid");
             }
-            if (type != null && !typeof(IPublishSubscribeChannel).IsAssignableFrom(type))
+            if (type != null && !typeof(ISubscriptionToPublishSubscribeChannel).IsAssignableFrom(type))
             {
                 throw new InvalidOperationException("The channel type is not valid");
             }

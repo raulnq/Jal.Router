@@ -9,11 +9,11 @@ namespace Jal.Router.Fluent.Impl
     {
         private readonly Saga _saga;
 
-        private readonly List<Route> _routes;
+        private readonly IList<Route> _routes;
 
         private readonly Type _middleware;
 
-        public RouteBuilder(Saga saga, List<Route> routes, Type middleware)
+        public RouteBuilder(Saga saga, IList<Route> routes, Type middleware)
         {
             _saga = saga;
             _routes = routes;

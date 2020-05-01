@@ -212,7 +212,7 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), new NullPointToPointChannel()));
 
-            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null, null));
+            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null, new NullPointToPointChannel()));
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

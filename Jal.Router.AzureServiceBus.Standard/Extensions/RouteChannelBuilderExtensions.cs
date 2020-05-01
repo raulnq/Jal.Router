@@ -12,7 +12,7 @@ namespace Jal.Router.AzureServiceBus.Standard
         }
         public static IChannelIWhenBuilder AddSubscriptionToTopic(this IRouteChannelBuilder builder, string path, string subscription, string connectionstring)
         {
-            return builder.AddSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusTopic));
+            return builder.AddSubscriptionToPublishSubscribeChannel(path, subscription, connectionstring, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusSubscription));
         }
     }
 }

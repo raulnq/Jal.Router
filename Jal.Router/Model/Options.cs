@@ -30,7 +30,7 @@ namespace Jal.Router.Model
         }
 
         private Options(string endpointname, Dictionary<string, string> headers, 
-            SagaData sagadata, string sagaid, List<Tracking> trackings, TracingContext tracingcontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
+            SagaData sagadata, string sagaid, IList<Tracking> trackings, TracingContext tracingcontext, Route route, Saga saga, string version, DateTime? scheduledenqueuedatetimeutc)
         {
             EndPointName = endpointname;
             Headers= headers;
@@ -62,6 +62,6 @@ namespace Jal.Router.Model
 
         public IDictionary<string,string> Headers { get; private set; }
 
-        public List<Tracking> Trackings { get; private set; }
+        public IList<Tracking> Trackings { get; private set; }
     }
 }

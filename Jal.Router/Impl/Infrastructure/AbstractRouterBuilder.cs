@@ -12,13 +12,19 @@ namespace Jal.Router.Impl
 
             AddPublishSubscribeChannel<NullPublishSubscribeChannel>();
 
+            AddSubscriptionToPublishSubscribeChannel<NullSubscriptionToPublishSubscribeChannel>();
+
             AddPointToPointChannel<FileSystemPointToPointChannel>();
 
             AddPublishSubscribeChannel<FileSystemPublishSubscribeChannel>();
 
+            AddSubscriptionToPublishSubscribeChannel<FileSystemSubscriptionToPublishSubscribeChannel>();
+
             AddPointToPointChannel<InMemoryPointToPointChannel>();
 
             AddPublishSubscribeChannel<InMemoryPublishSubscribeChannel>();
+
+            AddSubscriptionToPublishSubscribeChannel<InMemorySubscriptionToPublishSubscribeChannel>();
 
             AddShutdownTask<ChannelDestructor>();
 
@@ -120,6 +126,8 @@ namespace Jal.Router.Impl
         public abstract IRouterBuilder AddPointToPointChannel<TImplementation>() where TImplementation : class, IPointToPointChannel;
 
         public abstract IRouterBuilder AddPublishSubscribeChannel<TImplementation>() where TImplementation : class, IPublishSubscribeChannel;
+
+        public abstract IRouterBuilder AddSubscriptionToPublishSubscribeChannel<TImplementation>() where TImplementation : class, ISubscriptionToPublishSubscribeChannel;
 
         public abstract IRouterBuilder AddSource<TImplementation>() where TImplementation : class, IRouterConfigurationSource;
 

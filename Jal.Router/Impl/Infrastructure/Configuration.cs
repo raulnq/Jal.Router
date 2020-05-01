@@ -19,6 +19,8 @@ namespace Jal.Router.Impl
         public IList<Type> ShutdownWatcherTypes { get; private set; }
         public Type PointToPointChannelType { get; private set; }
         public Type PublishSubscribeChannelType { get; private set; }
+        public Type SubscriptionToPublishSubscribeChannelType { get; private set; }
+
         public Type StorageType { get; private set; }
         public Type MessageAdapterType { get; private set; }
         public Type ChannelShufflerType { get; private set; }
@@ -53,6 +55,12 @@ namespace Jal.Router.Impl
             PublishSubscribeChannelType = typeof(TPublishSubscribeChannel);
             return this;
         }
+        public IConfiguration UseSubscriptionToPublishSubscribeChannel<TSubscriptionToPublishSubscribeChannel>() where TSubscriptionToPublishSubscribeChannel : ISubscriptionToPublishSubscribeChannel
+        {
+            SubscriptionToPublishSubscribeChannelType = typeof(TSubscriptionToPublishSubscribeChannel);
+            return this;
+        }
+        
         public IConfiguration UseMessageAdapter<TMessageAdapter>() where TMessageAdapter : IMessageAdapter
         {
             MessageAdapterType = typeof(TMessageAdapter);
@@ -189,6 +197,7 @@ namespace Jal.Router.Impl
             UseMessageStorage<NullMessageStorage>();
             UsePointToPointChannel<NullPointToPointChannel>();
             UsePublishSubscribeChannel<NullPublishSubscribeChannel>();
+            UseSubscriptionToPublishSubscribeChannel<NullSubscriptionToPublishSubscribeChannel>();
             UseMessageSerializer<NullMessageSerializer>();
             UseMessageAdapter<NullMessageAdapter>();
             RouteMiddlewareTypes = new List<Type>();
@@ -200,6 +209,8 @@ namespace Jal.Router.Impl
             Parameters = new Dictionary<string, object>();
             EndpointMiddlewareTypes = new List<Type>();
             ShutdownWatcherTypes = new List<Type>();
+            AddRouteMiddleware<RouterMiddleware>();
+            AddEndpointMiddleware<BusMiddleware>();
             AddLogger<BeatLogger, Beat>();
             AddLogger<StatisticLogger, Statistic>();
             AddStartupTask<StartupLogger>();

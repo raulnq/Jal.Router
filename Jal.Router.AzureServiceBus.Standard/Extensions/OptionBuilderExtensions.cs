@@ -7,7 +7,7 @@ namespace Jal.Router.AzureServiceBus.Standard
 {
     public static class OptionBuilderExtensions
     {
-        public static void CreateIfNotExist(this IOptionBuilder builder, AzureServiceBusProperties properties, string filter = null)
+        public static void CreateIfNotExist(this IOptionBuilder builder, AzureServiceBusChannelProperties properties, string filter = null)
         {
             Rule r = null;
 

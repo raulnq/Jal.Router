@@ -1,6 +1,6 @@
 ﻿namespace Jal.Router.AzureServiceBus.Standard.Model
 {
-    public class AzureServiceBusProperties
+    public class AzureServiceBusChannelProperties
     {
         public int DefaultMessageTtlInDays { get; set; }
 

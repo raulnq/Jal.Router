@@ -120,7 +120,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 
             var host = _parameter.Container.GetInstance<IHost>();
 
-            host.Configuration.UseAzureServiceBusAsTransport(_parameter.AzureServiceBusParameter);
+            host.Configuration.AddAzureServiceBusAsTransport(_parameter.AzureServiceBusParameter);
 
             if (_parameter.UseSerilog)
             {

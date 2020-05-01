@@ -1,6 +1,6 @@
 namespace Jal.Router.Interface
 {
-    public interface IPublishSubscribeChannel : IListenerChannel, ISenderChannel, IChannelManager, IReaderChannel
+    public interface IPublishSubscribeChannel : ISenderChannel, IChannelManager, IReaderChannel
     {
 
     }

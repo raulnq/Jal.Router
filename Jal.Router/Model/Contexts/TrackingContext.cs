@@ -5,11 +5,11 @@ namespace Jal.Router.Model
 {
     public class TrackingContext
     {
-        public List<Tracking> Trackings { get; private set; }
+        public IList<Tracking> Trackings { get; private set; }
 
         public MessageContext Context { get; private set; }
 
-        public TrackingContext(MessageContext context, List<Tracking> trackings)
+        public TrackingContext(MessageContext context, IList<Tracking> trackings)
         {
             Context = context;
             Trackings = trackings;

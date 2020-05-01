@@ -72,6 +72,18 @@ namespace Jal.Router.Impl
             }
         }
 
+        private ISubscriptionToPublishSubscribeChannel CreateSubscriptionToPublishSubscribeChannel(Type type)
+        {
+            if (type == null)
+            {
+                return _factory.Create<ISubscriptionToPublishSubscribeChannel>(Configuration.SubscriptionToPublishSubscribeChannelType);
+            }
+            else
+            {
+                return _factory.Create<ISubscriptionToPublishSubscribeChannel>(type);
+            }
+        }
+
         public IMessageStorage CreateMessageStorage()
         {
             return _factory.Create<IMessageStorage>(Configuration.MessageStorageType);
@@ -187,7 +199,7 @@ namespace Jal.Router.Impl
 
             if (channel == ChannelType.SubscriptionToPublishSubscribe)
             {
-                var publishsubscriberchannel = CreatePublishSubscribeChannel(type);
+                var publishsubscriberchannel = CreateSubscriptionToPublishSubscribeChannel(type);
 
                 listenerchannel = publishsubscriberchannel;
 

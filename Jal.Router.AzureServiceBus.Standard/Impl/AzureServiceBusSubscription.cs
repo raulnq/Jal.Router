@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
@@ -11,54 +10,24 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
+    public class AzureServiceBusSubscription : AbstractChannel, ISubscriptionToPublishSubscribeChannel
     {
-        private QueueClient _client;
-
-        public void Open(SenderContext sendercontext)
-        {
-            _client = new QueueClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
-
-            if(_parameter.TimeoutInSeconds>0)
-            {
-                _client.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(_parameter.TimeoutInSeconds);
-            }
-        }
-
-        public async Task<string> Send(SenderContext sendercontext, object message)
-        {
-            var sbmessage = message as Microsoft.Azure.ServiceBus.Message;
-
-            if (sbmessage != null)
-            {
-                await _client.SendAsync(sbmessage).ConfigureAwait(false);
-
-                return sbmessage.MessageId;
-            }
-
-            return string.Empty;
-        }
+        private SubscriptionClient _subscriptionclient;
 
         public void Open(ListenerContext listenercontext)
         {
-            _client = new QueueClient(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path);
+            _subscriptionclient = new SubscriptionClient(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path, listenercontext.Channel.Subscription);
         }
 
         public bool IsActive(ListenerContext listenercontext)
         {
-            return !_client.IsClosedOrClosing;
+            return !_subscriptionclient.IsClosedOrClosing;
         }
 
-        public bool IsActive(SenderContext sendercontext)
+        public Task Close(ListenerContext listenercontext)
         {
-            return !_client.IsClosedOrClosing;
+            return _subscriptionclient.CloseAsync();
         }
-
-        public Task Close(SenderContext sendercontext)
-        {
-            return _client.CloseAsync();
-        }
-
         public void Listen(ListenerContext listenercontext)
         {
             var options = CreateOptions(listenercontext);
@@ -67,7 +36,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
             if (listenercontext.Channel.UsePartition)
             {
-                _client.RegisterSessionHandler(async (ms, message, token) => {
+                _subscriptionclient.RegisterSessionHandler(async (ms, message, token) => {
 
                     var context = await listenercontext.Read(message).ConfigureAwait(false);
 
@@ -79,7 +48,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                         await ms.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
 
-                        if (listenercontext.Channel.ClosePartitionCondition!=null && listenercontext.Channel.ClosePartitionCondition(context))
+                        if (listenercontext.Channel.ClosePartitionCondition != null && listenercontext.Channel.ClosePartitionCondition(context))
                         {
                             await ms.CloseAsync().ConfigureAwait(false);
                         }
@@ -97,7 +66,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             }
             else
             {
-                _client.RegisterMessageHandler(async (message, token) =>
+                _subscriptionclient.RegisterMessageHandler(async (message, token) =>
                 {
                     var context = await listenercontext.Read(message).ConfigureAwait(false);
 
@@ -107,7 +76,7 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     {
                         await listenercontext.Dispatch(context).ConfigureAwait(false);
 
-                        await _client.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
+                        await _subscriptionclient.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -115,8 +84,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     }
                     finally
                     {
-                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} route {listenercontext.Route?.Name}");
+                        Logger.Log($"Message {context.Id} completed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath}");
                     }
+
                 }, options);
             }
         }
@@ -158,9 +128,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                 Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
 
                 return Task.CompletedTask;
-            } ;
+            };
 
-            var options = new MessageHandlerOptions(handler) {AutoComplete = false};
+            var options = new MessageHandlerOptions(handler) { AutoComplete = false };
 
             if (_parameter.MaxConcurrentCalls > 0)
             {
@@ -170,21 +140,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 options.MaxAutoRenewDuration = TimeSpan.FromMinutes(_parameter.AutoRenewTimeoutInMinutes);
             }
-            return options;
-        }
 
-        public Task Close(ListenerContext context)
-        {
-            return _client.CloseAsync();
+            return options;
         }
 
         public async Task<bool> CreateIfNotExist(Channel channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
 
-            if (!await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            if (!await client.SubscriptionExistsAsync(channel.Path, channel.Subscription).ConfigureAwait(false))
             {
-                var description = new QueueDescription(channel.Path);
+                var description = new SubscriptionDescription(channel.Path, channel.Subscription);
 
                 var messagettl = 14;
 
@@ -204,24 +170,25 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 description.LockDuration = TimeSpan.FromSeconds(lockduration);
 
-                if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
-                {
-                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
-                    description.RequiresDuplicateDetection = true;
-                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
-                }
-
                 if (channel.Properties.ContainsKey(SessionEnabled))
                 {
                     description.RequiresSession = true;
                 }
 
-                if (channel.Properties.ContainsKey(PartitioningEnabled))
-                {
-                    description.EnablePartitioning = true;
-                }
+                await client.CreateSubscriptionAsync(description).ConfigureAwait(false);
 
-                await client.CreateQueueAsync(description).ConfigureAwait(false);
+                var subs = new SubscriptionClient(channel.ConnectionString, channel.Path, channel.Subscription);
+
+                var rule = channel.Rules.FirstOrDefault();
+
+                if (rule != null)
+                {
+                    await subs.RemoveRuleAsync("$Default").ConfigureAwait(false);
+
+                    var ruledescriptor = new RuleDescription(rule.Name, new SqlFilter(rule.Filter));
+
+                    await subs.AddRuleAsync(ruledescriptor).ConfigureAwait(false);
+                }
 
                 return true;
             }
@@ -233,19 +200,17 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             var client = new ManagementClient(channel.ConnectionString);
 
-            if (await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            if (await client.SubscriptionExistsAsync(channel.Path, channel.Subscription).ConfigureAwait(false))
             {
-                var info = await client.GetQueueRuntimeInfoAsync(channel.Path).ConfigureAwait(false);
+                var info = await client.GetSubscriptionRuntimeInfoAsync(channel.Path, channel.Subscription).ConfigureAwait(false);
 
-                var statistics = new Statistic(channel.Path);
+                var statistics = new Statistic(channel.Path, channel.Subscription);
 
                 statistics.Properties.Add("DeadLetterMessageCount", info.MessageCountDetails.DeadLetterMessageCount.ToString());
 
                 statistics.Properties.Add("ActiveMessageCount", info.MessageCountDetails.ActiveMessageCount.ToString());
 
                 statistics.Properties.Add("ScheduledMessageCount", info.MessageCountDetails.ScheduledMessageCount.ToString());
-
-                statistics.Properties.Add("CurrentSizeInBytes", info.SizeInBytes.ToString());
 
                 return statistics;
             }
@@ -257,9 +222,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             var client = new ManagementClient(channel.ConnectionString);
 
-            if (await client.QueueExistsAsync(channel.Path).ConfigureAwait(false))
+            if (await client.SubscriptionExistsAsync(channel.Path, channel.Subscription).ConfigureAwait(false))
             {
-                await client.DeleteQueueAsync(channel.Path).ConfigureAwait(false);
+                await client.DeleteSubscriptionAsync(channel.Path, channel.Subscription).ConfigureAwait(false);
 
                 return true;
             }
@@ -267,46 +232,9 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        public async Task<MessageContext> Read(SenderContext sendercontext, MessageContext context, IMessageAdapter adapter)
-        {
-            var client = default(SessionClient);
-
-            if(sendercontext.Channel.ReplyChannel.ChannelType== ChannelType.PointToPoint)
-            {
-                client = new SessionClient(sendercontext.Channel.ReplyChannel.ConnectionString, sendercontext.Channel.ReplyChannel.Path);
-            }
-            else
-            {
-                var entity = EntityNameHelper.FormatSubscriptionPath(sendercontext.Channel.ReplyChannel.Path, sendercontext.Channel.ReplyChannel.Subscription);
-
-                client = new SessionClient(sendercontext.Channel.ReplyChannel.ConnectionString, entity);
-            }
-            
-            var messagesession = await client.AcceptMessageSessionAsync(context.TracingContext.ReplyToRequestId).ConfigureAwait(false);
-
-            var message = sendercontext.Channel.ReplyTimeOut != 0 ?
-                await messagesession.ReceiveAsync(TimeSpan.FromSeconds(sendercontext.Channel.ReplyTimeOut)).ConfigureAwait(false) :
-                await messagesession.ReceiveAsync().ConfigureAwait(false);
-
-            MessageContext outputcontext = null;
-
-            if (message != null)
-            {
-                outputcontext = await adapter.ReadFromPhysicalMessage(message, sendercontext).ConfigureAwait(false);
-
-                await messagesession.CompleteAsync(message.SystemProperties.LockToken).ConfigureAwait(false);
-            }
-
-            await messagesession.CloseAsync().ConfigureAwait(false);
-
-            await client.CloseAsync().ConfigureAwait(false);
-
-            return outputcontext;
-        }
-
         private readonly AzureServiceBusParameter _parameter;
 
-        public AzureServiceBusQueue(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider) 
+        public AzureServiceBusSubscription(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
             : base(factory, logger)
         {
             _parameter = provider.Get<AzureServiceBusParameter>();

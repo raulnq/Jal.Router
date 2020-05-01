@@ -26,15 +26,15 @@ namespace Jal.Router.Impl
                 Validate(errors, channel.Subscription, "subscription", channeltype, channelname);
             }
 
-            if (channel.ReplyType != ReplyType.None)
+            if (channel.ReplyChannel != null)
             {
-                Validate(errors, channel.ReplyConnectionString, "reply connection string", channeltype, channelname);
+                Validate(errors, channel.ReplyChannel.ConnectionString, "reply connection string", channeltype, channelname);
 
-                Validate(errors, channel.ReplyPath, "reply path", channeltype, channelname);
+                Validate(errors, channel.ReplyChannel.Path, "reply path", channeltype, channelname);
 
-                if (channel.ReplyType == ReplyType.FromSubscriptionToPublishSubscribe)
+                if (channel.ReplyChannel.ChannelType == ChannelType.SubscriptionToPublishSubscribe)
                 {
-                    Validate(errors, channel.ReplySubscription, "reply subscription", channeltype, channelname);
+                    Validate(errors, channel.ReplyChannel.Subscription, "reply subscription", channeltype, channelname);
                 }
             }
 

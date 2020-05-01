@@ -16,7 +16,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IUseMethodBuilder<TContent> ForMessage<TContent>(Func<MessageContext, bool> condition = null)
         {
-            var whitRouteBuilder = new UseRouteMethodBuilder<TContent>(_route, condition);
+            var whitRouteBuilder = new UseMethodBuilder<TContent>(_route, condition);
 
             return whitRouteBuilder;
         }
@@ -196,7 +196,7 @@ namespace Jal.Router.Fluent.Impl
 
         public IUseMethodBuilder<TContent, TData> ForMessage<TContent>(Func<MessageContext, bool> condition = null)
         {
-            var whitRouteBuilder = new UseRouteMethodBuilder<TContent, TData>(_route, condition);
+            var whitRouteBuilder = new UseMethodBuilder<TContent, TData>(_route, condition);
 
             return whitRouteBuilder;
         }
