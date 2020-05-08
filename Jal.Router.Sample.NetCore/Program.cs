@@ -93,7 +93,7 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .AddAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
+                .AddAzureServiceBusAsTransport(new AzureServiceBusChannelConnection() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
                 .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter(config["storage"]) { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)

@@ -61,26 +61,26 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 var messagettl = 14;
 
-                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DefaultMessageTtlInDays))
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
+                    messagettl = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DefaultMessageTtlInDays]);
                 }
 
                 description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
 
-                if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes))
                 {
-                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
+                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes]);
                     description.RequiresDuplicateDetection = true;
                     description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
                 }
 
-                if (channel.Properties.ContainsKey(PartitioningEnabled))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._PartitioningEnabled))
                 {
                     description.EnablePartitioning = true;
                 }
 
-                if (channel.Properties.ContainsKey(ExpressMessageEnabled))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._ExpressMessageEnabled))
                 {
 
                 }
@@ -168,12 +168,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return outputcontext;
         }
 
-        private readonly AzureServiceBusParameter _parameter;
+        private readonly AzureServiceBusChannelConnection _parameter;
 
         public AzureServiceBusTopic(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
             : base(factory, logger)
         {
-            _parameter = provider.Get<AzureServiceBusParameter>();
+            _parameter = provider.Get<AzureServiceBusChannelConnection>();
         }
     }
 }

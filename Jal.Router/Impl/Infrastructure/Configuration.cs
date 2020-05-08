@@ -159,9 +159,9 @@ namespace Jal.Router.Impl
             return this;
         }
 
-        public IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask
+        public IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds, bool runimmediately=false) where TMonitoringTask : IMonitoringTask
         {
-            MonitoringTaskTypes.Add(new MonitorTask(typeof(TMonitoringTask), intervalinseconds * 1000));
+            MonitoringTaskTypes.Add(new MonitorTask(typeof(TMonitoringTask), intervalinseconds * 1000, runimmediately));
             return this;
         }
         public IConfiguration AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask

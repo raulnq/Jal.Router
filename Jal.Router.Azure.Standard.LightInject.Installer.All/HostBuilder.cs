@@ -34,7 +34,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
             return new HostBuilder(container, applicationname);
         }
 
-        public IHostBuilder UseAzureServiceBus(Action<IRouterBuilder> builderaction, Action<AzureServiceBusParameter> action=null)
+        public IHostBuilder UseAzureServiceBus(Action<IRouterBuilder> builderaction, Action<AzureServiceBusChannelConnection> action=null)
         {
             _parameter.Action = builderaction;
             action?.Invoke(_parameter.AzureServiceBusParameter);

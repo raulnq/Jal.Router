@@ -16,34 +16,7 @@ namespace Jal.Router.AzureServiceBus.Standard
                 r = new Rule(filter, "$Default", true);
             }
 
-            var dictionary = new Dictionary<string, object>();
-
-            if (properties.DefaultMessageTtlInDays > 0)
-            {
-                dictionary.Add("defaultmessagettlindays", properties.DefaultMessageTtlInDays.ToString());
-            }
-            if (properties.DuplicateMessageDetectionInMinutes > 0)
-            {
-                dictionary.Add("duplicatemessagedetectioninminutes", properties.DuplicateMessageDetectionInMinutes.ToString());
-            }
-            if (properties.ExpressMessageEnabled != null)
-            {
-                dictionary.Add("expressmessageenabled", "true");
-            }
-            if (properties.MessageLockDurationInSeconds > 0)
-            {
-                dictionary.Add("messagelockdurationinseconds", properties.MessageLockDurationInSeconds.ToString());
-            }
-            if (properties.PartitioningEnabled != null)
-            {
-                dictionary.Add("partitioningenabled", "true");
-            }
-            if (properties.SessionEnabled != null)
-            {
-                dictionary.Add("sessionenabled", "true");
-            }
-
-            builder.CreateIfNotExist(dictionary, new List<Rule>() { r });
+            builder.CreateIfNotExist(properties?.ToDictionary(), new List<Rule>() { r });
         }
 
         public static void CreateIfNotExist(this IOptionBuilder builder, string filter = null)

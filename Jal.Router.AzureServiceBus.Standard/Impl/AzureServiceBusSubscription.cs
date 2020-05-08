@@ -156,21 +156,21 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 var lockduration = 300;
 
-                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DefaultMessageTtlInDays))
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
+                    messagettl = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DefaultMessageTtlInDays]);
                 }
 
-                if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._MessageLockDurationInSeconds))
                 {
-                    lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
+                    lockduration = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._MessageLockDurationInSeconds]);
                 }
 
                 description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
 
                 description.LockDuration = TimeSpan.FromSeconds(lockduration);
 
-                if (channel.Properties.ContainsKey(SessionEnabled))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._SessionEnabled))
                 {
                     description.RequiresSession = true;
                 }
@@ -232,12 +232,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        private readonly AzureServiceBusParameter _parameter;
+        private readonly AzureServiceBusChannelConnection _parameter;
 
         public AzureServiceBusSubscription(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
             : base(factory, logger)
         {
-            _parameter = provider.Get<AzureServiceBusParameter>();
+            _parameter = provider.Get<AzureServiceBusChannelConnection>();
         }
     }
 }

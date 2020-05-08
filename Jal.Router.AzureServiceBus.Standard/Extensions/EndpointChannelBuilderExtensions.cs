@@ -1,4 +1,5 @@
 ﻿using Jal.Router.AzureServiceBus.Standard.Impl;
+using Jal.Router.AzureServiceBus.Standard.Model;
 using Jal.Router.Fluent.Interface;
 
 namespace Jal.Router.AzureServiceBus.Standard
@@ -6,14 +7,14 @@ namespace Jal.Router.AzureServiceBus.Standard
 
     public static class EndpointChannelBuilderExtensions
     {
-        public static IChannelIWhenBuilder AddTopic(this IEndpointChannelBuilder builder, string connectionstring, string path)
+        public static IChannelIWhenBuilder AddTopic(this IEndpointChannelBuilder builder, string connectionstring, string path, AzureServiceBusChannelConnection connection = null)
         {
-            return builder.AddPublishSubscribeChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusTopic));
+            return builder.AddPublishSubscribeChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusTopic), connection?.ToDictionary());
         }
 
-        public static IChannelIWhenBuilder AddQueue(this IEndpointChannelBuilder builder, string connectionstring, string path)
+        public static IChannelIWhenBuilder AddQueue(this IEndpointChannelBuilder builder, string connectionstring, string path, AzureServiceBusChannelConnection connection = null)
         {
-            return builder.AddPointToPointChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusQueue));
+            return builder.AddPointToPointChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusQueue), connection?.ToDictionary());
         }
 
         public static IAndWaitReplyFromBuilder AddQueue(this IReplyIEndpointChannelBuilder builder, string connectionstring, string path)

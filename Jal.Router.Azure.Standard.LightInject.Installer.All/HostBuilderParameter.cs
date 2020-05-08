@@ -16,14 +16,14 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
         public int HeartBeatFrequency { get; set; }
         public bool UseApplicationInsights { get; set; }
         public string ApplicationInsightsKey { get; set; }
-        public AzureServiceBusParameter AzureServiceBusParameter { get; set; }
+        public AzureServiceBusChannelConnection AzureServiceBusParameter { get; set; }
         public AzureStorageParameter AzureStorageParameter { get; set; }
         public bool UseAzureStorage { get; set; }
         public HostBuilderParameter()
         {
             ApplicationName = "App";
             HeartBeatFrequency = 600;
-            AzureServiceBusParameter = new AzureServiceBusParameter();
+            AzureServiceBusParameter = new AzureServiceBusChannelConnection();
             AzureStorageParameter = new AzureStorageParameter();
         }
     }

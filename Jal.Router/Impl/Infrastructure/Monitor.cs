@@ -25,7 +25,10 @@ namespace Jal.Router.Impl
 
                 Task.Factory.StartNew(async () =>
                 {
-                    await Task.Delay(type.IntervalInMilliSeconds).ConfigureAwait(false);
+                    if(!type.RunImmediately)
+                    {
+                        await Task.Delay(type.IntervalInMilliSeconds).ConfigureAwait(false);
+                    }
 
                     while (true)
                     {

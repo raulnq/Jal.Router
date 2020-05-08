@@ -190,33 +190,33 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
 
                 var lockduration = 300;
 
-                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DefaultMessageTtlInDays))
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
+                    messagettl = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DefaultMessageTtlInDays]);
                 }
 
-                if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._MessageLockDurationInSeconds))
                 {
-                    lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
+                    lockduration = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._MessageLockDurationInSeconds]);
                 }
 
                 description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
 
                 description.LockDuration = TimeSpan.FromSeconds(lockduration);
 
-                if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes))
                 {
-                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
+                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes]);
                     description.RequiresDuplicateDetection = true;
                     description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
                 }
 
-                if (channel.Properties.ContainsKey(SessionEnabled))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._SessionEnabled))
                 {
                     description.RequiresSession = true;
                 }
 
-                if (channel.Properties.ContainsKey(PartitioningEnabled))
+                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._PartitioningEnabled))
                 {
                     description.EnablePartitioning = true;
                 }
@@ -304,12 +304,12 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return outputcontext;
         }
 
-        private readonly AzureServiceBusParameter _parameter;
+        private readonly AzureServiceBusChannelConnection _parameter;
 
         public AzureServiceBusQueue(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider) 
             : base(factory, logger)
         {
-            _parameter = provider.Get<AzureServiceBusParameter>();
+            _parameter = provider.Get<AzureServiceBusChannelConnection>();
         }
     }
 }
