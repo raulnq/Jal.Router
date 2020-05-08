@@ -9,12 +9,12 @@ namespace Jal.Router.AzureServiceBus.Standard
     {
         public static IChannelIWhenBuilder AddTopic(this IEndpointChannelBuilder builder, string connectionstring, string path, AzureServiceBusChannelConnection connection = null)
         {
-            return builder.AddPublishSubscribeChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusTopic), connection?.ToDictionary());
+            return builder.AddPublishSubscribeChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusTopic), connection?.ToDictionary(), "Azure Service Bus");
         }
 
         public static IChannelIWhenBuilder AddQueue(this IEndpointChannelBuilder builder, string connectionstring, string path, AzureServiceBusChannelConnection connection = null)
         {
-            return builder.AddPointToPointChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusQueue), connection?.ToDictionary());
+            return builder.AddPointToPointChannel(connectionstring, path, typeof(AzureServiceBusMessageAdapter), typeof(AzureServiceBusQueue), connection?.ToDictionary(), "Azure Service Bus");
         }
 
         public static IAndWaitReplyFromBuilder AddQueue(this IReplyIEndpointChannelBuilder builder, string connectionstring, string path)

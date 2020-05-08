@@ -23,7 +23,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(connectionstring));
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, null, null);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, null, null, null);
 
             _channel.ReplyTo(channel, timeout);
         }
@@ -44,7 +44,7 @@ namespace Jal.Router.Fluent.Impl
                 throw new ArgumentNullException(nameof(subscription));
             }
 
-            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, null, null);
+            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, null, null, null);
 
             _channel.ReplyTo(channel, timeout);
         }

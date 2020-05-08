@@ -65,7 +65,7 @@ namespace Jal.Router.Tests
             factorymock.Verify(x => x.CreateMessageAdapter(It.IsAny<Type>()), Times.Once());
         }
 
-        public static void WasExecuted(this Mock<ISenderChannel> sendermock)
+        public static void WasExecuted(this Mock<IChannelSender> sendermock)
         {
             sendermock.Verify(x => x.Send(It.IsAny<SenderContext>(), It.IsAny<object>()), Times.Once());
         }

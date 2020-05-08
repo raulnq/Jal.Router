@@ -17,6 +17,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
 
         public int TimeoutInSeconds { get; set; }
 
+        public bool LogClientException { get; set; }
+
         public AzureServiceBusChannelConnection()
         {
             MaxConcurrentCalls = 4;
@@ -30,19 +32,56 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
             AutoRenewPartitionTimeoutInSeconds = 30;
 
             TimeoutInSeconds = 0;
+
+            LogClientException = false;
         }
 
-        public const string _MaxConcurrentCalls = "maxconcurrentcalls";
+        public AzureServiceBusChannelConnection(IDictionary<string, object> properties):this()
+        {
+            if(properties!=null)
+            {
+                if (properties.ContainsKey(_MaxConcurrentCalls))
+                {
+                    MaxConcurrentCalls = Convert.ToInt32(properties.ContainsKey(_MaxConcurrentCalls).ToString());
+                }
+                if (properties.ContainsKey(_MaxConcurrentPartitions))
+                {
+                    MaxConcurrentPartitions = Convert.ToInt32(properties.ContainsKey(_MaxConcurrentPartitions).ToString());
+                }
+                if (properties.ContainsKey(_AutoRenewPartitionTimeoutInSeconds))
+                {
+                    AutoRenewPartitionTimeoutInSeconds = Convert.ToInt32(properties.ContainsKey(_AutoRenewPartitionTimeoutInSeconds).ToString());
+                }
+                if (properties.ContainsKey(_AutoRenewTimeoutInMinutes))
+                {
+                    AutoRenewTimeoutInMinutes = Convert.ToInt32(properties.ContainsKey(_AutoRenewTimeoutInMinutes).ToString());
+                }
+                if (properties.ContainsKey(_MessagePartitionTimeoutInSeconds))
+                {
+                    MessagePartitionTimeoutInSeconds = Convert.ToInt32(properties.ContainsKey(_MessagePartitionTimeoutInSeconds).ToString());
+                }
+                if (properties.ContainsKey(_TimeoutInSeconds))
+                {
+                    TimeoutInSeconds = Convert.ToInt32(properties.ContainsKey(_TimeoutInSeconds).ToString());
+                }
+                LogClientException = Convert.ToBoolean(properties.ContainsKey(_LogClientException).ToString());
+            }
 
-        public const string _MaxConcurrentPartitions = "maxconcurrentpartitions";
+        }
 
-        public const string _AutoRenewPartitionTimeoutInSeconds = "autorenewpartitiontimeoutinseconds";
+        public const string _MaxConcurrentCalls = "connection_maxconcurrentcalls";
 
-        public const string _AutoRenewTimeoutInMinutes = "autorenewtimeoutinminutes";
+        public const string _MaxConcurrentPartitions = "connection_maxconcurrentpartitions";
 
-        public const string _MessagePartitionTimeoutInSeconds = "messagepartitiontimeoutinseconds";
+        public const string _AutoRenewPartitionTimeoutInSeconds = "connection_autorenewpartitiontimeoutinseconds";
 
-        public const string _TimeoutInSeconds = "timeoutinseconds";
+        public const string _AutoRenewTimeoutInMinutes = "connection_autorenewtimeoutinminutes";
+
+        public const string _MessagePartitionTimeoutInSeconds = "connection_messagepartitiontimeoutinseconds";
+
+        public const string _TimeoutInSeconds = "connection_timeoutinseconds";
+
+        public const string _LogClientException = "connection_logclientexception";
 
         public IDictionary<string, object> ToDictionary()
         {
@@ -72,6 +111,8 @@ namespace Jal.Router.AzureServiceBus.Standard.Model
             {
                 dictionary.Add(_TimeoutInSeconds, TimeoutInSeconds.ToString());
             }
+
+            dictionary.Add(_LogClientException, LogClientException.ToString());
 
             return dictionary;
         }

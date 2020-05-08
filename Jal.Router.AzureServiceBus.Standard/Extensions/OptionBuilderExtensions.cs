@@ -9,27 +9,30 @@ namespace Jal.Router.AzureServiceBus.Standard
     {
         public static void CreateIfNotExist(this IOptionBuilder builder, AzureServiceBusChannelProperties properties, string filter = null)
         {
-            Rule r = null;
-
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new Rule(filter, "$Default", true);
-            }
+                var r = new Rule(filter, "$Default", true);
 
-            builder.CreateIfNotExist(properties?.ToDictionary(), new List<Rule>() { r });
+                builder.CreateIfNotExist(properties?.ToDictionary(), new List<Rule>() { r });
+            }
+            else
+            {
+                builder.CreateIfNotExist(properties?.ToDictionary());
+            }
         }
 
         public static void CreateIfNotExist(this IOptionBuilder builder, string filter = null)
         {
-
-            Rule r = null;
-
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new Rule(filter, "$Default", true);
-            }
+                var r = new Rule(filter, "$Default", true);
 
-            builder.CreateIfNotExist(rules: new List<Rule>() { r });
+                builder.CreateIfNotExist(rules: new List<Rule>() { r });
+            }
+            else
+            {
+                builder.CreateIfNotExist();
+            }
         }
     }
 }

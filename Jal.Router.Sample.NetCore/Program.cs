@@ -93,7 +93,7 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .AddAzureServiceBusAsTransport(new AzureServiceBusChannelConnection() { AutoRenewTimeoutInMinutes = 60 })
+                .AddAzureServiceBusAsDefaultTransport(new AzureServiceBusChannelConnection() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
                 .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter(config["storage"]) { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
@@ -101,7 +101,7 @@ namespace Jal.Router.Sample.NetCore
                 .UseNewtonsoftAsSerializer()
                 .AddShutdownTask<ChannelDestructor>()
                 //.UseMemoryAsStorage()
-                //.AddMonitoringTask<ListenerMonitor>(30)
+                //.AddMonitoringTask<StatisticMonitor>(30, true)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
                 //.EnableEntityStorage()

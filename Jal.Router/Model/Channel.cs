@@ -5,7 +5,7 @@ namespace Jal.Router.Model
 {
     public class Channel
     {
-        public Channel(ChannelType channeltype, string connectionstring, string path, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
+        public Channel(ChannelType channeltype, string connectionstring, string path, Type adaptertype, Type type, string trasportname, bool fromrouterconfigurationsource = true)
         {
             ChannelType = channeltype;
 
@@ -24,10 +24,12 @@ namespace Jal.Router.Model
             Properties = new Dictionary<string, object>();
 
             Rules = new List<Rule>();
+
+            TransportName = trasportname;
         }
 
-        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, Type adaptertype, Type type, bool fromrouterconfigurationsource = true)
-            :this(channeltype, connectionstring, path, adaptertype, type, fromrouterconfigurationsource)
+        public Channel(ChannelType channeltype, string connectionstring, string path, string subscription, Type adaptertype, Type type, string trasportname, bool fromrouterconfigurationsource = true)
+            :this(channeltype, connectionstring, path, adaptertype, type, trasportname, fromrouterconfigurationsource) 
         {
             Subscription = subscription;
         }
@@ -55,6 +57,8 @@ namespace Jal.Router.Model
         public ChannelType ChannelType { get; private set; }
 
         public Channel ReplyChannel { get; private set; }
+
+        public string TransportName { get; set; }
 
         public string Id { get; }
 

@@ -61,7 +61,7 @@ var bus = container.GetInstance<IBus>();
 var host = container.GetInstance<IHost>();
 
 host.Configuration
-    .AddMemoryAsTransport()
+    .AddMemoryAsDefaultTransport()
     .UseNewtonsoftAsSerializer()
     .UseMemoryAsStorage();
 

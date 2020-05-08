@@ -6,13 +6,13 @@ namespace Jal.Router.AzureServiceBus.Standard
 {
     public static class ConfigurationExtensions
     {
-        public static IConfiguration AddAzureServiceBusAsTransport(this IConfiguration configuration, AzureServiceBusChannelConnection parameter=null)
+        public static IConfiguration AddAzureServiceBusAsDefaultTransport(this IConfiguration configuration, AzureServiceBusChannelConnection connection=null)
         {
             var p = new AzureServiceBusChannelConnection();
 
-            if (parameter != null)
+            if (connection != null)
             {
-                p = parameter;
+                p = connection;
             }
 
             return configuration

@@ -10,7 +10,7 @@ using Microsoft.Azure.ServiceBus.Management;
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
 
-    public class AzureServiceBusTopic : AbstractChannel, IPublishSubscribeChannel
+    public class AzureServiceBusTopic : AzureServiceBus, IPublishSubscribeChannel
     {
         private TopicClient _topicclient;
 
@@ -28,9 +28,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             _topicclient = new TopicClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
 
-            if (_parameter.TimeoutInSeconds > 0)
+            var connection = Get(sendercontext.Channel);
+
+            if (connection.TimeoutInSeconds > 0)
             {
-                _topicclient.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(_parameter.TimeoutInSeconds);
+                _topicclient.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(connection.TimeoutInSeconds);
             }
         }
 
@@ -59,28 +61,23 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
                     SupportOrdering = true
                 };
 
-                var messagettl = 14;
+                var properties = new AzureServiceBusChannelProperties(channel.Properties);
 
-                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DefaultMessageTtlInDays))
+                description.DefaultMessageTimeToLive = TimeSpan.FromDays(properties.DefaultMessageTtlInDays);
+
+                if (properties.DuplicateMessageDetectionInMinutes>0)
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DefaultMessageTtlInDays]);
-                }
-
-                description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
-
-                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes))
-                {
-                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[AzureServiceBusChannelProperties._DuplicateMessageDetectionInMinutes]);
                     description.RequiresDuplicateDetection = true;
-                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
+
+                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(properties.DuplicateMessageDetectionInMinutes);
                 }
 
-                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._PartitioningEnabled))
+                if (properties.PartitioningEnabled != null)
                 {
-                    description.EnablePartitioning = true;
+                    description.EnablePartitioning = properties.PartitioningEnabled.Value;
                 }
 
-                if (channel.Properties.ContainsKey(AzureServiceBusChannelProperties._ExpressMessageEnabled))
+                if (properties.ExpressMessageEnabled != null)
                 {
 
                 }
@@ -168,12 +165,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return outputcontext;
         }
 
-        private readonly AzureServiceBusChannelConnection _parameter;
 
         public AzureServiceBusTopic(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
-            : base(factory, logger)
+            : base(factory, logger, provider)
         {
-            _parameter = provider.Get<AzureServiceBusChannelConnection>();
+
         }
     }
 }

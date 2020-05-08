@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Tests", "Jal.Rou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jal.Router.Patterns", "Jal.Router.Patterns\Jal.Router.Patterns.csproj", "{AD9960D6-BD35-415C-93E9-E22CEC96193D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jal.Router.SqlServer", "Jal.Router.SqlServer\Jal.Router.SqlServer.csproj", "{A2F0AB05-7AED-44CC-990B-96FC55ED3250}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,10 @@ Global
 		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD9960D6-BD35-415C-93E9-E22CEC96193D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F0AB05-7AED-44CC-990B-96FC55ED3250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F0AB05-7AED-44CC-990B-96FC55ED3250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F0AB05-7AED-44CC-990B-96FC55ED3250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F0AB05-7AED-44CC-990B-96FC55ED3250}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

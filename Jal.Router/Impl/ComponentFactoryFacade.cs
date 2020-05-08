@@ -149,13 +149,17 @@ namespace Jal.Router.Impl
             return _factory.Create<TComponent>(type);
         }
 
-        public (ISenderChannel,IReaderChannel,IChannelManager) CreateSenderChannel(ChannelType channel, Type type)
+        public (IChannelSender,IChannelReader,IChannelCreator, IChannelDeleter, IChannelStatisticProvider) CreateSenderChannel(ChannelType channel, Type type)
         {
-            var senderchannel = default(ISenderChannel);
+            var senderchannel = default(IChannelSender);
 
-            var readerchannel = default(IReaderChannel);
+            var readerchannel = default(IChannelReader);
 
-            var channelmanager = default(IChannelManager);
+            var channelcreator = default(IChannelCreator);
+
+            var channeldeleter = default(IChannelDeleter);
+
+            var channelprovider = default(IChannelStatisticProvider);
 
             if (channel == ChannelType.PointToPoint)
             {
@@ -163,9 +167,13 @@ namespace Jal.Router.Impl
 
                 senderchannel = pointtopointchannel;
 
-                channelmanager = pointtopointchannel;
+                channelcreator = pointtopointchannel;
 
                 readerchannel = pointtopointchannel;
+
+                channeldeleter = pointtopointchannel;
+
+                channelprovider = pointtopointchannel;
             }
 
             if (channel == ChannelType.PublishSubscribe)
@@ -174,19 +182,27 @@ namespace Jal.Router.Impl
 
                 senderchannel = publishsubscribechannel;
 
-                channelmanager = publishsubscribechannel;
+                channelcreator = publishsubscribechannel;
 
                 readerchannel = publishsubscribechannel;
+
+                channeldeleter = publishsubscribechannel;
+
+                channelprovider = publishsubscribechannel;
             }
 
-            return (senderchannel,readerchannel, channelmanager);
+            return (senderchannel,readerchannel, channelcreator, channeldeleter, channelprovider);
         }
 
-        public (IListenerChannel, IChannelManager) CreateListenerChannel(ChannelType channel, Type type)
+        public (IChannelListener, IChannelCreator, IChannelDeleter, IChannelStatisticProvider) CreateListenerChannel(ChannelType channel, Type type)
         {
-            var listenerchannel = default(IListenerChannel);
+            var listenerchannel = default(IChannelListener);
 
-            var channelmanager = default(IChannelManager);
+            var channelcreator = default(IChannelCreator);
+
+            var channeldeleter = default(IChannelDeleter);
+
+            var channelprovider = default(IChannelStatisticProvider);
 
             if (channel == ChannelType.PointToPoint)
             {
@@ -194,19 +210,27 @@ namespace Jal.Router.Impl
 
                 listenerchannel = pointtopointchannel;
 
-                channelmanager = pointtopointchannel;
+                channelcreator = pointtopointchannel;
+
+                channeldeleter = pointtopointchannel;
+
+                channelprovider = pointtopointchannel;
             }
 
             if (channel == ChannelType.SubscriptionToPublishSubscribe)
             {
-                var publishsubscriberchannel = CreateSubscriptionToPublishSubscribeChannel(type);
+                var subscriptiontopublishsubscribechannel = CreateSubscriptionToPublishSubscribeChannel(type);
 
-                listenerchannel = publishsubscriberchannel;
+                listenerchannel = subscriptiontopublishsubscribechannel;
 
-                channelmanager = publishsubscriberchannel;
+                channelcreator = subscriptiontopublishsubscribechannel;
+
+                channeldeleter = subscriptiontopublishsubscribechannel;
+
+                channelprovider = subscriptiontopublishsubscribechannel;
             }
 
-            return (listenerchannel, channelmanager);
+            return (listenerchannel, channelcreator, channeldeleter, channelprovider);
         }
     }
 }
