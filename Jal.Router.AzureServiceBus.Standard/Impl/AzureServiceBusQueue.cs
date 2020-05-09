@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jal.Router.AzureServiceBus.Standard.Model;
-using Jal.Router.Impl;
 using Jal.Router.Interface;
 using Jal.Router.Model;
 using Microsoft.Azure.ServiceBus;
@@ -11,7 +10,7 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusQueue : AbstractChannel, IPointToPointChannel
+    public class AzureServiceBusQueue : AzureServiceBus, IPointToPointChannel
     {
         private QueueClient _client;
 
@@ -19,9 +18,11 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
         {
             _client = new QueueClient(sendercontext.Channel.ConnectionString, sendercontext.Channel.Path);
 
-            if(_parameter.TimeoutInSeconds>0)
+            var connection = Get(sendercontext.Channel);
+
+            if(connection.TimeoutInSeconds>0)
             {
-                _client.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(_parameter.TimeoutInSeconds);
+                _client.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(connection.TimeoutInSeconds);
             }
         }
 
@@ -121,58 +122,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             }
         }
 
-        private SessionHandlerOptions CreateSessionOptions(ListenerContext listenercontext)
-        {
-            Func<ExceptionReceivedEventArgs, Task> handler = args =>
-            {
-                var context = args.ExceptionReceivedContext;
-
-                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
-
-                return Task.CompletedTask;
-            };
-
-            var options = new SessionHandlerOptions(handler) { AutoComplete = false };
-
-            if (_parameter.MaxConcurrentPartitions > 0)
-            {
-                options.MaxConcurrentSessions = _parameter.MaxConcurrentPartitions;
-            }
-            if (_parameter.AutoRenewPartitionTimeoutInSeconds > 0)
-            {
-                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewPartitionTimeoutInSeconds);
-            }
-            if (_parameter.MessagePartitionTimeoutInSeconds > 0)
-            {
-                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessagePartitionTimeoutInSeconds);
-            }
-            return options;
-        }
-
-        private MessageHandlerOptions CreateOptions(ListenerContext listenercontext)
-        {
-            Func<ExceptionReceivedEventArgs, Task> handler = args =>
-            {
-                var context = args.ExceptionReceivedContext;
-
-                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
-
-                return Task.CompletedTask;
-            } ;
-
-            var options = new MessageHandlerOptions(handler) {AutoComplete = false};
-
-            if (_parameter.MaxConcurrentCalls > 0)
-            {
-                options.MaxConcurrentCalls = _parameter.MaxConcurrentCalls;
-            }
-            if (_parameter.AutoRenewTimeoutInMinutes > 0)
-            {
-                options.MaxAutoRenewDuration = TimeSpan.FromMinutes(_parameter.AutoRenewTimeoutInMinutes);
-            }
-            return options;
-        }
-
         public Task Close(ListenerContext context)
         {
             return _client.CloseAsync();
@@ -186,39 +135,27 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var description = new QueueDescription(channel.Path);
 
-                var messagettl = 14;
+                var properties = new AzureServiceBusChannelProperties(channel.Properties);
 
-                var lockduration = 300;
+                description.DefaultMessageTimeToLive = TimeSpan.FromDays(properties.DefaultMessageTtlInDays);
 
-                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                description.LockDuration = TimeSpan.FromSeconds(properties.MessageLockDurationInSeconds);
+
+                if (properties.DuplicateMessageDetectionInMinutes>0)
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
-                }
-
-                if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
-                {
-                    lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
-                }
-
-                description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
-
-                description.LockDuration = TimeSpan.FromSeconds(lockduration);
-
-                if (channel.Properties.ContainsKey(DuplicateMessageDetectionInMinutes))
-                {
-                    var duplicatemessagedetectioninminutes = Convert.ToInt32(channel.Properties[DuplicateMessageDetectionInMinutes]);
                     description.RequiresDuplicateDetection = true;
-                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(duplicatemessagedetectioninminutes);
+
+                    description.DuplicateDetectionHistoryTimeWindow = TimeSpan.FromMinutes(properties.DuplicateMessageDetectionInMinutes);
                 }
 
-                if (channel.Properties.ContainsKey(SessionEnabled))
+                if (properties.SessionEnabled!=null)
                 {
-                    description.RequiresSession = true;
+                    description.RequiresSession = properties.SessionEnabled.Value;
                 }
 
-                if (channel.Properties.ContainsKey(PartitioningEnabled))
+                if (properties.PartitioningEnabled!=null)
                 {
-                    description.EnablePartitioning = true;
+                    description.EnablePartitioning = properties.PartitioningEnabled.Value;
                 }
 
                 await client.CreateQueueAsync(description).ConfigureAwait(false);
@@ -304,12 +241,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return outputcontext;
         }
 
-        private readonly AzureServiceBusParameter _parameter;
-
         public AzureServiceBusQueue(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider) 
-            : base(factory, logger)
+            : base(factory, logger, provider)
         {
-            _parameter = provider.Get<AzureServiceBusParameter>();
+            
         }
     }
 }

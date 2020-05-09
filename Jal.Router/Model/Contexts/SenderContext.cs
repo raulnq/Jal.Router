@@ -9,13 +9,13 @@ namespace Jal.Router.Model
     {
         public EndPoint EndPoint { get; private set; }
 
-        public IReaderChannel ReaderChannel { get; private set; }
+        public IChannelReader ReaderChannel { get; private set; }
 
-        public ISenderChannel SenderChannel { get; private set; }
+        public IChannelSender SenderChannel { get; private set; }
 
         public static SenderContext Create(IComponentFactoryFacade factory, ILogger logger, IHasher hasher, Channel channel, EndPoint endpoint)
         {
-            var (senderchannel, readerchannel, channelmanager) = factory.CreateSenderChannel(channel.ChannelType, channel.Type);
+            var (senderchannel, readerchannel, channelcreator, channeldeleter, channelprovider) = factory.CreateSenderChannel(channel.ChannelType, channel.Type);
 
             var adapter = factory.CreateMessageAdapter(channel.AdapterType);
 
@@ -25,13 +25,13 @@ namespace Jal.Router.Model
 
             var entitystorage = factory.CreateEntityStorage();
 
-            return new SenderContext(endpoint, channel, channelmanager, senderchannel, readerchannel, adapter, serializer, messagestorage, entitystorage, logger, hasher);
+            return new SenderContext(endpoint, channel, channelcreator, channeldeleter, channelprovider, senderchannel, readerchannel, adapter, serializer, messagestorage, entitystorage, logger, hasher);
         }
 
-        private SenderContext(EndPoint endpoint, Channel channel, IChannelManager channelmanager, 
-            ISenderChannel senderchannel, IReaderChannel readerchannel, IMessageAdapter adapter, 
+        private SenderContext(EndPoint endpoint, Channel channel, IChannelCreator channelcreator, IChannelDeleter channeldeleter, IChannelStatisticProvider channelprovider,
+            IChannelSender senderchannel, IChannelReader readerchannel, IMessageAdapter adapter, 
             IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage, ILogger logger, IHasher hasher)
-            :base(channel, channelmanager, adapter, serializer, messagestorage, entitystorage, logger, hasher)
+            :base(channel, channelcreator, channeldeleter, channelprovider, adapter, serializer, messagestorage, entitystorage, logger, hasher)
         {
 
             if (senderchannel == null)

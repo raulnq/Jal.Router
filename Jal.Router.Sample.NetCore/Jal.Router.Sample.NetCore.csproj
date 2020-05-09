@@ -3,11 +3,16 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>0a5f7b05-dcd4-4b14-af02-ede6186a9667</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Jal.ChainOfResponsability.LightInject.Installer" Version="3.3.1" />
     <PackageReference Include="Jal.Locator.LightInject" Version="2.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

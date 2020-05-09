@@ -10,7 +10,11 @@ namespace Jal.Router.Model
 
         public Channel Channel { get; protected set; }
 
-        public IChannelManager ChannelManager { get; protected set; }
+        public IChannelCreator ChannelCreator { get; protected set; }
+
+        public IChannelDeleter ChannelDeleter { get; protected set; }
+
+        public IChannelStatisticProvider ChannelProvider { get; protected set; }
 
         public IMessageAdapter MessageAdapter { get; protected set; }
 
@@ -24,18 +28,24 @@ namespace Jal.Router.Model
 
         public readonly IHasher _hasher;
 
-        protected AbstractContext(Channel channel, IChannelManager channelmanager, IMessageAdapter adapter,
+        protected AbstractContext(Channel channel, IChannelCreator channelcreator, IChannelDeleter channeldeleter, IChannelStatisticProvider channelprovider, IMessageAdapter adapter,
             IMessageSerializer serializer, IMessageStorage messagestorage, IEntityStorage entitystorage, ILogger logger, IHasher hasher)
         {
-            if (channelmanager == null)
+            if (channelcreator == null)
             {
-                throw new ArgumentNullException(nameof(channelmanager));
+                throw new ArgumentNullException(nameof(channelcreator));
+            }
+            if (channeldeleter == null)
+            {
+                throw new ArgumentNullException(nameof(channelcreator));
             }
             if (channel == null)
             {
                 throw new ArgumentNullException(nameof(channel));
             }
-            ChannelManager = channelmanager;
+            ChannelProvider = channelprovider;
+            ChannelDeleter = channeldeleter;
+            ChannelCreator = channelcreator;
             Channel = channel;
             MessageAdapter = adapter;
             MessageSerializer = serializer;
@@ -52,7 +62,7 @@ namespace Jal.Router.Model
 
         public async Task CreateIfNotExist()
         {
-            var created = await ChannelManager.CreateIfNotExist(Channel).ConfigureAwait(false);
+            var created = await ChannelCreator.CreateIfNotExist(Channel).ConfigureAwait(false);
 
             if (created)
             {
@@ -66,7 +76,7 @@ namespace Jal.Router.Model
 
         public async Task DeleteIfExist()
         {
-            var deleted = await ChannelManager.DeleteIfExist(Channel).ConfigureAwait(false);
+            var deleted = await ChannelDeleter.DeleteIfExist(Channel).ConfigureAwait(false);
 
             if (deleted)
             {
@@ -80,7 +90,7 @@ namespace Jal.Router.Model
 
         public Task<Statistic> GetStatistic()
         {
-            return ChannelManager.GetStatistic(Channel);
+            return ChannelProvider.GetStatistic(Channel);
         }
     }
 }

@@ -72,79 +72,79 @@ namespace Jal.Router.Impl
                 data = string.Empty;
             }
 
-            var filemessage = new Message(){ ContentType = "application/json", Content = data };
+            var message = new Message(){ ContentType = "application/json", Content = data };
 
             foreach (var header in context.Headers)
             {
-                filemessage.Headers.Add(header.Key, header.Value);
+                message.Headers.Add(header.Key, header.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Origin.From))
             {
-                filemessage.From = context.Origin.From;
+                message.From = context.Origin.From;
             }
 
             if (!string.IsNullOrWhiteSpace(context.Version))
             {
-                filemessage.Version = context.Version;
+                message.Version = context.Version;
             }
 
             if (!string.IsNullOrWhiteSpace(context.SagaContext.Id))
             {
-                filemessage.SagaId = context.SagaContext.Id;
+                message.SagaId = context.SagaContext.Id;
             }
 
             if (!string.IsNullOrWhiteSpace(context.ContentContext.ClaimCheckId))
             {
-                filemessage.ClaimCheckId = context.ContentContext.ClaimCheckId;
+                message.ClaimCheckId = context.ContentContext.ClaimCheckId;
             }
 
             if (context.TrackingContext != null)
             {
-                filemessage.Trackings = context.TrackingContext.Trackings;
+                message.Trackings = context.TrackingContext.Trackings;
             }
 
             if (context.ScheduledEnqueueDateTimeUtc != null)
             {
-                filemessage.ScheduledEnqueueTimeUtc = context.ScheduledEnqueueDateTimeUtc.Value;
+                message.ScheduledEnqueueTimeUtc = context.ScheduledEnqueueDateTimeUtc.Value;
             }
 
             if (!string.IsNullOrWhiteSpace(context.Origin.Key))
             {
-                filemessage.Origin = context.Origin.Key;
+                message.Origin = context.Origin.Key;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.Id))
             {
-                filemessage.Id = context.TracingContext.Id;
+                message.Id = context.TracingContext.Id;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.ReplyToRequestId))
             {
-                filemessage.ReplyToRequestId = context.TracingContext.ReplyToRequestId;
+                message.ReplyToRequestId = context.TracingContext.ReplyToRequestId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.RequestId))
             {
-                filemessage.RequestId = context.TracingContext.RequestId;
+                message.RequestId = context.TracingContext.RequestId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.PartitionId))
             {
-                filemessage.PartitionId = context.TracingContext.PartitionId;
+                message.PartitionId = context.TracingContext.PartitionId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.OperationId))
             {
-                filemessage.OperationId = context.TracingContext.OperationId;
+                message.OperationId = context.TracingContext.OperationId;
             }
 
             if (!string.IsNullOrWhiteSpace(context.TracingContext.ParentId))
             {
-                filemessage.ParentId = context.TracingContext.ParentId;
+                message.ParentId = context.TracingContext.ParentId;
             }
 
-            return filemessage;
+            return message;
         }
     }
 }

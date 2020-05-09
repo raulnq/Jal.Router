@@ -35,7 +35,7 @@ namespace Jal.Router.ApplicationInsights
 
                 Data = context.Data.ContentContext.Data,
 
-                Type = Configuration.DefaultTransportName,
+                Type = string.IsNullOrEmpty(context.Data.Channel.TransportName)? Configuration.DefaultTransportName : context.Data.Channel.TransportName,
             };
 
             PopulateContext(telemetry.Context, context.Data);

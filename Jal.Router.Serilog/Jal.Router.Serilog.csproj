@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Raul Naupari</Authors>
-    <Version>5.1.0</Version>
+    <Version>5.2.0</Version>
     <Company>Raul Naupari</Company>
     <Description>Jal.Router integration with Serilog</Description>
     <Copyright />

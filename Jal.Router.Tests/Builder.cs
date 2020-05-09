@@ -142,7 +142,7 @@ namespace Jal.Router.Tests
 
             endpoint.SetOrigin(new Origin());
 
-            endpoint.Channels.Add(new Channel(channel, null, null, null, null));
+            endpoint.Channels.Add(new Channel(channel, null, null, null, null, null));
 
             endpointprovidermock.Setup(x => x.Provide(It.IsAny<Options>(), It.IsAny<object>())).Returns(endpoint);
 
@@ -151,7 +151,7 @@ namespace Jal.Router.Tests
 
         public static Channel CreateChannel(ChannelType channeltype = ChannelType.PointToPoint, string connectionstring = "connectionstring", string path = "path", string subscription = "subscription", Type adapter = null, Type type = null)
         {
-            return new Channel(channeltype, connectionstring, path, subscription, adapter, type);
+            return new Channel(channeltype, connectionstring, path, subscription, adapter, type, null);
         }
 
         public static SenderContext CreateSenderContext(IComponentFactoryFacade factory = null, EndPoint endpoint = null, Channel channel = null)
@@ -210,9 +210,9 @@ namespace Jal.Router.Tests
 
             factorymock.Setup(x => x.CreateMessageAdapter(It.IsAny<Type>())).Returns(new NullMessageAdapter());
 
-            factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), new NullPointToPointChannel()));
+            factorymock.Setup(m => m.CreateListenerChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), new NullPointToPointChannel(), new NullPointToPointChannel(), new NullPointToPointChannel()));
 
-            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null, new NullPointToPointChannel()));
+            factorymock.Setup(m => m.CreateSenderChannel(It.IsAny<ChannelType>(), It.IsAny<Type>())).Returns((new NullPointToPointChannel(), null, new NullPointToPointChannel(), new NullPointToPointChannel(), new NullPointToPointChannel()));
 
             factorymock.Setup(m => m.Configuration).Returns(new Configuration());
 

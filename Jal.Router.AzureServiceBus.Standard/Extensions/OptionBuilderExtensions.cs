@@ -9,54 +9,30 @@ namespace Jal.Router.AzureServiceBus.Standard
     {
         public static void CreateIfNotExist(this IOptionBuilder builder, AzureServiceBusChannelProperties properties, string filter = null)
         {
-            Rule r = null;
-
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new Rule(filter, "$Default", true);
-            }
+                var r = new Rule(filter, "$Default", true);
 
-            var dictionary = new Dictionary<string, object>();
-
-            if (properties.DefaultMessageTtlInDays > 0)
-            {
-                dictionary.Add("defaultmessagettlindays", properties.DefaultMessageTtlInDays.ToString());
+                builder.CreateIfNotExist(properties?.ToDictionary(), new List<Rule>() { r });
             }
-            if (properties.DuplicateMessageDetectionInMinutes > 0)
+            else
             {
-                dictionary.Add("duplicatemessagedetectioninminutes", properties.DuplicateMessageDetectionInMinutes.ToString());
+                builder.CreateIfNotExist(properties?.ToDictionary());
             }
-            if (properties.ExpressMessageEnabled != null)
-            {
-                dictionary.Add("expressmessageenabled", "true");
-            }
-            if (properties.MessageLockDurationInSeconds > 0)
-            {
-                dictionary.Add("messagelockdurationinseconds", properties.MessageLockDurationInSeconds.ToString());
-            }
-            if (properties.PartitioningEnabled != null)
-            {
-                dictionary.Add("partitioningenabled", "true");
-            }
-            if (properties.SessionEnabled != null)
-            {
-                dictionary.Add("sessionenabled", "true");
-            }
-
-            builder.CreateIfNotExist(dictionary, new List<Rule>() { r });
         }
 
         public static void CreateIfNotExist(this IOptionBuilder builder, string filter = null)
         {
-
-            Rule r = null;
-
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                r = new Rule(filter, "$Default", true);
-            }
+                var r = new Rule(filter, "$Default", true);
 
-            builder.CreateIfNotExist(rules: new List<Rule>() { r });
+                builder.CreateIfNotExist(rules: new List<Rule>() { r });
+            }
+            else
+            {
+                builder.CreateIfNotExist();
+            }
         }
     }
 }

@@ -10,13 +10,20 @@ using Microsoft.Azure.ServiceBus.Management;
 
 namespace Jal.Router.AzureServiceBus.Standard.Impl
 {
-    public class AzureServiceBusSubscription : AbstractChannel, ISubscriptionToPublishSubscribeChannel
+    public class AzureServiceBusSubscription : AzureServiceBus, ISubscriptionToPublishSubscribeChannel
     {
         private SubscriptionClient _subscriptionclient;
 
         public void Open(ListenerContext listenercontext)
         {
             _subscriptionclient = new SubscriptionClient(listenercontext.Channel.ConnectionString, listenercontext.Channel.Path, listenercontext.Channel.Subscription);
+
+            var connection = Get(listenercontext.Channel);
+
+            if (connection.TimeoutInSeconds > 0)
+            {
+                _subscriptionclient.ServiceBusConnection.OperationTimeout = TimeSpan.FromSeconds(connection.TimeoutInSeconds);
+            }
         }
 
         public bool IsActive(ListenerContext listenercontext)
@@ -91,59 +98,6 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             }
         }
 
-        private SessionHandlerOptions CreateSessionOptions(ListenerContext listenercontext)
-        {
-            Func<ExceptionReceivedEventArgs, Task> handler = args =>
-            {
-                var context = args.ExceptionReceivedContext;
-
-                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
-
-                return Task.CompletedTask;
-            };
-
-            var options = new SessionHandlerOptions(handler) { AutoComplete = false };
-
-            if (_parameter.MaxConcurrentPartitions > 0)
-            {
-                options.MaxConcurrentSessions = _parameter.MaxConcurrentPartitions;
-            }
-            if (_parameter.AutoRenewPartitionTimeoutInSeconds > 0)
-            {
-                options.MaxAutoRenewDuration = TimeSpan.FromSeconds(_parameter.AutoRenewPartitionTimeoutInSeconds);
-            }
-            if (_parameter.MessagePartitionTimeoutInSeconds > 0)
-            {
-                options.MessageWaitTimeout = TimeSpan.FromSeconds(_parameter.MessagePartitionTimeoutInSeconds);
-            }
-            return options;
-        }
-
-        private MessageHandlerOptions CreateOptions(ListenerContext listenercontext)
-        {
-            Func<ExceptionReceivedEventArgs, Task> handler = args =>
-            {
-                var context = args.ExceptionReceivedContext;
-
-                Logger.Log($"Message failed to {listenercontext.Channel.ToString()} channel {listenercontext.Channel.FullPath} Endpoint: {context.Endpoint} Entity Path: {context.EntityPath} Executing Action: {context.Action}, {args.Exception}");
-
-                return Task.CompletedTask;
-            };
-
-            var options = new MessageHandlerOptions(handler) { AutoComplete = false };
-
-            if (_parameter.MaxConcurrentCalls > 0)
-            {
-                options.MaxConcurrentCalls = _parameter.MaxConcurrentCalls;
-            }
-            if (_parameter.AutoRenewTimeoutInMinutes > 0)
-            {
-                options.MaxAutoRenewDuration = TimeSpan.FromMinutes(_parameter.AutoRenewTimeoutInMinutes);
-            }
-
-            return options;
-        }
-
         public async Task<bool> CreateIfNotExist(Channel channel)
         {
             var client = new ManagementClient(channel.ConnectionString);
@@ -152,27 +106,15 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             {
                 var description = new SubscriptionDescription(channel.Path, channel.Subscription);
 
-                var messagettl = 14;
+                var properties = new AzureServiceBusChannelProperties(channel.Properties);
 
-                var lockduration = 300;
+                description.DefaultMessageTimeToLive = TimeSpan.FromDays(properties.DefaultMessageTtlInDays);
 
-                if (channel.Properties.ContainsKey(DefaultMessageTtlInDays))
+                description.LockDuration = TimeSpan.FromSeconds(properties.MessageLockDurationInSeconds);
+
+                if (properties.SessionEnabled != null)
                 {
-                    messagettl = Convert.ToInt32(channel.Properties[DefaultMessageTtlInDays]);
-                }
-
-                if (channel.Properties.ContainsKey(MessageLockDurationInSeconds))
-                {
-                    lockduration = Convert.ToInt32(channel.Properties[MessageLockDurationInSeconds]);
-                }
-
-                description.DefaultMessageTimeToLive = TimeSpan.FromDays(messagettl);
-
-                description.LockDuration = TimeSpan.FromSeconds(lockduration);
-
-                if (channel.Properties.ContainsKey(SessionEnabled))
-                {
-                    description.RequiresSession = true;
+                    description.RequiresSession = properties.SessionEnabled.Value;
                 }
 
                 await client.CreateSubscriptionAsync(description).ConfigureAwait(false);
@@ -232,12 +174,10 @@ namespace Jal.Router.AzureServiceBus.Standard.Impl
             return false;
         }
 
-        private readonly AzureServiceBusParameter _parameter;
-
         public AzureServiceBusSubscription(IComponentFactoryFacade factory, ILogger logger, IParameterProvider provider)
-            : base(factory, logger)
+            : base(factory, logger, provider)
         {
-            _parameter = provider.Get<AzureServiceBusParameter>();
+
         }
     }
 }

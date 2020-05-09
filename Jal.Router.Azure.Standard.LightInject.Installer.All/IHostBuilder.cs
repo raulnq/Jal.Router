@@ -7,7 +7,7 @@ namespace Jal.Router.Azure.Standard.LightInject.Installer.All
 {
     public interface IHostBuilder
     {
-        IHostBuilder UseAzureServiceBus(Action<IRouterBuilder> builderaction, Action<AzureServiceBusParameter> action=null);
+        IHostBuilder UseAzureServiceBus(Action<IRouterBuilder> builderaction, Action<AzureServiceBusChannelConnection> action=null);
         IHostBuilder UseSerilog();
         IHostBuilder UseApplicationInsights(string applicationinsightskey="");
         IHostBuilder UseAzureStorage(Action<AzureStorageParameter> action = null);

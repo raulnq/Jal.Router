@@ -24,7 +24,7 @@ namespace Jal.Router.Tests
 
             factory.Configuration.MonitoringTaskTypes.Clear();
 
-            factory.Configuration.MonitoringTaskTypes.Add(new Model.MonitorTask(typeof(string), 250));
+            factory.Configuration.MonitoringTaskTypes.Add(new Model.MonitorTask(typeof(string), 250, false));
 
             var sut = new Monitor(factory, new NullLogger());
 

@@ -47,7 +47,7 @@ namespace Jal.Router.Interface
         IConfiguration UseRouterInterceptor<TRouterInterceptor>() where TRouterInterceptor : IRouterInterceptor;
         IConfiguration UseBusInterceptor<TBusInterceptor>() where TBusInterceptor : IBusInterceptor;
         IConfiguration UseMessageSerializer<TSerializer>() where TSerializer : IMessageSerializer;
-        IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds) where TMonitoringTask : IMonitoringTask;
+        IConfiguration AddMonitoringTask<TMonitoringTask>(int intervalinseconds, bool runimmediately = false) where TMonitoringTask : IMonitoringTask;
         IConfiguration AddStartupTask<TStartupTask>() where TStartupTask : IStartupTask;
         IConfiguration AddShutdownTask<TShoutdown>() where TShoutdown : IShutdownTask;
         IConfiguration AddLogger<TLogger, TInfo>() where TLogger : ILogger<TInfo>;

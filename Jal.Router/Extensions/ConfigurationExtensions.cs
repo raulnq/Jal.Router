@@ -17,7 +17,7 @@ namespace Jal.Router.Extensions
             return configuration.AddShutdownWatcher<FileShutdownWatcher, ShutdownFileWatcherParameter>(new ShutdownFileWatcherParameter() { File = filepath });
         }
 
-        public static IConfiguration AddFileSystemAsTransport(this IConfiguration configuration, FileSystemParameter parameter = null)
+        public static IConfiguration AddFileSystemAsDefaultTransport(this IConfiguration configuration, FileSystemParameter parameter = null)
         {
             var p = new FileSystemParameter();
 
@@ -35,7 +35,7 @@ namespace Jal.Router.Extensions
                 .AddParameter(p);
         }
 
-        public static IConfiguration AddMemoryAsTransport(this IConfiguration configuration, InMemoryParameter parameter = null)
+        public static IConfiguration AddMemoryAsDefaultTransport(this IConfiguration configuration, InMemoryParameter parameter = null)
         {
             var p = new InMemoryParameter();
 

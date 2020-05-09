@@ -15,11 +15,11 @@ namespace Jal.Router.Tests
         {
             var routermock = new Mock<IRouter>();
 
-            var listenermock = new Mock<IListenerChannel>();
+            var listenermock = new Mock<IChannelListener>();
 
             var factorymock = Builder.CreateFactoryMock();
 
-            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns((listenermock.Object, new NullPointToPointChannel()));
+            factorymock.Setup(x => x.CreateListenerChannel(It.IsAny<Model.ChannelType>(), It.IsAny<Type>())).Returns((listenermock.Object, new NullPointToPointChannel(), new NullPointToPointChannel(), new NullPointToPointChannel()));
 
             var factory = factorymock.Object;
 
@@ -33,7 +33,7 @@ namespace Jal.Router.Tests
 
             listenercontext.ListenerChannel.ShouldNotBeNull();
 
-            listenercontext.ListenerChannel.ShouldBeAssignableTo<IListenerChannel>();
+            listenercontext.ListenerChannel.ShouldBeAssignableTo<IChannelListener>();
 
             listenercontext.Channel.Path.ShouldBe("path");
         }

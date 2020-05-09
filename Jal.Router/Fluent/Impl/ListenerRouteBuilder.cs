@@ -16,7 +16,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IChannelIWhenBuilder AddPointToPointChannel(string path, string connectionstring, Type adapter=null, Type type = null)
+        public IChannelIWhenBuilder AddPointToPointChannel(string path, string connectionstring, Type adapter=null, Type type = null, IDictionary<string, object> properties = null, string trasnportname = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -38,14 +38,22 @@ namespace Jal.Router.Fluent.Impl
                 throw new InvalidOperationException("The channel type is not valid");
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type, trasnportname);
+
+            if(properties!=null)
+            {
+                foreach (var item in properties)
+                {
+                    channel.Properties.Add(item.Key, item.Value);
+                }
+            }
 
             _route.Channels.Add(channel);
 
             return new ChannelWhenBuilder(channel);
         }
 
-        public IChannelIWhenBuilder AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter=null, Type type = null)
+        public IChannelIWhenBuilder AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter=null, Type type = null, IDictionary<string, object> properties = null, string trasnportname = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -68,7 +76,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new InvalidOperationException("The channel type is not valid");
             }
 
-            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type);
+            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type, trasnportname);
+
+
+            if (properties != null)
+            {
+                foreach (var item in properties)
+                {
+                    channel.Properties.Add(item.Key, item.Value);
+                }
+            }
+
 
             _route.Channels.Add(channel);
 
@@ -99,7 +117,7 @@ namespace Jal.Router.Fluent.Impl
             _route = route;
         }
 
-        public IChannelIWhenBuilder AddPointToPointChannel(string path, string connectionstring, Type adapter = null, Type type = null)
+        public IChannelIWhenBuilder AddPointToPointChannel(string path, string connectionstring, Type adapter = null, Type type = null, IDictionary<string, object> properties = null, string trasnportname= null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -121,14 +139,22 @@ namespace Jal.Router.Fluent.Impl
                 throw new InvalidOperationException("The channel type is not valid");
             }
 
-            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type);
+            var channel = new Channel(ChannelType.PointToPoint, connectionstring, path, adapter, type, trasnportname);
+
+            if (properties != null)
+            {
+                foreach (var item in properties)
+                {
+                    channel.Properties.Add(item.Key, item.Value);
+                }
+            }
 
             _route.Channels.Add(channel);
 
             return new ChannelWhenBuilder(channel);
         }
 
-        public IChannelIWhenBuilder AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter = null, Type type = null)
+        public IChannelIWhenBuilder AddSubscriptionToPublishSubscribeChannel(string path, string subscription, string connectionstring, Type adapter = null, Type type = null, IDictionary<string, object> properties = null, string trasnportname = null)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -151,7 +177,17 @@ namespace Jal.Router.Fluent.Impl
                 throw new InvalidOperationException("The channel type is not valid");
             }
 
-            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type);
+            var channel = new Channel(ChannelType.SubscriptionToPublishSubscribe, connectionstring, path, subscription, adapter, type, trasnportname);
+
+
+            if (properties != null)
+            {
+                foreach (var item in properties)
+                {
+                    channel.Properties.Add(item.Key, item.Value);
+                }
+            }
+
 
             _route.Channels.Add(channel);
 

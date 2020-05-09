@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Jal.Router.Interface
 {
-    public interface ISenderChannel
+    public interface IChannelSender
     {
         void Open(SenderContext context);
 

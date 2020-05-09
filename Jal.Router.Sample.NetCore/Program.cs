@@ -17,6 +17,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using Jal.Router.Newtonsoft;
 using Jal.Router.AzureStorage;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -24,6 +27,12 @@ namespace Jal.Router.Sample.NetCore
     {
         static void Main(string[] args)
         {
+            var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddEnvironmentVariables()
+            .AddUserSecrets<Program>()
+            .Build();
+
             var container = new ServiceContainer();
             container.AddRouter( c=>
             {
@@ -34,7 +43,7 @@ namespace Jal.Router.Sample.NetCore
                 c.AddMessageHandlerAsSingleton<IMessageHandler<Message>, QueueListenByOneHandler>();
             });
 
-
+            container.Register<IConfiguration>(x=>config, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoBHandlers>(typeof(QueueListenByTwoBHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, TopicListenByOneHandler>(typeof(TopicListenByOneHandler).FullName, new PerContainerLifetime());
@@ -84,15 +93,15 @@ namespace Jal.Router.Sample.NetCore
                 return messagecontext.Send(m, "sendtoqueue3");
             });
             host.Configuration
-                .AddAzureServiceBusAsTransport(new AzureServiceBusParameter() { AutoRenewTimeoutInMinutes = 60 })
+                .AddAzureServiceBusAsDefaultTransport(new AzureServiceBusChannelConnection() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
-                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter("") { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
+                .UseAzureStorageAsStorage(new AzureStorage.AzureStorageParameter(config["storage"]) { SagaTableName = "sagasmoke", MessageTableName = "messagessmoke", TableSufix = DateTime.UtcNow.ToString("yyyyMMdd"), ContainerName = "messages", TableStorageMaxColumnSizeOnKilobytes = 64 })
                 //.AddMonitoringTask<HeartBeatLogger>(150)
                 //.UseMemoryAsTransport()
                 .UseNewtonsoftAsSerializer()
                 .AddShutdownTask<ChannelDestructor>()
                 //.UseMemoryAsStorage()
-                //.AddMonitoringTask<ListenerMonitor>(30)
+                //.AddMonitoringTask<StatisticMonitor>(30, true)
                 //.AddMonitoringTask<ListenerRestartMonitor>(60)
                 //.AddMonitoringTask<PointToPointChannelMonitor>(60)
                 //.EnableEntityStorage()
@@ -130,9 +139,9 @@ namespace Jal.Router.Sample.NetCore
 
     public class FileRouterConfigurationSmokeTest : AbstractRouterConfigurationSource
     {
-        public FileRouterConfigurationSmokeTest()
+        public FileRouterConfigurationSmokeTest(IConfiguration config)
         {
-            var connectionstring = "Endpoint=sb://raulqueuetests.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8WpD2e6cWAW3Qj4AECuzdKCySM4M+ZAIW2VGRHvvXlo=";
+            var connectionstring = config["bus"];
 
             RegisterOrigin("smoketestapp", "123");
 
@@ -280,9 +289,9 @@ namespace Jal.Router.Sample.NetCore
 
         private readonly string _sendersessionqueue = "sendersessionqueue";
 
-        public RouterConfigurationSmokeTest()
+        public RouterConfigurationSmokeTest(IConfiguration config)
         {
-            var connectionstring = "";
+            var connectionstring = config["bus"];
 
             RegisterHandler(_sendersessionqueue + "_handler")
             .ToListen(x =>
