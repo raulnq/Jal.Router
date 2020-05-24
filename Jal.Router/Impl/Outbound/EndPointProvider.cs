@@ -9,7 +9,7 @@ namespace Jal.Router.Impl
     public class EndPointProvider : IEndPointProvider
     {
         private readonly EndPoint[] _endpoints;
-        public EndPointProvider(IRouterConfigurationSource[] sources)
+        public EndPointProvider(IEnumerable<IRouterConfigurationSource> sources)
         {
             var routes = new List<EndPoint>();
 

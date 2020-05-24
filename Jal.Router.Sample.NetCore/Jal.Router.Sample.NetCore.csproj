@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Jal.Router.Azure.Standard.LightInject.Installer.All\Jal.Router.Azure.Standard.LightInject.Installer.All.csproj" />
+    <ProjectReference Include="..\Jal.Router.Microsoft.Extensions.DependencyInjection\Jal.Router.Microsoft.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

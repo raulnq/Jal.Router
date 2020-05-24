@@ -20,6 +20,8 @@ using Jal.Router.AzureStorage;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using Microsoft.Extensions.DependencyInjection;
+using Jal.Router.Microsoft.Extensions.DependencyInjection;
 
 namespace Jal.Router.Sample.NetCore
 {
@@ -43,7 +45,7 @@ namespace Jal.Router.Sample.NetCore
                 c.AddMessageHandlerAsSingleton<IMessageHandler<Message>, QueueListenByOneHandler>();
             });
 
-            container.Register<IConfiguration>(x=>config, new PerContainerLifetime());
+            container.Register<IConfiguration>(x => config, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoAHandlers>(typeof(QueueListenByTwoAHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, QueueListenByTwoBHandlers>(typeof(QueueListenByTwoBHandlers).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, TopicListenByOneHandler>(typeof(TopicListenByOneHandler).FullName, new PerContainerLifetime());
@@ -52,7 +54,7 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, ToPublishHandler>(typeof(ToPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, FromPublishHandler>(typeof(FromPublishHandler).FullName, new PerContainerLifetime());
             container.Register<IAsyncMiddleware<MessageContext>, Middleware>(typeof(Middleware).FullName, new PerContainerLifetime());
-            container.Register<IMessageHandlerWithData<Message,Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
+            container.Register<IMessageHandlerWithData<Message, Data>, StartHandler>(typeof(StartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>(typeof(AlternativeStartHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, ContinueHandler>(typeof(ContinueHandler).FullName, new PerContainerLifetime());
             container.Register<IMessageHandlerWithData<Message, Data>, EndHandler>(typeof(EndHandler).FullName, new PerContainerLifetime());
@@ -67,31 +69,71 @@ namespace Jal.Router.Sample.NetCore
             container.Register<IMessageHandler<Message>, HandlerQueueA>(typeof(HandlerQueueA).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, HandlerTopic1Subscription1>(typeof(HandlerTopic1Subscription1).FullName, new PerContainerLifetime());
             container.Register<IMessageHandler<Message>, HandlerQueue3>(typeof(HandlerQueue3).FullName, new PerContainerLifetime());
+
+
+            //container.AddSingleton<IConfiguration>(x => config);
+            //container.AddSingleton<IMessageHandler<Message>, QueueListenByTwoAHandlers>();
+            //container.AddSingleton<IMessageHandler<Message>, QueueListenByTwoBHandlers>();
+            //container.AddSingleton<IMessageHandler<Message>, TopicListenByOneHandler>();
+            //container.AddSingleton<IMessageHandler<Message>, HandlingTwoQueuesInOneHandler>();
+            //container.AddSingleton<IMessageHandler<Message>, QueueListenByOneHandlerWithException>();
+            //container.AddSingleton<IMessageHandler<Message>, ToPublishHandler>();
+            //container.AddSingleton<IMessageHandler<Message>, FromPublishHandler>();
+            //container.AddSingleton<IAsyncMiddleware<MessageContext>, Middleware>();
+            //container.AddSingleton<IMessageHandlerWithData<Message, Data>, StartHandler>();
+            //container.AddSingleton<IMessageHandlerWithData<Message, Data>, AlternativeStartHandler>();
+            //container.AddSingleton<IMessageHandlerWithData<Message, Data>, ContinueHandler>();
+            //container.AddSingleton<IMessageHandlerWithData<Message, Data>, EndHandler>();
+            //container.AddSingleton<IMessageHandler<Message>, ToReplyHandler>();
+            //container.AddSingleton<IMessageHandler<Message>, FromReplyHandler>();
+
+            //container.AddSingleton<IMessageHandler<Message>, QueueToRead>();
+            //container.AddSingleton<IMessageHandler<Message>, QueueToSend>();
+            //container.AddSingleton<IMessageHandler<Message>, QueueToReadPartition>();
+            //container.AddSingleton<IMessageHandler<Message>, QueueListenSessionSenderHandlers>();
+
+            //container.AddSingleton<IMessageHandler<Message>, HandlerQueueA>();
+            //container.AddSingleton<IMessageHandler<Message>, HandlerTopic1Subscription1>();
+            //container.AddSingleton<IMessageHandler<Message>, HandlerQueue3>();
+
+
             //var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
             //Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
             var appRoot = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);//appPathMatcher.Match(path).Value;
+
+
+            //var provider = container.BuildServiceProvider();
+
             var host = container.GetInstance<IHost>();
             var bus = container.GetInstance<IBus>();
-            var factory = container.GetInstance<IComponentFactoryFacade>();
+
+            //var host = provider.GetRouterHost();
+
+            //var bus = provider.GetRouterBus();
+
+            //var factory = container.GetInstance<IComponentFactoryFacade>();
+
             var parameter = new FileSystemParameter() { Path = appRoot };
-            var messagecontext = MessageContext.CreateFromListen(bus, factory);
-            parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
-             {
-                 //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
 
-                 //fs.CreateFile(path, fn, me);
+            //var messagecontext = MessageContext.CreateFromListen(bus, factory);
 
-                 var m = ms.Deserialize<Message>(me.Content);
+            //parameter.AddEndpointHandler("sendtoqueue1", (ms, me) =>
+            // {
+            //     //var path = fs.CreateSubscriptionToPublishSubscribeChannelPath(parameter, "connectionstring", "topic1", "subscription1");
 
-                 return messagecontext.Send(m, "sendtotopic1");
+            //     //fs.CreateFile(path, fn, me);
+
+            //     var m = ms.Deserialize<Message>(me.Content);
+
+            //     return messagecontext.Send(m, "sendtotopic1");
                  
-             });
-            parameter.AddEndpointHandler("sendtoqueue2", (ms, me) =>
-            {
-                var m = ms.Deserialize<Message>(me.Content);
+            // });
+            //parameter.AddEndpointHandler("sendtoqueue2", (ms, me) =>
+            //{
+            //    var m = ms.Deserialize<Message>(me.Content);
 
-                return messagecontext.Send(m, "sendtoqueue3");
-            });
+            //    return messagecontext.Send(m, "sendtoqueue3");
+            //});
             host.Configuration
                 .AddAzureServiceBusAsDefaultTransport(new AzureServiceBusChannelConnection() { AutoRenewTimeoutInMinutes = 60 })
                 //.UseFileSystemAsTransport(parameter)
@@ -125,7 +167,7 @@ namespace Jal.Router.Sample.NetCore
 
             //await host.Shutdown();
 
-            host.RunAndBlock(()=> bus.Send(new Message(), Options.Create("queuelistenbyonehandler")));
+            host.RunAndBlock(()=> bus.Send(new Message(), Options.Create("queuelistenbyonehandler", id: "1")));
 
             //var bus = container.GetInstance<IBus>();
 
