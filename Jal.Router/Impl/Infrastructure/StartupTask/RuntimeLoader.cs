@@ -1,13 +1,14 @@
 ﻿using Jal.Router.Interface;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Jal.Router.Impl
 {
     public class RuntimeLoader : AbstractStartupTask, IStartupTask
     {
-        private readonly IRouterConfigurationSource[] _sources;
+        private readonly IEnumerable<IRouterConfigurationSource> _sources;
 
-        public RuntimeLoader(IComponentFactoryFacade factory, IRouterConfigurationSource[] sources, ILogger logger)
+        public RuntimeLoader(IComponentFactoryFacade factory, IEnumerable<IRouterConfigurationSource> sources, ILogger logger)
             :base(factory, logger)
         {
             _sources = sources;

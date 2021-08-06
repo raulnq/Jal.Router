@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/raulnq/Jal.Router</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>5.2.0</Version>
+    <Version>5.2.2</Version>
     <Description>Messaging patterns based on Jal.Router library</Description>
   </PropertyGroup>
 

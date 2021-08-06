@@ -5,7 +5,7 @@ namespace Jal.Router.Model
 {
     public class Options
     {
-        public static Options Create(string endpointname="endpoint", string id=null, string version=null)
+        public static Options Create(string endpointname="endpoint", string id=null, string version=null, DateTime? scheduledenqueuedatetimeutc=null)
         {
             return new Options(endpointname,
             new Dictionary<string, string>(), null, string.Empty,
@@ -14,7 +14,7 @@ namespace Jal.Router.Model
             null,
             null,
             version,
-            null);
+            scheduledenqueuedatetimeutc);
         }
 
         public static Options CreateFromMessageContext(MessageContext context, string endpointname, TracingContext tracingcontext, string sagaid, string version, DateTime? scheduledenqueuedatetimeutc)

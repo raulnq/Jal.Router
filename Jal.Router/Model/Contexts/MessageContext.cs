@@ -56,12 +56,12 @@ namespace Jal.Router.Model
 
         public static MessageContext CreateFromListen(IBus bus, IComponentFactoryFacade factory)
         {
-            return new MessageContext(bus, factory.CreateMessageSerializer(), factory.CreateEntityStorage(), null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
+            return new MessageContext(bus, factory.CreateMessageSerializer(), factory.CreateEntityStorage(), null, null, null, new TracingContext(Guid.NewGuid().ToString()), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
         public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage)
         {
-            return new MessageContext(bus, serializer, entitystorage, null, null, null, null, DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
+            return new MessageContext(bus, serializer, entitystorage, null, null, null, new TracingContext(Guid.NewGuid().ToString()), DateTime.UtcNow, new List<Tracking>(), new Origin(), string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
         public static MessageContext CreateFromListen(IBus bus, IMessageSerializer serializer, IEntityStorage entitystorage, Route route, 
